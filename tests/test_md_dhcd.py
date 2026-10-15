@@ -273,6 +273,12 @@ def test_applicant_lines_stop_at_conditions_and_skip_negations():
                      ("business", "developers")}
 
 
+def test_heading_counts_as_an_applicant_line():
+    html = ('<main><div class="usa-prose maryland-toc-target"><h2>Household eligibility requirements</h2>'
+            '<p>To qualify for assistance, you must:</p><ul><li>Be renting your home.</li></ul></div></main>')
+    assert [(t.value, t.source_code) for t in md.applicant_types_for(md.applicant_text(html))] == [("household", "household")]
+
+
 def test_place_words_after_a_spatial_preposition_are_not_applicants():
     tags = md.applicant_types_for(["Units of general local government in non-entitlement counties and non-entitlement cities and towns"])
     pairs = {(t.value, t.source_code) for t in tags}

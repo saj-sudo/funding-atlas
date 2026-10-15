@@ -77,13 +77,15 @@ conditions, then definitions. So the scan now reads lines, not whole sections (`
   condition word ("businesses that:", "your company:"), where the scan stops for that section;
 - a negated line never counts ("For-profit businesses are not eligible to apply."), and neither does a negated
   heading ("Who is not eligible to apply?");
-- a place word right after a spatial preposition is a place ("located in a designated rural county").
+- a place word right after a spatial preposition is a place ("located in a designated rural county");
+- the section heading is itself the first line ("Household eligibility requirements" names the applicant).
 
-Effect on DHCD, re-normalized from the stored fixtures: TAG, Community Legacy and MIP unchanged; CDBG loses the
-`county` tags it took from the entitlement-county list under "Who is not eligible"; NourishMD gains `for-profit`
-and loses a `county` from "located in a designated rural county"; Net Zero keeps homeowners and developers; MEAP
-loses its one `household` tag ("you must: meet income qualifications" names no applicant type). All on the side of
-reading less into the page.
+Effect on DHCD, re-normalized from the stored live payloads: 7 local-government programs tagged as before; CDBG
+loses the `county` tags it took from the entitlement-county list under "Who is not eligible"; NourishMD gains
+`for-profit` and loses a `county` from "located in a designated rural county"; MEAP and Housing Rehabilitation
+lose their one `household` tag (both are "you must:" condition lists, which name no applicant type), so 9 DHCD
+records are untagged instead of 7. All on the side of reading less into the page. Commerce: 2 records carry
+local-government tags, both correct. MHT: 8 of 11.
 
 ## Applicant keyword table (shared; additions for milestone 4 marked)
 

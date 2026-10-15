@@ -27,9 +27,10 @@ Known gaps, all because the page does not say it, so the record does not either:
   heading), Homelessness Solutions Program, Housing Choice Voucher Program, Lead Hazard Reduction. SRP and MIP are
   municipal rounds, so when they reopen they will show in the diff but not in `v_open_for_municipalities` until
   either the keyword map grows or SRP borrows eligibility from its sub-pages. Decide at milestone 4.
-- Milestone 4 moved the applicant scan to line level (see `maryland_drupal.md`, "Applicant lines"): MEAP joins the
-  untagged list, CDBG drops the entitlement-county tags from its "Who is not eligible" section, NourishMD gains
-  `for-profit`. Everything else is unchanged.
+- Milestone 4 moved the applicant scan to line level (see `maryland_drupal.md`, "Applicant lines"): MEAP and
+  Housing Rehabilitation join the untagged list (nine now), CDBG drops the entitlement-county tags from its "Who is
+  not eligible" section, NourishMD gains `for-profit`. Everything else, including every local-government tag, is
+  unchanged.
 - Only record pages are stored in `raw_record`, so the `lastmod` gate covers 33 of ~200 pages and a warm run is
   still about 170 requests (75 seconds). Fine for one agency.
 - `Program.slug` embeds `source_id`, which here is a path with slashes. Unique and harmless, ugly if slugs ever

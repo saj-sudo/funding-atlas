@@ -436,12 +436,13 @@ class MarylandDrupalConnector:
                 and not NEGATION_RE.search(heading) and "ineligible" not in heading.lower())
 
     def applicant_text(self, main_html: str) -> list[str]:
-        """The applicant-naming lines of the who-may-apply sections. Never the whole page."""
+        """The applicant-naming lines of the who-may-apply sections, each preceded by its heading
+        ("Household eligibility requirements" names the applicant by itself). Never the whole page."""
         return [
             line
             for heading, lines in section_lines_by_heading(main_html)
             if self.is_applicant_heading(heading)
-            for line in applicant_lines(lines)
+            for line in [heading, *applicant_lines(lines)]
         ]
 
     def categories_for(self, source_id: str) -> list[CategoryTag]:
