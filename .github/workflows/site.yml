@@ -2,8 +2,8 @@
 #
 # The site is static: one page per state plus an index, built by `cli.py export` from atlas.db. The database
 # is the state that makes change detection work (first_seen, program_change), so it has to survive between
-# runs: it lives on the gh-pages branch next to the site it was built from, and is restored from there at the
-# start of every run. gh-pages is a single orphan commit, force-pushed each time, so history never grows.
+# runs: it lives on the gh-pages branch (gzipped) next to the site it was built from, and is restored from there
+# at the start of every run. gh-pages is a single orphan commit, force-pushed each time, so history never grows.
 # Nothing generated is ever committed to main.
 #
 #   schedule          daily: run every connector, then build and publish
@@ -47,7 +47,7 @@ jobs:
       - name: Restore the database from gh-pages
         run: |
           if git fetch --depth=1 origin gh-pages 2>/dev/null; then
-            git show origin/gh-pages:atlas.db > atlas.db && echo "restored atlas.db ($(du -h atlas.db | cut -f1))"
+            git show origin/gh-pages:atlas.db.gz | gunzip > atlas.db && echo "restored atlas.db ($(du -h atlas.db | cut -f1))"
           else
             echo "no gh-pages branch yet: starting from an empty database"
           fi
@@ -71,8 +71,9 @@ jobs:
         run: |
           uv run python cli.py export --out site
           uv run python -c "import sqlite3; sqlite3.connect('atlas.db').execute(\"VACUUM INTO 'site/atlas.db'\")"
+          gzip -6 site/atlas.db          # ~84 MB raw today, ~15 MB gzipped; GitHub refuses files over 100 MB
           touch site/.nojekyll
-          du -sh site site/atlas.db
+          du -sh site site/atlas.db.gz
 
       - name: Publish to gh-pages
         run: |

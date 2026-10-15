@@ -121,7 +121,7 @@
       '<p><b>New</b> marks a record first seen in the last ' + DATA.rules.new_days + ' days, after the source\'s first full read. <b>Updated</b> marks one whose source text changed in that window.</p></div>' +
       '<div><h2>What I would like to know from you</h2><ol>' + q + '</ol></div>' +
       '<div><h2>Data and code</h2>' +
-      '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db">atlas.db</a> (SQLite, every record and every logged change).</p>' +
+      '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db.gz">atlas.db.gz</a> (SQLite, gzipped: every record, every raw payload and every logged change).</p>' +
       '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a></p></div>';
   }
 

@@ -38,11 +38,11 @@ The page markup, stylesheet and script live in `web/`; `scripts/build_site.py` o
 
 Hosting is GitHub Pages from the `gh-pages` branch. `.github/workflows/site.yml` runs daily: it restores `atlas.db`
 from `gh-pages`, runs every connector (a failing source is logged, not fatal), rebuilds the site, and force-pushes
-`site/` plus a vacuumed copy of the database as a single orphan commit. A push to `main` rebuilds from the stored
+`site/` plus a vacuumed, gzipped copy of the database as a single orphan commit. A push to `main` rebuilds from the stored
 database without touching the sources. Nothing generated is committed to `main`. One-time setup: in the repository's
 Settings, Pages, set the source to "Deploy from a branch", branch `gh-pages`, folder `/ (root)`.
 
-The database behind the live site is downloadable at `/atlas.db` on the site.
+The database behind the live site is downloadable at `/atlas.db.gz` on the site (SQLite; about 84 MB unpacked today, most of it the raw payloads that let warm runs skip unchanged records).
 
 ## Licenses
 
