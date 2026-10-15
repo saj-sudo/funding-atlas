@@ -67,6 +67,11 @@ Applicant types include household/individual now even though v0.1 ignores them. 
 3. First Maryland agency connector.
 4. Second and third MD connectors; now extract the shared base class.
 5. Static HTML export; share with one person at a Maryland municipal league or COG and ask what's missing.
+   - Decide first: the `likely` tier now includes business programs that merely admit local governments
+     (Advantage Maryland, the Alcohol Manufacturing Fund; more sit in `possible`). Options: an agency or
+     category filter on the page next to the tier, a "primary applicant" signal in `v_municipal_relevance`
+     (e.g. local government named in the first applicant line, not just anywhere), or leave it and let the
+     COG reader say whether it bothers them. Context: `docs/connectors/maryland_drupal.md`, "Applicant lines".
 
 ## Open questions (don't resolve in code yet)
 
