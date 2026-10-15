@@ -8,7 +8,7 @@ import db
 from pipeline.models import ALL_APPLICANT_TYPES, ApplicantTag, CategoryTag, Program
 from pipeline.upsert import upsert
 
-EVERYONE = [ApplicantTag(value=t, source_code=c) for t, c in zip(ALL_APPLICANT_TYPES, [f"{i:02d}" for i in range(13)])]
+EVERYONE = [ApplicantTag(value=t, source_code=c) for t, c in zip(ALL_APPLICANT_TYPES, [f"{i:02d}" for i in range(13)], strict=True)]
 LOCAL = [ApplicantTag(value="municipality", source_code="02"), ApplicantTag(value="county", source_code="01"),
          ApplicantTag(value="state", source_code="00"), ApplicantTag(value="tribe", source_code="07")]
 
