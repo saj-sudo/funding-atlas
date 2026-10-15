@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -9,6 +10,7 @@ import typer
 import db
 from pipeline.diff import latest_run_id, render
 from pipeline.run import CONNECTORS, run_connector
+from scripts import export_html
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 DbOpt = Annotated[str, typer.Option("--db", help="SQLite file")]
@@ -110,6 +112,18 @@ def aln(
             name = name if len(name) <= 70 else name[:69] + "…"
             url = conn.execute("SELECT source_url FROM program WHERE id = ?", (r["opportunity_id"],)).fetchone()[0]
             typer.echo(f"| {name} | {r['opportunity_status']} | {r['opportunity_closes_at'] or ''} | {url} |")
+
+
+@app.command()
+def export(
+    out: Annotated[Path, typer.Option(help="where to write the page")] = export_html.DEFAULT_OUT,
+    db_path: DbOpt = db.DEFAULT_DB,
+) -> None:
+    """Write the open-programs page (v_municipal_page) as one self-contained HTML file."""
+    conn = db.connect(db_path)
+    db.apply_schema(conn)
+    path, n = export_html.write(conn, out)
+    typer.echo(f"{path}: {n} programs")
 
 
 if __name__ == "__main__":
