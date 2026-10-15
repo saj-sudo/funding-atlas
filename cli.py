@@ -51,5 +51,27 @@ def diff(
     typer.echo(render(conn, rid))
 
 
+@app.command("open")
+def open_programs(
+    tier: Annotated[str, typer.Option(help="likely, possible, unlikely, or all (comma-separate to combine)")] = "likely",
+    db_path: DbOpt = db.DEFAULT_DB,
+) -> None:
+    """List open and forecasted programs a municipality can apply for, best signal first."""
+    conn = db.connect(db_path)
+    db.apply_schema(conn)
+    tiers = ["likely", "possible", "unlikely"] if tier == "all" else [t.strip() for t in tier.split(",")]
+    rows = conn.execute(
+        f"SELECT * FROM v_open_for_municipalities WHERE municipal_tier IN ({','.join('?' * len(tiers))})", tiers
+    ).fetchall()
+    typer.echo(f"{len(rows)} programs · tier {', '.join(tiers)}\n")
+    typer.echo("| tier | name | agency | status | closes | max award | source |")
+    typer.echo("|---|---|---|---|---|---|---|")
+    for r in rows:
+        name = r["name"].replace("|", "/")
+        name = name if len(name) <= 70 else name[:69] + "…"
+        amt = f"{r['amount_max']:,}" if r["amount_max"] is not None else ""
+        typer.echo(f"| {r['municipal_tier']} | {name} | {r['agency_code']} | {r['status']} | {r['closes_at'] or ''} | {amt} | {r['source_url']} |")
+
+
 if __name__ == "__main__":
     app()
