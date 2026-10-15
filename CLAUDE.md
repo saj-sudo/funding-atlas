@@ -19,7 +19,11 @@ connector or one feature per session, no abstractions before the third real case
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
-- `scripts/export_html.py` (`cli.py export`): renders `v_municipal_page` to `export/maryland-municipal.html`.
+- `scripts/build_site.py` (`cli.py export`): builds `site/` (index + one page per state) from the navigator views
+  (migration 0005). The markup, stylesheet and script are real files in `web/` with `{{SLOT}}` placeholders; Python
+  only queries SQL and fills them in. No framework, no build step, no external requests from the pages.
+- `.github/workflows/site.yml`: daily connector runs + rebuild, published to the `gh-pages` branch together with
+  `atlas.db` (the database is restored from there at the start of each run). Generated files never land on `main`.
 
 ## How to work in this repo
 
@@ -36,5 +40,6 @@ connector or one feature per session, no abstractions before the third real case
 
 ## Current state (2026-10-15)
 
-Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht`. Milestones 1 to 5 shipped.
-Next up, each its own session: navigator UI and hosting, Maryland depth, Mid-Atlantic portal survey. See the roadmap.
+Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht`. Milestones 1 to 6 shipped;
+the site is live at https://saj-sudo.github.io/funding-atlas/. Next up, each its own session: Maryland depth,
+Mid-Atlantic portal survey. See the roadmap.

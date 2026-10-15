@@ -11,34 +11,15 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 3 | First Maryland agency | 2026-10-15 | DHCD, 33 records, chosen over GGO, MDOT, DNR, MEA after a live survey | `connectors/md_dhcd.md` |
 | 4 | Second and third Maryland agencies, shared base | 2026-10-15 | Commerce (34) and MHT (11) on `MarylandDrupalConnector`; line-level applicant scan | `connectors/maryland_drupal.md`, `md_commerce.md`, `md_mht.md` |
 | 5 | Static page | 2026-10-15 | `v_municipal_page`, `scripts/export_html.py`, `cli.py export`; 133 rows (83 likely, 50 possible), 696 unlikely excluded | this file, decisions log |
+| 6 | Navigator UI and hosting | 2026-10-15 | `LICENSE` + `LICENSE-DATA`; migration 0005 (`v_navigator_program`, `v_navigator_change`, `v_navigator_coverage`); `scripts/build_site.py` + `web/`: index with a tile-grid state map, 51 state pages with the new / closing / status-changed strip, faceted filters with counts, card list, detail panel, change log; `.github/workflows/site.yml` publishing to `gh-pages` daily; Lighthouse accessibility 100 on both page types; the Maryland page carries exactly the `v_municipal_page` rows | this file, decisions log, README |
 
 ## Next
 
-### 6. Navigator UI and hosting
+### 6. Navigator UI and hosting (shipped, see Done)
 
-Goal: a page people want to use and that screenshots well, live at a public URL.
-
-Brief:
-- State picker for all 50 states and DC. Federal rows are national already (jurisdiction `US`); every state gets them
-  on day one. State coverage is shown per state, honestly: "Maryland: 3 agencies, 78 programs. Virginia: no state
-  sources yet."
-- Landing view leads with change and time: new this week, closing within 30 days, status flipped since the last run.
-  These come from `first_seen`, `closes_at` and `program_change`; no new data is needed.
-- Faceted filters: tier, level, agency, category, funding type, status, rolling, text. Counts on every facet.
-- Detail panel per program: summary, verbatim eligibility, applicant tags, categories, Assistance Listings cited,
-  first seen / last changed, source link. Nothing invented, blanks stay blank.
-- A changes feed: the last N `program_change` rows across connectors, readable as a log.
-- Print and screenshot friendly; works at phone width; accessible (keyboard, contrast, labels).
-- No framework or build step unless the session decides it is worth it; one generated page per state plus an index
-  is the default architecture. Data embedded as JSON, rendered client-side, so the generator stays small.
-- Hosting: GitHub Pages. A workflow runs the connectors and the export on a schedule and commits the built site to a
-  `gh-pages` branch or `site/` directory. Generated files are never committed to `main`.
-- First action of the session: add `LICENSE` (MIT) and `LICENSE-DATA` (ODbL), per the decisions log.
-
-Acceptance: live URL; screenshots of the landing view, a filtered list and a detail panel; the Maryland page shows
-the same 133 rows as `v_municipal_page`; Lighthouse accessibility pass; no external requests from the page.
-
-Must not: touch the connectors or the relevance view; invent fields the sources do not provide.
+Live at https://saj-sudo.github.io/funding-atlas/. Left for a later session, none blocking: shareable filter links
+are in the URL hash already; a per-state RSS or JSON feed of the change log; the Grants.gov data-cleanup items under
+milestone 10 show on the page as they are in the database (`&quot;` in deadline text, contact names as agencies).
 
 ### 7. Maryland depth
 
@@ -112,6 +93,13 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-15 | License: MIT code, ODbL records | open data for the records, permissive for the code; files land with milestone 6 | `SPEC.md` licensing |
 | 2026-10-15 | Expansion is platform-first, Mid-Atlantic first | agency-by-agency does not scale to 50 states for one person; neighbours share COGs and media | milestones 8 and 9 |
 | 2026-10-15 | Agency-by-agency across 50 states rejected | 150+ hand-built parsers is the DSIRE trap the project exists to avoid | this file |
+| 2026-10-15 | Repo goes public | GitHub Pages on a free account needs it; the pitch is open connectors and SQL-auditable rules, which a private repo undercuts; nothing sensitive in the tree | milestone 6 |
+| 2026-10-15 | The database rides the `gh-pages` branch with the site | it must persist between runs for change detection; one git push is one mechanism; an Actions cache evicts after 7 idle days; as a bonus `/atlas.db` is a public data download | `site.yml` |
+| 2026-10-15 | Daily schedule; a push to `main` rebuilds without re-reading sources | deadlines and new notices move daily; UI changes go live on merge without hammering the agencies | `site.yml` |
+| 2026-10-15 | Tile-grid cartogram, not a geographic map | no map asset, every tile is a plain link with the state's coverage as its name, reads at phone width | `web/app.js` |
+| 2026-10-15 | "New" means first seen after the source's first full read | on a connector's first run every record is `added`; a page saying "134 new this week" on launch day is true and useless | `scripts/build_site.py` |
+| 2026-10-15 | Single-file Maryland export retired | each state page is still one self-contained file; two exporters is one too many for a solo operator | milestone 6 |
+| 2026-10-15 | Likely tier checked by default, possible one click away | same choice as milestone 5; counts on the facet make the second tier visible | `web/app.js` |
 
 ## Open questions (do not resolve in code yet)
 
