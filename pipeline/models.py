@@ -131,7 +131,7 @@ class Program(BaseModel):
         return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
     @classmethod
-    def from_row(cls, row: dict[str, Any]) -> "Program":
+    def from_row(cls, row: dict[str, Any]) -> Program:
         """Rebuild a Program from a `program` row dict that also carries the three list fields
         (as produced by pipeline.upsert.load_existing)."""
         data = {f: row.get(f) for f in PROGRAM_FIELDS}

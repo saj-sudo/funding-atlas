@@ -134,3 +134,38 @@ def test_from_row_round_trips(conn):
     upsert(conn, r1, [p], "2026-10-01T00:00:00Z")
     rebuilt = Program.from_row(load_existing(conn, "test", "1"))
     assert rebuilt.record_hash == p.record_hash
+
+
+def test_opportunity_links_to_listing_by_aln(conn):
+    r1 = new_run(conn, 1)
+    listing = make_program(source_connector="sam_assistance_listings", source_id="97.106", name="Securing the Cities",
+                           status="unknown", closes_at=None, amount_min=500000, amount_max=1000000,
+                           match_required=False, alns=["97.106"])
+    opportunity = make_program(source_connector="grants_gov", source_id="361438", name="STC FY26 NOFO",
+                               alns=["97.106", "99.999"])
+    upsert(conn, r1, [listing, opportunity], "2026-10-01T00:00:00Z")
+
+    rows = [dict(r) for r in conn.execute("SELECT * FROM v_opportunity_listing ORDER BY aln")]
+    assert [(r["aln"], r["listing_name"], r["listing_amount_max"]) for r in rows] == [
+        ("97.106", "Securing the Cities", 1000000), ("99.999", None, None)]
+    assert all(r["opportunity_name"] == "STC FY26 NOFO" for r in rows)
+
+    cov = dict(conn.execute("SELECT * FROM v_aln_coverage").fetchone())
+    assert cov["opportunity_connector"] == "grants_gov"
+    assert (cov["opportunities_with_alns"], cov["all_matched"], cov["some_matched"], cov["none_matched"]) == (1, 0, 1, 0)
+    assert (cov["aln_refs"], cov["aln_refs_unmatched"]) == (2, 1)
+
+    # The catalog never leaks into the "open right now" answer.
+    names = [r[0] for r in conn.execute("SELECT name FROM v_open_for_municipalities")]
+    assert names == ["STC FY26 NOFO"]
+
+
+def test_diff_tables_are_capped(conn):
+    from pipeline.diff import MAX_ROWS_PER_TABLE
+    r1 = new_run(conn, 1)
+    upsert(conn, r1, [make_program(source_id=str(i), name=f"P{i}") for i in range(MAX_ROWS_PER_TABLE + 5)],
+           "2026-10-01T00:00:00Z")
+    report = render(conn, r1)
+    assert f"### Added ({MAX_ROWS_PER_TABLE + 5})" in report
+    assert "… and 5 more" in report
+    assert report.count("| P") == MAX_ROWS_PER_TABLE

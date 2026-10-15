@@ -8,7 +8,7 @@ import db
 from pipeline.models import ALL_APPLICANT_TYPES, ApplicantTag, CategoryTag, Program
 from pipeline.upsert import upsert
 
-EVERYONE = [ApplicantTag(value=t, source_code=c) for t, c in zip(ALL_APPLICANT_TYPES, [f"{i:02d}" for i in range(13)])]
+EVERYONE = [ApplicantTag(value=t, source_code=c) for t, c in zip(ALL_APPLICANT_TYPES, [f"{i:02d}" for i in range(13)], strict=True)]
 LOCAL = [ApplicantTag(value="municipality", source_code="02"), ApplicantTag(value="county", source_code="01"),
          ApplicantTag(value="state", source_code="00"), ApplicantTag(value="tribe", source_code="07")]
 
@@ -84,6 +84,6 @@ def test_open_view_orders_by_tier(conn):
 
 
 def test_migration_is_recorded_and_rerun_safe(conn):
-    assert db.schema_version(conn) == 2
+    assert db.schema_version(conn) == db.migrations()[-1][0]
     db.apply_schema(conn)  # second call must not fail or duplicate
-    assert conn.execute("SELECT COUNT(*) FROM schema_version").fetchone()[0] == 2
+    assert conn.execute("SELECT COUNT(*) FROM schema_version").fetchone()[0] == 1 + len(db.migrations())

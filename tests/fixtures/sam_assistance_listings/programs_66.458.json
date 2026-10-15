@@ -1,0 +1,695 @@
+{
+ "hit": {
+  "_rScore": 61,
+  "_type": "assistanceListing",
+  "publishDate": "2026-06-16T12:01:28-04:00",
+  "assistanceTypes": [
+   {
+    "hierarchy": [
+     {
+      "elementId": "F",
+      "code": "FF",
+      "level": 1,
+      "value": "Financial"
+     },
+     {
+      "elementId": "F001",
+      "code": "F001",
+      "level": 2,
+      "value": "Grant"
+     }
+    ]
+   }
+  ],
+  "fhNames": null,
+  "relatedPrograms": null,
+  "isActive": true,
+  "title": "Clean Water State Revolving Fund",
+  "objective": "To create State Revolving Funds (SRFs) through a program of capitalization grants to States which will provide a long-term source of State financing for construction of wastewater treatment facilities and implementation of other water quality managem",
+  "isFunded": true,
+  "historicalIndex": [
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2026-06-16T12:01:28.218-04:00",
+    "isManual": false,
+    "index": 13,
+    "historicalIndexId": "d0d96c77d0df45f3bb432bbf812489c6",
+    "body": "Clean Water State Revolving Fund",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "title",
+    "createdDate": "2022-11-03T12:43:01.799-04:00",
+    "isManual": false,
+    "index": 9,
+    "historicalIndexId": "7bf2968341164982a49eeff5c40ad05a",
+    "body": "<b>To: </b>Clean Water State Revolving Fund<br><b>From: </b>Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2022,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2022-09-16T01:03:30.287-04:00",
+    "isManual": false,
+    "index": 8,
+    "historicalIndexId": "fdaff0b477f44f809c9261be09607f9d",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2022,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2021-09-02T01:02:30.306-04:00",
+    "isManual": false,
+    "index": 6,
+    "historicalIndexId": "63b4bf359ae44b318a59ec87fc5152b6",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2021,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2026-02-06T10:46:02.806-05:00",
+    "isManual": false,
+    "index": 12,
+    "historicalIndexId": "7f6717272d67479cadede1a0d70b77c0",
+    "body": "Clean Water State Revolving Fund",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2023-08-23T11:30:48.684-04:00",
+    "isManual": false,
+    "index": 10,
+    "historicalIndexId": "c60b9c68efda462fb6a1588695d88030",
+    "body": "Clean Water State Revolving Fund",
+    "fiscalYear": 2023,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2024-12-03T10:30:07.996-05:00",
+    "isManual": false,
+    "index": 11,
+    "historicalIndexId": "c99c1024279147cc851b103b312cb99c",
+    "body": "Clean Water State Revolving Fund",
+    "fiscalYear": 2024,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2022-04-21T01:00:02.162-04:00",
+    "isManual": false,
+    "index": 7,
+    "historicalIndexId": "304ad9a9fa194e949830503bbb605160",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2022,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2020-09-03T01:00:41.93-04:00",
+    "isManual": false,
+    "index": 5,
+    "historicalIndexId": "19427c30cb8a4dfea9d101cbb8891c7c",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100212183",
+    "actionType": "title",
+    "createdDate": "2004-06-21T01:00:00-04:00",
+    "isManual": true,
+    "index": 2,
+    "historicalIndexId": "dea268162c05a636ee439721e176c894",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2003,
+    "statusCode": "B"
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2018-09-14T01:00:06.626-04:00",
+    "isManual": false,
+    "index": 3,
+    "historicalIndexId": "f8f23875bc144f9ba619be61354110f8",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2018,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100081847",
+    "actionType": "publish",
+    "createdDate": "2019-08-30T01:00:02.183-04:00",
+    "isManual": false,
+    "index": 4,
+    "historicalIndexId": "e5f7d3d39bbf42bbbfbfb45baf1d37e7",
+    "body": "Capitalization Grants for Clean Water State Revolving Funds",
+    "fiscalYear": 2019,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100212183",
+    "actionType": "publish",
+    "createdDate": "2004-06-21T01:00:00-04:00",
+    "isManual": true,
+    "index": 1,
+    "historicalIndexId": "6f7f2dbd2831592f94a3f9bf09084fa3",
+    "body": "Capitalization Grants for State Revolving Funds",
+    "fiscalYear": 1988,
+    "statusCode": "B"
+   }
+  ],
+  "assistanceTypeLabels": [
+   "F001 - Grant"
+  ],
+  "modifiedDate": "2026-06-16T12:01:28-04:00",
+  "organizationHierarchy": [
+   {
+    "organizationId": "100081847",
+    "code": "6800",
+    "level": 1,
+    "name": "ENVIRONMENTAL PROTECTION AGENCY",
+    "status": "Active"
+   }
+  ],
+  "programNumber": "66.458",
+  "_id": "360097c9cad3491dbfad8954b7c7c1f8"
+ },
+ "detail": {
+  "data": {
+   "title": "Clean Water State Revolving Fund",
+   "version": "2.0",
+   "website": "https://www.epa.gov/cwsrf",
+   "contacts": {
+    "local": {
+     "flag": "none",
+     "description": "",
+     "officeLocationURL": ""
+    },
+    "headquarters": [
+     {
+      "fax": "",
+      "zip": "20460",
+      "city": "Washington",
+      "email": "loadholtz.logan@epa.gov",
+      "phone": "(202)564-1599",
+      "state": "DC",
+      "title": "",
+      "country": "USA",
+      "fullName": "Logan Loadholtz",
+      "contactId": "dd22c1f472da4968b8b68b9c27720b07",
+      "streetAddress": "Environmental Protection Agency, 1200 Pennsylvania Avenue, N.W. (Mail Code: 4204M)",
+      "streetAddress2": ""
+     }
+    ]
+   },
+   "projects": {
+    "list": [
+     {
+      "fiscalYear": 2025,
+      "description": "State revolving loan fund; wastewater projects involving advanced treatment, secondary treatment, infiltration/inflow correction, replacement/upgrade of pipe and equipment and expansion of existing wastewater treatment plants; nonpoint source and estuary protection projects (for example, septic system rehabilitation, leaking underground storage tank removal, contaminated soil removal, agricultural BMPs, conservation easements, wetlands protection/rehabilitation, and prevention of agricultural runoff); stormwater management; decentralized wastewater treatment; water reuse. For projects funded under the Infrastructure Investment and Jobs Act (IIJA), Public Law 117-58, some project examples include wastewater treatment plant upgrades to address PFAS and other emerging contaminants. For projects funded via the disaster supplementals appropriated in the Consolidated Appropriations Act, 2023, Public Law 117-328 and American Relief Act, 2025, P.L. 118-158, some project examples include upgrade of a treatment facility; and projects to reduce flood or fire damage risk and vulnerability at eligible facilities under section 212 of the Clean Water Act. Project examples for projects funded under the American Relief Act, 2025, P.L. 118-158 to improve the resilience of decentralized wastewater treatment systems may include protection measures to mitigate flooding to decentralized wastewater treatment systems, studies to assess the potential to connect homes served by decentralized wastewater treatment systems to centralized wastewater systems, and the establishment of such connections."
+     }
+    ],
+    "isApplicable": true
+   },
+   "financial": {
+    "accounts": [
+     {
+      "code": "68-0103-0-1-304",
+      "description": "State and Tribal Assistance Grants (STAG)"
+     }
+    ],
+    "description": "State Revolving Fund capitalization awards range from $7,879,000 to $177,146,000. Awards are also made to Indian Tribes and U.S. Territories.",
+    "obligations": [
+     {
+      "values": [
+       {
+        "year": 2024,
+        "actual": 3757991795
+       },
+       {
+        "year": 2025,
+        "actual": 4587092534
+       },
+       {
+        "year": 2026,
+        "estimate": 5980907298
+       }
+      ],
+      "description": "(Consolidated Appropriations Act, 2023 Disaster Supplementals)",
+      "obligationId": "9f7b9e3d2c5241a5900936fb6ee49a42",
+      "assistanceType": "F001",
+      "awardAmountBasisCode": [
+       "A02"
+      ],
+      "awardRecipientBasisCode": [
+       "R02"
+      ]
+     }
+    ],
+    "accomplishments": {
+     "list": [
+      {
+       "fiscalYear": 2025,
+       "description": "Each year, 51 grants are awarded to states and Puerto Rico. Assistance in FY 25 included funding to prevent polluted runoff, upgrade wastewater treatment plants from secondary level treatment to advanced (tertiary) treatment to reduce pollutant loads, and improve water quality on a watershed basis."
+      }
+     ],
+     "isApplicable": true
+    },
+    "isFundedCurrentFY": true,
+    "additionalInformation": "",
+    "rangeAndAverageAssistance": [
+     {
+      "fiscalYear": "2025",
+      "averageAwardAmount": "92512500",
+      "maximumAwardAmount": "177146000",
+      "minimumAwardAmount": "7879000"
+     },
+     {
+      "fiscalYear": "2026",
+      "averageAwardAmount": "64221000",
+      "maximumAwardAmount": "374224000",
+      "minimumAwardAmount": "16644000"
+     }
+    ]
+   },
+   "objective": "To create State Revolving Funds (SRFs) through a program of capitalization grants to States which will provide a long-term source of State financing for construction of wastewater treatment facilities and implementation of other water quality management activities. Capitalization grants are available to each State for the purpose of establishing a Clean Water SRF for providing assistance for: (1) construction of publicly owned wastewater treatment works; (2) implementation of nonpoint source management activities included in State Plans developed pursuant to Section 319; (3) development and implementation a National Estuary Program comprehensive conservation and management plan under Section 320; (4) the construction, repair, or replacement of decentralized wastewater treatment systems that treat municipal wastewater or domestic sewage; (5) measures to manage, reduce, treat or recapture stormwater or subsurface drainage water; (6) any municipality or intermunicipal, interstate, or State agency for measures to reduce the demand for publicly owned treatment works capacity through water conservation, efficiency or reuse; (7) the development and implementation of watershed projects meeting the criteria set forth in section 122; (8) any municipality or intermunicipal, interstate, or State agency for measures to reduce the energy consumption needs for publicly owned treatment works; (9) reusing or recycling wastewater, stormwater, or subsurface drainage water; (10) measures to increase the security of publicly owned treatment works; (11) any qualified nonprofit entity, as determined by the Administrator, to provide assistance to owners and operators of small and medium publicly owned treatment works to plan, develop, and obtain financing for eligible projects under section 603I, including planning, design, and associated preconstruction activities and to assist such treatment works in achieving compliance with the Clean Water Act (CWA); and (12) any qualified nonprofit entity, as determined by the Administrator, to provide assistance to an eligible individual (as defined in subsection (j))— (A) for the repair or replacement of existing individual household decentralized wastewater treatment systems or in a case in which an eligible individual resides in a household that could be cost effectively connected to an available publicly owned treatment works, for the connection of the applicable household to such treatment works. The program supports the Agency’s strategic goal of providing clean and safe water. The Infrastructure Investment and Jobs Act (IIJA), 2021, (Public Law 117-58), makes available additional capitalization grants to each state for the purpose of providing assistance through the Clean Water SRF to: (1) activities identified above and (2) activities identified above for projects that address emerging contaminants. The capitalization grant is deposited in the State’s SRF, which is used to provide loans and other types of financial assistance, to local communities, intermunicipal and interstate agencies, and other eligible entities as described in Title VI of the Clean Water Act. Division N of the Consolidated Appropriations Act, 2023, Public Law 117-328 also includes $665.2 million in supplemental funding for the CWSRF, available only to states or territories in EPA Regions 2 and 4 for treatment works impacted by Hurricanes Fiona or Ian. The American Relief Act, 2025, P.L. 118-158, provides $1.23 billion in supplemental funds for the CWSRF available only to states or territories in EPA Regions 3, 4, and 9 for wastewater treatment works impacted by Hurricanes Helene and Milton and the Hawai’i wildfires. The American Relief Act, 2025, P.L. 118-158 also provides an additional $85 million in supplemental funding for the CWSRF program to improve the resilience of decentralized wastewater treatment systems, available only to states or territories in EPA Regions 3 and 4 impacted by Hurricanes Helene and Milton. A maximum of four percent of the grant amounts, $400,000 each year, or 1/5 percent per year of the current valuation (total net position) of the fund may be used by the States for the cost of administering the SRF. States determine priorities for funding within their State in accordance with the CWA. For the 51 State CWSRFs, a portion of the capitalization grant funding must be used to provide additional subsidy in the form of grants, principal forgiveness, or negative interest loans.",
+   "assistance": {
+    "appeal": {
+     "interval": "9",
+     "description": "Disputes relating to matters other than the competitive selection of recipients will be resolved under 2 CFR 1500 Subpart E, as applicable."
+    },
+    "renewal": {
+     "interval": "8",
+     "description": "For those portions of the State program that do not change from year to year, a subsequent grant application may incorporate by reference relevant portions of the previous year's application which have not changed or an operating agreement approved by the region."
+    },
+    "approval": {
+     "interval": "3",
+     "description": "Approval time averages 45 days."
+    },
+    "payments": {
+     "list": [
+      {
+       "type": "D",
+       "frequency": "D",
+       "paymentId": "a1e8540b90a84b01aabedfd223626a57",
+       "fundingDate": "",
+       "spendingPeriod": 1,
+       "spendingPeriodType": "Y",
+       "frequencyDescription": null,
+       "spendingPeriodDescription": "Funds are available for EPA’s obligation to the State during the fiscal year in which they are allotted and during the following year. The State must agree to enter into binding commitments with recipients to provide financial assistance from the SRF in an amount equal to 120 percent of each quarterly grant payment. The State is also required to agree to expend all funds in the SRF in an expeditious and timely manner Method of awarding/releasing assistance: The method of fund disbursement will be determined at the time of award."
+      }
+     ]
+    },
+    "deadlines": {
+     "flag": "C",
+     "list": [],
+     "description": "Contact the headquarters or regional location, as appropriate for application deadlines"
+    },
+    "awardProcedure": {
+     "description": "A grant application is reviewed by the appropriate Regional Office and, if approved, the grant is awarded by the Regional Administrator under a delegation of authority from the Administrator of EPA."
+    },
+    "selectionCriteria": {
+     "isApplicable": false
+    },
+    "applicationProcedure": {
+     "opportunityPostedLocation": "G"
+    },
+    "preApplicationCoordination": {
+     "description": "Preapplication coordination is required. Environmental impact information is not required for this program. This program is excluded from coverage under E.O. 12372. As indicated in EPA Financial Assistance Programs Subject to Executive Order 12372 and Section 204 of the Demonstration Cities and Metropolitan Development Act and Section 401 of the Intergovernmental Cooperation Act, at https://www.epa.gov/grants/epa-financial-assistance-programs-subject-executive-order-12372-and-section-204, EPA has determined that states meet their intergovernmental review responsibilities when they comply with the public notice requirements for Intended Use Plans prescribed in 40 CFR 35.3150. An applicant (State) should seek pre-application assistance from the appropriate EPA Regional Office. The State is required to prepare and provide for public comment a plan identifying the intended uses of the funds in the SRF (an intended use plan) and how those support  the goals of the SRF. The plan is to be submitted no later than the application.",
+     "environmentalImpact": {
+      "reports": [
+       {
+        "isSelected": true,
+        "reportCode": "otherRequired"
+       }
+      ]
+     }
+    }
+   },
+   "compliance": {
+    "maps": {
+     "basis": [],
+     "usageList": [],
+     "areCBSADelineationsUsed": "no",
+     "currentCBSADelineationAdopted": {
+      "historicalDelineationSelection": ""
+     }
+    },
+    "audit": {
+     "frequency": [
+      "T"
+     ],
+     "description": "Grants and cooperative agreements are subject to inspections and audits by the Comptroller General of the United States, the EPA Office of Inspector General, other EPA staff, or any authorized representative of the Federal government. Reviews by the EPA Project Officer and the Grants Specialist may occur each year.  A State must, at a minimum, comply with the provisions of 2 CFR 200, Subpart F.  States are also encouraged to conduct annual independent audits.",
+     "isApplicable": true
+    },
+    "records": {
+     "description": "As part of the annual review conducted by the agency to assess the State's performance against activities identified in the intended use plan and annual report, and to determine compliance with the terms of the capitalization grant agreement, the State or loan recipient shall make available to EPA such records as the Regional Administrator reasonably requires to review and determine State compliance with the requirements of the CWA. Recipients must keep financial records, including all documents supporting entries on accounting records and to substantiate changes in grants available to personnel authorized to examine EPA recipients grants and cooperative agreements records. Recipients must maintain all records until 3 years from the date of submission of final expenditure reports as required by 2 CFR 200.334. If questions, such as those raised because of audits remain following the 3-year period, recipients must retain records until the matter is completely resolved.",
+     "retentionPeriod": 3,
+     "retentionPeriodType": "Y"
+    },
+    "reports": [
+     {
+      "code": "progress",
+      "frequency": [
+       "T"
+      ],
+      "description": "Beginning the first fiscal year after receiving payments, the State shall provide an annual report to the Regional Administrator in accordance with the schedule established in the grant agreement (generally not later than 90 days after the end of the fiscal year in which the payments were received). The annual report shall describe how the State has met the goals and objectives for the preceding fiscal year, as identified in its intended use plan, including identification of loan recipients, loan amounts, and loan terms and similar details on other forms of financial assistance provided from the SRF. Loan information is required to be entered into CBR in the quarter in which the loan is made. The Disaster Relief Act, 2019, loan information is also required to be put into CBR."
+     }
+    ],
+    "documents": {
+     "description": "",
+     "isApplicable": true
+    },
+    "CFR200Requirements": {
+     "questions": [
+      {
+       "code": "subpartB",
+       "isSelected": true
+      },
+      {
+       "code": "subpartC",
+       "isSelected": true
+      },
+      {
+       "code": "subpartD",
+       "isSelected": true
+      },
+      {
+       "code": "subpartE",
+       "isSelected": true
+      },
+      {
+       "code": "subpartF",
+       "isSelected": true
+      }
+     ],
+     "description": ""
+    },
+    "formulaAndMatching": {
+     "moe": {
+      "description": ""
+     },
+     "types": {
+      "moe": false,
+      "formula": true,
+      "matching": true
+     },
+     "formula": {
+      "part": "Section 1285",
+      "title": "33",
+      "chapter": "NA",
+      "subPart": "NA",
+      "publicLaw": "NA",
+      "description": "33 U.S.C. 1285 Allotments to the States are determined by a table of decimal fractions (\"formula\") in Section 205(c)(3) of the Clean Water Act (CWA)."
+     },
+     "matching": {
+      "percent": "20",
+      "description": "Under the CWSRF base appropriations the required State match is 20% of the amount of the capitalization made to the State. Under the FY25IIJA general supplemental capitalization grant appropriations, the required State match is 20% of the amount of the capitalization grant made to the State. Under the IIJA Emerging Contaminant supplemental capitalization grant, match is waived. The match is also waived for the supplemental appropriation under the 2023 Consolidated Appropriations Act.",
+      "requirementFlag": "M"
+     },
+     "isApplicable": true
+    },
+    "additionalRequirements": {
+     "list": [
+      {
+       "id": "5a1e8024ba964dd892b27b0b3e0840b0",
+       "URL": "https://www.ecfr.gov/",
+       "description": "2 CFR 200 1500 (EPA Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards); 40 CFR Part 33 (Participation by Disadvantaged Business Enterprises in United States Environmental Protection Agency Programs); 40 CFR Part 35 SubPart K (State Water Pollution Control Revolving Funds)."
+      }
+     ]
+    },
+    "guidelinesAndInformation": {
+     "list": []
+    }
+   },
+   "fiscalYear": 2026,
+   "description": "To create State Revolving Funds (SRFs) through a program of capitalization grants to States which will provide a long-term source of State financing for construction of wastewater treatment facilities and implementation of other water quality management activities.",
+   "eligibility": {
+    "usage": {
+     "loanTerms": {
+      "description": "The capitalization grant is deposited in the state's SRF, which is used to provide loans and other types of financial assistance to municipalities, intermunicipal, interstate, and State agencies and other eligible entities as described in Title VI of the Clean Water Act. The capitalization grant is deposited in the state's SRF, which is used to provide loans and other types of financial assistance to municipalities, intermunicipal, interstate, and State agencies and other eligible entities as described in Title VI of the Clean Water Act.",
+      "isApplicable": true
+     },
+     "restrictions": {
+      "description": "",
+      "isApplicable": false
+     },
+     "discretionaryFund": {
+      "description": "",
+      "isApplicable": false
+     }
+    },
+    "applicant": {
+     "types": [
+      "ET22020",
+      "ET22010",
+      "ET23010"
+     ],
+     "description": "States and Puerto Rico are eligible to receive capitalization grants under Title VI. Indian tribes are eligible to receive grants from Title VI for the construction of municipal wastewater facilities. The District of Columbia, territories, possessions of the U.S. are eligible to receive grants from Title VI for the construction of municipal wastewater facilities (see Assistance Listing 66.418). Division N of the Consolidated Appropriations Act, 2023, Public Law 117-328 also includes $665.2 million in supplemental funding for the CWSRF, available only to states or territories in EPA Regions 2 and 4 for treatment works impacted by Hurricanes Fiona or Ian. Only the State of Florida and the Commonwealth of Puerto Rico are eligible to apply for these CWSRF supplemental funds. Two percent of the appropriated funds are reserved for direct grants or interagency agreements to benefit Tribes. The American Relief Act, 2025, P.L. 118-158, provides $1.23 billion in supplemental  funds for the CWSRF available only to states or territories in EPA Regions 3, 4, and 9 for wastewater treatment works impacted by Hurricanes Helene and Milton and the Hawai’i wildfires. Only the States of Florida, Georgia, Hawai’i, North Carolina, South Carolina, Tennessee, and Virginia are eligible to apply for these CWSRF  supplemental funds. The American Relief Act, 2025, P.L. 118-158 also provides an additional $85 million in supplemental funding for the CWSRF program to improve the resilience of decentralized wastewater treatment systems, available only to states or territories in EPA Regions 3 and 4 impacted by Hurricanes Helene and Milton. Only the States of Florida, Georgia, North Carolina, South Carolina, Tennessee, and Virginia are eligible to apply for these CWSRF supplemental funds."
+    },
+    "limitation": {
+     "awarded": "other",
+     "description": "Funds are available for EPA's obligation to the State during the fiscal year in which they are allotted and during the following year. The State must agree to enter into binding commitments with recipients to provide financial assistance from the SRF in an amount equal to 120 percent of each quarterly grant payment. The State is also required to agree to expend all funds in the SRF in an expeditious and timely manner",
+     "awardedDescription": "The method of fund disbursement will be determined at the time of award."
+    },
+    "beneficiary": {
+     "types": [
+      "ET22050",
+      "ET22010",
+      "ET26010",
+      "ET41010",
+      "ET23010",
+      "ET51090",
+      "ET59010",
+      "ET59020",
+      "ET59999"
+     ],
+     "description": "For loans and other financial assistance (but not grants) for wastewater treatment facilities: municipalities, intermunicipal, interstate, State agencies, and Indian tribes. For nonpoint source management programs and estuary activities in approved State Nonpoint Source Management Programs and Comprehensive Conservation and Management Plans: the public agencies listed above, individuals, nonprofit organizations, homeowners, land/property owners.",
+     "isSameAsApplicant": false
+    },
+    "documentation": {
+     "description": [
+      "To receive a capitalization grant, a State shall enter into an agreement with the EPA Regional Administrator which shall include, but not be limited to, the 10 specifications set forth in Section 602(b) of the CWA. 2 CFR 200 Subpart E applies to the program.  \r\n\r\n \r\n"
+     ],
+     "isApplicable": true
+    },
+    "assistanceUsage": {
+     "types": [
+      "ZZ999"
+     ],
+     "description": "Capitalization grants are available to each State for the purpose of establishing a Clean Water SRF for providing assistance for: (1) construction of publicly owned wastewater treatment works; (2) implementation of nonpoint source management activities included in State Plans developed pursuant to Section 319; (3) development and implementation a National Estuary Program comprehensive conservation and management plan under Section 320; (4) the construction, repair, or replacement of decentralized wastewater treatment systems that treat municipal wastewater or domestic sewage; (5) measures to manage, reduce, treat or recapture stormwater or subsurface drainage water; (6) any municipality or intermunicipal, interstate, or State agency for measures to reduce the demand for publicly owned treatment works capacity through water conservation, efficiency or reuse; (7) the development and implementation of watershed projects meeting the criteria set forth in section 122; (8) any municipality or intermunicipal, interstate, or State agency for measures to reduce the energy consumption needs for publicly owned treatment works; (9) reusing or recycling wastewater, stormwater, or subsurface drainage water; (10) measures to increase the security of publicly owned treatment works; (11) any qualified nonprofit entity, as determined by the Administrator, to provide assistance to owners and operators of small and medium publicly owned treatment works to plan, develop, and obtain financing for eligible projects under section 603(c), including planning, design, and associated preconstruction activities and to assist such treatment works in achieving compliance with the Clean Water Act; and (12) any qualified nonprofit entity, as determined by the Administrator, to provide assistance to an eligible individual (as defined in subsection (j))— (A) for the repair or replacement of existing individual household decentralized wastewater treatment systems or in a case in which an eligible individual resides in a household that could be cost effectively connected to an available publicly owned treatment works, for the connection of the applicable household to such treatment works. The capitalization grant is deposited in the State's SRF, which is used to provide loans and other types of financial assistance, to local communities, intermunicipal and interstate agencies, and other eligible entities as described in Title VI of the Clean Water Act. A maximum of four percent of the grant amounts, $400,000 each year, or 1/5 percent per year of the current valuation (total net position) of the fund may be used by the States for the cost of administering the SRF. States determine priorities for funding within their State in accordance with the CWA. The Infrastructure Investment and Jobs Act (IIJA), 2021, (Public Law 117-58), makes available additional capitalization grants to each state for the purpose of providing assistance through the Clean Water SRF to: (1) activities identified above and (2) activities identified above for projects that address emerging contaminants."
+    },
+    "assistanceRestriction": {
+     "types": [
+      "ZZ999"
+     ]
+    }
+   },
+   "programNumber": "66.458",
+   "authorizations": {
+    "list": [
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": null,
+       "title": "",
+       "section": "",
+       "description": "Clean Water Act (CWA) Title VI, as amended"
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "description": ""
+      },
+      "executiveOrder": null,
+      "authorizationId": "32ce5a5709724e67945f1e624455ebbe",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": null,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": null,
+       "title": null,
+       "section": null,
+       "description": "Infrastructure Investment and Jobs Act (IIJA) (PL 117-58)"
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "description": ""
+      },
+      "executiveOrder": null,
+      "authorizationId": "728037e7e8cb4f28a5262b564a4b70eb",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": null,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": null,
+       "title": null,
+       "section": null,
+       "description": "Consolidated Appropriations Act, 2023, Public Law 117-328"
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "description": ""
+      },
+      "executiveOrder": null,
+      "authorizationId": "5ebd8e4f28a94ca2bf2b913de96d2f3b",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": null,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": null,
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "number": 158,
+       "description": "American Relief Act, 2025",
+       "congressCode": 118
+      },
+      "executiveOrder": null,
+      "authorizationId": "c55b731b9f46415bad9199e8bebe9919",
+      "authorizationTypes": {
+       "USC": null,
+       "act": null,
+       "statute": null,
+       "publicLaw": true,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     }
+    ]
+   },
+   "organizationId": "100081847",
+   "assistanceTypes": [
+    "0001001"
+   ],
+   "functionalCodes": [
+    "0010001"
+   ],
+   "relatedPrograms": [
+    "a5fca4da4b70ac4b100f56077e84401c"
+   ],
+   "alternativeNames": [
+    "CW State Revolving Fund"
+   ],
+   "missionSubCategories": [
+    {
+     "code": [
+      "0017003"
+     ],
+     "type": "Primary"
+    }
+   ]
+  },
+  "parentProgramId": "796057b616210e060a6e3208cbaa7abd",
+  "latest": true,
+  "revision": false,
+  "fiscalYearLatest": true,
+  "publishedDate": "2026-06-16T16:01:28.153+00:00",
+  "modifiedDate": "2026-06-16T16:01:28.153+00:00",
+  "submittedDate": "2026-06-16T16:01:28.224+00:00",
+  "autoPublishDate": null,
+  "status": {
+   "code": "published",
+   "value": "Published"
+  },
+  "archived": false,
+  "additionalProperty": null,
+  "additionalInfo": {
+   "sections": [
+    {
+     "id": "header-information",
+     "status": "updated"
+    },
+    {
+     "id": "overview",
+     "status": "updated"
+    },
+    {
+     "id": "authorization",
+     "status": "updated"
+    },
+    {
+     "id": "financial-information-obligations",
+     "status": "updated"
+    },
+    {
+     "id": "financial-information-other",
+     "status": "updated"
+    },
+    {
+     "id": "criteria-information",
+     "status": "updated"
+    },
+    {
+     "id": "applying-for-assistance",
+     "status": "updated"
+    },
+    {
+     "id": "compliance-requirements",
+     "status": "updated"
+    },
+    {
+     "id": "contact-information",
+     "status": "updated"
+    }
+   ]
+  },
+  "_links": {
+   "self": {
+    "href": "/fac/v1/programs/360097c9cad3491dbfad8954b7c7c1f8"
+   }
+  },
+  "id": "360097c9cad3491dbfad8954b7c7c1f8"
+ }
+}

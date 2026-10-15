@@ -1,0 +1,799 @@
+{
+ "hit": {
+  "_rScore": 100,
+  "_type": "assistanceListing",
+  "publishDate": "2026-10-09T01:00:21-04:00",
+  "assistanceTypes": [
+   {
+    "hierarchy": [
+     {
+      "elementId": "F",
+      "code": "FF",
+      "level": 1,
+      "value": "Financial"
+     },
+     {
+      "elementId": "F010",
+      "code": "F010",
+      "level": 2,
+      "value": "Other Financial Assistance"
+     }
+    ]
+   },
+   {
+    "hierarchy": [
+     {
+      "elementId": "F",
+      "code": "FF",
+      "level": 1,
+      "value": "Financial"
+     },
+     {
+      "elementId": "F002",
+      "code": "F002",
+      "level": 2,
+      "value": "Cooperative Agreement"
+     }
+    ]
+   }
+  ],
+  "fhNames": null,
+  "relatedPrograms": null,
+  "isActive": true,
+  "title": "Securing the Cities Program",
+  "objective": "​​Goal: ​Develop and enhance sustainable radiological/nuclear (R/N) detection and reporting capabilities among regional operational partners.  \n\nObjectives:  \n\n1. Assist state, local, tribal, and territorial (SLTT) agencies in developing R/N detectio",
+  "isFunded": false,
+  "historicalIndex": [
+   {
+    "organizationId": "300000275",
+    "actionType": "publish",
+    "createdDate": "2020-06-25T01:00:11.219-04:00",
+    "isManual": false,
+    "index": 5,
+    "historicalIndexId": "0a533830afda499c84a591ce3ce66313",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "agency",
+    "createdDate": "2020-07-13T13:17:51.547-04:00",
+    "isManual": false,
+    "index": 7,
+    "historicalIndexId": "2952d6d09c5246399ef935281f189c4f",
+    "body": null,
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "300000275",
+    "actionType": "publish",
+    "createdDate": "2019-08-15T01:00:12.849-04:00",
+    "isManual": false,
+    "index": 4,
+    "historicalIndexId": "6518d8b93dfd4ecdb4b84efc054f36ae",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2019,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "publish",
+    "createdDate": "2020-07-13T13:17:51.538-04:00",
+    "isManual": false,
+    "index": 6,
+    "historicalIndexId": "bfd4392a00264432a5861633b7bea316",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "300000275",
+    "actionType": "publish",
+    "createdDate": "2018-09-04T01:00:21.5-04:00",
+    "isManual": false,
+    "index": 3,
+    "historicalIndexId": "e97eef9f304946c19d636750ef6257d0",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2018,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100011942",
+    "actionType": "publish",
+    "createdDate": "2007-08-03T00:00:00-04:00",
+    "isManual": false,
+    "index": 1,
+    "historicalIndexId": "0e11af58980ddcfbab44bc0d33a83650",
+    "body": "Securing the Cities",
+    "fiscalYear": 2007,
+    "statusCode": null
+   },
+   {
+    "organizationId": "100011942",
+    "actionType": "title",
+    "createdDate": "2013-04-16T10:57:52-04:00",
+    "isManual": false,
+    "index": 2,
+    "historicalIndexId": "dc549ae835e2802853aa6da88ba89cc6",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2013,
+    "statusCode": null
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "publish",
+    "createdDate": "2021-07-26T01:00:12.539-04:00",
+    "isManual": false,
+    "index": 8,
+    "historicalIndexId": "59128c1ac8614918a40b989752d51ca1",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2021,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100176827",
+    "actionType": "publish",
+    "createdDate": "2026-07-01T11:56:33.076-04:00",
+    "isManual": false,
+    "index": 14,
+    "historicalIndexId": "14b675c9891f45cbb87765f2c5e8cb0d",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100176827",
+    "actionType": "publish",
+    "createdDate": "2026-09-11T12:11:13.039-04:00",
+    "isManual": false,
+    "index": 16,
+    "historicalIndexId": "6f4edbe9ce5b45d6a13cc2f4782fdecc",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "publish",
+    "createdDate": "2024-06-25T01:00:11.85-04:00",
+    "isManual": false,
+    "index": 11,
+    "historicalIndexId": "ecae0ce01e6841318b5683a96c27ad02",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2024,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100176827",
+    "actionType": "agency",
+    "createdDate": "2026-07-01T11:56:33.094-04:00",
+    "isManual": false,
+    "index": 15,
+    "historicalIndexId": "64425641e7d84695a409445a6aa1a074",
+    "body": null,
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100011942",
+    "actionType": "agency",
+    "createdDate": "2026-06-25T10:33:00.299-04:00",
+    "isManual": false,
+    "index": 13,
+    "historicalIndexId": "25ddde012947492da23516136509d4e3",
+    "body": null,
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100011942",
+    "actionType": "publish",
+    "createdDate": "2026-06-25T10:33:00.286-04:00",
+    "isManual": false,
+    "index": 12,
+    "historicalIndexId": "85e723d4c01743339e985200bd9a0e2c",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "publish",
+    "createdDate": "2022-09-06T01:00:40.638-04:00",
+    "isManual": false,
+    "index": 9,
+    "historicalIndexId": "cc3e22640c15495688a864f93a6fc586",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2022,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "500044550",
+    "actionType": "publish",
+    "createdDate": "2023-09-01T14:35:36.524-04:00",
+    "isManual": false,
+    "index": 10,
+    "historicalIndexId": "1380f3ecfc3c41baad61f0a162aca759",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2023,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100176827",
+    "actionType": "publish",
+    "createdDate": "2026-10-09T01:00:21.15-04:00",
+    "isManual": false,
+    "index": 17,
+    "historicalIndexId": "21755feb0b5d43089a33ef4ce4a89a33",
+    "body": "Securing the Cities Program",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   }
+  ],
+  "assistanceTypeLabels": [
+   "F002 - Cooperative Agreement",
+   "F010 - Other Financial Assistance"
+  ],
+  "modifiedDate": "2026-10-09T01:00:21-04:00",
+  "organizationHierarchy": [
+   {
+    "organizationId": "100011942",
+    "code": "7000",
+    "level": 1,
+    "name": "HOMELAND SECURITY, DEPARTMENT OF",
+    "status": "Active"
+   },
+   {
+    "organizationId": "100011943",
+    "code": "7022",
+    "level": 2,
+    "name": "FEDERAL EMERGENCY MANAGEMENT AGENCY",
+    "status": "Active"
+   },
+   {
+    "organizationId": "100176827",
+    "code": "70FH10",
+    "level": 3,
+    "name": "FEMA",
+    "status": "Active"
+   }
+  ],
+  "programNumber": "97.106",
+  "_id": "8fdfa74764584e68866bd2c86952b754"
+ },
+ "detail": {
+  "data": {
+   "title": "Securing the Cities Program",
+   "version": "2.0",
+   "website": "http://www.fema.gov",
+   "contacts": {
+    "local": {
+     "flag": "none",
+     "description": "",
+     "officeLocationURL": ""
+    },
+    "headquarters": [
+     {
+      "fax": "",
+      "zip": "20024",
+      "city": "Washington",
+      "email": "ki.harvey@fema.dhs.gov",
+      "phone": "202-961-8010",
+      "state": "DC",
+      "title": "DHS, Office of Health Affairs",
+      "country": "USA",
+      "fullName": "Ki Harvey",
+      "contactId": "8da07d5ddc014c478ca259f437d63620",
+      "streetAddress": "400 C Street SW",
+      "streetAddress2": ""
+     }
+    ]
+   },
+   "projects": {
+    "list": [
+     {
+      "fiscalYear": 2025,
+      "description": "​​Salaries, equipment, training (backfill/overtime), supplies​"
+     },
+     {
+      "fiscalYear": 2026,
+      "description": "​​Salaries, equipment, training (backfill/overtime), supplies​"
+     }
+    ],
+    "isApplicable": true
+   },
+   "financial": {
+    "accounts": [
+     {
+      "code": "70-0413-0-1-453",
+      "description": ""
+     }
+    ],
+    "description": "See Program Guidance.",
+    "obligations": [
+     {
+      "values": [
+       {
+        "year": 2024,
+        "actual": 28481679
+       },
+       {
+        "year": 2025,
+        "actual": 1500000
+       },
+       {
+        "year": 2026,
+        "estimate": 4045580
+       }
+      ],
+      "description": "",
+      "obligationId": "e6de1edb3cc042eebb895d83c29efe61",
+      "assistanceType": "F002",
+      "awardAmountBasisCode": [
+       "A01"
+      ],
+      "awardRecipientBasisCode": [
+       "R02"
+      ]
+     },
+     {
+      "values": [
+       {
+        "year": 2024,
+        "actual": 5983321
+       },
+       {
+        "year": 2025,
+        "actual": 32965000
+       },
+       {
+        "year": 2026,
+        "estimate": 30419420
+       }
+      ],
+      "description": "",
+      "obligationId": "7e76923d43294cb0935fd159802b48f0",
+      "assistanceType": "F010",
+      "awardAmountBasisCode": [
+       "A01"
+      ],
+      "awardRecipientBasisCode": [
+       "R02"
+      ]
+     }
+    ],
+    "accomplishments": {
+     "list": [
+      {
+       "fiscalYear": 2025,
+       "description": "Four non-competitive awards were made"
+      },
+      {
+       "fiscalYear": 2026,
+       "description": "Funding anticipated to be spent on equipment and other program support item"
+      }
+     ],
+     "isApplicable": true
+    },
+    "isFundedCurrentFY": true,
+    "additionalInformation": "​​Program Support/Carryover​ \nObligation Value:​​$34,465,000​ \n\nFY 24 ​​$5,983,321​ \n​​FY 25 $32,965,000​ \nFY 26 ​​$30,419,420​ \n\n​​",
+    "rangeAndAverageAssistance": [
+     {
+      "fiscalYear": "2025",
+      "averageAwardAmount": "750000",
+      "maximumAwardAmount": "1000000",
+      "minimumAwardAmount": "500000"
+     },
+     {
+      "fiscalYear": "2026",
+      "averageAwardAmount": "1348527",
+      "maximumAwardAmount": "2109867",
+      "minimumAwardAmount": "502000"
+     }
+    ]
+   },
+   "objective": "​​Goal: ​Develop and enhance sustainable radiological/nuclear (R/N) detection and reporting capabilities among regional operational partners.  \n\nObjectives:  \n\n1. Assist state, local, tribal, and territorial (SLTT) agencies in developing R/N detection and reporting           capability.  \n\n2. Establish information connectivity to support R/N alarm adjudication. \n\n3. Establish administrative infrastructure to support an R/N detection program.  \n\n4. Establish coordination mechanisms between operational partners for steady-state operations, enhanced steady-state operations, and crisis and search operations.",
+   "assistance": {
+    "appeal": {
+     "interval": "8",
+     "description": "None"
+    },
+    "renewal": {
+     "interval": "8",
+     "description": "See Notice of Funding Opportunity"
+    },
+    "approval": {
+     "interval": "1",
+     "description": "​​STC applications​ are non-competitive"
+    },
+    "payments": {
+     "list": [
+      {
+       "type": "R",
+       "frequency": "R",
+       "paymentId": "dc993af8a4c94810941906a399be9346",
+       "fundingDate": "20260831",
+       "spendingPeriod": 3,
+       "spendingPeriodType": "Y",
+       "frequencyDescription": null,
+       "spendingPeriodDescription": "Recipients have five years from the last day the funds can be obligated. Therefore, eight years before cancellation."
+      }
+     ]
+    },
+    "deadlines": {
+     "flag": "Y",
+     "list": [
+      {
+       "end": "2026-08-31",
+       "start": "2026-06-01",
+       "description": "Refer to Cooperative Agreement"
+      }
+     ],
+     "description": "See Notice of Funding Opportunity [ NOFO]"
+    },
+    "awardProcedure": {
+     "description": "​​Standard award procedures from Grants & Financial Assistance Division, Office of Procurement Operations, Office of the Chief Financial Officer, DHS​  \n\nRefer to Notice of Funding Opportunity"
+    },
+    "selectionCriteria": {
+     "description": "​​Having received a prior award under this program and the presence of an FBI level Five Regional Render Safe Team​",
+     "isApplicable": true
+    },
+    "applicationProcedure": {
+     "location": "N",
+     "opportunityPostedURL": "https://www.fema.gov/grants/preparedness/homeland-security/fy-25-nofo",
+     "opportunityPostedLocation": "O"
+    },
+    "preApplicationCoordination": {
+     "environmentalImpact": {
+      "reports": [
+       {
+        "isSelected": true,
+        "reportCode": "ExecutiveOrder12372"
+       }
+      ]
+     }
+    }
+   },
+   "compliance": {
+    "maps": {
+     "basis": [],
+     "usageList": [],
+     "areCBSADelineationsUsed": "no",
+     "currentCBSADelineationAdopted": {
+      "historicalDelineationSelection": ""
+     }
+    },
+    "audit": {
+     "frequency": [
+      "H"
+     ],
+     "description": "Audits are performed:  ​​Ad hoc desk audits​, during site visits and project close out.",
+     "isApplicable": true
+    },
+    "records": {
+     "description": "​​Notice of Grant Award, Terms & Conditions, Reporting schedule​",
+     "retentionPeriod": 3,
+     "retentionPeriodType": "Y"
+    },
+    "reports": [
+     {
+      "code": "progress",
+      "frequency": [
+       "Q"
+      ],
+      "description": "See Program Guidance."
+     },
+     {
+      "code": "other",
+      "frequency": [
+       "Q"
+      ],
+      "description": "Cash and Expenditure Reports: Quarterly"
+     }
+    ],
+    "documents": {
+     "description": "",
+     "isApplicable": true
+    },
+    "CFR200Requirements": {
+     "questions": [
+      {
+       "code": "subpartB",
+       "isSelected": true
+      },
+      {
+       "code": "subpartC",
+       "isSelected": true
+      },
+      {
+       "code": "subpartD",
+       "isSelected": true
+      },
+      {
+       "code": "subpartE",
+       "isSelected": true
+      },
+      {
+       "code": "subpartF",
+       "isSelected": true
+      }
+     ],
+     "description": ""
+    },
+    "formulaAndMatching": {
+     "moe": {
+      "description": ""
+     },
+     "types": {
+      "moe": false,
+      "formula": false,
+      "matching": false
+     },
+     "formula": {
+      "part": "",
+      "title": "",
+      "chapter": "",
+      "subPart": "",
+      "publicLaw": "",
+      "description": ""
+     },
+     "matching": {
+      "description": ""
+     },
+     "isApplicable": false
+    },
+    "additionalRequirements": {
+     "list": [
+      {
+       "id": "4afddcb4c1be4f5d8361ee9b635f74a6",
+       "URL": "https://hsema.dc.gov/page/securing-cities-stc-program",
+       "description": "Guidance from the ​​STC Fact Sheet​"
+      }
+     ]
+    },
+    "guidelinesAndInformation": {
+     "list": []
+    }
+   },
+   "fiscalYear": 2026,
+   "description": "​​This program’s purpose is to detect radiological/nuclear materials out of regulatory control and detect terrorists attacks.​",
+   "eligibility": {
+    "usage": {
+     "loanTerms": {
+      "description": "",
+      "isApplicable": false
+     },
+     "restrictions": {
+      "description": "See Program Guidance",
+      "isApplicable": true
+     },
+     "discretionaryFund": {
+      "description": "",
+      "isApplicable": false
+     }
+    },
+    "applicant": {
+     "types": [
+      "ET26020",
+      "ET26040"
+     ],
+     "description": "State, Local, and Tribal entities"
+    },
+    "limitation": {
+     "awarded": "other",
+     "description": "The length and time phasing of assistance varies with each award.  The award package includes instructions on administering the grant award, as well as the associated terms and conditions.  Recipients must accept all conditions of an award, as well as any special terms and conditions in the Notice of Award to receive an award under this program.  Refer to program guidance or the specific notice of funding opportunity (NOFO) for the method of awarding/releasing assistance. Awards are subject to the Cash Management Improvement Act for payment and/or reimbursement of expenditures.",
+     "awardedDescription": "See Program Guidance."
+    },
+    "beneficiary": {
+     "types": [
+      "ET26010",
+      "ET26020",
+      "ET26040"
+     ],
+     "description": "State, Local, and Tribal entities",
+     "isSameAsApplicant": false
+    },
+    "documentation": {
+     "description": [],
+     "isApplicable": false
+    },
+    "assistanceUsage": {
+     "types": [
+      "PM001",
+      "PR001",
+      "MC001"
+     ],
+     "description": "​​Salaries and Wages, Fringe Benefits, Equipment, Training, Supplies, Travel, Other (Backfill/Overtime), Indirect Costs, and Contractual​"
+    },
+    "assistanceRestriction": {
+     "types": [
+      "CN007",
+      "UN002"
+     ],
+     "description": "​​Cooperative Agreement funding must be used to accomplish the objectives of the program.​"
+    }
+   },
+   "programNumber": "97.106",
+   "authorizations": {
+    "list": [
+     {
+      "USC": {
+       "title": "6",
+       "section": "591-596",
+       "description": ""
+      },
+      "act": {
+       "description": "Homeland Security Act of 2002"
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "number": "10",
+       "description": "",
+       "congressCode": "112"
+      },
+      "executiveOrder": null,
+      "authorizationId": "04444981244319e14617f71b4bc28bcb",
+      "authorizationTypes": {
+       "USC": true,
+       "act": null,
+       "statute": null,
+       "publicLaw": null,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": null,
+       "title": "Countering Weapons of Mass Destruction Act of 2018",
+       "section": null,
+       "description": "Homeland Security Act of 2002"
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "number": "387",
+       "description": "",
+       "congressCode": "115"
+      },
+      "executiveOrder": null,
+      "authorizationId": "f926301603e345e18797a3a9c56c4675",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": true,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": null,
+       "title": "Homeland Security Act of 2002, as amended (6 U.S.C. Subsection 596b).",
+       "section": "1928",
+       "description": null
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "description": ""
+      },
+      "executiveOrder": null,
+      "authorizationId": "0bd870abf3764e9cbc347ae554a5f553",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": null,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     }
+    ]
+   },
+   "organizationId": "100176827",
+   "assistanceTypes": [
+    "0003001",
+    "0017001",
+    "0023001"
+   ],
+   "functionalCodes": [
+    "0006001",
+    "0010005"
+   ],
+   "alternativeNames": [
+    "​​Securing the Cities Program​"
+   ],
+   "popularShortName": "STC Program",
+   "missionSubCategories": [
+    {
+     "code": [
+      "0006006"
+     ],
+     "type": "Primary"
+    },
+    {
+     "code": [
+      "0007012",
+      "0010005",
+      "0016012"
+     ],
+     "type": "Other"
+    }
+   ]
+  },
+  "parentProgramId": "ecba4238e0b3a8469fc13c4daf58390f",
+  "latest": true,
+  "revision": false,
+  "fiscalYearLatest": true,
+  "publishedDate": "2026-10-09T05:00:21.007+00:00",
+  "modifiedDate": "2026-10-09T05:00:21.007+00:00",
+  "submittedDate": "2026-10-09T05:00:21.158+00:00",
+  "autoPublishDate": null,
+  "status": {
+   "code": "published",
+   "value": "Published"
+  },
+  "archived": false,
+  "additionalProperty": null,
+  "additionalInfo": {
+   "sections": [
+    {
+     "id": "header-information",
+     "status": "updated"
+    },
+    {
+     "id": "overview",
+     "status": "updated"
+    },
+    {
+     "id": "authorization",
+     "status": "updated"
+    },
+    {
+     "id": "financial-information-obligations",
+     "status": "updated"
+    },
+    {
+     "id": "financial-information-other",
+     "status": "updated"
+    },
+    {
+     "id": "criteria-information",
+     "status": "updated"
+    },
+    {
+     "id": "applying-for-assistance",
+     "status": "updated"
+    },
+    {
+     "id": "compliance-requirements",
+     "status": "updated"
+    },
+    {
+     "id": "contact-information",
+     "status": "updated"
+    }
+   ]
+  },
+  "_links": {
+   "self": {
+    "href": "/fac/v1/programs/8fdfa74764584e68866bd2c86952b754"
+   }
+  },
+  "id": "8fdfa74764584e68866bd2c86952b754"
+ }
+}

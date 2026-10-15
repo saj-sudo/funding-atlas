@@ -12,7 +12,17 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=8.2",
+    "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F: pyflakes + pycodestyle errors, I: import order, B: common bugs, UP: modern syntax.
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]   # line length is advisory; SQL strings and URLs run long on purpose

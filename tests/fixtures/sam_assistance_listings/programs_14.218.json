@@ -1,0 +1,661 @@
+{
+ "hit": {
+  "_rScore": 80,
+  "_type": "assistanceListing",
+  "publishDate": "2026-01-20T00:00:02-05:00",
+  "assistanceTypes": [
+   {
+    "hierarchy": [
+     {
+      "elementId": "F",
+      "code": "FF",
+      "level": 1,
+      "value": "Financial"
+     },
+     {
+      "elementId": "F001",
+      "code": "F001",
+      "level": 2,
+      "value": "Grant"
+     }
+    ]
+   }
+  ],
+  "fhNames": null,
+  "relatedPrograms": null,
+  "isActive": true,
+  "title": "Community Development Block Grants/Entitlement Grants",
+  "objective": "The primary objective of this program is the development of viable urban communities by providing decent housing, a suitable living environment, and expanding economic opportunities, principally for persons of low- and moderate-income. Each activity ",
+  "isFunded": true,
+  "historicalIndex": [
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2021-07-08T01:00:33.898-04:00",
+    "isManual": false,
+    "index": 6,
+    "historicalIndexId": "1a675d8943e841e0a6c4b74d989aaf50",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2021,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2020-06-12T01:00:02.482-04:00",
+    "isManual": false,
+    "index": 4,
+    "historicalIndexId": "416cab316ce5428c98244c6785150b9c",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100500309",
+    "actionType": "publish",
+    "createdDate": "2004-06-21T00:00:00-05:00",
+    "isManual": true,
+    "index": 1,
+    "historicalIndexId": "d918918207cb4357227efb57d8f54f03",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 1975,
+    "statusCode": "B"
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2020-11-12T00:00:02.247-05:00",
+    "isManual": false,
+    "index": 5,
+    "historicalIndexId": "6dc22acad20045b09803d2c17fef2d1b",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2020,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2019-09-04T01:00:35.86-04:00",
+    "isManual": false,
+    "index": 3,
+    "historicalIndexId": "cec78b7b9cc34d928c2130101b122403",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2019,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2018-09-17T01:00:14.65-04:00",
+    "isManual": false,
+    "index": 2,
+    "historicalIndexId": "53172e006b7c44e79d82ad6f1493ed37",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2018,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2023-08-21T01:00:10.37-04:00",
+    "isManual": false,
+    "index": 8,
+    "historicalIndexId": "10ae86076f8a464bb181e8412191ff60",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2023,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2022-08-11T01:08:55.28-04:00",
+    "isManual": false,
+    "index": 7,
+    "historicalIndexId": "52c1051cb1e546d8ae0043d3f952af87",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2022,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2023-09-05T01:03:57.291-04:00",
+    "isManual": false,
+    "index": 9,
+    "historicalIndexId": "614247809c6d469bb106981b6e49c49b",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2023,
+    "statusCode": ""
+   },
+   {
+    "organizationId": "100037358",
+    "actionType": "publish",
+    "createdDate": "2026-01-20T00:00:02.757-05:00",
+    "isManual": false,
+    "index": 10,
+    "historicalIndexId": "18029b0df6aa4bbcafd46a0a01a17f80",
+    "body": "Community Development Block Grants/Entitlement Grants",
+    "fiscalYear": 2026,
+    "statusCode": ""
+   }
+  ],
+  "assistanceTypeLabels": [
+   "F001 - Grant"
+  ],
+  "modifiedDate": "2026-01-20T00:00:02-05:00",
+  "organizationHierarchy": [
+   {
+    "organizationId": "100000391",
+    "code": "8600",
+    "level": 1,
+    "name": "HOUSING AND URBAN DEVELOPMENT, DEPARTMENT OF",
+    "status": "Active"
+   },
+   {
+    "organizationId": "100037358",
+    "code": "8620",
+    "level": 2,
+    "name": "ASSISTANT SECRETARY FOR COMMUNITY PLANNING AND DEVELOPMENT",
+    "status": "Active"
+   }
+  ],
+  "programNumber": "14.218",
+  "_id": "119731e97d1d45049c49031370539efb"
+ },
+ "detail": {
+  "data": {
+   "title": "Community Development Block Grants/Entitlement Grants",
+   "version": "2.0",
+   "website": "https://www.hud.gov/hud-partners/community-cdbg",
+   "contacts": {
+    "local": {
+     "flag": "none",
+     "description": "Contact appropriate HUD  Field Office listed on the HUD website at the link below:\nhttps://www.hud.gov/program_offices/comm_planning/staff",
+     "officeLocationURL": ""
+    },
+    "headquarters": [
+     {
+      "fax": "",
+      "zip": "20410",
+      "city": "Washington",
+      "email": "james.e.hoemann@hud.gov",
+      "phone": "202-402-5716",
+      "state": "DC",
+      "title": "Community Planning and Development Specialist",
+      "country": "US",
+      "fullName": "James E. Hoemann",
+      "contactId": "8a23028fbc64fd5e88636d9cc23a7b3c",
+      "streetAddress": "451 7th Street SW,  Room 7282",
+      "streetAddress2": ""
+     }
+    ]
+   },
+   "projects": {
+    "list": [],
+    "isApplicable": false
+   },
+   "financial": {
+    "accounts": [
+     {
+      "code": "86-0162-0-1-451",
+      "description": null
+     }
+    ],
+    "description": "From low of $63,935 to a high of $169,345,195 for New York City; average grant $1,949,851; median grant $897,413.",
+    "obligations": [
+     {
+      "values": [
+       {
+        "year": 2024,
+        "actual": 2461000000
+       },
+       {
+        "year": 2025,
+        "actual": 2004307112
+       },
+       {
+        "year": 2026,
+        "estimate": 2004307112
+       }
+      ],
+      "description": "Obligations made to entitled metropolitan cities and urban counties.",
+      "obligationId": "26adad02c866f4dfa94bf9d2d6603a6b",
+      "assistanceType": "F001",
+      "awardAmountBasisCode": [
+       "A02"
+      ],
+      "awardRecipientBasisCode": [
+       "R04"
+      ]
+     }
+    ],
+    "accomplishments": {
+     "list": [],
+     "isApplicable": false
+    },
+    "isFundedCurrentFY": true,
+    "additionalInformation": "The USAspending.gov information covers three assistance listings: 14.228 State CDBG, 14.218 Entitlement CDBG, and 14.225 Insular Areas CDBG. The obligations reported below only apply to the Entitlement CDBG program.",
+    "rangeAndAverageAssistance": [
+     {
+      "fiscalYear": "2025",
+      "averageAwardAmount": "1878521",
+      "maximumAwardAmount": "1701595540",
+      "minimumAwardAmount": "47069"
+     },
+     {
+      "fiscalYear": "2026",
+      "averageAwardAmount": "1878521",
+      "maximumAwardAmount": "170159554",
+      "minimumAwardAmount": "47069"
+     }
+    ]
+   },
+   "objective": "The primary objective of this program is the development of viable urban communities by providing decent housing, a suitable living environment, and expanding economic opportunities, principally for persons of low- and moderate-income. Each activity funded must meet one of the program's National Objectives by: Benefiting low- and moderate-income families; aiding in the prevention or elimination of slums or blight; or meeting other community\ndevelopment needs having a particular urgency because existing conditions pose a serious and immediate threat to the health or welfare of the community where other financial resources are not available.",
+   "assistance": {
+    "appeal": {
+     "interval": "9",
+     "description": "Administrative appeals process followed if entitlement grant funds are withheld or reduced, for reasons other than timely performance, or repayment proposed for non-compliance or non-performance."
+    },
+    "renewal": {
+     "interval": "8",
+     "description": "Every 3 to 5 years, localities submit a new Consolidated Plan.  For each year of a Consolidated Plan, localities submit an Annual Action Plan and program certifications."
+    },
+    "approval": {
+     "interval": "9",
+     "description": "HUD will review plan submissions for completeness and consistency with the purposes of the Act, within 45 days of receipt from a grantee."
+    },
+    "payments": {
+     "list": [
+      {
+       "type": "R",
+       "frequency": "O",
+       "paymentId": "5e828e1c26bb499e926d1d2e9c65223a",
+       "fundingDate": "20261001",
+       "spendingPeriod": 9,
+       "spendingPeriodType": "Y",
+       "frequencyDescription": "Based on the grantees policies and procedures",
+       "spendingPeriodDescription": "Not Applicable"
+      }
+     ]
+    },
+    "deadlines": {
+     "flag": "Y",
+     "list": [
+      {
+       "end": "2026-08-16",
+       "start": "2025-11-15",
+       "description": "See below."
+      }
+     ],
+     "description": "For formula grants in the 2026 fiscal year, Annual Action Plans associated with the Consolidated Plan must be submitted based on the grantee's program year, but no earlier than the date allocations are announced and no later than August 16, 2026."
+    },
+    "awardProcedure": {
+     "description": "HUD will provide funds based on the formula allocations after the grantee submits its Consolidated Plan, annual action plan and Certifications."
+    },
+    "selectionCriteria": {
+     "isApplicable": false
+    },
+    "applicationProcedure": {},
+    "preApplicationCoordination": {
+     "description": "Executive Order 12372 is applicable only where a recipient proposes to use funds for the planning or construction (reconstruction or installation) of water or sewer facilities.",
+     "environmentalImpact": {
+      "reports": [
+       {
+        "isSelected": true,
+        "reportCode": "ExecutiveOrder12372"
+       },
+       {
+        "isSelected": true,
+        "reportCode": "otherRequired"
+       }
+      ]
+     }
+    }
+   },
+   "compliance": {
+    "maps": {
+     "basis": [
+      {
+       "code": "Agency election",
+       "isSelected": true
+      }
+     ],
+     "usageList": [
+      {
+       "code": "Non-statistical uses",
+       "details": [
+        {
+         "code": "Recipient Eligibility",
+         "isSelected": true
+        }
+       ],
+       "isSelected": true
+      }
+     ],
+     "areCBSADelineationsUsed": "yes",
+     "currentCBSADelineationAdopted": {
+      "isSelected": "yes",
+      "historicalDelineationSelection": ""
+     }
+    },
+    "audit": {
+     "frequency": [
+      "A"
+     ],
+     "description": "The auditee  may elect to have a program-specific audit conducted under certain limited circumstances.",
+     "isApplicable": true
+    },
+    "records": {
+     "description": "The recipient must maintain records with regard to eligibility, national objectives, financial management, citizen participation, relocation, other resources, acquisition, housing assistance to dwelling units and households, equal opportunity, environmental impact, labor standards and other requirements set forth in the program regulations.  Records shall be retained for a period of four years after submission of the report in which the activity is reported as completed, except as otherwise prescribed in the regulations.",
+     "retentionPeriod": 4,
+     "retentionPeriodType": "Y"
+    },
+    "reports": [
+     {
+      "code": "progress",
+      "frequency": [
+       "A"
+      ],
+      "description": "The recipient's efficient expenditure of grant funds is evaluated annually (through information provided in the IDIS (see below)) 60-days prior to the end of its program year."
+     }
+    ],
+    "documents": {
+     "description": "",
+     "isApplicable": true
+    },
+    "CFR200Requirements": {
+     "questions": [
+      {
+       "code": "subpartB",
+       "isSelected": true
+      },
+      {
+       "code": "subpartC",
+       "isSelected": true
+      },
+      {
+       "code": "subpartD",
+       "isSelected": true
+      },
+      {
+       "code": "subpartE",
+       "isSelected": true
+      },
+      {
+       "code": "subpartF",
+       "isSelected": true
+      }
+     ],
+     "description": "Applicability of the uniform administrative requirements is amended by 24 CFR 570.502 of the CDBG regulations."
+    },
+    "formulaAndMatching": {
+     "moe": {
+      "description": ""
+     },
+     "types": {
+      "moe": false,
+      "formula": true,
+      "matching": false
+     },
+     "formula": {
+      "part": "570",
+      "title": "24",
+      "chapter": "V",
+      "subPart": "A",
+      "publicLaw": "93-383",
+      "description": "Entitlement grant amounts are determined by formula"
+     },
+     "matching": {
+      "description": ""
+     },
+     "isApplicable": true
+    },
+    "additionalRequirements": {
+     "list": []
+    },
+    "guidelinesAndInformation": {
+     "list": []
+    }
+   },
+   "fiscalYear": 2025,
+   "description": "The overall CDBG program objective is to develop viable urban communities by providing decent housing, a suitable living environment, and expanding economic opportunities, principally for persons of low and moderate income.  Funds made available under an emergency appropriation on March 27, 2020, known as CDBG-CV, are to be used similarly, but specifically to prevent, prepare for, and respond to coronavirus.",
+   "eligibility": {
+    "usage": {
+     "loanTerms": {
+      "description": "",
+      "isApplicable": false
+     },
+     "restrictions": {
+      "description": "Recipients may only carry out eligible activities as listed in 24 CFR 570.201-207 or the statute.\n\nRecipients may contract with other local agencies or nonprofit organizations to carry out part or all of their programs.  Community-based development organizations may carry out neighborhood revitalization, community economic development or energy conservation projects to further achieve the national objectives of the CDBG program.  CDBG-CV funds may be used to cover or reimburse allowable costs consistent with preventing, preparing for, and responding to coronavirus incurred by a locality regardless of the date on which such costs were incurred.  All eligible activities must either benefit low-and moderate-income persons, aid in the prevention or elimination of slums or blight, or meet other community development needs having a particular urgency that the grantee is unable to finance on its own.\n\nAdditionally, recipients of CDBG-CV funds are urged to use this funding in a coordinated effort with local public health authorities, emergency management offices, and other public safety authorities before undertaking any activity to support local pandemic response.  Recipients may undertake a wide range of activities directed toward assisting their community to prevent, prepare for, and respond to coronavirus.  Examples include public services designed to increase the capacity of the local health system to address the pandemic; emergency income payment programs to assist low- and moderate-income individuals and families with items such as food, clothing, housing, or utilities for a period of up to six consecutive months; interim assistance activities to address the public health emergency, such as “pop-up,” temporary coronavirus testing sites; grants or loans to businesses to avoid or mitigate job losses caused by business loss due to social distancing guidelines; assistance to microenterprises or other for-profit entities when the recipient determines that the provision of such assistance is appropriate to carry out critical medical, food delivery, cleaning, and other services to support home health and quarantine; assistance for the acquisition, rehabilitation, or construction of facilities for coronavirus testing, diagnosis, or treatment; and coronavirus planning and capacity building activities.\n\nEntitlement communities develop their own programs and funding priorities as long as programs/activities conform to the statutory standards and program regulations.  Specific statutory provisions of CDBG-CV funds include the suspension of the Housing and Community Development Act provision that caps expenditures for public services activities; the submission of the Consolidated Housing and Community Development Strategy and Plan (Con Plan) for use of CDBG-CV funds no later than August 16, 2021; the ability of a grantee to adopt and use expedited procedures to prepare, propose, modify, or amend its annual statement of activities (Annual Action Plan) to provide citizens with notice and a reasonable opportunity to comment of no less than five days; the suspension of in-person public hearings and the adoption of virtual public hearings to fulfill public hearing requirements for the use of all funds made available under the CARES Act as long as national or local health authorities recommend social distancing and limiting public gatherings for public health reasons; and the requirement that adequate procedures are in place to prevent duplication of benefits as required by the Stafford Act and in accordance with Disaster Recovery Reform Act of 2018.",
+      "isApplicable": true
+     },
+     "discretionaryFund": {
+      "description": "",
+      "isApplicable": false
+     }
+    },
+    "applicant": {
+     "types": [
+      "ET22020",
+      "ET24010",
+      "ET24020"
+     ],
+     "description": "Recipients are cities in Metropolitan Areas designated by OMB as a central city of the Metropolitan Area; principal cities of Metropolitan Areas with populations of less than 50,000; other cities over 50,000 in population in Metropolitan Areas; and qualified urban counties of at least 200,000 (excluding the population in entitlement cities located within the boundaries of such counties) are eligible to receive CDBG entitlement grants determined by a statutory formula."
+    },
+    "limitation": {
+     "awarded": "letter",
+     "description": "Program of assistance is for an annual activities, but activities generally may be continued beyond one year until they are deemed completed."
+    },
+    "beneficiary": {
+     "types": [
+      "ET11020",
+      "ET11010"
+     ],
+     "description": "The principal beneficiaries of CDBG funds are low- and moderate-income persons (generally defined as a member of a family having an income equal to or less than the Section 8 low income limit established by HUD).  The recipient must certify that at least 70 percent of the grant funds received during a 1, 2, or 3-year period, that it designates, are expended for activities that will principally benefit low- and moderate-income persons.",
+     "isSameAsApplicant": false
+    },
+    "documentation": {
+     "description": [
+      "Recipients must certify they will meet program requirements and applicable federal requirements."
+     ],
+     "isApplicable": true
+    },
+    "assistanceUsage": {
+     "types": [
+      "AD001",
+      "CC001",
+      "CN007",
+      "CN011",
+      "CP001"
+     ],
+     "description": "Recipient communities may undertake a wide range of community-based activities directed toward neighborhood revitalization, economic development, and community services, facilities, and improvements.  Entitlement communities develop their programs and set their funding priorities in conformance with the statutory standards, program regulations, and other federal requirements.  Specific activities that can be carried out with Community Development Block Grant (CDBG) funds include acquisition of real property; relocation; clearance and demolition; rehabilitation of residential and nonresidential structures; provision of public facilities and improvements, such as water and sewer facilities (which require reviews by the State single point of contact or a Regional Planning Agency in accordance with Executive Order 12372), streets, and neighborhood centers.  Within program limitations, CDBG funds can also pay for public services.  Recipients may provide assistance to microenterprises or other for-profit entities when the recipient determines that such assistance is appropriate to carry out an economic development project. Community-based development organizations may carry out neighborhood revitalization, community economic development, or energy conservation activities.  Each CDBG eligible activity must meet one of three national objectives:  benefit low- and moderate-income persons, aid in the prevention or elimination of slums or blight, or meet other community development needs having a particular urgency that the grantee is unable to finance on its own."
+    },
+    "assistanceRestriction": {
+     "types": [
+      "AD001"
+     ],
+     "description": "Recipients may only carry out eligible activities as listed in 24 CFR 570.201-207 or the statute. Recipients may contract with other local agencies or nonprofit organizations to carry out part or all of their programs. Community-based development organizations may carry out neighborhood revitalization, community economic development or energy conservation projects to further achieve the national objectives of the CDBG program. All eligible activities must either benefit low-and moderate-income persons, aid in the prevention or elimination of slums or blight, or meet other community development needs having a particular urgency that the grantee is unable to finance on its own. Entitlement communities develop their own programs and funding priorities as long as programs/activities conform to the statutory standards and program regulations."
+    }
+   },
+   "programNumber": "14.218",
+   "authorizations": {
+    "list": [
+     {
+      "USC": {
+       "title": "42",
+       "section": "5301-5321",
+       "description": ""
+      },
+      "act": {
+       "part": "24",
+       "title": "I",
+       "section": "570",
+       "description": "Housing and Community Development Act of 1974"
+      },
+      "statute": {
+       "page": "633",
+       "volume": "88",
+       "description": ""
+      },
+      "publicLaw": {
+       "number": "383",
+       "description": "",
+       "congressCode": "93"
+      },
+      "executiveOrder": null,
+      "authorizationId": "b2f68a4e9a37231ca9d8d2b0941a9638",
+      "authorizationTypes": {
+       "USC": true,
+       "act": true,
+       "statute": true,
+       "publicLaw": true,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     },
+     {
+      "USC": {
+       "description": ""
+      },
+      "act": {
+       "part": "",
+       "title": "",
+       "section": "Division B, Title XII",
+       "description": "Coronavirus Aid, Relief, and Economic Security Act or \"CARES Act\""
+      },
+      "statute": {
+       "description": ""
+      },
+      "publicLaw": {
+       "number": "136",
+       "description": "",
+       "congressCode": "116"
+      },
+      "executiveOrder": null,
+      "authorizationId": "ee79c6b804a74b059b8e799724ed5a61",
+      "authorizationTypes": {
+       "USC": null,
+       "act": true,
+       "statute": null,
+       "publicLaw": true,
+       "executiveOrder": null
+      },
+      "parentAuthorizationId": null
+     }
+    ]
+   },
+   "organizationId": "100037358",
+   "assistanceTypes": [
+    "0001001"
+   ],
+   "functionalCodes": [
+    "0002002",
+    "0003001",
+    "0003003",
+    "0003005",
+    "0003007",
+    "0003010",
+    "0003011",
+    "0003012",
+    "0010003",
+    "0012008",
+    "0013003",
+    "0013009",
+    "0013011",
+    "0013012",
+    "0017003",
+    "0002001",
+    "0003006",
+    "0006003",
+    "0008003",
+    "0008011",
+    "0016005"
+   ],
+   "relatedPrograms": [
+    "96651589d619442984f6d94444b55af0",
+    "762281971eaf463398442e8d4dd57313"
+   ],
+   "alternativeNames": [
+    "Community Development Block Grant Program for Entitlement Communities."
+   ],
+   "popularShortName": "CDBG",
+   "missionSubCategories": [
+    {
+     "code": [
+      "0003002"
+     ],
+     "type": "Primary"
+    },
+    {
+     "code": [
+      "0002002",
+      "0013002",
+      "0014011",
+      "0013009"
+     ],
+     "type": "Other"
+    }
+   ]
+  },
+  "parentProgramId": "75c19bc34eb650c446c2c4a078500ba5",
+  "latest": true,
+  "revision": false,
+  "fiscalYearLatest": true,
+  "publishedDate": "2026-01-20T05:00:02.615+00:00",
+  "modifiedDate": "2026-01-20T05:00:02.615+00:00",
+  "submittedDate": "2026-01-20T05:00:02.781+00:00",
+  "autoPublishDate": null,
+  "status": {
+   "code": "published",
+   "value": "Published"
+  },
+  "archived": false,
+  "additionalProperty": null,
+  "additionalInfo": {
+   "sections": [
+    {
+     "id": "financial-information-obligations",
+     "status": "updated"
+    },
+    {
+     "id": "overview",
+     "status": "updated"
+    },
+    {
+     "id": "authorization",
+     "status": "updated"
+    },
+    {
+     "id": "financial-information-other",
+     "status": "updated"
+    },
+    {
+     "id": "criteria-information",
+     "status": "updated"
+    },
+    {
+     "id": "applying-for-assistance",
+     "status": "updated"
+    },
+    {
+     "id": "compliance-requirements",
+     "status": "updated"
+    },
+    {
+     "id": "contact-information",
+     "status": "updated"
+    },
+    {
+     "id": "header-information",
+     "status": "updated"
+    }
+   ]
+  },
+  "_links": {
+   "self": {
+    "href": "/fac/v1/programs/119731e97d1d45049c49031370539efb"
+   }
+  },
+  "id": "119731e97d1d45049c49031370539efb"
+ }
+}

@@ -119,7 +119,9 @@ def fetch_detail(client: httpx.Client, opportunity_id: str) -> dict[str, Any]:
     return _post(client, FETCH_URL, {"opportunityId": int(opportunity_id)})["data"]
 
 
-def fetch(limit: int | None = None) -> list[RawRecord]:
+def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = None) -> list[RawRecord]:
+    """`prior` (last stored payloads) is accepted for interface parity and ignored: Grants.gov gives no
+    per-record change stamp on the search hit, so every detail is refetched."""
     out: list[RawRecord] = []
     with _client() as client:
         for hit in iter_hits(client, limit):
