@@ -25,6 +25,9 @@ def _describe(fields: dict | None) -> str:
     return ", ".join(parts)
 
 
+MAX_ROWS_PER_TABLE = 100   # a first catalog run adds ~2,900 rows; the report is for reading, the DB has the rest
+
+
 def latest_run_id(conn: sqlite3.Connection) -> int | None:
     row = conn.execute("SELECT MAX(id) FROM run").fetchone()
     return row[0] if row else None
@@ -60,11 +63,13 @@ def render(conn: sqlite3.Connection, run_id: int) -> str:
             return
         out.extend(["", f"### {title} ({len(subset)})", "",
                     "| name | status | closes | change | source |", "|---|---|---|---|---|"])
-        for r in subset:
+        for r in subset[:MAX_ROWS_PER_TABLE]:
             out.append(
                 f"| {_trim(r['name'])} | {r['status']} | {r['closes_at'] or ''} | "
                 f"{_trim(_describe(r['fields']), 90)} | {r['source_url']} |"
             )
+        if len(subset) > MAX_ROWS_PER_TABLE:
+            out.append(f"| … and {len(subset) - MAX_ROWS_PER_TABLE} more | | | | |")
 
     transitions = [r for r in rows if r["fields"] and "status" in r["fields"]]
     table("Status transitions", transitions)

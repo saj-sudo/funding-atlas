@@ -7,16 +7,25 @@ import sqlite3
 from datetime import UTC, datetime
 from types import ModuleType
 
-from connectors import grants_gov
+from connectors import grants_gov, sam_assistance_listings
 from pipeline.upsert import mark_missing, upsert
 
 CONNECTORS: dict[str, ModuleType] = {
     "grants_gov": grants_gov,
+    "sam_assistance_listings": sam_assistance_listings,
 }
 
 
 def utcnow() -> str:
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def load_prior(conn: sqlite3.Connection, name: str) -> dict[str, dict]:
+    """Last stored raw payload per source record, so a connector can skip refetching what has not moved."""
+    return {
+        r["source_id"]: json.loads(r["payload"])
+        for r in conn.execute("SELECT source_id, payload FROM raw_record WHERE source_connector = ?", (name,))
+    }
 
 
 def run_connector(name: str, conn: sqlite3.Connection, limit: int | None = None) -> int:
@@ -30,7 +39,7 @@ def run_connector(name: str, conn: sqlite3.Connection, limit: int | None = None)
     run_id = cur.lastrowid
     conn.commit()
     try:
-        raws = connector.fetch(limit=limit)
+        raws = connector.fetch(limit=limit, prior=load_prior(conn, name))
         conn.executemany(
             "INSERT INTO raw_record (source_connector, source_id, fetched_at, payload) VALUES (?, ?, ?, ?)"
             " ON CONFLICT(source_connector, source_id) DO UPDATE SET fetched_at = excluded.fetched_at,"
