@@ -1,7 +1,8 @@
 # funding-atlas
 
 A jurisdiction-indexed registry of public funding programs with change detection.
-See [CLAUDE.md](CLAUDE.md) for scope, schema, and how to work in this repo.
+What it is and the record model: [docs/SPEC.md](docs/SPEC.md). Plan and decisions: [docs/ROADMAP.md](docs/ROADMAP.md).
+How to work in the repo: [CLAUDE.md](CLAUDE.md).
 
 ```
 uv sync
