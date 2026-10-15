@@ -222,7 +222,7 @@ def test_normalize_funding_status_box():
     assert p.funding_source == "pass_through" and p.alns == ["93.568"]
     assert p.closes_at_text.startswith("next funding cycle: November 1, 2026")
     assert p.opens_at is None and p.closes_at is None
-    assert p.applicant_pairs() == [("household", "household")]
+    assert p.applicant_pairs() == []            # "To be eligible ... you must:" names no applicant type
 
 
 def test_normalize_invents_nothing_from_a_bare_box():
@@ -242,18 +242,50 @@ def test_normalize_invents_nothing_from_a_bare_box():
 
 
 def test_applicant_tags_come_from_who_sections_only():
-    sections = [
-        ("Eligible participants", "Small municipalities with populations of 5,000 or less are eligible."),
-        ("Eligible circuit sponsors", "Municipal governments, county governments or private organizations may sponsor."),
-        ("Eligible project locations", "Projects must serve residents of a Priority Funding Area."),
-        ("Eligible use of funds", "Salaries for homeowners' counselors."),
-        ("Eligible applicants", "IRS designated 501(c)(3) organizations."),
-    ]
-    text = md.applicant_sections_text(sections)
-    assert "residents" not in text and "homeowners" not in text
-    pairs = {(t.value, t.source_code) for t in md.applicant_types_for(text)}
+    html = ('<main><div class="usa-prose maryland-toc-target">'
+            '<h2>Eligible participants</h2><p>Small municipalities with populations of 5,000 or less are eligible.</p>'
+            '<h2>Eligible circuit sponsors</h2><p>Municipal governments, county governments or private organizations may sponsor.</p>'
+            '<h2>Eligible project locations</h2><p>Projects must serve residents of a Priority Funding Area.</p>'
+            '<h2>Eligible use of funds</h2><p>Salaries for homeowners\' counselors.</p>'
+            '<h2>Eligible applicants</h2><p>IRS designated 501(c)(3) organizations.</p>'
+            '<h2>Who is not eligible to apply?</h2><p>Businesses and individuals.</p>'
+            '</div></main>')
+    lines = md.applicant_text(html)
+    text = " ".join(lines)
+    assert "residents" not in text and "homeowners" not in text and "Businesses" not in text
+    pairs = {(t.value, t.source_code) for t in md.applicant_types_for(lines)}
     assert pairs == {("municipality", "municipalities"), ("county", "county"), ("nonprofit", "501(c)(3)")}
-    assert md.eligibility_text_for(sections).count("\n\n") == 4      # every eligibility section is kept verbatim
+    sections = md.body_sections(html)
+    assert md.eligibility_text_for(sections).count("\n\n") == 5      # every eligibility section is kept verbatim
+
+
+def test_applicant_lines_stop_at_conditions_and_skip_negations():
+    html = ('<main><div class="usa-prose maryland-toc-target"><h2>Eligible applicants</h2>'
+            '<p>To be eligible to receive a grant, an applicant must be either:</p>'
+            '<ul><li>A nonprofit organization</li><li>A State or local government unit</li></ul>'
+            '<p>For-profit businesses are not eligible to apply.</p>'
+            '<p>This credit is for developers that:</p>'
+            '<ul><li>are located within a Tier 1 County</li></ul>'
+            '<p>Level 2. Requires local government approval (municipality or county resolution).</p>'
+            '</div></main>')
+    pairs = {(t.value, t.source_code) for t in md.applicant_types_for(md.applicant_text(html))}
+    assert pairs == {("nonprofit", "nonprofit"), ("municipality", "local government"), ("county", "local government"),
+                     ("business", "developers")}
+
+
+def test_heading_counts_as_an_applicant_line():
+    html = ('<main><div class="usa-prose maryland-toc-target"><h2>Household eligibility requirements</h2>'
+            '<p>To qualify for assistance, you must:</p><ul><li>Be renting your home.</li></ul></div></main>')
+    assert [(t.value, t.source_code) for t in md.applicant_types_for(md.applicant_text(html))] == [("household", "household")]
+
+
+def test_place_words_after_a_spatial_preposition_are_not_applicants():
+    tags = md.applicant_types_for(["Units of general local government in non-entitlement counties and non-entitlement cities and towns"])
+    pairs = {(t.value, t.source_code) for t in tags}
+    assert ("county", "units of general local government") in pairs and ("municipality", "towns") in pairs
+    assert ("county", "counties") not in pairs
+    assert md.applicant_types_for(["then 4+ weeks of performances in 4+ cities outside Maryland"]) == []
+    assert md.applicant_types_for(["must be located in a designated rural county"]) == []
 
 
 def test_hash_is_stable_across_normalize_calls():

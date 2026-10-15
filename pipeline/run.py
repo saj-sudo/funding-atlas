@@ -7,13 +7,15 @@ import sqlite3
 from datetime import UTC, datetime
 from types import ModuleType
 
-from connectors import grants_gov, md_dhcd, sam_assistance_listings
+from connectors import grants_gov, md_commerce, md_dhcd, md_mht, sam_assistance_listings
 from pipeline.upsert import mark_missing, upsert
 
 CONNECTORS: dict[str, ModuleType] = {
     "grants_gov": grants_gov,
     "sam_assistance_listings": sam_assistance_listings,
     "md_dhcd": md_dhcd,
+    "md_commerce": md_commerce,
+    "md_mht": md_mht,
 }
 
 
