@@ -5,7 +5,7 @@ Milestone 4, connector 2. Live probe 2026-10-15. Platform notes and the base cla
 ## Source
 
 `https://commerce.maryland.gov`, Drupal on the maryland.gov platform. Programs live under `/financial-incentives/`
-in three sections: `grants` (8), `loans-financing` (12), `tax-incentives` (16). 36 program pages; the three section
+in three sections: `grants` (8), `loans-financing` (11), `tax-incentives` (15). 34 program pages; the three section
 index pages and two Global Gateway sub-pages have no status section and are not records.
 
 Sitemap entry:
@@ -33,7 +33,7 @@ Page skeleton (ExportMD):
   <h2>How to Apply</h2> ...
 ```
 
-`Program Status` is the first `<h2>` on all 36 pages (one page, the data center exemption, has it twice with the same
+`Program Status` is the first `<h2>` on all 34 pages (one page, the data center exemption, has it twice with the same
 text). It is prose, but the first sentence is formulaic. Every distinct opening seen:
 
 | Opening sentence(s) | Count | Reading |
@@ -101,7 +101,7 @@ as deadlines.
 
 ## Expected result (October 2026)
 
-36 records: about 25 open (most on a rolling basis), 9 closed, 1 forecasted (Manufacturing 4.0, next window
+34 records: 24 open (most on a rolling basis), 8 closed, 1 forecasted (Manufacturing 4.0, next window
 2027-08-02), 1 unknown (CBAF). Municipal relevance: Advantage Maryland (`likely`, from "counties, municipalities");
 everything else `possible` or `unlikely`. Commerce adds breadth to the registry, not many municipal hits; that is
 expected and fine.

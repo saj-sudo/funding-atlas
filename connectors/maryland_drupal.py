@@ -240,6 +240,7 @@ class MarylandDrupalConnector:
     SECTION_CATEGORIES: dict[str, tuple[str, ...]] = {}   # first URL segment -> categories; else ("other",)
     CATEGORY_CODE: str | None = None               # source_code for categories; default: the URL segment
     PASS_THROUGH: dict[str, list[str]] = {}        # source_id -> ALNs for federal pass-throughs
+    ELIGIBILITY_HEADING_RE: re.Pattern[str] = ELIGIBILITY_HEADING_RE # sections kept verbatim as eligibility_text
     APPLICANT_HEADING_RE: re.Pattern[str] = ELIGIBILITY_HEADING_RE   # sections scanned for applicant keywords
     THING_HEADING_RE: re.Pattern[str] | None = None                 # ... minus these (things, not people)
 
@@ -353,10 +354,13 @@ class MarylandDrupalConnector:
         """Where the match wording is looked for. Default: the whole body."""
         return " ".join(text for _, text in sections)
 
+    def match_required_for(self, text: str) -> bool | None:
+        return match_required_for(text)
+
     # -- shared mapping --
 
     def eligibility_text_for(self, sections: list[tuple[str, str]]) -> str | None:
-        texts = [text for heading, text in sections if ELIGIBILITY_HEADING_RE.search(heading) and text]
+        texts = [text for heading, text in sections if self.ELIGIBILITY_HEADING_RE.search(heading) and text]
         return "\n\n".join(texts) or None
 
     def applicant_sections_text(self, sections: list[tuple[str, str]]) -> str:
@@ -399,7 +403,7 @@ class MarylandDrupalConnector:
             funding_source="pass_through" if alns is not None else "direct",
             amount_min=amount_min,
             amount_max=amount_max,
-            match_required=match_required_for(self.match_text(sections)),
+            match_required=self.match_required_for(self.match_text(sections)),
             match_pct=None,
             status=status["status"],
             opens_at=status.get("opens_at"),

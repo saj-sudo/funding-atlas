@@ -9,7 +9,7 @@ Drupal-theme parser, not a SharePoint one". This doc records the check and what 
 
 | Site | Sitemap | Non-media pages | `og:updated_time` | DHCD summary box | Labeled status field | Verdict |
 |---|---|---|---|---|---|---|
-| commerce.maryland.gov | yes, 1,532 URLs, every one with `lastmod` | 209 (76 after skipping press room, boards, contacts) | yes | none | **`<h2>Program Status</h2>`** as the first body section on 36 program pages under `/financial-incentives/` | **Build.** Connector 2. |
+| commerce.maryland.gov | yes, 1,532 URLs, every one with `lastmod` | 209 (76 after skipping press room, boards, contacts) | yes | none | **`<h2>Program Status</h2>`** as the first body section on 34 program pages under `/financial-incentives/` | **Build.** Connector 2. |
 | mht.maryland.gov | yes, 673 URLs with `lastmod` | 302 (84 after skipping education-outreach, about, events, locations) | yes | 1 (a "now open" banner on the one open program) | **`<h2>Timeline</h2>`** bullets on 12 funding pages, plus a site-level **"Open funding opportunities"** list on `/funding/how-apply-grant` | **Build.** Connector 3. |
 | aging.maryland.gov | yes, 101 URLs | 62 (35 after skipping news, about, test pages) | yes | none | none; one `/grants` page with a single FY27 notice in prose | Not a source yet. Revisit when it has two programs. |
 | energy.maryland.gov (MEA) | **404** (SharePoint) | n/a | no | n/a | prose, hand-listed program URLs; some pages carry a `FY26 Program Status: The application portal is currently CLOSED to new applications.` sentence | Still deferred. No enumeration and no change-detection signal. Next lead after the Drupal sites; the "Program Status:" sentence is parseable. |
