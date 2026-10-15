@@ -77,8 +77,8 @@ ul, ol { margin: 0; padding: 0; }
 /* ---------- skip link, top bar ---------- */
 .skip { position: absolute; left: 16px; top: -60px; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; border-radius: 6px; z-index: 50; text-decoration: none; }
 .skip:focus { top: 12px; }
-.skip.inside { position: static; display: none; margin-bottom: 8px; }
-.skip.inside:focus { display: inline-block; }
+.skip.inside { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip.inside:focus { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: inline-block; margin: 0 0 10px; }
 #results:focus { outline: none; }
 .topbar { border-bottom: 1px solid var(--line); background: var(--surface); position: sticky; top: 0; z-index: 20; }
 .topbar .wrap { display: flex; align-items: center; gap: 14px; min-height: 56px; flex-wrap: wrap; padding-top: 6px; padding-bottom: 6px; }
