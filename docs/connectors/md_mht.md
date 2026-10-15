@@ -2,11 +2,21 @@
 
 Milestone 4, connector 3. Live probe 2026-10-15. Platform notes and the base class are in `maryland_drupal.md`.
 
+## Implemented (2026-10-15, same day)
+
+`connectors/md_mht.py` follows this doc on the `MarylandDrupalConnector` base. Live run on a fresh database: 11
+records (4 open, 7 closed), as expected below; the second run reports no changes. Amounts filled on 6 records
+(`up to $X` on five, the Maritime range on one; MHAA's two tiers stay null), match on 7. Two corrections to the
+survey, both counting errors: 11 program pages, not 12 (the easement page has a Timeline but no eligibility
+section), and the AAHPP `<h1>`s do carry "Non-Capital Grants" / "Capital Grants", so the names are distinct.
+The open list on the how-to-apply page is read from its list items only; the paragraph after it links a
+newsletter and an events page.
+
 ## Source
 
 `https://mht.maryland.gov`, Drupal on the maryland.gov platform. Funding programs live under `/funding/` (grants,
 loans, three state tax credits) plus the Maryland Heritage Areas Program project grants under `/planning-protection/`.
-12 program pages carry a `Timeline` section and an eligibility section. Local governments are named as eligible
+11 program pages carry a `Timeline` section and an eligibility section. Local governments are named as eligible
 applicants on 7 of them (Historic Preservation Capital and Non-Capital, MHAA project grants, Museum Assistance,
 Loans for Historic Preservation, Maritime Heritage, both AAHPP grants), which makes MHT the most municipal of the
 three Maryland agencies so far.
@@ -64,7 +74,8 @@ Nothing in a Timeline says whether the current round is open. Two things on the 
 
 - Enumerate from `sitemap.xml`; keep `/funding/...` and `/planning-protection/...`, skip media, education-outreach,
   about, events, locations, contacts. About 40 pages.
-- `fetch()` first GETs `/funding/how-apply-grant` and reads the open list (paths). Non-200 aborts the run: without the
+- `fetch()` first GETs `/funding/how-apply-grant` and reads the paths linked from the list under "Open funding
+  opportunities" (list items only; the paragraph after it links a newsletter and an events page). Non-200 aborts the run: without the
   list every status would be a guess. Every record payload, fresh or reused from `prior`, gets `listed_open: bool`
   stamped on it, so a change in the list changes the payload and the record even when the program page did not move.
 - A page is a record only if its body has a `Timeline` section and a heading matching `eligib`. The easement page has a
@@ -76,7 +87,7 @@ Nothing in a Timeline says whether the current round is open. Two things on the 
 | Program field | Source | Rule |
 |---|---|---|
 | source_connector | constant | `md_mht` |
-| name | `<h1>` | cleaned, verbatim. Both AAHPP pages are titled "Speaker Adrienne A. Jones African American Heritage Preservation Program"; the sub-program name exists only in the path. Not appended: never invent. `source_id` and `slug` disambiguate. |
+| name | `<h1>` | cleaned, verbatim (the AAHPP pages are "Speaker Adrienne A. Jones African American Heritage Preservation Program Non-Capital Grants" / "... Capital Grants") |
 | level / jurisdiction | constant | `state` / `MD` |
 | administering_agency / agency_code | constant | `Maryland Historical Trust` / `MD-MHT` |
 | funding_type | name keywords | `tax credit` → tax_credit, `loan` → loan, `grant` → grant; MHAA "Project Grants" → grant |
@@ -104,12 +115,11 @@ Nothing in a Timeline says whether the current round is open. Two things on the 
 2. **The open list is fetched every run and failure aborts the run.** The flag is stamped on reused payloads too.
 3. **Amounts are parsed here** because the wording is regular across pages; this is the first connector to fill
    `amount_max`. Two ranges on one page → null.
-4. **Both AAHPP pages keep the shared `<h1>`.** Ugly in a list, but it is what the page says.
 
 ## Expected result (October 2026)
 
-12 records: 4 open (AAHPP Non-Capital via the list, closes 2026-11-20; Loans, Homeowner and Small Commercial tax
-credits as year-round), 8 closed. `v_open_for_municipalities` gains AAHPP Non-Capital (likely: "Local governments")
+11 records: 4 open (AAHPP Non-Capital via the list, closes 2026-11-20; Loans, Homeowner and Small Commercial tax
+credits as year-round), 7 closed. `v_open_for_municipalities` gains AAHPP Non-Capital (likely: "Local governments")
 and Loans for Historic Preservation (likely). Maritime Heritage (round opens October 16, due November 13) is closed
 today by MHT's own list; if their list lags, the diff on a later run shows the flip.
 
