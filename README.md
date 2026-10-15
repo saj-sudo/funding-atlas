@@ -13,7 +13,9 @@ uv run python cli.py run md_commerce                          # Maryland Commerc
 uv run python cli.py run md_mht                               # Maryland Historical Trust: ~35 pages, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
+uv run python cli.py export                                   # export/maryland-municipal.html: the open-programs page (milestone 5)
 sqlite3 atlas.db "SELECT * FROM v_aln_coverage;"              # how many opportunities resolve to a listing
+sqlite3 atlas.db "SELECT * FROM v_municipal_page;"            # the page as data
 ```
 
 Connectors: `grants_gov` (federal notices), `sam_assistance_listings` (the program catalog underneath them,
@@ -21,3 +23,7 @@ joined by ALN through `v_opportunity_listing`), and three Maryland agencies on t
 `md_dhcd`, `md_commerce`, `md_mht`. They share `connectors/maryland_drupal.py` (sitemap enumeration, lastmod
 refetch gate, page parsing, applicant tagging) and each keeps only its own status rules. Docs per connector and for
 the shared base are in `docs/connectors/`.
+
+The page is one self-contained HTML file (no external assets) built from `v_municipal_page`: likely and possible
+municipal tiers, likely shown by default, filters by tier, level, status, agency and text. `export/` is gitignored;
+send the file as an attachment. Rows first seen or changed in the last 14 days carry a `new` or `updated` badge.

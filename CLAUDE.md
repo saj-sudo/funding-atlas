@@ -67,11 +67,13 @@ Applicant types include household/individual now even though v0.1 ignores them. 
 3. First Maryland agency connector.
 4. Second and third MD connectors; now extract the shared base class.
 5. Static HTML export; share with one person at a Maryland municipal league or COG and ask what's missing.
-   - Decide first: the `likely` tier now includes business programs that merely admit local governments
-     (Advantage Maryland, the Alcohol Manufacturing Fund; more sit in `possible`). Options: an agency or
-     category filter on the page next to the tier, a "primary applicant" signal in `v_municipal_relevance`
-     (e.g. local government named in the first applicant line, not just anywhere), or leave it and let the
-     COG reader say whether it bothers them. Context: `docs/connectors/maryland_drupal.md`, "Applicant lines".
+   - Page shipped (`scripts/export_html.py`, `v_municipal_page` in migration 0004, `cli.py export`). Decision
+     taken: the `likely` tier still includes business programs that merely admit local governments (Advantage
+     Maryland, the Alcohol Manufacturing Fund); the page handles that with tier, level, agency and text filters
+     and `v_municipal_relevance` is unchanged. A "primary applicant" signal (local government named in the first
+     applicant line, which needs the connectors to record line position) is deferred until the reader says the
+     business rows bother them. Context: `docs/connectors/maryland_drupal.md`, "Applicant lines".
+   - Next: send the file, collect answers to the four questions in its footer, then decide what milestone 6 is.
 
 ## Open questions (don't resolve in code yet)
 
