@@ -76,7 +76,7 @@ Nothing in a Timeline says whether the current round is open. Two things on the 
 | Program field | Source | Rule |
 |---|---|---|
 | source_connector | constant | `md_mht` |
-| name | `<h1>` | cleaned. The AAHPP pages are both titled "Speaker Adrienne A. Jones African American Heritage Preservation Program"; the `<h1>` is followed by the sub-program name in the sitemap path only, so `name` gets ` (Non-Capital Grants)` / ` (Capital Grants)` appended from the last path segment when two pages share an `<h1>`? No: never invent. Keep the `<h1>` verbatim; `source_id` and `slug` disambiguate. |
+| name | `<h1>` | cleaned, verbatim. Both AAHPP pages are titled "Speaker Adrienne A. Jones African American Heritage Preservation Program"; the sub-program name exists only in the path. Not appended: never invent. `source_id` and `slug` disambiguate. |
 | level / jurisdiction | constant | `state` / `MD` |
 | administering_agency / agency_code | constant | `Maryland Historical Trust` / `MD-MHT` |
 | funding_type | name keywords | `tax credit` → tax_credit, `loan` → loan, `grant` → grant; MHAA "Project Grants" → grant |
