@@ -74,6 +74,29 @@ FUNDING_TYPE_KEYWORDS: tuple[tuple[str, str], ...] = (
     ("tax credit", "tax_credit"), ("loan", "loan"), ("voucher", "voucher"), ("grant", "grant"),
 )
 
+# Applicant tags are read from lines that talk about who applies or qualifies. A line that names a
+# place ("in 4+ cities outside Maryland", "within a Tier 1 County") or a condition is not an applicant
+# line; a negated line ("For-profit businesses are not eligible to apply") never is. A paragraph that
+# ends with a colon introduces a list of applicants ("an applicant must be either:") unless it ends with
+# a condition word ("This credit is for businesses that:"), and list items at the top of a section are
+# introduced by the heading itself ("Eligible applicants").
+APPLICANT_MARKER_RE = re.compile(
+    r"appl(?:y|ies|icant|ication)|eligib|qualif(?:y|ies|ied|ying)|\bis for\b|\bare for\b|\bassists?\b"
+    r"|\bopen to\b|\bawarded to\b|\bgo(?:es)? to\b|\bserves?\b|\bbenefit",
+    re.I,
+)
+NEGATION_RE = re.compile(r"\b(?:not|cannot|ineligible|except|excluding|unless)\b", re.I)
+CONDITION_LEAD_IN_RE = re.compile(
+    r"\b(?:that|must|if|which|who|whose|company|business|businesses|you|categories|tracks|following"
+    r"|criteria|requirements)\s*:$",
+    re.I,
+)
+# A place word right after a spatial preposition is a place, not an applicant: "in 4+ cities outside
+# Maryland", "within a Tier 1 County", "located in a designated rural county".
+LOCATION_CONTEXT_RE = re.compile(
+    r"\b(?:in|within|outside|inside|into|across|throughout|near|serving|serve)\s+(?:[\w$%+,'’/()-]+\s+){0,3}$", re.I
+)
+
 MATCH_NOT_REQUIRED_RE = re.compile(r"match(?:ing)?(?: funds?)? (?:is|are) not required", re.I)
 MATCH_REQUIRED_RE = re.compile(r"match(?:ing)?(?: funds?)? (?:is|are) required", re.I)
 ELIGIBILITY_HEADING_RE = re.compile(r"eligib", re.I)
@@ -166,6 +189,44 @@ def section_lines(main_html: str, heading_re: re.Pattern[str]) -> list[tuple[str
     return out
 
 
+def section_lines_by_heading(main_html: str) -> list[tuple[str, list[tuple[str, str]]]]:
+    """(heading, [(tag, text), ...]) for every <h2> section, lines being its <li> and <p> elements."""
+    prose = _prose(main_html)
+    out: list[tuple[str, list[tuple[str, str]]]] = []
+    for el in prose.children:
+        if isinstance(el, Tag) and el.name == "h2":
+            out.append((clean(el.get_text(" ")), []))
+        elif out and isinstance(el, Tag):
+            for item in el.find_all(["li", "p"]) if el.name != "p" else [el]:
+                text = clean(item.get_text(" "))
+                if text:
+                    out[-1][1].append((item.name, text))
+    return out
+
+
+def applicant_lines(lines: list[tuple[str, str]]) -> list[str]:
+    """The lines of one who-may-apply section that name applicants (see APPLICANT_MARKER_RE). The first
+    line is the applicant statement whatever it says ("Maryland homeowners, builders, developers, or
+    investors who meet the following criteria:"); list items at the top are introduced by the heading.
+    These sections state the applicant, then list conditions, then define terms, so the scan stops at
+    the first condition lead-in ("businesses that:"): what follows is about the conditions, not the
+    applicant ("AND local government approval (municipality or county resolution/letter)")."""
+    out: list[str] = []
+    listing = True
+    for i, (tag, text) in enumerate(lines):
+        negated = bool(NEGATION_RE.search(text))
+        marked = i == 0 or bool(APPLICANT_MARKER_RE.search(text))
+        if tag == "p":
+            if marked and not negated:
+                out.append(text)
+            if text.endswith(":") and CONDITION_LEAD_IN_RE.search(text):
+                break
+            listing = marked and not negated and text.endswith(":")
+        elif listing and not negated:
+            out.append(text)
+    return out
+
+
 def parse_box(main_html: str) -> list[tuple[str, str]]:
     """(label, value) per bullet of the platform summary box, labels lowercased without the colon.
     Unlabeled bullets get label ''. No box -> []."""
@@ -200,14 +261,18 @@ def sentences(text: str) -> list[str]:
     return [s.strip() for s in _sentence_re.split(clean(text)) if s.strip()]
 
 
-def applicant_types_for(applicant_text: str | None) -> list[ApplicantTag]:
-    if not applicant_text:
-        return []
+def applicant_types_for(applicant_text: str | list[str] | None) -> list[ApplicantTag]:
+    """Keyword tags over applicant lines. The first match of each phrase that is not in a location
+    context wins; the matched phrase is the tag's source_code."""
+    lines = [applicant_text] if isinstance(applicant_text, str) else list(applicant_text or [])
     tags: list[ApplicantTag] = []
     for pattern, values in APPLICANT_KEYWORDS:
-        m = re.search(pattern, applicant_text, re.I)
-        if m:
-            phrase = m.group(0).lower()
+        phrase = next(
+            (m.group(0).lower() for line in lines for m in re.finditer(pattern, line, re.I)
+             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()])),
+            None,
+        )
+        if phrase:
             tags += [ApplicantTag(value=v, source_code=phrase) for v in values]
     return tags
 
@@ -363,13 +428,21 @@ class MarylandDrupalConnector:
         texts = [text for heading, text in sections if self.ELIGIBILITY_HEADING_RE.search(heading) and text]
         return "\n\n".join(texts) or None
 
-    def applicant_sections_text(self, sections: list[tuple[str, str]]) -> str:
-        return " ".join(
-            text for heading, text in sections
-            if self.APPLICANT_HEADING_RE.search(heading)
-            and not (self.THING_HEADING_RE is not None and self.THING_HEADING_RE.search(heading))
-            and text
-        )
+    def is_applicant_heading(self, heading: str) -> bool:
+        """A who-may-apply heading: matches APPLICANT_HEADING_RE, is not about things, is not negated
+        ("Who is not eligible to apply?", "Ineligible projects")."""
+        return (bool(self.APPLICANT_HEADING_RE.search(heading))
+                and not (self.THING_HEADING_RE is not None and self.THING_HEADING_RE.search(heading))
+                and not NEGATION_RE.search(heading) and "ineligible" not in heading.lower())
+
+    def applicant_text(self, main_html: str) -> list[str]:
+        """The applicant-naming lines of the who-may-apply sections. Never the whole page."""
+        return [
+            line
+            for heading, lines in section_lines_by_heading(main_html)
+            if self.is_applicant_heading(heading)
+            for line in applicant_lines(lines)
+        ]
 
     def categories_for(self, source_id: str) -> list[CategoryTag]:
         section = source_id.split("/", 1)[0]
@@ -413,7 +486,7 @@ class MarylandDrupalConnector:
             summary=clean(payload.get("description")) or None,
             eligibility_text=self.eligibility_text_for(sections),
             eligibility_structured=None,
-            applicant_types=applicant_types_for(self.applicant_sections_text(sections)),
+            applicant_types=applicant_types_for(self.applicant_text(main_html)),
             categories=self.categories_for(raw.source_id),
             alns=alns or [],
         )

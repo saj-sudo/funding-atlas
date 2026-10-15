@@ -213,6 +213,6 @@ resolve_missing = SITE.resolve_missing
 classify_page = SITE.classify_page
 iter_sitemap = SITE.iter_sitemap
 eligibility_text_for = SITE.eligibility_text_for
-applicant_sections_text = SITE.applicant_sections_text
+applicant_text = SITE.applicant_text
 categories_for = SITE.categories_for
 _client = SITE.client   # probe script

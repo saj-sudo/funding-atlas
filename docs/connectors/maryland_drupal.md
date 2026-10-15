@@ -62,6 +62,29 @@ Rule for the refactor: DHCD record hashes on the seven fixtures must be identica
 shared applicant keyword table gains entries (tribe, state agency, higher education, not-for-profit) that DHCD text
 happens to contain; the test run says which.
 
+## Applicant lines (added during implementation)
+
+The first live run of Commerce put six business tax credits in the municipal `likely` tier: their "Who This Is For"
+sections mention places ("4+ cities outside Maryland", "within a Tier 1 County", "incorporated municipalities") and
+conditions ("local government approval (municipality or county resolution)"), and the keyword scan read those as
+applicants. The sections on all three sites have the same shape: the applicant statement first, then a list of
+conditions, then definitions. So the scan now reads lines, not whole sections (`applicant_lines` in the base):
+
+- the first line of a who-section is the applicant statement whatever it says; list items at the top are introduced
+  by the heading ("Eligible applicants" → "Local governments");
+- a later paragraph counts only if it talks about applying or qualifying (`APPLICANT_MARKER_RE`), and a paragraph
+  ending in a colon introduces applicant list items ("an applicant must be either:") unless it ends with a
+  condition word ("businesses that:", "your company:"), where the scan stops for that section;
+- a negated line never counts ("For-profit businesses are not eligible to apply."), and neither does a negated
+  heading ("Who is not eligible to apply?");
+- a place word right after a spatial preposition is a place ("located in a designated rural county").
+
+Effect on DHCD, re-normalized from the stored fixtures: TAG, Community Legacy and MIP unchanged; CDBG loses the
+`county` tags it took from the entitlement-county list under "Who is not eligible"; NourishMD gains `for-profit`
+and loses a `county` from "located in a designated rural county"; Net Zero keeps homeowners and developers; MEAP
+loses its one `household` tag ("you must: meet income qualifications" names no applicant type). All on the side of
+reading less into the page.
+
 ## Applicant keyword table (shared; additions for milestone 4 marked)
 
 `units? of (general )?local government`, `local governments?` → municipality, county; `municipalit\w*`, `cities`,

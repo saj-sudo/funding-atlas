@@ -143,7 +143,7 @@ def test_normalize_open_window_from_until():
     p = normalize(RD)
     assert p.status == "open" and (p.opens_at, p.closes_at) == (date(2026, 6, 1), date(2026, 11, 15))
     assert p.rolling is None
-    assert ("business", "for-profit") in p.applicant_pairs()
+    assert p.applicant_pairs() == [("business", "businesses")]   # "for-profit" only appears in a later condition line
 
 
 def test_normalize_between_rounds_is_closed():

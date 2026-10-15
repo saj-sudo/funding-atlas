@@ -2,6 +2,19 @@
 
 Milestone 4, connector 2. Live probe 2026-10-15. Platform notes and the base class are in `maryland_drupal.md`.
 
+## Implemented (2026-10-15, same day)
+
+`connectors/md_commerce.py` follows this doc on the `MarylandDrupalConnector` base. Live run on a fresh database:
+34 records (24 open, 8 closed, 1 forecasted, 1 unknown), matching the expectation below; the second run reports no
+changes. 10 of the 24 open records are rolling. Dates landed where the wording allowed: ESCC and MPVOLP have both
+window dates, R&D its from/until window, Child Care its last close, M4.0 its announced next window as `opens_at`.
+MEIF's "deadline was 5:00 p.m. on June 1, 2026" stays in `closes_at_text` only.
+
+The first run also exposed a problem in the shared applicant scan (place words in "Who This Is For" tagging
+counties and cities as applicants), fixed in the base; see `maryland_drupal.md`, "Applicant lines". After the fix
+two Commerce records carry local-government tags, both correctly: Advantage Maryland ("counties, municipalities")
+and the Maryland Alcohol Manufacturing Fund ("A State or local government unit" may apply).
+
 ## Source
 
 `https://commerce.maryland.gov`, Drupal on the maryland.gov platform. Programs live under `/financial-incentives/`
