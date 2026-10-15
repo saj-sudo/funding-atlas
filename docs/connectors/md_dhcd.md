@@ -1,8 +1,36 @@
 # Maryland DHCD connector: site verification and field mapping
 
 Milestone 3 pre-work. Live probe of the five CLAUDE.md candidates on 2026-10-15, the raw data behind the pick, and the
-field mapping the parser session will implement. No code yet, by design: CLAUDE.md asks for URL, raw sample, and
+field mapping the parser implements. Written before any code, by design: CLAUDE.md asks for URL, raw sample, and
 mapping before any parser.
+
+## Implemented (2026-10-15, same day)
+
+`connectors/md_dhcd.py` follows this doc. Live run on a fresh database: 33 records added (13 open, 2 forecasted,
+15 closed, 1 exhausted, 2 unknown), matching the crawl table at the end of this doc; the second run reports no
+changes; `v_open_for_municipalities` lists CDBG Recovery Housing (tier likely, closes 2026-11-01), as predicted.
+Three things changed between the mapping below and the code, all on the side of inventing less:
+
+- **Applicant tags are read from the who-may-apply eligibility sections only.** "Eligible activities", "Eligible
+  project locations", "Eligible use of funds" and the like are kept verbatim in `eligibility_text` but not scanned
+  for applicant keywords, because "serve residents of a Priority Funding Area" was tagging TAG as a household
+  program. The rule is an exclusion list on the heading (`THING_HEADING_RE`), so "Eligible participants" and
+  "Eligible circuit sponsors" on the Circuit Rider page still count. `501(c)(3)` was added as a nonprofit phrase.
+- **No ALN for CDBG Recovery Housing.** SAM.gov has no listing titled Recovery Housing (14.277, 14.278, 14.279 are
+  other programs), so it is `pass_through` with an empty ALN list. 14.228, 81.042 and 93.568 verified.
+- **`Next funding cycle` is kept in `closes_at_text`** (MEAP), never parsed into a date column.
+
+Known gaps, all because the page does not say it, so the record does not either:
+- Seven records have no applicant tags: State Revitalization Programs (eligibility lives on the sub-program pages,
+  which have no box), Main Street Improvement Grant ("Main Street Maryland communities" is not in the keyword map),
+  Main Street Tier Structure, Maryland Housing Leadership Awards ("local jurisdictions", under an "Award categories"
+  heading), Homelessness Solutions Program, Housing Choice Voucher Program, Lead Hazard Reduction. SRP and MIP are
+  municipal rounds, so when they reopen they will show in the diff but not in `v_open_for_municipalities` until
+  either the keyword map grows or SRP borrows eligibility from its sub-pages. Decide at milestone 4.
+- Only record pages are stored in `raw_record`, so the `lastmod` gate covers 33 of ~200 pages and a warm run is
+  still about 170 requests (75 seconds). Fine for one agency.
+- `Program.slug` embeds `source_id`, which here is a path with slashes. Unique and harmless, ugly if slugs ever
+  become URLs.
 
 ## Context
 
