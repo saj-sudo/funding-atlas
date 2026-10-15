@@ -36,7 +36,7 @@ REPO_URL = "https://github.com/saj-sudo/funding-atlas"
 NEW_DAYS = 7           # first seen (after the source's first full read) within this many days -> "new"
 UPDATED_DAYS = 7       # source changed within this many days -> "updated"
 CLOSING_DAYS = 30      # closes within this many days -> "closing soon"
-FEED_N = 200           # change-feed rows per state page (federal + that state)
+FEED_N = 200           # change-feed rows per state page: the newest N federal plus the newest N of that state
 INDEX_FEED_N = 20      # change-feed rows on the index
 
 CONNECTOR_LABEL = {
@@ -250,7 +250,12 @@ def state_payload(
 ) -> dict[str, Any]:
     rows = [p for p in programs if p["state"] is None or p["state"] == code]
     listed = {p["id"] for p in rows}
-    feed = [shape_change(c, listed) for c in changes if c["state"] is None or c["state"] == code][:FEED_N]
+    # Newest N federal plus newest N state rows, merged: a day of 1,000 federal changes must not push the
+    # state's own log off its page.
+    fed = [c for c in changes if c["state"] is None][:FEED_N]
+    own = [c for c in changes if c["state"] == code][:FEED_N]
+    merged = sorted(fed + own, key=lambda c: (c["changed_at"], c["change_id"]), reverse=True)
+    feed = [shape_change(c, listed) for c in merged]
     cov = coverage.get(code)
     federal_open = sum(1 for p in rows if p["state"] is None)
     return {

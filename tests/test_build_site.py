@@ -146,6 +146,7 @@ def test_build_shapes_changes(conn):
     added = next(c for c in md["changes"] if c["name"] == "Brand New Notice")
     assert added["type"] == "added" and added["listed"] is True and added["fields"] == []
     assert all(c["state"] in (None, "MD") for c in md["changes"])
+    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 3    # two added + the flip, never starved by federal rows
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
