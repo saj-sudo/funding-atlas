@@ -299,6 +299,7 @@ footer.site b { color: var(--ink); }
   .topbar, .pulse, .tabs, .toolbar, .facets, .filters-toggle, .skip, dialog, .chipbar, .arrow, .goto, .hover { display: none !important; }
   .layout { grid-template-columns: 1fr; }
   .card { break-inside: avoid; box-shadow: none; }
+  .card:focus-within { outline: none; }
   .card h3 button::after { content: " (" attr(data-url) ")"; font-weight: 400; font-size: .8rem; color: #333; }
   #panel-changes[hidden] { display: block !important; }
   #panel-changes::before { content: "Changes"; display: block; font-weight: 700; font-size: 1.2rem; margin: 24px 0 8px; }
