@@ -84,6 +84,6 @@ def test_open_view_orders_by_tier(conn):
 
 
 def test_migration_is_recorded_and_rerun_safe(conn):
-    assert db.schema_version(conn) == 2
+    assert db.schema_version(conn) == db.migrations()[-1][0]
     db.apply_schema(conn)  # second call must not fail or duplicate
-    assert conn.execute("SELECT COUNT(*) FROM schema_version").fetchone()[0] == 2
+    assert conn.execute("SELECT COUNT(*) FROM schema_version").fetchone()[0] == 1 + len(db.migrations())
