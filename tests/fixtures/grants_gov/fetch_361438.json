@@ -1,0 +1,846 @@
+{
+ "errorcode": 0,
+ "msg": "Webservice Succeeds",
+ "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.InZ4TkZ1Q3haNXJkR1NIbVM1ZkdjZEFFVW9vM25oVmZKREpnQUdsd1dVNjg9Ig.nToXKfsjx6PLsqj0N4wt4_6ymU0ynAMU_WMT8ih0Z8U",
+ "data": {
+  "id": 361438,
+  "revision": 4,
+  "opportunityNumber": "PAR-28-014",
+  "opportunityTitle": "Early-Onset Cancers: Investigating Etiology, Mechanisms, and Early Detection Strategies (RP1 Clinical Trials Optional)",
+  "owningAgencyCode": "HHS-NIH11",
+  "listed": "L",
+  "publisherUid": "1643657692",
+  "modifiedComments": "Updated opportunity details to match NOFO.",
+  "flag2006": "N",
+  "opportunityCategory": {
+   "category": "D",
+   "description": "Discretionary"
+  },
+  "synopsis": {
+   "opportunityId": 361438,
+   "version": 1,
+   "agencyCode": "HHS-NIH11",
+   "agencyName": "National Institutes of Health",
+   "agencyPhone": "301-402-2541",
+   "agencyAddressDesc": "Early-OnsetCancersNOFO_DCCPS_DCB_DCP@mail.nih.gov",
+   "agencyDetails": {
+    "code": "NIH",
+    "seed": "HHS-NIH11",
+    "agencyName": "National Institutes of Health",
+    "agencyCode": "HHS-NIH11",
+    "topAgencyCode": "HHS"
+   },
+   "topAgencyDetails": {
+    "code": "HHS",
+    "seed": "HHS",
+    "agencyName": "Department of Health and Human Services",
+    "agencyCode": "HHS",
+    "topAgencyCode": "HHS"
+   },
+   "agencyContactPhone": "301-402-2541",
+   "agencyContactName": "National Institutes of Health",
+   "agencyContactDesc": "National Cancer Institute (NCI)\nEarly-OnsetCancersNOFO_DCCPS_DCB_DCP@mail.nih.gov",
+   "agencyContactEmail": "Early-OnsetCancersNOFO_DCCPS_DCB_DCP@mail.nih.gov",
+   "agencyContactEmailDesc": "Early-OnsetCancersNOFO_DCCPS_DCB_DCP@mail.nih.gov",
+   "synopsisDesc": "<p>This Notice of Funding Opportunity (NOFO) invites applications that investigate the etiology of sporadic non-hereditary early-onset cancers (EOCs: ages 18 to 49 years) and the underlying biological mechanisms that play a role in these cancers to inform prevention and control strategies. The proposed research is expected to advance the understanding of the unexplained rise of cancers in young adults. More specifically, studies should focus on one or more of the following: i) identifying what environmental or lifestyle exposures are driving the increase in the incidence of non-hereditary EOCs, and how these factors vary by patient demographics; ii) examining the biological mechanisms and host responses that underlie the increase in EOCs; and iii) identifying how those at increased risk of developing EOCs can be identified more effectively.</p><p>In an effort to streamline the application process and sustain momentum in this critical research area, this NOFO &nbsp;supports both exploratory/developmental and standard research projects through a grant award instrument.&nbsp;</p>",
+   "responseDate": "Oct 11, 2029 12:00:00 AM EDT",
+   "postingDate": "Oct 14, 2026 12:00:00 AM EDT",
+   "archiveDate": "Dec 11, 2029 12:00:00 AM EST",
+   "costSharing": false,
+   "awardCeiling": "none",
+   "awardFloor": "none",
+   "applicantEligibilityDesc": "Refer to Section III. Eligibility Information in the NOFO for additional information on eligibility.Foreign Organizations/International CollaborationsNon-domestic (non-U.S.) Entities (Foreign Organizations) are eligible to apply.Non-domestic (non-U.S.) components of U.S. Organizations are eligible to apply.Foreign components, as defined in the NIH Grants Policy Statement, are not allowed.NIH will no longer issue awards (i.e., new, renewal, or non-competing continuation) to domestic or foreign entities that involve foreign subawards/subcontracts. All NIH-funded research involving foreign subawards/subcontracts must be submitted in response to a NOFO that is specifically designated for funded international collaborations. See NIH Grants Policy Statement 16.8 Collaborative International Research Awards.Applications involving foreign subawards/subcontracts submitted in response to this NOFO will be deemed noncompliant and will not be considered for funding. This policy applies to all monetary international collaborations resulting in foreign subawards/subcontracts, however, it does not preclude unfunded international collaborations or foreign components, funding for foreign consultants, or procurement of unique equipment or supplies from foreign vendors.",
+   "createTimeStamp": "Oct 14, 2026 02:04:02 PM EDT",
+   "createdDate": "Oct 14, 2026 02:03:53 PM EDT",
+   "lastUpdatedDate": "Oct 14, 2026 02:03:53 PM EDT",
+   "applicantTypes": [
+    {
+     "id": "06",
+     "description": "Public and State controlled institutions of higher education"
+    },
+    {
+     "id": "08",
+     "description": "Public housing authorities/Indian housing authorities"
+    },
+    {
+     "id": "23",
+     "description": "Small businesses"
+    },
+    {
+     "id": "22",
+     "description": "For profit organizations other than small businesses"
+    },
+    {
+     "id": "20",
+     "description": "Private institutions of higher education"
+    },
+    {
+     "id": "25",
+     "description": "Others (see text field entitled \"Additional Information on Eligibility\" for clarification)"
+    },
+    {
+     "id": "07",
+     "description": "Native American tribal governments (Federally recognized)"
+    },
+    {
+     "id": "05",
+     "description": "Independent school districts"
+    },
+    {
+     "id": "02",
+     "description": "City or township governments"
+    },
+    {
+     "id": "11",
+     "description": "Native American tribal organizations (other than Federally recognized tribal governments)"
+    },
+    {
+     "id": "01",
+     "description": "County governments"
+    },
+    {
+     "id": "00",
+     "description": "State governments"
+    },
+    {
+     "id": "13",
+     "description": "Nonprofits that do not have a 501(c)(3) status with the IRS, other than institutions of higher education"
+    },
+    {
+     "id": "12",
+     "description": "Nonprofits having a 501(c)(3) status with the IRS, other than institutions of higher education"
+    },
+    {
+     "id": "04",
+     "description": "Special district governments"
+    }
+   ],
+   "fundingInstruments": [
+    {
+     "id": "G",
+     "description": "Grant"
+    }
+   ],
+   "fundingActivityCategories": [
+    {
+     "id": "HL",
+     "description": "Health"
+    }
+   ],
+   "responseDateStr": "2029-10-11-00-00-00",
+   "postingDateStr": "2026-10-14-00-00-00",
+   "archiveDateStr": "2029-12-11-00-00-00",
+   "createTimeStampStr": "2026-10-14-14-04-02"
+  },
+  "agencyDetails": {
+   "code": "NIH",
+   "seed": "HHS-NIH11",
+   "agencyName": "National Institutes of Health",
+   "agencyCode": "HHS-NIH11",
+   "topAgencyCode": "HHS"
+  },
+  "topAgencyDetails": {
+   "code": "HHS",
+   "seed": "HHS",
+   "agencyName": "Department of Health and Human Services",
+   "agencyCode": "HHS",
+   "topAgencyCode": "HHS"
+  },
+  "forecast": {
+   "opportunityId": 361438,
+   "version": 4,
+   "postingDate": "Mar 10, 2026 12:00:00 AM EDT",
+   "archiveDate": "Oct 13, 2026 12:00:00 AM EDT",
+   "forecastDesc": "<p>Through this Notice of Funding Opportunity (NOFO), the National Cancer Institute (NCI) invites applications that investigate the etiology of sporadic non-hereditary early-onset cancers (EOCs: ages 18 to 49 years) and the underlying biological mechanisms that play a role in these cancers to inform prevention and control strategies. The proposed research is expected to advance the understanding of the unexplained rise of cancers in young adults. More specifically, studies should address one or more of the following: i) what modifiable exposures are driving the increase in the incidence of non-hereditary EOCs, and how do these factors vary by patient demographics? (ii) what biological mechanisms and host responses underly the increase in EOCs? and (iii) how can those at increased risk for developing EOCs be identified more effectively?</p><p>This NOFO consolidates exploratory/developmental and research project funding mechanisms to streamline the application process and sustain momentum in this critical research area. Applicants have the option of submitting either an exploratory/developmental research project with a project period of up to 2 years or a research project with a project period of 4 to 5 years.</p><p>&nbsp;</p>",
+   "costSharing": false,
+   "agencyContactName": "Epidemiology and Genomics Research Program",
+   "agencyContactPhone": "240-276-6932",
+   "agencyContactEmail": "ncidccpsegrpnofos@mail.nih.gov",
+   "agencyContactEmailDesc": "ncidccpsegrpnofos@mail.nih.gov",
+   "agencyCode": "HHS-NIH11",
+   "applicantEligibilityDesc": "Other Eligible ApplicantsIndian/Native American Tribal Governments (Other than Federally Recognized);Eligible Agencies of the Federal Government;U.S. Territory or Possession;Regional Organizations;Non-domestic (non-U.S.) Entities (Foreign Institutions).",
+   "estSynopsisPostingDate": "Jun 30, 2026 12:00:00 AM EDT",
+   "estApplicationResponseDate": "Oct 05, 2026 12:00:00 AM EDT",
+   "estAwardDate": "Jul 01, 2027 12:00:00 AM EDT",
+   "estProjectStartDate": "Jul 01, 2027 12:00:00 AM EDT",
+   "fiscalYear": 2027,
+   "modComments": "Updated Archive Date",
+   "createTimeStamp": "Oct 14, 2026 02:04:02 PM EDT",
+   "createdDate": "Mar 10, 2026 03:06:45 PM EDT",
+   "lastUpdatedDate": "Oct 14, 2026 02:04:02 PM EDT",
+   "agencyDetails": {
+    "code": "NIH",
+    "seed": "HHS-NIH11",
+    "agencyName": "National Institutes of Health",
+    "agencyCode": "HHS-NIH11",
+    "topAgencyCode": "HHS"
+   },
+   "applicantTypes": [
+    {
+     "id": "06",
+     "description": "Public and State controlled institutions of higher education"
+    },
+    {
+     "id": "08",
+     "description": "Public housing authorities/Indian housing authorities"
+    },
+    {
+     "id": "23",
+     "description": "Small businesses"
+    },
+    {
+     "id": "22",
+     "description": "For profit organizations other than small businesses"
+    },
+    {
+     "id": "20",
+     "description": "Private institutions of higher education"
+    },
+    {
+     "id": "25",
+     "description": "Others (see text field entitled \"Additional Information on Eligibility\" for clarification)"
+    },
+    {
+     "id": "07",
+     "description": "Native American tribal governments (Federally recognized)"
+    },
+    {
+     "id": "05",
+     "description": "Independent school districts"
+    },
+    {
+     "id": "02",
+     "description": "City or township governments"
+    },
+    {
+     "id": "11",
+     "description": "Native American tribal organizations (other than Federally recognized tribal governments)"
+    },
+    {
+     "id": "01",
+     "description": "County governments"
+    },
+    {
+     "id": "00",
+     "description": "State governments"
+    },
+    {
+     "id": "13",
+     "description": "Nonprofits that do not have a 501(c)(3) status with the IRS, other than institutions of higher education"
+    },
+    {
+     "id": "12",
+     "description": "Nonprofits having a 501(c)(3) status with the IRS, other than institutions of higher education"
+    },
+    {
+     "id": "04",
+     "description": "Special district governments"
+    }
+   ],
+   "fundingInstruments": [
+    {
+     "id": "G",
+     "description": "Grant"
+    }
+   ],
+   "fundingActivityCategories": [
+    {
+     "id": "HL",
+     "description": "Health"
+    }
+   ],
+   "postingDateStr": "2026-03-10-00-00-00",
+   "archiveDateStr": "2026-10-13-00-00-00",
+   "estSynopsisPostingDateStr": "2026-06-30-00-00-00",
+   "estApplicationResponseDateStr": "2026-10-05-00-00-00",
+   "estAwardDateStr": "2027-07-01-00-00-00",
+   "estProjectStartDateStr": "2027-07-01-00-00-00",
+   "createTimeStampStr": "2026-10-14-14-04-02"
+  },
+  "synopsisAttachmentFolders": [
+   {
+    "id": 81401,
+    "opportunityId": 361438,
+    "folderType": "Full Announcement",
+    "folderName": "Full Announcement",
+    "zipLobSize": 29259,
+    "createdDate": "Oct 14, 2026 02:04:01 PM EDT",
+    "lastUpdatedDate": "Oct 14, 2026 02:04:02 PM EDT",
+    "synopsisAttachments": [
+     {
+      "id": 355217,
+      "opportunityId": 361438,
+      "mimeType": "text/html;charset=UTF-8",
+      "fileName": "PAR-28-014-Full-Announcement.html",
+      "fileDescription": "PAR-28-014-Full-Announcement.html",
+      "fileLobSize": 130952,
+      "createdDate": "Oct 14, 2026 02:04:02 PM EDT",
+      "synopsisAttFolderId": 81401
+     }
+    ]
+   }
+  ],
+  "synopsisDocumentURLs": [],
+  "synAttChangeComments": [],
+  "cfdas": [
+   {
+    "id": 435791,
+    "opportunityId": 361438,
+    "cfdaNumber": "93.113",
+    "programTitle": "Environmental Health"
+   },
+   {
+    "id": 432155,
+    "opportunityId": 361438,
+    "cfdaNumber": "93.393",
+    "programTitle": "Cancer Cause and Prevention Research"
+   }
+  ],
+  "opportunityHistoryDetails": [
+   {
+    "oppHistId": {
+     "opportunityId": 361438,
+     "revision": 0
+    },
+    "opportunityId": 361438,
+    "revision": 0,
+    "opportunityNumber": "PAR-26-150",
+    "opportunityTitle": "Early-Onset Cancers: Investigating Etiology, Mechanisms, and Early Detection Strategies (RP1 Clinical Trials Optional)",
+    "owningAgencyCode": "HHS-NIH11",
+    "publisherUid": "85078824959489933389587371192040018034",
+    "opportunityCategory": {
+     "category": "D",
+     "description": "Discretionary"
+    },
+    "forecast": {
+     "oppHistId": {
+      "opportunityId": 361438,
+      "revision": 0
+     },
+     "opportunityId": 361438,
+     "revision": 0,
+     "version": 1,
+     "postingDate": "Mar 10, 2026 12:00:00 AM EDT",
+     "forecastDesc": "<p>Through this Notice of Funding Opportunity (NOFO), the National Cancer Institute (NCI) invites applications that investigate the etiology of sporadic non-hereditary early-onset cancers (EOCs: ages 18 to 49 years) and the underlying biological mechanisms that play a role in these cancers to inform prevention and control strategies. The proposed research is expected to advance the understanding of the unexplained rise of cancers in young adults. More specifically, studies should address one or more of the following: i) what modifiable exposures are driving the increase in the incidence of non-hereditary EOCs, and how do these factors vary by patient demographics? (ii) what biological mechanisms and host responses underly the increase in EOCs? and (iii) how can those at increased risk for developing EOCs be identified more effectively?</p><p>This NOFO consolidates exploratory/developmental and research project funding mechanisms to streamline the application process and sustain momentum in this critical research area. Applicants have the option of submitting either an exploratory/developmental research project with a project period of up to 2 years or a research project with a project period of 4 to 5 years.</p><p>&nbsp;</p>",
+     "costSharing": false,
+     "agencyContactName": "Epidemiology and Genomics Research Program",
+     "agencyContactPhone": "240-276-6932",
+     "agencyContactEmail": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyContactEmailDesc": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyCode": "HHS-NIH11",
+     "applicantEligibilityDesc": "Other Eligible ApplicantsIndian/Native American Tribal Governments (Other than Federally Recognized);Eligible Agencies of the Federal Government;U.S. Territory or Possession;Regional Organizations;Non-domestic (non-U.S.) Entities (Foreign Institutions).",
+     "estSynopsisPostingDate": "Jun 30, 2026 12:00:00 AM EDT",
+     "estApplicationResponseDate": "Oct 05, 2026 12:00:00 AM EDT",
+     "estAwardDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "estProjectStartDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "fiscalYear": 2027,
+     "createTimeStamp": "Mar 10, 2026 03:06:45 PM EDT",
+     "actionType": "U",
+     "actionDate": "Oct 14, 2026 01:53:43 PM EDT",
+     "createdDate": "Mar 10, 2026 03:06:45 PM EDT",
+     "lastUpdatedDate": "Mar 10, 2026 03:06:45 PM EDT",
+     "agencyDetails": {
+      "code": "NIH",
+      "seed": "HHS-NIH11",
+      "agencyName": "National Institutes of Health",
+      "agencyCode": "HHS-NIH11",
+      "topAgencyCode": "HHS"
+     },
+     "applicantTypes": [
+      {
+       "id": "05",
+       "description": "Independent school districts"
+      },
+      {
+       "id": "22",
+       "description": "For profit organizations other than small businesses"
+      },
+      {
+       "id": "11",
+       "description": "Native American tribal organizations (other than Federally recognized tribal governments)"
+      },
+      {
+       "id": "12",
+       "description": "Nonprofits having a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "07",
+       "description": "Native American tribal governments (Federally recognized)"
+      },
+      {
+       "id": "20",
+       "description": "Private institutions of higher education"
+      },
+      {
+       "id": "23",
+       "description": "Small businesses"
+      },
+      {
+       "id": "04",
+       "description": "Special district governments"
+      },
+      {
+       "id": "02",
+       "description": "City or township governments"
+      },
+      {
+       "id": "13",
+       "description": "Nonprofits that do not have a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "00",
+       "description": "State governments"
+      },
+      {
+       "id": "08",
+       "description": "Public housing authorities/Indian housing authorities"
+      },
+      {
+       "id": "01",
+       "description": "County governments"
+      },
+      {
+       "id": "06",
+       "description": "Public and State controlled institutions of higher education"
+      },
+      {
+       "id": "25",
+       "description": "Others (see text field entitled \"Additional Information on Eligibility\" for clarification)"
+      }
+     ],
+     "fundingInstruments": [
+      {
+       "id": "G",
+       "description": "Grant"
+      }
+     ],
+     "fundingActivityCategories": [
+      {
+       "id": "HL",
+       "description": "Health"
+      }
+     ],
+     "postingDateStr": "2026-03-10-00-00-00",
+     "estSynopsisPostingDateStr": "2026-06-30-00-00-00",
+     "estApplicationResponseDateStr": "2026-10-05-00-00-00",
+     "estAwardDateStr": "2027-07-01-00-00-00",
+     "estProjectStartDateStr": "2027-07-01-00-00-00",
+     "createTimeStampStr": "2026-03-10-15-06-45"
+    },
+    "cfdas": [
+     {
+      "id": 432155,
+      "opportunityId": 361438,
+      "revision": 2,
+      "cfdaNumber": "93.393",
+      "programTitle": "Cancer Cause and Prevention Research"
+     },
+     {
+      "id": 432156,
+      "opportunityId": 361438,
+      "revision": 1,
+      "cfdaNumber": "93.396",
+      "programTitle": "Cancer Biology Research"
+     },
+     {
+      "id": 432157,
+      "opportunityId": 361438,
+      "revision": 1,
+      "cfdaNumber": "93.399",
+      "programTitle": "Cancer Control"
+     }
+    ],
+    "synopsisModifiedFields": [],
+    "forecastModifiedFields": []
+   },
+   {
+    "oppHistId": {
+     "opportunityId": 361438,
+     "revision": 1
+    },
+    "opportunityId": 361438,
+    "revision": 1,
+    "opportunityNumber": "PAR-28-014",
+    "opportunityTitle": "Early-Onset Cancers: Investigating Etiology, Mechanisms, and Early Detection Strategies (RP1 Clinical Trials Optional)",
+    "owningAgencyCode": "HHS-NIH11",
+    "publisherUid": "marlowegj",
+    "listed": "L",
+    "opportunityCategory": {
+     "category": "D",
+     "description": "Discretionary"
+    },
+    "modifiedComments": "Updated opportunity details to match NOFO.",
+    "forecast": {
+     "oppHistId": {
+      "opportunityId": 361438,
+      "revision": 1
+     },
+     "opportunityId": 361438,
+     "revision": 1,
+     "version": 2,
+     "postingDate": "Mar 10, 2026 12:00:00 AM EDT",
+     "forecastDesc": "<p>Through this Notice of Funding Opportunity (NOFO), the National Cancer Institute (NCI) invites applications that investigate the etiology of sporadic non-hereditary early-onset cancers (EOCs: ages 18 to 49 years) and the underlying biological mechanisms that play a role in these cancers to inform prevention and control strategies. The proposed research is expected to advance the understanding of the unexplained rise of cancers in young adults. More specifically, studies should address one or more of the following: i) what modifiable exposures are driving the increase in the incidence of non-hereditary EOCs, and how do these factors vary by patient demographics? (ii) what biological mechanisms and host responses underly the increase in EOCs? and (iii) how can those at increased risk for developing EOCs be identified more effectively?</p><p>This NOFO consolidates exploratory/developmental and research project funding mechanisms to streamline the application process and sustain momentum in this critical research area. Applicants have the option of submitting either an exploratory/developmental research project with a project period of up to 2 years or a research project with a project period of 4 to 5 years.</p><p>&nbsp;</p>",
+     "costSharing": false,
+     "agencyContactName": "Epidemiology and Genomics Research Program",
+     "agencyContactPhone": "240-276-6932",
+     "agencyContactEmail": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyContactEmailDesc": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyCode": "HHS-NIH11",
+     "sendEmail": "N",
+     "applicantEligibilityDesc": "Other Eligible ApplicantsIndian/Native American Tribal Governments (Other than Federally Recognized);Eligible Agencies of the Federal Government;U.S. Territory or Possession;Regional Organizations;Non-domestic (non-U.S.) Entities (Foreign Institutions).",
+     "estSynopsisPostingDate": "Jun 30, 2026 12:00:00 AM EDT",
+     "estApplicationResponseDate": "Oct 05, 2026 12:00:00 AM EDT",
+     "estAwardDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "estProjectStartDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "fiscalYear": 2027,
+     "modComments": "Updated opportunity details to match NOFO.",
+     "createTimeStamp": "Oct 14, 2026 01:53:43 PM EDT",
+     "actionType": "U",
+     "actionDate": "Oct 14, 2026 02:03:53 PM EDT",
+     "createdDate": "Mar 10, 2026 03:06:45 PM EDT",
+     "lastUpdatedDate": "Oct 14, 2026 01:53:43 PM EDT",
+     "agencyDetails": {
+      "code": "NIH",
+      "seed": "HHS-NIH11",
+      "agencyName": "National Institutes of Health",
+      "agencyCode": "HHS-NIH11",
+      "topAgencyCode": "HHS"
+     },
+     "applicantTypes": [
+      {
+       "id": "05",
+       "description": "Independent school districts"
+      },
+      {
+       "id": "22",
+       "description": "For profit organizations other than small businesses"
+      },
+      {
+       "id": "11",
+       "description": "Native American tribal organizations (other than Federally recognized tribal governments)"
+      },
+      {
+       "id": "12",
+       "description": "Nonprofits having a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "07",
+       "description": "Native American tribal governments (Federally recognized)"
+      },
+      {
+       "id": "20",
+       "description": "Private institutions of higher education"
+      },
+      {
+       "id": "23",
+       "description": "Small businesses"
+      },
+      {
+       "id": "04",
+       "description": "Special district governments"
+      },
+      {
+       "id": "02",
+       "description": "City or township governments"
+      },
+      {
+       "id": "13",
+       "description": "Nonprofits that do not have a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "00",
+       "description": "State governments"
+      },
+      {
+       "id": "08",
+       "description": "Public housing authorities/Indian housing authorities"
+      },
+      {
+       "id": "01",
+       "description": "County governments"
+      },
+      {
+       "id": "06",
+       "description": "Public and State controlled institutions of higher education"
+      },
+      {
+       "id": "25",
+       "description": "Others (see text field entitled \"Additional Information on Eligibility\" for clarification)"
+      }
+     ],
+     "fundingInstruments": [
+      {
+       "id": "G",
+       "description": "Grant"
+      }
+     ],
+     "fundingActivityCategories": [
+      {
+       "id": "HL",
+       "description": "Health"
+      }
+     ],
+     "postingDateStr": "2026-03-10-00-00-00",
+     "estSynopsisPostingDateStr": "2026-06-30-00-00-00",
+     "estApplicationResponseDateStr": "2026-10-05-00-00-00",
+     "estAwardDateStr": "2027-07-01-00-00-00",
+     "estProjectStartDateStr": "2027-07-01-00-00-00",
+     "createTimeStampStr": "2026-10-14-13-53-43"
+    },
+    "cfdas": [
+     {
+      "id": 432155,
+      "opportunityId": 361438,
+      "revision": 2,
+      "cfdaNumber": "93.393",
+      "programTitle": "Cancer Cause and Prevention Research"
+     },
+     {
+      "id": 432156,
+      "opportunityId": 361438,
+      "revision": 1,
+      "cfdaNumber": "93.396",
+      "programTitle": "Cancer Biology Research"
+     },
+     {
+      "id": 432157,
+      "opportunityId": 361438,
+      "revision": 1,
+      "cfdaNumber": "93.399",
+      "programTitle": "Cancer Control"
+     }
+    ],
+    "synopsisModifiedFields": [],
+    "forecastModifiedFields": [
+     "revision",
+     "version",
+     "opportunityNumber",
+     "sendEmail",
+     "modComments",
+     "createTimeStamp"
+    ]
+   },
+   {
+    "oppHistId": {
+     "opportunityId": 361438,
+     "revision": 3
+    },
+    "opportunityId": 361438,
+    "revision": 3,
+    "opportunityNumber": "PAR-28-014",
+    "opportunityTitle": "Early-Onset Cancers: Investigating Etiology, Mechanisms, and Early Detection Strategies (RP1 Clinical Trials Optional)",
+    "owningAgencyCode": "HHS-NIH11",
+    "publisherUid": "1643657692",
+    "listed": "L",
+    "opportunityCategory": {
+     "category": "D",
+     "description": "Discretionary"
+    },
+    "modifiedComments": "Updated opportunity details to match NOFO.",
+    "forecast": {
+     "oppHistId": {
+      "opportunityId": 361438,
+      "revision": 3
+     },
+     "opportunityId": 361438,
+     "revision": 3,
+     "version": 3,
+     "postingDate": "Mar 10, 2026 12:00:00 AM EDT",
+     "forecastDesc": "<p>Through this Notice of Funding Opportunity (NOFO), the National Cancer Institute (NCI) invites applications that investigate the etiology of sporadic non-hereditary early-onset cancers (EOCs: ages 18 to 49 years) and the underlying biological mechanisms that play a role in these cancers to inform prevention and control strategies. The proposed research is expected to advance the understanding of the unexplained rise of cancers in young adults. More specifically, studies should address one or more of the following: i) what modifiable exposures are driving the increase in the incidence of non-hereditary EOCs, and how do these factors vary by patient demographics? (ii) what biological mechanisms and host responses underly the increase in EOCs? and (iii) how can those at increased risk for developing EOCs be identified more effectively?</p><p>This NOFO consolidates exploratory/developmental and research project funding mechanisms to streamline the application process and sustain momentum in this critical research area. Applicants have the option of submitting either an exploratory/developmental research project with a project period of up to 2 years or a research project with a project period of 4 to 5 years.</p><p>&nbsp;</p>",
+     "costSharing": false,
+     "agencyContactName": "Epidemiology and Genomics Research Program",
+     "agencyContactPhone": "240-276-6932",
+     "agencyContactEmail": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyContactEmailDesc": "ncidccpsegrpnofos@mail.nih.gov",
+     "agencyCode": "HHS-NIH11",
+     "applicantEligibilityDesc": "Other Eligible ApplicantsIndian/Native American Tribal Governments (Other than Federally Recognized);Eligible Agencies of the Federal Government;U.S. Territory or Possession;Regional Organizations;Non-domestic (non-U.S.) Entities (Foreign Institutions).",
+     "estSynopsisPostingDate": "Jun 30, 2026 12:00:00 AM EDT",
+     "estApplicationResponseDate": "Oct 05, 2026 12:00:00 AM EDT",
+     "estAwardDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "estProjectStartDate": "Jul 01, 2027 12:00:00 AM EDT",
+     "fiscalYear": 2027,
+     "modComments": "Updated opportunity details to match NOFO.",
+     "createTimeStamp": "Oct 14, 2026 02:03:53 PM EDT",
+     "actionType": "U",
+     "actionDate": "Oct 14, 2026 02:03:53 PM EDT",
+     "createdDate": "Mar 10, 2026 03:06:45 PM EDT",
+     "lastUpdatedDate": "Oct 14, 2026 02:03:53 PM EDT",
+     "agencyDetails": {
+      "code": "NIH",
+      "seed": "HHS-NIH11",
+      "agencyName": "National Institutes of Health",
+      "agencyCode": "HHS-NIH11",
+      "topAgencyCode": "HHS"
+     },
+     "applicantTypes": [
+      {
+       "id": "05",
+       "description": "Independent school districts"
+      },
+      {
+       "id": "22",
+       "description": "For profit organizations other than small businesses"
+      },
+      {
+       "id": "11",
+       "description": "Native American tribal organizations (other than Federally recognized tribal governments)"
+      },
+      {
+       "id": "12",
+       "description": "Nonprofits having a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "07",
+       "description": "Native American tribal governments (Federally recognized)"
+      },
+      {
+       "id": "20",
+       "description": "Private institutions of higher education"
+      },
+      {
+       "id": "23",
+       "description": "Small businesses"
+      },
+      {
+       "id": "04",
+       "description": "Special district governments"
+      },
+      {
+       "id": "02",
+       "description": "City or township governments"
+      },
+      {
+       "id": "13",
+       "description": "Nonprofits that do not have a 501(c)(3) status with the IRS, other than institutions of higher education"
+      },
+      {
+       "id": "00",
+       "description": "State governments"
+      },
+      {
+       "id": "08",
+       "description": "Public housing authorities/Indian housing authorities"
+      },
+      {
+       "id": "01",
+       "description": "County governments"
+      },
+      {
+       "id": "06",
+       "description": "Public and State controlled institutions of higher education"
+      },
+      {
+       "id": "25",
+       "description": "Others (see text field entitled \"Additional Information on Eligibility\" for clarification)"
+      }
+     ],
+     "fundingInstruments": [
+      {
+       "id": "G",
+       "description": "Grant"
+      }
+     ],
+     "fundingActivityCategories": [
+      {
+       "id": "HL",
+       "description": "Health"
+      }
+     ],
+     "postingDateStr": "2026-03-10-00-00-00",
+     "estSynopsisPostingDateStr": "2026-06-30-00-00-00",
+     "estApplicationResponseDateStr": "2026-10-05-00-00-00",
+     "estAwardDateStr": "2027-07-01-00-00-00",
+     "estProjectStartDateStr": "2027-07-01-00-00-00",
+     "createTimeStampStr": "2026-10-14-14-03-53"
+    },
+    "cfdas": [
+     {
+      "id": 435791,
+      "opportunityId": 361438,
+      "revision": 2,
+      "cfdaNumber": "93.113",
+      "programTitle": "Environmental Health"
+     },
+     {
+      "id": 432155,
+      "opportunityId": 361438,
+      "revision": 2,
+      "cfdaNumber": "93.393",
+      "programTitle": "Cancer Cause and Prevention Research"
+     }
+    ],
+    "synopsisModifiedFields": [],
+    "forecastModifiedFields": [
+     "revision",
+     "version",
+     "cfdas",
+     "sendEmail"
+    ]
+   }
+  ],
+  "opportunityPkgs": [
+   {
+    "id": 294377,
+    "topportunityId": 361438,
+    "familyId": 14,
+    "dialect": "XFDL2.2",
+    "opportunityNumber": "PAR-28-014",
+    "opportunityTitle": "Early-Onset Cancers: Investigating Etiology, Mechanisms, and Early Detection Strategies (RP1 Clinical Trials Optional)",
+    "cfdaNumber": "93.393",
+    "openingDate": "2027-01-08",
+    "closingDate": "2029-10-11",
+    "owningAgencyCode": "HHS-NIH11",
+    "agencyDetails": {
+     "code": "NIH",
+     "seed": "HHS-NIH11",
+     "agencyName": "National Institutes of Health",
+     "agencyCode": "HHS-NIH11",
+     "topAgencyCode": "HHS"
+    },
+    "topAgencyDetails": {
+     "code": "HHS",
+     "seed": "HHS",
+     "agencyName": "Department of Health and Human Services",
+     "agencyCode": "HHS",
+     "topAgencyCode": "HHS"
+    },
+    "programTitle": "Cancer Cause and Prevention Research",
+    "contactInfo": "<p>eRA Service Desk</p><p><a href=\"https://www.era.nih.gov/need-help \">https://www.era.nih.gov/need-help&nbsp;</a></p>",
+    "gracePeriod": 35,
+    "competitionId": "FORMS-I",
+    "competitionTitle": "Use for due date on or after January 25, 2025.",
+    "electronicRequired": "Y",
+    "expectedApplicationCount": 100,
+    "openToApplicantType": 1,
+    "listed": "L",
+    "isMultiProject": "N",
+    "extension": "pdf",
+    "mimetype": "application/pdf",
+    "lastUpdate": "Oct 14, 2026 02:05:32 PM EDT",
+    "workspaceCompatibleFlag": "Y",
+    "packageId": "PKG00294377",
+    "openingDateStr": "2027-01-08-00-00-00",
+    "closingDateStr": "2029-10-11-00-00-00"
+   }
+  ],
+  "closedOpportunityPkgs": [],
+  "originalDueDate": "Oct 11, 2029 12:00:00 AM EDT",
+  "synopsisModifiedFields": [],
+  "forecastModifiedFields": [
+   "revision",
+   "version",
+   "archiveDate",
+   "modComments"
+  ],
+  "errorMessages": [],
+  "synPostDateInPast": true,
+  "docType": "synopsis",
+  "forecastHistCount": 3,
+  "synopsisHistCount": 0,
+  "assistCompatible": false,
+  "assistURL": "",
+  "relatedOpps": [],
+  "draftMode": "N",
+  "ost": "POSTED"
+ }
+}
