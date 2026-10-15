@@ -1,0 +1,942 @@
+{
+ "_embedded": {
+  "results": [
+   {
+    "_rScore": 0,
+    "_type": "assistanceListing",
+    "publishDate": "2026-10-13T01:00:02-04:00",
+    "assistanceTypes": [
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F002",
+        "code": "F002",
+        "level": 2,
+        "value": "Cooperative Agreement"
+       }
+      ]
+     }
+    ],
+    "fhNames": null,
+    "relatedPrograms": null,
+    "isActive": true,
+    "title": "Section 6104 CAA, 2026: State Studies and Health and Human Services Report On Costs Of Providing Maternity, Labor, and Delivery Services",
+    "objective": "The Centers for Medicare & Medicaid Services (CMS) is offering a cooperative agreement to fund a national technical assistance (TA) entity This entity will support states, U.S. territories, Washington D.C., and small rural hospitals in collecting and",
+    "isFunded": false,
+    "historicalIndex": [
+     {
+      "organizationId": "100075508",
+      "actionType": "publish",
+      "createdDate": "2026-10-13T01:00:02.536-04:00",
+      "isManual": false,
+      "index": 1,
+      "historicalIndexId": "944eadce53e4465ab031126e3df522ed",
+      "body": "Section 6104 CAA, 2026: State Studies and Health and Human Services Report On Costs Of Providing Maternity, Labor, and Delivery Services",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     }
+    ],
+    "assistanceTypeLabels": [
+     "F002 - Cooperative Agreement"
+    ],
+    "modifiedDate": "2026-10-13T01:00:02-04:00",
+    "organizationHierarchy": [
+     {
+      "organizationId": "100004222",
+      "code": "7500",
+      "level": 1,
+      "name": "HEALTH AND HUMAN SERVICES, DEPARTMENT OF",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100075508",
+      "code": "7530",
+      "level": 2,
+      "name": "CENTERS FOR MEDICARE AND MEDICAID SERVICES",
+      "status": "Active"
+     }
+    ],
+    "programNumber": "93.00Y",
+    "_id": "e0e927e36a844f15a7d69b71469a33b4"
+   },
+   {
+    "_rScore": 0,
+    "_type": "assistanceListing",
+    "publishDate": "2026-10-09T01:00:21-04:00",
+    "assistanceTypes": [
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F010",
+        "code": "F010",
+        "level": 2,
+        "value": "Other Financial Assistance"
+       }
+      ]
+     },
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F002",
+        "code": "F002",
+        "level": 2,
+        "value": "Cooperative Agreement"
+       }
+      ]
+     }
+    ],
+    "fhNames": null,
+    "relatedPrograms": null,
+    "isActive": true,
+    "title": "Securing the Cities Program",
+    "objective": "​​Goal: ​Develop and enhance sustainable radiological/nuclear (R/N) detection and reporting capabilities among regional operational partners.  \n\nObjectives:  \n\n1. Assist state, local, tribal, and territorial (SLTT) agencies in developing R/N detectio",
+    "isFunded": false,
+    "historicalIndex": [
+     {
+      "organizationId": "300000275",
+      "actionType": "publish",
+      "createdDate": "2020-06-25T01:00:11.219-04:00",
+      "isManual": false,
+      "index": 5,
+      "historicalIndexId": "0a533830afda499c84a591ce3ce66313",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "agency",
+      "createdDate": "2020-07-13T13:17:51.547-04:00",
+      "isManual": false,
+      "index": 7,
+      "historicalIndexId": "2952d6d09c5246399ef935281f189c4f",
+      "body": null,
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "300000275",
+      "actionType": "publish",
+      "createdDate": "2019-08-15T01:00:12.849-04:00",
+      "isManual": false,
+      "index": 4,
+      "historicalIndexId": "6518d8b93dfd4ecdb4b84efc054f36ae",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2019,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "publish",
+      "createdDate": "2020-07-13T13:17:51.538-04:00",
+      "isManual": false,
+      "index": 6,
+      "historicalIndexId": "bfd4392a00264432a5861633b7bea316",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "300000275",
+      "actionType": "publish",
+      "createdDate": "2018-09-04T01:00:21.5-04:00",
+      "isManual": false,
+      "index": 3,
+      "historicalIndexId": "e97eef9f304946c19d636750ef6257d0",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2018,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100011942",
+      "actionType": "publish",
+      "createdDate": "2007-08-03T00:00:00-04:00",
+      "isManual": false,
+      "index": 1,
+      "historicalIndexId": "0e11af58980ddcfbab44bc0d33a83650",
+      "body": "Securing the Cities",
+      "fiscalYear": 2007,
+      "statusCode": null
+     },
+     {
+      "organizationId": "100011942",
+      "actionType": "title",
+      "createdDate": "2013-04-16T10:57:52-04:00",
+      "isManual": false,
+      "index": 2,
+      "historicalIndexId": "dc549ae835e2802853aa6da88ba89cc6",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2013,
+      "statusCode": null
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "publish",
+      "createdDate": "2021-07-26T01:00:12.539-04:00",
+      "isManual": false,
+      "index": 8,
+      "historicalIndexId": "59128c1ac8614918a40b989752d51ca1",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2021,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100176827",
+      "actionType": "publish",
+      "createdDate": "2026-07-01T11:56:33.076-04:00",
+      "isManual": false,
+      "index": 14,
+      "historicalIndexId": "14b675c9891f45cbb87765f2c5e8cb0d",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100176827",
+      "actionType": "publish",
+      "createdDate": "2026-09-11T12:11:13.039-04:00",
+      "isManual": false,
+      "index": 16,
+      "historicalIndexId": "6f4edbe9ce5b45d6a13cc2f4782fdecc",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "publish",
+      "createdDate": "2024-06-25T01:00:11.85-04:00",
+      "isManual": false,
+      "index": 11,
+      "historicalIndexId": "ecae0ce01e6841318b5683a96c27ad02",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100176827",
+      "actionType": "agency",
+      "createdDate": "2026-07-01T11:56:33.094-04:00",
+      "isManual": false,
+      "index": 15,
+      "historicalIndexId": "64425641e7d84695a409445a6aa1a074",
+      "body": null,
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100011942",
+      "actionType": "agency",
+      "createdDate": "2026-06-25T10:33:00.299-04:00",
+      "isManual": false,
+      "index": 13,
+      "historicalIndexId": "25ddde012947492da23516136509d4e3",
+      "body": null,
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100011942",
+      "actionType": "publish",
+      "createdDate": "2026-06-25T10:33:00.286-04:00",
+      "isManual": false,
+      "index": 12,
+      "historicalIndexId": "85e723d4c01743339e985200bd9a0e2c",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "publish",
+      "createdDate": "2022-09-06T01:00:40.638-04:00",
+      "isManual": false,
+      "index": 9,
+      "historicalIndexId": "cc3e22640c15495688a864f93a6fc586",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2022,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "500044550",
+      "actionType": "publish",
+      "createdDate": "2023-09-01T14:35:36.524-04:00",
+      "isManual": false,
+      "index": 10,
+      "historicalIndexId": "1380f3ecfc3c41baad61f0a162aca759",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2023,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100176827",
+      "actionType": "publish",
+      "createdDate": "2026-10-09T01:00:21.15-04:00",
+      "isManual": false,
+      "index": 17,
+      "historicalIndexId": "21755feb0b5d43089a33ef4ce4a89a33",
+      "body": "Securing the Cities Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     }
+    ],
+    "assistanceTypeLabels": [
+     "F002 - Cooperative Agreement",
+     "F010 - Other Financial Assistance"
+    ],
+    "modifiedDate": "2026-10-09T01:00:21-04:00",
+    "organizationHierarchy": [
+     {
+      "organizationId": "100011942",
+      "code": "7000",
+      "level": 1,
+      "name": "HOMELAND SECURITY, DEPARTMENT OF",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100011943",
+      "code": "7022",
+      "level": 2,
+      "name": "FEDERAL EMERGENCY MANAGEMENT AGENCY",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100176827",
+      "code": "70FH10",
+      "level": 3,
+      "name": "FEMA",
+      "status": "Active"
+     }
+    ],
+    "programNumber": "97.106",
+    "_id": "8fdfa74764584e68866bd2c86952b754"
+   },
+   {
+    "_rScore": 0,
+    "_type": "assistanceListing",
+    "publishDate": "2026-10-09T01:00:21-04:00",
+    "assistanceTypes": [
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F004",
+        "code": "F004",
+        "level": 2,
+        "value": "Loan Guarantee"
+       }
+      ]
+     },
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F001",
+        "code": "F001",
+        "level": 2,
+        "value": "Grant"
+       }
+      ]
+     }
+    ],
+    "fhNames": null,
+    "relatedPrograms": [
+     {
+      "programNumber": "10.769",
+      "id": "92038020ae664896045b070ce885bab2",
+      "title": "Rural Business Enterprise Grants"
+     },
+     {
+      "programNumber": "10.768",
+      "id": "eb653c8ea0b24c088ffe6933525b662a",
+      "title": "Business and Industry Guaranteed Loans"
+     }
+    ],
+    "isActive": true,
+    "title": "Rural Energy for America Program",
+    "objective": "(1) Provision of grants and loan guarantees to agricultural producers and rural small businesses to promote energy efficiency improvements and renewable energy systems development.  The program provides grants of up to 25% of project costs and/or loa",
+    "isFunded": false,
+    "historicalIndex": [
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2024-12-16T00:05:59.521-05:00",
+      "isManual": false,
+      "index": 8,
+      "historicalIndexId": "394e432e08c34c64a38507b52de281e8",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2022-08-25T01:01:11.818-04:00",
+      "isManual": false,
+      "index": 6,
+      "historicalIndexId": "1b1a522c8d1b4d5fa267c057975bd3ab",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2022,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2026-10-09T01:00:21.464-04:00",
+      "isManual": false,
+      "index": 10,
+      "historicalIndexId": "e672b14357f848fc9a2ad4c2fe175570",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2026-02-03T00:18:17.58-05:00",
+      "isManual": false,
+      "index": 9,
+      "historicalIndexId": "07e94034ede14bf585b0796fb4165d60",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2023-08-29T10:46:25.568-04:00",
+      "isManual": false,
+      "index": 7,
+      "historicalIndexId": "edce8d2803c446f5bf86af95f0a77e01",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2023,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2021-09-08T01:00:07.564-04:00",
+      "isManual": false,
+      "index": 5,
+      "historicalIndexId": "bbf9c34b917344309c87353b242a8350",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2021,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2020-08-12T01:00:17.089-04:00",
+      "isManual": false,
+      "index": 4,
+      "historicalIndexId": "69412661191f4e10911d0f80aaae7d51",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2018-09-03T01:00:49.795-04:00",
+      "isManual": false,
+      "index": 2,
+      "historicalIndexId": "54b71240f4ae432c9056791916d7d4ff",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2018,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2009-12-11T07:47:17-05:00",
+      "isManual": false,
+      "index": 1,
+      "historicalIndexId": "c8a436355962e503d39caf1fb8afd7a1",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2009,
+      "statusCode": null
+     },
+     {
+      "organizationId": "100076307",
+      "actionType": "publish",
+      "createdDate": "2019-08-13T01:00:42.972-04:00",
+      "isManual": false,
+      "index": 3,
+      "historicalIndexId": "ab33be8d5e46484db8fdc65df3fc6f67",
+      "body": "Rural Energy for America Program",
+      "fiscalYear": 2019,
+      "statusCode": ""
+     }
+    ],
+    "assistanceTypeLabels": [
+     "F001 - Grant",
+     "F004 - Loan Guarantee"
+    ],
+    "modifiedDate": "2026-10-09T01:00:21-04:00",
+    "organizationHierarchy": [
+     {
+      "organizationId": "100006809",
+      "code": "1200",
+      "level": 1,
+      "name": "AGRICULTURE, DEPARTMENT OF",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100076307",
+      "code": "12E4",
+      "level": 2,
+      "name": "RURAL BUSINESS COOPERATIVE SERVICE",
+      "status": "Active"
+     }
+    ],
+    "programNumber": "10.868",
+    "_id": "eb9304f6c8c945d9b85408b9f88b6f33"
+   },
+   {
+    "_rScore": 0,
+    "_type": "assistanceListing",
+    "publishDate": "2026-10-09T01:00:02-04:00",
+    "assistanceTypes": [
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F001",
+        "code": "F001",
+        "level": 2,
+        "value": "Grant"
+       }
+      ]
+     }
+    ],
+    "fhNames": null,
+    "relatedPrograms": null,
+    "isActive": true,
+    "title": "Community Wood Energy and Wood Innovation Program",
+    "objective": "Provide assistance to supplement the capital costs for: 1) Installing a wood energy system that utilizes wood and wood biomass (including residuals) as the primary fuels source.  2) Building an innovative wood products facility which can include the ",
+    "isFunded": false,
+    "historicalIndex": [
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2020-03-24T01:00:07.159-04:00",
+      "isManual": false,
+      "index": 1,
+      "historicalIndexId": "f98260a6b915417f8f06db94290f47a2",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2022-04-11T01:00:32.97-04:00",
+      "isManual": false,
+      "index": 3,
+      "historicalIndexId": "ebc4aa6bf01941c298e4b0073e08f9e9",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2022,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2023-09-05T01:01:52.946-04:00",
+      "isManual": false,
+      "index": 4,
+      "historicalIndexId": "eeb1288f6ec24064a0f8e5199eda8211",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2023,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2021-08-12T01:01:49.663-04:00",
+      "isManual": false,
+      "index": 2,
+      "historicalIndexId": "778fa07664d048fd84ad2f3f3d442920",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2021,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2024-12-12T00:07:19.918-05:00",
+      "isManual": false,
+      "index": 6,
+      "historicalIndexId": "61a80a3e705f46cc9d0ce98e45060708",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2026-10-09T01:00:02.572-04:00",
+      "isManual": false,
+      "index": 8,
+      "historicalIndexId": "340b46e16d594453ae7c403f1842c730",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2024-05-21T01:01:39.089-04:00",
+      "isManual": false,
+      "index": 5,
+      "historicalIndexId": "4a18faee7654495e91b374a14291c1ce",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2026-02-11T00:07:48.073-05:00",
+      "isManual": false,
+      "index": 7,
+      "historicalIndexId": "59623fb6483c45d5a039903bcc3fdeaf",
+      "body": "Community Wood Energy and Wood Innovation Program",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     }
+    ],
+    "assistanceTypeLabels": [
+     "F001 - Grant"
+    ],
+    "modifiedDate": "2026-10-09T01:00:02-04:00",
+    "organizationHierarchy": [
+     {
+      "organizationId": "100006809",
+      "code": "1200",
+      "level": 1,
+      "name": "AGRICULTURE, DEPARTMENT OF",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100013241",
+      "code": "12C2",
+      "level": 2,
+      "name": "FOREST SERVICE",
+      "status": "Active"
+     }
+    ],
+    "programNumber": "10.708",
+    "_id": "582d1cbe25a244d9ba383e70da8bf6db"
+   },
+   {
+    "_rScore": 0,
+    "_type": "assistanceListing",
+    "publishDate": "2026-10-09T01:00:02-04:00",
+    "assistanceTypes": [
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F001",
+        "code": "F001",
+        "level": 2,
+        "value": "Grant"
+       }
+      ]
+     },
+     {
+      "hierarchy": [
+       {
+        "elementId": "F",
+        "code": "FF",
+        "level": 1,
+        "value": "Financial"
+       },
+       {
+        "elementId": "F002",
+        "code": "F002",
+        "level": 2,
+        "value": "Cooperative Agreement"
+       }
+      ]
+     }
+    ],
+    "fhNames": null,
+    "relatedPrograms": [
+     {
+      "programNumber": "10.708",
+      "id": "582d1cbe25a244d9ba383e70da8bf6db",
+      "title": "Community Wood Energy and Wood Innovation Program"
+     }
+    ],
+    "isActive": true,
+    "title": "Wood Utilization Assistance",
+    "objective": "The USDA Forest Service, Wood Innovations program provides technical and financial assistance to strengthen the forest products industry and expand wood product and wood energy markets.  These programs and projects address the nationwide challenge of",
+    "isFunded": false,
+    "historicalIndex": [
+     {
+      "organizationId": "100006809",
+      "actionType": "publish",
+      "createdDate": "2004-06-21T01:00:00-04:00",
+      "isManual": true,
+      "index": 1,
+      "historicalIndexId": "bf0686d89fa3bb175f0668c9638e0797",
+      "body": "Technology Marketing Unit",
+      "fiscalYear": 2003,
+      "statusCode": "B"
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2018-08-14T01:00:10.029-04:00",
+      "isManual": false,
+      "index": 6,
+      "historicalIndexId": "35dd551a72d544978d586cb7d9cf83f9",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2018,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2018-06-29T01:00:02.139-04:00",
+      "isManual": false,
+      "index": 5,
+      "historicalIndexId": "73ea335eee52479090dc57901bbc2c4c",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2018,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2019-08-28T01:00:53.301-04:00",
+      "isManual": false,
+      "index": 7,
+      "historicalIndexId": "a06182f8ad8e4d6eb361a3b23f42518a",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2019,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2020-03-23T01:00:04.919-04:00",
+      "isManual": false,
+      "index": 8,
+      "historicalIndexId": "d9484824c9704c94ad52f52555d79b70",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "title",
+      "createdDate": "2014-08-26T11:40:53-04:00",
+      "isManual": false,
+      "index": 4,
+      "historicalIndexId": "b638acb503b0bff029defa129905e285",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2014,
+      "statusCode": null
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2020-11-06T00:00:02.249-05:00",
+      "isManual": false,
+      "index": 9,
+      "historicalIndexId": "49db07ac7d8746b0bf5f3e8aee5e6f6d",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2020,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100006809",
+      "actionType": "title",
+      "createdDate": "2005-09-13T01:00:00-04:00",
+      "isManual": false,
+      "index": 3,
+      "historicalIndexId": "3bbdfb4b8fa6b428117155f82935eaf4",
+      "body": "Forest Products Lab: Technology Marketing Unit  (TMU)",
+      "fiscalYear": 2005,
+      "statusCode": null
+     },
+     {
+      "organizationId": "100006809",
+      "actionType": "title",
+      "createdDate": "2005-04-28T01:00:00-04:00",
+      "isManual": true,
+      "index": 2,
+      "historicalIndexId": "3a7572f93f24b3d004790b1a7f8264cb",
+      "body": "Forest Products Lab: Technology Marketing Unit  (TMU)",
+      "fiscalYear": 2005,
+      "statusCode": null
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2026-02-11T00:05:59.813-05:00",
+      "isManual": false,
+      "index": 16,
+      "historicalIndexId": "f6cb7a770da74588b7d315b02e2e8bf0",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2023-06-28T01:01:12.247-04:00",
+      "isManual": false,
+      "index": 12,
+      "historicalIndexId": "9d1c6c61ae89473098584d0b2d9bf92a",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2023,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2026-10-09T01:00:02.662-04:00",
+      "isManual": false,
+      "index": 17,
+      "historicalIndexId": "15d8f4fba38340c1971fd4c09a75801c",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2026,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2023-09-05T01:04:37.666-04:00",
+      "isManual": false,
+      "index": 13,
+      "historicalIndexId": "fdfdf77860294c818fb7f0d3c1ec6fbe",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2023,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2021-08-12T01:00:02.276-04:00",
+      "isManual": false,
+      "index": 10,
+      "historicalIndexId": "89b65ad2e6e14539ba7b47b14ddfd958",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2021,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2024-05-14T01:00:02.171-04:00",
+      "isManual": false,
+      "index": 14,
+      "historicalIndexId": "f1fa4192f826438c9c8566863ee9406e",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2024-12-06T00:02:18.347-05:00",
+      "isManual": false,
+      "index": 15,
+      "historicalIndexId": "4469c1f157464e2085d2ab2a4e491a9e",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2024,
+      "statusCode": ""
+     },
+     {
+      "organizationId": "100013241",
+      "actionType": "publish",
+      "createdDate": "2022-04-11T01:00:10.177-04:00",
+      "isManual": false,
+      "index": 11,
+      "historicalIndexId": "8d25d72af4c84f57ac6ffbbdc4607985",
+      "body": "Wood Utilization Assistance",
+      "fiscalYear": 2022,
+      "statusCode": ""
+     }
+    ],
+    "assistanceTypeLabels": [
+     "F001 - Grant",
+     "F002 - Cooperative Agreement"
+    ],
+    "modifiedDate": "2026-10-09T01:00:02-04:00",
+    "organizationHierarchy": [
+     {
+      "organizationId": "100006809",
+      "code": "1200",
+      "level": 1,
+      "name": "AGRICULTURE, DEPARTMENT OF",
+      "status": "Active"
+     },
+     {
+      "organizationId": "100013241",
+      "code": "12C2",
+      "level": 2,
+      "name": "FOREST SERVICE",
+      "status": "Active"
+     }
+    ],
+    "programNumber": "10.674",
+    "_id": "72e7d622b1e34732a52b679711407bf7"
+   }
+  ]
+ },
+ "_links": {
+  "self": {
+   "href": "https://52samdotgovsearch.prod.apps-internal.prod-iae.bsp.gsa.gov/sgs/v1/search?index=cfda&index=cfda&q=&q=&page=0&page=0&size=5&size=5&sort=-modifiedDate&sort=-modifiedDate&raw=false&mode=search&mode=search&is_active=true{&qMode,exactMatch}",
+   "templated": true
+  }
+ },
+ "page": {
+  "size": 5,
+  "totalElements": 2869,
+  "totalPages": 574,
+  "number": 0,
+  "maxAllowedRecords": 10000
+ }
+}
