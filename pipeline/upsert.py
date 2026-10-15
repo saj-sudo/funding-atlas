@@ -81,7 +81,8 @@ def _log_change(conn, run_id, pid, change_type, old_hash, new_hash, fields, now)
 
 
 def upsert(conn: sqlite3.Connection, run_id: int, programs: Iterable[Program], now: str) -> dict[str, int]:
-    """Insert new programs, update changed ones, touch last_seen on the rest. Logs every add/change."""
+    """Insert new programs, update changed ones, touch last_seen on the rest. Logs every add/change.
+    The source is the truth: anything that differs from it, including manual DB edits, is a change."""
     counts = {"added": 0, "changed": 0, "unchanged": 0}
     for p in programs:
         new_hash = p.record_hash
@@ -100,12 +101,14 @@ def upsert(conn: sqlite3.Connection, run_id: int, programs: Iterable[Program], n
             continue
 
         pid = existing["id"]
-        if existing["record_hash"] == new_hash:
-            conn.execute("UPDATE program SET last_seen = ? WHERE id = ?", (now, pid))
+        # Compare columns, not just the stored hash: a row edited by hand in SQLite keeps its old
+        # hash, and the next run must reconcile it back to what the source says.
+        fields = changed_fields(existing, p)
+        if not fields:
+            conn.execute("UPDATE program SET last_seen = ?, record_hash = ? WHERE id = ?", (now, new_hash, pid))
             counts["unchanged"] += 1
             continue
 
-        fields = changed_fields(existing, p)
         conn.execute(
             f"UPDATE program SET {_SET}, slug = ?, record_hash = ?, last_seen = ?, last_changed = ? WHERE id = ?",
             vals + (p.slug, new_hash, now, now, pid),

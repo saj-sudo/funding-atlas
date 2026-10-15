@@ -51,12 +51,13 @@ def test_strip_html():
 
 def test_normalize_minimal_hit_without_detail():
     raw = RawRecord(source_connector="grants_gov", source_id="1", payload={
-        "hit": {"id": "1", "number": "X-1", "title": "T", "agencyCode": "DOT", "agency": "DOT",
+        "hit": {"id": "1", "number": "X-1", "title": "Roads &amp; Bridges", "agencyCode": "DOT", "agency": "DOT",
                 "openDate": "01/02/2026", "closeDate": "", "oppStatus": "posted", "alnist": ["20.205"]},
         "detail": {},
     })
     p = gg.normalize(raw)
     assert p.status == "open" and p.opens_at == date(2026, 1, 2) and p.closes_at is None
+    assert p.name == "Roads & Bridges"
     assert p.alns == ["20.205"] and p.funding_type is None and p.amount_max is None
     assert p.applicant_types == [] and p.record_hash  # nothing invented
 
