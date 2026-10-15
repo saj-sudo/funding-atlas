@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<style>
+{{CSS}}
+</style>
+</head>
+<body data-page="index">
+<a class="skip" href="#main">Skip to the state picker</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <span class="gen">Built {{GENERATED}}</span>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="index-hero">
+    <h1>Open public funding for local governments, by state.</h1>
+    <p class="lede">Federal notices and state pass-through programs that name towns, cities and counties as eligible, read straight from the agencies that run them, with every change logged. Pick a state to see what is open, what is new and what closes soon.</p>
+    <noscript><p class="noscript">The state map needs JavaScript. Each state's page is a plain link: for example <a href="md/">md/</a> for Maryland.</p></noscript>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="map-wrap" aria-labelledby="map-h">
+    <h2 id="map-h">Pick a state</h2>
+    <p class="muted small">Federal notices appear on every state page. Blue states also have state agency sources connected.</p>
+    <nav class="map" id="map" aria-label="States" style="margin-top:12px"></nav>
+    <div class="legend" aria-hidden="true"><span><i class="src"></i> state sources connected</span><span><i></i> federal notices only</span></div>
+    <p class="hover" id="hover" aria-live="polite">Hover or focus a state for its coverage.</p>
+    <form class="goto" id="goto">
+      <label for="goto-select">Or choose from a list</label>
+      <select id="goto-select"></select>
+      <button class="btn primary" type="submit">Go</button>
+    </form>
+  </section>
+
+  <section class="index-feed two">
+    <div>
+      <h2>Latest changes across every source</h2>
+      <ol class="feed" id="feed"></ol>
+    </div>
+    <div>
+      <h2>What this is</h2>
+      <p class="muted">A registry, not advice. Each row is one program page or federal notice read by a connector; the status and dates are what that source said on the run date. Blank fields mean the source did not state the value. Nothing is inferred and nothing is guessed, which is why some states say "no state sources yet": the connectors for them have not been built.</p>
+      <p class="muted" style="margin-top:8px">The relevance tiers (likely, possible) are rule-based readings of each record, written as SQL you can audit. Argue with the rules, not the records.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{{DATA}}</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>
