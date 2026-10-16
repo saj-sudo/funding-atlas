@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+from connectors import maryland_sharepoint as sp
 from connectors import md_mea as me
 from pipeline.models import RawRecord
 
@@ -30,11 +31,11 @@ COMMERCIAL_SOLAR = "business/pages/commercial-solar.aspx"
 
 
 def payload(source_id: str) -> dict:
-    return json.loads((FIXTURES / f"{me.fixture_name(source_id)}.json").read_text())
+    return json.loads((FIXTURES / f"{sp.fixture_name(source_id)}.json").read_text())
 
 
 def index_html(path: str) -> tuple[str, str]:
-    data = json.loads((FIXTURES / f"index__{me.fixture_name(path)}.json").read_text())
+    data = json.loads((FIXTURES / f"index__{sp.fixture_name(path)}.json").read_text())
     return data["url"], data["main_html"]
 
 
@@ -77,25 +78,25 @@ def test_index_union_across_the_five_indexes():
 
 
 def test_source_id_and_fixture_name_rules():
-    assert me.source_id_for("https://energy.maryland.gov/govt/Pages/SolarAPP.aspx#top") == SOLARAPP
-    assert me.canonical_url("/Pages/X.aspx#a", "http://energy.maryland.gov/Pages/Renewables.aspx") == "https://energy.maryland.gov/Pages/X.aspx"
-    assert me.fixture_name(CCB) == "pages__commercial-26communitybuildingsgrantprogram"
-    assert me.fixture_name(MSAP) == "residential__pages__incentives__maryland-solar-access-program"
+    assert sp.source_id_for("https://energy.maryland.gov/govt/Pages/SolarAPP.aspx#top") == SOLARAPP
+    assert sp.canonical_url("/Pages/X.aspx#a", "http://energy.maryland.gov/Pages/Renewables.aspx") == "https://energy.maryland.gov/Pages/X.aspx"
+    assert sp.fixture_name(CCB) == "pages__commercial-26communitybuildingsgrantprogram"
+    assert sp.fixture_name(MSAP) == "residential__pages__incentives__maryland-solar-access-program"
 
 
 # ---------- page parsing ----------
 
 def test_page_payload_needs_the_mdgov_body():
-    assert me.page_payload("https://energy.maryland.gov/x", "<html><main><p>nothing</p></main></html>") is None
-    p = me.page_payload("https://energy.maryland.gov/x", f"<html><head><title>T</title></head><body>{section('<p>Status: Open</p>')}</body></html>")
-    assert p is not None and p["title"] == "T" and p["content_hash"] == me.text_hash(p["main_html"])
+    assert sp.page_payload("https://energy.maryland.gov/x", "<html><main><p>nothing</p></main></html>") is None
+    p = sp.page_payload("https://energy.maryland.gov/x", f"<html><head><title>T</title></head><body>{section('<p>Status: Open</p>')}</body></html>")
+    assert p is not None and p["title"] == "T" and p["content_hash"] == sp.text_hash(p["main_html"])
 
 
 def test_text_hash_ignores_cloudflare_email_markup():
     a = section('<p>Contact <a class="__cf_email__" data-cfemail="b6d1d7">[email protected]</a></p>')
     b = section('<p>Contact <a class="__cf_email__" data-cfemail="0f3a2c">[email protected]</a></p>')
-    assert a != b and me.text_hash(a) == me.text_hash(b)
-    assert me.text_hash(a) != me.text_hash(section("<p>Contact nobody</p>"))
+    assert a != b and sp.text_hash(a) == sp.text_hash(b)
+    assert sp.text_hash(a) != sp.text_hash(section("<p>Contact nobody</p>"))
 
 
 def test_labeled_lines_take_an_empty_value_from_the_next_block_and_own_text_from_nested_divs():
@@ -140,7 +141,7 @@ def test_label_kinds(label, kind):
     ("", None), (None, None),
 ])
 def test_deadline_dates(value, expected):
-    assert me.parse_text_date(value) == expected
+    assert sp.parse_text_date(value) == expected
 
 
 def fields(body: str, index: dict | None = None, today: date = TODAY) -> dict:

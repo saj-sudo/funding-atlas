@@ -17,6 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from connectors.maryland_sharepoint import fixture_name, main_section, page_h1, page_payload  # noqa: E402
 from pipeline.models import RawRecord  # noqa: E402
 
 DEFAULT_PAGES = {
@@ -60,8 +61,8 @@ def main(connector: str, paths: list[str]) -> None:
         for path in getattr(mod, "INDEX_PATHS", None) or (mod.INDEX_PATH,):
             url = f"{site.BASE}/{path}"
             resp = client.get(url)
-            section = mod.main_section(resp.text)
-            (fixtures / f"index__{mod.fixture_name(path)}.json").write_text(
+            section = main_section(resp.text)
+            (fixtures / f"index__{fixture_name(path)}.json").write_text(
                 json.dumps({"url": url, "main_html": str(section)}, indent=1, ensure_ascii=False))
             time.sleep(0.3)
 
@@ -72,17 +73,17 @@ def main(connector: str, paths: list[str]) -> None:
             print("http", resp.status_code)
             if resp.status_code != 200:
                 continue
-            payload = mod.page_payload(entry["url"], resp.text)
+            payload = page_payload(entry["url"], resp.text)
             if payload is None:
                 print("no mdgov body")
                 continue
             time.sleep(0.5)
-            again = mod.page_payload(entry["url"], client.get(entry["url"]).text)
+            again = page_payload(entry["url"], client.get(entry["url"]).text)
             print("text hash stable:", again is not None and again["content_hash"] == payload["content_hash"],
                   "| markup identical:", again is not None and again["main_html"] == payload["main_html"])
             payload = site.annotate(payload, entry) if hasattr(site, "annotate") else {**payload, **{k: v for k, v in entry.items() if k != "url"}}
-            (fixtures / f"{mod.fixture_name(path)}.json").write_text(json.dumps(payload, indent=1, ensure_ascii=False))
-            print("title:", payload.get("title"), "| h1:", mod.page_h1(payload["main_html"]), "| body:", len(payload["main_html"]), "bytes")
+            (fixtures / f"{fixture_name(path)}.json").write_text(json.dumps(payload, indent=1, ensure_ascii=False))
+            print("title:", payload.get("title"), "| h1:", page_h1(payload["main_html"]), "| body:", len(payload["main_html"]), "bytes")
             print("index:", {k: v for k, v in payload.items() if k in ("index", "unit", "section", "listed")})
             if hasattr(mod, "labeled_lines"):
                 for kind, label, value in mod.labeled_lines(payload["main_html"]):
