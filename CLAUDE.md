@@ -14,8 +14,8 @@ connector or one feature per session, no abstractions before the third real case
 - Python 3.12, `uv`, SQLite via `sqlite3` (Postgres later), `httpx`, `pydantic` for the record model, `typer` CLI.
 - `connectors/`: one module per source exposing `fetch(limit, prior) -> list[RawRecord]`,
   `normalize(raw) -> Program`, `resolve_missing(source_id)`. Keep them dumb. Maryland's Drupal agencies share
-  `connectors/maryland_drupal.py`; a second platform base is extracted only when a second state on the same platform
-  forces it.
+  `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; a new platform base
+  is extracted only when the second site on that platform forces it.
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
@@ -38,8 +38,9 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-15)
+## Current state (2026-10-16)
 
-Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht`. Milestones 1 to 6 shipped;
-the site is live at https://saj-sudo.github.io/funding-atlas/. Next up, each its own session: Maryland depth,
-Mid-Atlantic portal survey. See the roadmap.
+Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
+`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`). Milestones 1 to 7 shipped; the site is live at
+https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). Next up: Mid-Atlantic
+portal survey. See the roadmap.

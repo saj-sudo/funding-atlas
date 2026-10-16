@@ -51,7 +51,8 @@ The navigator UI should lead with 1 and 3. A plain table shows only 4.
 - Navigator site (shipped 2026-10-15): state picker for all 50 states and DC (federal rows everywhere, state coverage
   stated per state), a landing strip of new / closing soon / status changes, faceted filters with counts, a detail
   panel, a change feed. GitHub Pages, rebuilt daily.
-- Maryland depth: the big municipal funders (DNR, MDOT, MDE, MEA, GOCPP, MDEM) are not yet connected.
+- Maryland depth (shipped 2026-10-16): MEA and DNR connected on a shared SharePoint base. GOCPP blocks crawlers in
+  robots.txt (surveyed, stopped); MDEM lists two programs; MDOT and MDE have no listing. Seven connectors.
 - Expansion beyond Maryland, platform-first: survey each state's central grants portal, build one connector per
   platform, treat a state as configuration. Mid-Atlantic first.
 
@@ -128,9 +129,10 @@ position; deferred until a reader says the business rows bother them.
 Each connector module exposes `fetch(limit, prior)`, `normalize(raw)` and `resolve_missing(source_id)`, is
 registered in `pipeline/run.py`, has a fixture directory under `tests/fixtures/` and a doc under `docs/connectors/`
 written before the parser (URL, raw sample, field mapping, decisions, expected result). Change signals used so far:
-`lastmod` in a sitemap plus `og:updated_time` (Maryland Drupal), the record hash itself (everything). The three
-Maryland agencies share `connectors/maryland_drupal.py`; the platform-first expansion plan assumes the same shape, one
-base per platform with per-state configuration.
+`lastmod` in a sitemap plus `og:updated_time` (Maryland Drupal), a sha256 of the cleaned main-content text (Maryland
+SharePoint, whose CDN gives every page the same `Last-Modified`), the record hash itself (everything). The three Drupal
+agencies share `connectors/maryland_drupal.py` and the two SharePoint agencies `connectors/maryland_sharepoint.py`; the
+platform-first expansion plan assumes the same shape, one base per platform with per-state configuration.
 
 ## Licensing
 

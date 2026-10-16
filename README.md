@@ -25,10 +25,12 @@ sqlite3 atlas.db "SELECT * FROM v_navigator_program;"         # every state page
 ```
 
 Connectors: `grants_gov` (federal notices), `sam_assistance_listings` (the program catalog underneath them,
-joined by ALN through `v_opportunity_listing`), and three Maryland agencies on the state's Drupal platform:
-`md_dhcd`, `md_commerce`, `md_mht`. They share `connectors/maryland_drupal.py` (sitemap enumeration, lastmod
-refetch gate, page parsing, applicant tagging) and each keeps only its own status rules. Docs per connector and for
-the shared base are in `docs/connectors/`.
+joined by ALN through `v_opportunity_listing`), three Maryland agencies on the state's Drupal platform (`md_dhcd`,
+`md_commerce`, `md_mht`, sharing `connectors/maryland_drupal.py`: sitemap enumeration, lastmod refetch gate, page
+parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`, sharing
+`connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading). Each
+connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
+surveyed there too, and stopped on its robots.txt.
 
 ## The site
 

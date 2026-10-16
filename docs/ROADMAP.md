@@ -11,6 +11,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 3 | First Maryland agency | 2026-10-15 | DHCD, 33 records, chosen over GGO, MDOT, DNR, MEA after a live survey | `connectors/md_dhcd.md` |
 | 4 | Second and third Maryland agencies, shared base | 2026-10-15 | Commerce (34) and MHT (11) on `MarylandDrupalConnector`; line-level applicant scan | `connectors/maryland_drupal.md`, `md_commerce.md`, `md_mht.md` |
 | 5 | Static page | 2026-10-15 | `v_municipal_page`, `scripts/export_html.py`, `cli.py export`; 133 rows (83 likely, 50 possible), 696 unlikely excluded | this file, decisions log |
+| 7 | Maryland depth | 2026-10-16 | `md_mea` (28 records) and `md_dnr` (20) on a new `MarylandSharePointConnector` base (`connectors/maryland_sharepoint.py`); shared applicant table gains `municipal`; GOCPP surveyed and stopped on its robots.txt; MDEM, MDOT, MDE surveyed, no listing to read. Maryland open municipal rows 6 → 13 on the day (the roadmap's "from 5" baseline had grown to 6 that morning when MHT's Maritime round opened). Acceptance was 15: the shortfall is seasonal (CPP's and GOCPP's rounds are closed in October) and the GOCPP block, not a loosened rule | `connectors/md_mea.md`, `md_dnr.md`, `md_gocpp.md`, `maryland_sharepoint.md` |
 | 6 | Navigator UI and hosting | 2026-10-15 | `LICENSE` + `LICENSE-DATA`; migration 0005 (`v_navigator_program`, `v_navigator_change`, `v_navigator_coverage`); `scripts/build_site.py` + `web/`: index with a tile-grid state map, 51 state pages with the new / closing / status-changed strip, faceted filters with counts, card list, detail panel, change log; `.github/workflows/site.yml` publishing to `gh-pages` daily; Lighthouse accessibility 100 on both page types; the Maryland page carries exactly the `v_municipal_page` rows | this file, decisions log, README |
 
 ## Next
@@ -21,27 +22,22 @@ Live at https://saj-sudo.github.io/funding-atlas/. Left for a later session, non
 are in the URL hash already; a per-state RSS or JSON feed of the change log; the Grants.gov data-cleanup items under
 milestone 10 show on the page as they are in the database (`&quot;` in deadline text, contact names as agencies).
 
-### 7. Maryland depth
+### 7. Maryland depth (shipped 2026-10-16, see Done; two items remain)
 
-Goal: the state side of the Maryland page covers the agencies that fund towns, not just the three Drupal sites.
+Shipped: MEA and DNR, and the SharePoint base they share. Still open, none blocking:
 
-Order, from the surveys in `connectors/md_dhcd.md` and `connectors/maryland_drupal.md`:
-1. **MEA** (energy.maryland.gov). Survey runner-up. `all-incentives.aspx` tables, program pages with a parseable
-   "Program Status:" sentence, FY27 General Notice PDF with launch dates. SharePoint, no sitemap.
-2. **DNR** grants and loans index (`/Pages/grantsandloans.aspx`), ~30 programs across sub-sites; Program Open Space
-   Local, Community Parks and Playgrounds, Waterway Improvement are the municipal ones.
-3. **GOCPP** (Governor's Office of Crime Prevention and Policy): the local law-enforcement and victim-services rounds.
-4. **MDEM**: FEMA pass-throughs (HMGP, BRIC, EMPG).
-5. **MDOT** (Bikeways, Urban Tree, SHA programs on roads.maryland.gov) and **MDE** (water and sewer financing,
-   Bay Restoration Fund).
-
-Approach for SharePoint sites: enumerate from the hand-curated index page, store the index payload so additions and
-removals show in the diff, per-page prose status with the same closed-beats-active rule Commerce uses, change signal
-from the `Last-Modified` header or a hash of the main content. Each connector gets its own doc, fixtures and
-expected-result section before the parser. Ask before any headless-browser workaround.
-
-Acceptance: open municipal state rows at least triple (from 5); every new connector has a second-run "no changes"
-result recorded in its doc.
+- **GOCPP** (gocpp.maryland.gov): 43 grant programs on WordPress with a clean taxonomy (`eligible_apply-*` classes)
+  and an open list, but `robots.txt` ends with `User-agent: * / Disallow: /`. Stopped per CLAUDE.md. Next step is a
+  request to the office for crawl permission or a feed; the survey and the connector design are in
+  `connectors/md_gocpp.md`. The municipal law-enforcement rounds (BARM, SAPP, PRAR, GVRG, ...) are the known gap.
+- **MDEM** (mdem.maryland.gov, SharePoint): `/Pages/grants.aspx` says it is "still in development" and lists two
+  programs with structured `Applications Open?` and deadline fields (NSGP, "open" with a 2023 deadline; FMA, closed,
+  local governments eligible). `/community/Pages/Mitigation.aspx` redirects to `/Pages/hazard-mitigation.aspx`, which
+  names no programs (a request-info form, the Resilient MD Revolving Loan Fund, FAQs). Two records is not a connector;
+  revisit when the index grows. The base class fits it when that day comes.
+- **MDOT** and **MDE**: no listing to enumerate from (survey in `connectors/md_dhcd.md`); three to five hand-written
+  pages each. Candidates for a hand-listed `HAND_ADDED`-style connector on the SharePoint base if outreach asks for
+  Bikeways, Urban Tree, or the water and sewer financing rows by name.
 
 ### 8. Mid-Atlantic portal survey
 
@@ -100,6 +96,16 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-15 | "New" means first seen after the source's first full read | on a connector's first run every record is `added`; a page saying "134 new this week" on launch day is true and useless | `scripts/build_site.py` |
 | 2026-10-15 | Single-file Maryland export retired | each state page is still one self-contained file; two exporters is one too many for a solo operator | milestone 6 |
 | 2026-10-15 | Likely tier checked by default, possible one click away | same choice as milestone 5; counts on the facet make the second tier visible | `web/app.js` |
+| 2026-10-16 | Shared applicant table gains `municipal` | "county and municipal governments" (MEA) and "governing bodies of municipal corporations" (DNR) matched nothing; one DHCD record changed, correctly | `connectors/maryland_drupal.md` |
+| 2026-10-16 | SharePoint base extracted at the second mdgov site, with MEA's fixture hashes as the gate | same rule that produced `maryland_drupal.py`; MDEM, MDOT and MDE are on the same theme | `connectors/maryland_sharepoint.md` |
+| 2026-10-16 | Text hash, not markup hash, and every page every run on SharePoint | the CDN stamps one `Last-Modified` on every page and Cloudflare rewrites the e-mail markup per response; the sites are small | `connectors/maryland_sharepoint.md` |
+| 2026-10-16 | A stated deadline with no status wording: open while ahead, `unknown` after | the source says applications are due on a date; a past date on a page that says nothing else is a stale page, not a closure; the views drop it either way | `connectors/md_mea.md` decision 4 |
+| 2026-10-16 | A future launch or FOA issue date turns a closed page into `forecasted` | DHCD's rule applied to MEA's labels (Megawatts for Maryland) | `connectors/md_mea.md` decision 3 |
+| 2026-10-16 | Index facts are stamped on records, the index page is not a record | the pipeline normalizes every RawRecord into a Program; added and missing already show additions and removals | `connectors/maryland_sharepoint.md` |
+| 2026-10-16 | "No longer accepting" is not a closed phrase on DNR | the Grants Gateway says it about another program; an open phrase inside a negated sentence does not open a page either | `connectors/md_dnr.md` decision 1 |
+| 2026-10-16 | GOCPP stopped on robots.txt | `User-agent: * / Disallow: /`; CLAUDE.md says say so and stop; ask the office | `connectors/md_gocpp.md` |
+| 2026-10-16 | MEA's FY27 General Notice PDF not parsed | the table flattens badly and every launch date is on the program page | `connectors/md_mea.md` decision 7 |
+| 2026-10-16 | No `connectors/text.py` yet | the SharePoint base imports the text helpers from the Drupal module, as `md_mht` already imported `parse_date` from Grants.gov; a third platform base forces the move | `connectors/maryland_sharepoint.md` |
 
 ## Open questions (do not resolve in code yet)
 
