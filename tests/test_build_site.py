@@ -1,4 +1,4 @@
-"""Navigator site: the three views of migration 0005, the JSON shaping, and the rendered pages, on an
+"""Navigator site: the views of migrations 0005 and 0006, the JSON shaping, and the rendered pages, on an
 in-memory database. No network, no browser."""
 
 from __future__ import annotations
@@ -52,6 +52,15 @@ FIRST_RUN = [
          administering_agency="Virginia DHCD", agency_code="VA-DHCD", eligibility_text="towns and cities"),
     prog("20.205", "Highway Planning and Construction", source_connector="sam_assistance_listings", status="unknown",
          applicant_types=[], categories=[], alns=["20.205"]),
+    # between rounds: a state round that closed three months ago (listed), one that closed two years ago (too old),
+    # and a closed federal notice (never listed: federal rows stay off the appendix)
+    prog("8", "Spring Round", source_connector="md_dhcd", level="state", jurisdiction="MD",
+         administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+         status="closed", closes_at=(NOW - timedelta(days=90)).date(), closes_at_text="application closed: three months ago"),
+    prog("9", "Long Dead Credit", source_connector="md_dhcd", level="state", jurisdiction="MD",
+         administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+         status="closed", closes_at=(NOW - timedelta(days=700)).date()),
+    prog("10", "Old Notice", status="closed", closes_at=(NOW - timedelta(days=30)).date(), eligibility_text="local governments"),
 ]
 SECOND_RUN = [
     prog("4", "Will Close Later", source_connector="md_dhcd", level="state", jurisdiction="MD",
@@ -102,10 +111,23 @@ def test_navigator_change_keeps_the_closed_flip(conn):
 
 def test_navigator_coverage(conn):
     cov = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_navigator_coverage")}
-    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 2 and cov["MD"]["n_open_municipal"] == 1
-    assert cov["MD"]["last_ok"] == T2
-    assert cov["VA"]["n_programs"] == 1 and cov["VA"]["last_ok"] is None
+    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 4 and cov["MD"]["n_open_municipal"] == 1
+    assert cov["MD"]["n_between_rounds"] == 2 and cov["MD"]["last_ok"] == T2
+    assert cov["VA"]["n_programs"] == 1 and cov["VA"]["n_between_rounds"] == 0 and cov["VA"]["last_ok"] is None
     assert "US" not in cov
+
+
+def test_navigator_between_lists_recent_closed_state_rounds_only(conn):
+    rows = [dict(r) for r in conn.execute("SELECT * FROM v_navigator_between")]
+    assert [r["name"] for r in rows] == ["Spring Round", "Will Close Later"]       # dated first, then undated
+    assert all(r["state"] == "MD" for r in rows)                                   # never a federal row
+    assert "Long Dead Credit" not in {r["name"] for r in rows}                      # older than 15 months
+    assert "Old Notice" not in {r["name"] for r in rows}                            # federal, closed, recent: still out
+    spring = rows[0]
+    assert spring["days_since_deadline"] == 90 and spring["last_reopened"] is None and spring["municipal_tier"] == "likely"
+    assert rows[1]["closes_at"] is None and rows[1]["days_since_deadline"] is None
+    on_page = {r["id"] for r in conn.execute("SELECT id FROM v_navigator_program")}
+    assert not on_page & {r["id"] for r in rows}
 
 
 # ---------- shaping ----------
@@ -126,6 +148,11 @@ def test_build_shapes_programs_and_rules(conn):
     assert rs["rolling"] is True and rs["closes_at"] is None and rs["closes_text"].startswith("Loan applications")
     assert rs["state"] == "MD" and rs["listings"] == [] and rs["amount_max"] is None
     assert md["coverage"]["state"]["agencies"] == 2 and md["coverage"]["state"]["open"] == 1
+    assert md["coverage"]["state"]["between"] == 2 and md["rules"]["between_months"] == build_site.BETWEEN_MONTHS
+    assert [p["name"] for p in md["between"]] == ["Spring Round", "Will Close Later"]
+    spring = md["between"][0]
+    assert spring["days_since_deadline"] == 90 and spring["days_to_close"] == -90 and spring["last_reopened"] is None
+    assert spring["closes_text"] == "application closed: three months ago" and spring["status"] == "closed"
     assert md["coverage"]["federal"]["open"] == 3
     assert md["excluded_unlikely"] == 1
     assert [s["connector"] for s in md["coverage"]["state"]["sources"]] == ["md_dhcd", "md_mht"]
@@ -133,20 +160,21 @@ def test_build_shapes_programs_and_rules(conn):
     va = site["states"]["VA"]
     assert {p["name"] for p in va["programs"]} == {"Wildlife Crossings Pilot", "<script>alert(1)</script> Resilience", "Brand New Notice", "Virginia Towns Fund"}
     assert va["coverage"]["state"]["last_ok"] is None and va["coverage"]["state"]["programs"] == 1
+    assert va["between"] == [] and va["coverage"]["state"]["between"] == 0
     assert site["states"]["WY"]["coverage"]["state"] is None
-    assert len(site["states"]["WY"]["programs"]) == 3
+    assert len(site["states"]["WY"]["programs"]) == 3 and site["states"]["WY"]["between"] == []
 
 
 def test_build_shapes_changes(conn):
     site = build_site.build(conn, generated_at=GEN)
     md = site["states"]["MD"]
     flip = next(c for c in md["changes"] if c["name"] == "Will Close Later" and c["type"] == "changed")
-    assert flip["status_flip"] is True and flip["listed"] is False
+    assert flip["status_flip"] is True and flip["listed"] is True        # closed, but on the page under "between rounds"
     assert flip["fields"] == [{"field": "status", "old": "open", "new": "closed"}]
     added = next(c for c in md["changes"] if c["name"] == "Brand New Notice")
     assert added["type"] == "added" and added["listed"] is True and added["fields"] == []
     assert all(c["state"] in (None, "MD") for c in md["changes"])
-    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 3    # two added + the flip, never starved by federal rows
+    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 5    # four added + the flip, never starved by federal rows
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
@@ -158,8 +186,9 @@ def test_index_states_and_tile_grid(conn):
     assert len(states) == 51 and len({s["code"] for s in states}) == 51
     assert len({(s["row"], s["col"]) for s in states}) == 51          # no two tiles on one cell
     md = next(s for s in states if s["code"] == "MD")
-    assert md["programs"] == 2 and md["open"] == 1 and md["agencies"] == 2
-    assert next(s for s in states if s["code"] == "WY")["programs"] == 0
+    assert md["programs"] == 4 and md["open"] == 1 and md["agencies"] == 2 and md["between"] == 2
+    wy = next(s for s in states if s["code"] == "WY")
+    assert wy["programs"] == 0 and wy["between"] == 0
 
 
 # ---------- rendering ----------
@@ -178,7 +207,8 @@ def test_write_site(conn, tmp_path):
     assert page.startswith("<!doctype html>")
     assert "<script>alert(1)</script>" not in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
-    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) == 4
+    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) == 4 and len(data["between"]) == 2
+    assert 'id="between-list"' in page and 'id="between-toggle"' in page
     assert "&lt;may&gt;" in json.dumps(data) or "<may>" in json.dumps(data)   # verbatim text survives round trip
     # self-contained: nothing loaded from anywhere
     body = page.replace("https://x/", "")
@@ -190,3 +220,28 @@ def test_write_site(conn, tmp_path):
     (out / "stale.txt").write_text("x")
     build_site.write(conn, out, generated_at=GEN)
     assert not (out / "stale.txt").exists()
+
+
+def test_a_reopening_is_observed_from_the_change_log(conn):
+    """Last in the file on purpose: it adds a third run to the shared fixture."""
+    t3 = (NOW - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    run3 = conn.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('md_dhcd', ?, ?, 'ok')", (t3, t3)).lastrowid
+    reopened = prog("8", "Spring Round", source_connector="md_dhcd", level="state", jurisdiction="MD",
+                    administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+                    status="open", closes_at=(NOW + timedelta(days=60)).date(), closes_at_text="application closes in two months")
+    upsert(conn, run3, [reopened], t3)
+    assert "Spring Round" not in {r["name"] for r in conn.execute("SELECT name FROM v_navigator_between")}
+    assert "Spring Round" in {r["name"] for r in conn.execute("SELECT name FROM v_navigator_program")}
+    # close it again: the appendix now carries the observed reopening date, from the log, not from a calendar
+    t4 = NOW.strftime("%Y-%m-%dT%H:%M:%SZ")
+    run4 = conn.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('md_dhcd', ?, ?, 'ok')", (t4, t4)).lastrowid
+    closed = prog("8", "Spring Round", source_connector="md_dhcd", level="state", jurisdiction="MD",
+                  administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+                  status="closed", closes_at=(NOW - timedelta(days=1)).date())
+    upsert(conn, run4, [closed], t4)
+    row = dict(conn.execute("SELECT * FROM v_navigator_between WHERE name = 'Spring Round'").fetchone())
+    assert row["last_reopened"] == t3 and row["days_since_deadline"] == 1
+    site = build_site.build(conn, generated_at=GEN)
+    spring = next(p for p in site["states"]["MD"]["between"] if p["name"] == "Spring Round")
+    assert spring["last_reopened"] == t3
+

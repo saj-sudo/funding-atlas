@@ -87,12 +87,18 @@ lose their one `household` tag (both are "you must:" condition lists, which name
 records are untagged instead of 7. All on the side of reading less into the page. Commerce: 2 records carry
 local-government tags, both correct. MHT: 8 of 11.
 
-## Applicant keyword table (shared; additions for milestone 4 marked)
+## Applicant keyword table (shared; additions for milestone 4 marked, milestone 7 in italics)
 
-`units? of (general )?local government`, `local governments?` → municipality, county; `municipalit\w*`, `cities`,
+`units? of (general )?local government`, `local governments?` → municipality, county; `municipalit\w*`, *`municipal`*, `cities`,
 `towns?` → municipality; `count(y|ies)` → county; `non-?profits?`, `501(c)(3)`, **`not-for-profit`** → nonprofit;
 `for-profits?`, `business(es)?`, `retailers?`, `developers?` → business; `homeowners?`, `households?`, `residents?`,
 `renters?` → household; `individuals?` → individual; `housing authorit\w*` → housing_authority; `schools?`,
 `local education agenc\w*` → school; **`tribal|tribes?`** → tribe; **`state (government )?agenc\w*`** → state;
 **`colleges?|universit\w*|institutions? of higher education`** → higher_ed. Scanned over the who-may-apply sections
 only; the matched phrase is stored as `source_code`.
+
+Milestone 7 added `\bmunicipal\b` (2026-10-16): MEA writes "county and municipal governments" and DNR "the governing bodies
+of municipal corporations", neither of which `municipalit\w*` matches. Ripple on the three Drupal connectors, measured
+by re-running them on a database loaded that morning: one change, the Town Manager Circuit Rider Program ("Municipal
+governments, county governments or private organizations may sponsor") gains a municipality tag, which is correct;
+Commerce and MHT unchanged.

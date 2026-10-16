@@ -254,7 +254,8 @@ def test_applicant_tags_come_from_who_sections_only():
     text = " ".join(lines)
     assert "residents" not in text and "homeowners" not in text and "Businesses" not in text
     pairs = {(t.value, t.source_code) for t in md.applicant_types_for(lines)}
-    assert pairs == {("municipality", "municipalities"), ("county", "county"), ("nonprofit", "501(c)(3)")}
+    assert pairs == {("municipality", "municipalities"), ("municipality", "municipal"), ("county", "county"),
+                     ("nonprofit", "501(c)(3)")}
     sections = md.body_sections(html)
     assert md.eligibility_text_for(sections).count("\n\n") == 5      # every eligibility section is kept verbatim
 

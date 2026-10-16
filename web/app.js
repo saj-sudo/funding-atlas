@@ -31,7 +31,7 @@
                        Date.UTC(+a.slice(0, 4), +a.slice(5, 7) - 1, +a.slice(8, 10))) / 86400000);
   }
   function relDays(d) {
-    if (d < 0) return 'closed ' + (-d) + (d === -1 ? ' day' : ' days') + ' ago';
+    if (d < 0) return 'deadline passed ' + (-d) + (d === -1 ? ' day' : ' days') + ' ago';
     if (d === 0) return 'closes today';
     if (d === 1) return 'closes tomorrow';
     if (d < 14) return 'closes in ' + d + ' days';
@@ -130,12 +130,12 @@
   // =====================================================================================
 
   function statePage() {
-    var P = DATA.programs, C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var P = DATA.programs, B = DATA.between || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
     P.forEach(function (p) {
       p._text = [p.name, p.agency, p.agency_code, p.number, p.summary].join(' ').toLowerCase();
     });
     var byId = {}, bySlug = {};
-    P.forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
+    P.concat(B).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
 
     var FACETS = [
       { key: 'tier', label: 'Relevance to a municipality', get: function (p) { return [p.tier]; },
@@ -154,7 +154,7 @@
     ];
     var DEFAULT_SEL = { tier: ['likely'] };
 
-    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all' };
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false };
     function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
     resetSel();
 
@@ -175,6 +175,7 @@
       if (hsh.tab === 'changes') st.tab = 'changes';
       if (hsh.feed) st.feed = hsh.feed;
       if (hsh.quick) st.quick = hsh.quick;
+      if (hsh.between === '1') st.between = true;
       var any = false;
       FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
       if (hsh.all === '1' && !any) st.sel = {};
@@ -187,6 +188,7 @@
       if (st.quick) parts.push('quick=' + st.quick);
       if (st.tab === 'changes') parts.push('tab=changes');
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
+      if (st.between) parts.push('between=1');
       var same = true;
       FACETS.forEach(function (f) {
         var cur = (st.sel[f.key] || []).slice().sort().join(','), def = (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
@@ -240,6 +242,7 @@
     if (cov.state) {
       covHtml += '<span class="cov"><b>' + h(S.name) + ':</b> ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
         ' · ' + cov.state.programs + ' programs read · ' + cov.state.open + ' open for local governments' +
+        (cov.state.between ? ' · ' + cov.state.between + ' between rounds' : '') +
         (cov.state.last_ok ? ' · read ' + fmtDate(cov.state.last_ok) : '') + '</span>';
     } else {
       covHtml += '<span class="cov none"><b>' + h(S.name) + ':</b> no state sources yet. Federal notices only.</span>';
@@ -355,6 +358,42 @@
       if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
     });
 
+    // ---- between rounds: closed or past-deadline state programs, collapsed by default ----
+    // Nothing here forecasts: the last deadline is what the source stated, the cycle text is the source's own
+    // wording, and "reopened last on" is an observation from the change log (absent until it has happened).
+    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
+    function betweenCard(p) {
+      var meta = [p.agency || p.agency_code, p.number].filter(Boolean).join(' · ');
+      var facts = [];
+      if (p.closes_at) facts.push('<span><span class="k">Last deadline</span> <b>' + h(fmtDate(p.closes_at)) + '</b>' + (p.days_since_deadline != null ? ' · ' + h(agoDays(p.days_since_deadline)) : '') + '</span>');
+      else facts.push('<span class="k">No deadline date stated</span>');
+      if (p.last_reopened) facts.push('<span><span class="k">Reopened last on</span> <b>' + h(fmtDate(p.last_reopened, true)) + '</b></span>');
+      if (p.amount_max != null) facts.push('<span><span class="k">Max award</span> <b class="num">' + money(p.amount_max) + '</b></span>');
+      if (p.match_required != null) facts.push('<span><span class="k">Match</span> <b>' + (p.match_required ? 'required' : 'not required') + '</b></span>');
+      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span class="k">' + h(words(p.funding_type)) + '</span>');
+      return '<article class="card between-card" data-id="' + p.id + '">' +
+        '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
+        (meta ? '<p class="meta">' + h(meta) + '</p>' : '') +
+        '<div class="facts">' + facts.join('') + '</div>' +
+        (p.closes_text ? '<p class="cycle"><span class="k">As written by the source:</span> ' + h(p.closes_text) + '</p>' : '') +
+        (p.categories.length ? '<ul class="chips" aria-label="Categories">' + p.categories.map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') + '</ul>' : '') +
+        '<span class="arrow" aria-hidden="true">›</span></article>';
+    }
+    var betweenEl = el('between'), betweenList = el('between-list'), betweenToggle = el('between-toggle');
+    el('n-between').textContent = B.length;
+    el('between-d').textContent = (cov.state ? S.name + ' programs' : 'State programs') +
+      ' for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) +
+      ' months of that deadline, with the last deadline and the agency\'s own wording about its cycle. Nothing here forecasts the next round; the change log shows the day one reopens.';
+    betweenList.innerHTML = B.map(betweenCard).join('');
+    if (!B.length) betweenEl.hidden = true;
+    betweenToggle.addEventListener('click', function () { st.between = !st.between; render(); });
+    betweenList.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      var c = e.target.closest('.card');
+      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
+    });
+
     // ---- pulse, tabs, feed ----
     Array.prototype.forEach.call(document.querySelectorAll('.tile'), function (t) {
       t.addEventListener('click', function () {
@@ -408,6 +447,7 @@
         fact('Status', h(cap(p.status))) +
         fact('Closes', closes, isSoon(p) ? 'soon' : '') +
         fact('Opens', p.opens_at ? h(fmtDate(p.opens_at)) : null) +
+        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
         fact('Deadline, as written', p.closes_text && p.closes_text.length <= 80 ? h(p.closes_text) : null) +
         fact('Rolling', p.rolling == null ? null : (p.rolling ? 'Yes, applications accepted year-round' : 'No')) +
         fact('Award', amount ? h(amount) : null) +
@@ -504,6 +544,9 @@
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();
       renderResults();
+      betweenToggle.setAttribute('aria-expanded', String(st.between));
+      betweenToggle.textContent = st.between ? 'Hide' : 'Show ' + B.length;
+      betweenList.hidden = !st.between;
       renderFeed(feedEl, feedRows(), function (c) {
         return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
           : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
@@ -517,7 +560,8 @@
     render();
     renderFooter(
       '<p><b>Tier</b> is a rule-based reading of the record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>possible</i> means local governments are eligible but the signal is weaker. ' +
-      DATA.excluded_unlikely + ' further open records that list local governments as eligible are left off this page as unlikely (research notices, requests for information, foreign-facing programs).</p>'
+      DATA.excluded_unlikely + ' further open records that list local governments as eligible are left off this page as unlikely (research notices, requests for information, foreign-facing programs).</p>' +
+      '<p><b>Between rounds</b> lists state programs for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) + ' months of it, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
     );
     if (slug && bySlug[slug]) openDetail(bySlug[slug], null, true);
   }
@@ -533,11 +577,11 @@
       '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
       '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
       '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open for local governments</span></div>';
+      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' between rounds</span></div>';
 
     function covText(s) {
       return s.programs > 0
-        ? s.name + ': ' + s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open for local governments' + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. Plus ' + F.open + ' federal notices.'
+        ? s.name + ': ' + s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open for local governments' + (s.between ? ', ' + s.between + ' between rounds' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. Plus ' + F.open + ' federal notices.'
         : s.name + ': no state sources yet. ' + F.open + ' federal notices.';
     }
     var map = el('map');

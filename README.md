@@ -14,6 +14,8 @@ uv run python cli.py run sam_assistance_listings --limit 25   # full run: ~2,900
 uv run python cli.py run md_dhcd                              # Maryland DHCD: ~200 page fetches, about 2 minutes
 uv run python cli.py run md_commerce                          # Maryland Commerce: ~40 pages, under a minute
 uv run python cli.py run md_mht                               # Maryland Historical Trust: ~35 pages, under a minute
+uv run python cli.py run md_mea                               # Maryland Energy Administration: 5 indexes + ~35 pages, under a minute
+uv run python cli.py run md_dnr                               # Maryland DNR: 1 index + ~22 pages, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -23,16 +25,19 @@ sqlite3 atlas.db "SELECT * FROM v_navigator_program;"         # every state page
 ```
 
 Connectors: `grants_gov` (federal notices), `sam_assistance_listings` (the program catalog underneath them,
-joined by ALN through `v_opportunity_listing`), and three Maryland agencies on the state's Drupal platform:
-`md_dhcd`, `md_commerce`, `md_mht`. They share `connectors/maryland_drupal.py` (sitemap enumeration, lastmod
-refetch gate, page parsing, applicant tagging) and each keeps only its own status rules. Docs per connector and for
-the shared base are in `docs/connectors/`.
+joined by ALN through `v_opportunity_listing`), three Maryland agencies on the state's Drupal platform (`md_dhcd`,
+`md_commerce`, `md_mht`, sharing `connectors/maryland_drupal.py`: sitemap enumeration, lastmod refetch gate, page
+parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`, sharing
+`connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading). Each
+connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
+surveyed there too, and stopped on its robots.txt.
 
 ## The site
 
-`cli.py export` builds `site/` (gitignored) from three views in migration 0005: `v_navigator_program` (every open or
-forecasted program a local government can apply to, any state), `v_navigator_change` (the change log) and
-`v_navigator_coverage` (what was read per state). Each state page is one self-contained HTML file with its data
+`cli.py export` builds `site/` (gitignored) from four views in migrations 0005 and 0006: `v_navigator_program` (every open or
+forecasted program a local government can apply to, any state), `v_navigator_between` (its collapsed appendix: closed or
+past-deadline state programs within 15 months of their last deadline, for the next round), `v_navigator_change` (the
+change log) and `v_navigator_coverage` (what was read per state). Each state page is one self-contained HTML file with its data
 embedded as JSON and no external requests, so `site/md/index.html` also works as an email attachment or offline.
 The page markup, stylesheet and script live in `web/`; `scripts/build_site.py` only queries SQL and fills them in.
 
