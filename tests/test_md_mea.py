@@ -92,6 +92,12 @@ def test_page_payload_needs_the_mdgov_body():
     assert p is not None and p["title"] == "T" and p["content_hash"] == sp.text_hash(p["main_html"])
 
 
+def test_summary_drops_the_site_boilerplate():
+    assert sp.summary_for("An official website of the State of Maryland.") is None
+    assert sp.summary_for("  ") is None and sp.summary_for(None) is None
+    assert sp.summary_for("Grants for parks.") == "Grants for parks."
+
+
 def test_text_hash_ignores_cloudflare_email_markup():
     a = section('<p>Contact <a class="__cf_email__" data-cfemail="b6d1d7">[email protected]</a></p>')
     b = section('<p>Contact <a class="__cf_email__" data-cfemail="0f3a2c">[email protected]</a></p>')
@@ -223,7 +229,8 @@ def test_normalize_open_grant_with_labels_and_federal_money():
     assert p.eligibility_text.startswith("Target Audience: Maryland counties, cities, towns")
     assert p.applicant_pairs() == [("county", "counties"), ("municipality", "cities"), ("municipality", "towns")]
     assert p.category_pairs() == [("energy", "mea")]
-    assert (p.amount_min, p.amount_max) == (None, None) and p.summary
+    assert (p.amount_min, p.amount_max) == (None, None)
+    assert p.summary is None and payload(SOLARAPP)["description"].startswith("An official website")   # theme boilerplate, not a summary
 
 
 def test_normalize_now_open_prose_with_launch_date_and_municipal_wording():

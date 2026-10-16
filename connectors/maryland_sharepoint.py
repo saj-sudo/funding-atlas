@@ -55,6 +55,8 @@ from pipeline.models import CategoryTag, Program, RawRecord
 BODY_SELECTOR = "#ctl00_PlaceHolderMain_RichHtmlField1__ControlWrapper_RichHtmlField"
 H1_SELECTOR = "#ctl00_PlaceHolderMain_editmodepanel2 h1"
 LEAF_BLOCKS = ("p", "div", "li", "td", "th", "h2", "h3", "h4", "h5", "h6")
+# Every mdgov page carries the same site-wide <meta name="description">; it is the theme's, not the program's.
+BOILERPLATE_DESCRIPTIONS = {"an official website of the state of maryland."}
 
 MONTH = (r"(?:January|February|March|April|May|June|July|August|September|October|November|December"
          r"|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)")
@@ -151,6 +153,13 @@ def leaf_lines(main_html: str) -> list[str]:
 def page_sentences(main_html: str) -> list[str]:
     """Sentences per block, so a label line and the paragraph after it never fuse into one sentence."""
     return [s for line in leaf_lines(main_html) for s in sentences(line)]
+
+
+def summary_for(description: str | None) -> str | None:
+    """The page's meta description, unless it is the theme's site-wide boilerplate (then null: the page did not
+    describe the program)."""
+    text = clean(description)
+    return None if not text or text.lower() in BOILERPLATE_DESCRIPTIONS else text
 
 
 def parse_text_date(value: str | None) -> date | None:
@@ -288,7 +297,7 @@ class MarylandSharePointConnector:
             closes_at=status.get("closes_at"),
             closes_at_text=status.get("closes_at_text"),
             rolling=status.get("rolling"),
-            summary=clean(payload.get("description")) or None,
+            summary=summary_for(payload.get("description")),
             eligibility_text="\n\n".join(lines) or None,
             eligibility_structured=None,
             applicant_types=applicant_types_for(lines),

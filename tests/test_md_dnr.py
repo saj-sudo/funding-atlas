@@ -143,7 +143,7 @@ def test_normalize_cpp_closed_with_unit_h1_and_municipal_corporations():
     assert p.closes_at_text == "The application period for the Fiscal Year 2028 Community Parks and Playgrounds Program grant is now closed."
     assert p.applicant_pairs() == [("municipality", "municipal")]
     assert p.category_pairs() == [("parks", "Land Acquisition and Planning")]
-    assert p.funding_type is None and p.funding_source == "direct" and p.summary
+    assert p.funding_type is None and p.funding_source == "direct" and p.summary is None      # boilerplate meta description
 
 
 def test_normalize_lwcf_forecasted_federal_government_entities():

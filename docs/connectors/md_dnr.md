@@ -99,7 +99,7 @@ first `<h2>` of the body. Every page has `<meta name="description">`.
 | closes_at | application deadline sentences | the latest full date among sentences about applications or proposals carrying `due`, `deadline`, `closes on`, `submit ... by` or `must be submitted/received`, excluding report, notification and award sentences |
 | closes_at_text | the sentences above | opens sentence, status sentence(s), deadline sentence(s), joined with a space |
 | rolling | the open sentence | `rolling basis` / `year-round` → True, unless the page also states a dated deadline |
-| summary | `<meta name="description">` | as is |
+| summary | `<meta name="description">` | null: every DNR page carries the theme's site-wide boilerplate (`maryland_sharepoint.md`, decision 0) |
 | eligibility_text | applicant sentences | sentences matching `eligible`, `may apply`, `available to`, `open to`, `applicant(s)`, `applications from`, minus negated ones; page order |
 | applicant_types | keyword tags over the same sentences | shared table; `municipal` (added for milestone 7) catches CPP's "governing bodies of municipal corporations" |
 | categories | unit | Land Acquisition and Planning → `parks`; Watershed & Climate Services and Boating Services → `water`; else `other`; `source_code` = the unit |

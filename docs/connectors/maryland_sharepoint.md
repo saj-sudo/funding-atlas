@@ -12,7 +12,7 @@ standalone first, and the extraction commit left every MEA fixture's `record_has
 | robots.txt | allows `/Pages/`; disallows `/_vti_bin/`, `/_layouts/`, `/_catalogs/` | same |
 | Page body | `#ctl00_PlaceHolderMain_RichHtmlField1__ControlWrapper_RichHtmlField` inside the first `section.mdgov-section` of `main#mdgovMain` | same |
 | Page `<h1>` | `#ctl00_PlaceHolderMain_editmodepanel2 h1` | same; on four Land Acquisition pages it is the unit name, on one MET page it is empty |
-| `<meta name="description">` | every page | every page |
+| `<meta name="description">` | every page, always the theme's "An official website of the State of Maryland." | same |
 | `Last-Modified` | one CDN timestamp on every page | same |
 | `ETag` | none | none |
 | Cloudflare e-mail obfuscation | every page with a mailto (`data-cfemail` rewritten per response) | the index and about half the pages |
@@ -46,6 +46,9 @@ facts), `classify_page`, `normalize`.
 
 ## Decisions
 
+0. **The meta description is not a summary.** All 48 pages carry the theme's "An official website of the State of
+   Maryland."; `summary_for` nulls it. Found on the first rendered page (a card summarised WIF as the state's website);
+   the fix changes every SharePoint record's hash once.
 1. **Text hash, not markup hash.** Two fetches of the same MEA page differ in `data-cfemail` and agree in text. The
    record hash is the change signal; `content_hash` is for the probe and for audit.
 2. **Every page every run.** No usable `Last-Modified` or `ETag`; the sites are small (about 40 and 25 requests).

@@ -128,7 +128,7 @@ ACCEPTING APPLICATIONS, PER STATE LAW.`, `*FY26 Higher Education Clean Energy Gr
 | closes_at | first deadline line | the first `Month D, YYYY` in the line's first sentence, times and weekdays around it ignored, ordinals stripped, no year → null; kept whatever the status |
 | closes_at_text | status, deadline and launch lines | `Label: value` joined with `; ` |
 | rolling | deadline line, open records only | `ongoing`, `remains open`, `until funding`, `first-come`, `rolling` → True |
-| summary | `<meta name="description">` | as is |
+| summary | `<meta name="description">` | null: every MEA page carries the theme's site-wide boilerplate (`maryland_sharepoint.md`, decision 0) |
 | eligibility_text | audience lines + applicant sentences | `Label: value` for every audience line, then the body sentences matching `may apply`, `eligible applicants/entities/to apply`, `is/are open to`, `available to`, minus negated ones; page order; deduplicated |
 | applicant_types | keyword tags over the same lines | shared table; `municipal` added for this connector |
 | categories | constant + index | `energy` (source_code `mea`); plus `transportation` when the transportation index lists the page |
