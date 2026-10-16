@@ -109,6 +109,7 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-16 | Between rounds is a separate, collapsed group, not a status or a tier | a town prepares months before a round opens; the open list must keep meaning "apply now or soon"; closed or past-deadline state programs within 15 months of their last deadline go in an appendix, off by default like the possible tier | migration 0006 |
 | 2026-10-16 | Federal notices are never "between rounds" | Grants.gov closes a notice with a real date when it leaves the search, so hundreds of one-off numbers would land on all 51 pages; the recurring federal thing is the Assistance Listing | migration 0006 header |
 | 2026-10-16 | Reopening dates are observed, never computed | `last_reopened` is the change log's last closed-to-open flip and stays null until one has happened; no "expected next round" is derived from a calendar | migration 0006 |
+| 2026-10-16 | A keyword tags an applicant only in noun position | `individual` matched the adjective ("individual school facilities", "individual private lands"); plural always, singular only before punctuation or a function word; four records lose a wrong tag, none gains one | `connectors/maryland_drupal.md` |
 | 2026-10-16 | No `connectors/text.py` yet | the SharePoint base imports the text helpers from the Drupal module, as `md_mht` already imported `parse_date` from Grants.gov; a third platform base forces the move | `connectors/maryland_sharepoint.md` |
 
 ## Open questions (do not resolve in code yet)

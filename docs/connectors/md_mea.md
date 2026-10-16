@@ -27,9 +27,8 @@ Known gaps, all because the page does not say it the way the rules read:
 - Solar Technical Assistance "provides technical assistance ... to state and local government entities" in a
   description sentence, not an applicant sentence, so it carries no tags. Jane E. Lawton moved to the Maryland Clean
   Energy Center on 2026-07-01 and its MEA page is a pointer: `unknown`, no tags.
-- `\bindividuals?\b` in the shared keyword table matches "individual school facilities" (Decarbonizing Public Schools)
-  and "the individual identified to receive funding" (Affordable Electrification Outreach). Both records are closed;
-  the table is shared, so the fix (an adjective guard) waits for a case that surfaces.
+- (Fixed the same day, milestone 7.1.) `individual` used to tag the adjective in "individual school facilities" and the
+  recipient in "the individual identified to receive funding"; the shared table now matches the noun only.
 - The FY27 General Notice of Upcoming Programs PDF is not parsed: `pdftotext` flattens its table into interleaved
   multi-line cells, and the program pages carry their own launch dates. Decision 7.
 

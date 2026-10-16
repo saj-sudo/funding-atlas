@@ -61,7 +61,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bhouseholds?\b", ("household",)),
     (r"\bresidents?\b", ("household",)),
     (r"\brenters?\b", ("household",)),
-    (r"\bindividuals?\b", ("individual",)),
+    # The noun only: plural always, singular when a function word or punctuation follows ("any individual who",
+    # "an individual may apply"). The adjective ("individual school facilities") never tags.
+    (r"\bindividuals\b|\bindividual\b(?=\s*(?:$|[,.;:)]|(?:and|or|who|that|which|may|can|must|is|are|applying|seeking)\b))",
+     ("individual",)),
     (r"housing authorit\w*", ("housing_authority",)),
     (r"\bschools?\b", ("school",)),
     (r"local education agenc\w*", ("school",)),

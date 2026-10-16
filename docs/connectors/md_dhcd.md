@@ -199,7 +199,7 @@ Keyword map for applicant_types (decision 2), phrase → tags:
 `units? of (general )?local government`, `local governments?` → municipality, county;
 `municipalit\w*`, `cities`, `towns?` → municipality; `count(y\|ies)` → county; `nonprofit` → nonprofit;
 `for-profit`, `business(es)?`, `retailers?`, `developers?` → business; `homeowners?`, `households?`, `residents?`,
-`renters?` → household; `individuals?` → individual; `housing authorit\w*` → housing_authority;
+`renters?` → household; `individuals` / `individual` in noun position → individual; `housing authorit\w*` → housing_authority;
 `school`, `local education agenc` → school. Only the eligibility sections are scanned, never the whole page.
 
 ## Decisions (1 and 2 confirmed 2026-10-15; 3 and 4 are defaults, override at review)
