@@ -46,6 +46,7 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
     (r"local governments?", ("municipality", "county")),
     (r"municipalit\w*", ("municipality",)),
+    (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
     (r"\bcities\b", ("municipality",)),
     (r"\btowns?\b", ("municipality",)),
     (r"\bcount(?:y|ies)\b", ("county",)),
