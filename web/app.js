@@ -31,7 +31,7 @@
                        Date.UTC(+a.slice(0, 4), +a.slice(5, 7) - 1, +a.slice(8, 10))) / 86400000);
   }
   function relDays(d) {
-    if (d < 0) return 'closed ' + (-d) + (d === -1 ? ' day' : ' days') + ' ago';
+    if (d < 0) return 'deadline passed ' + (-d) + (d === -1 ? ' day' : ' days') + ' ago';
     if (d === 0) return 'closes today';
     if (d === 1) return 'closes tomorrow';
     if (d < 14) return 'closes in ' + d + ' days';
