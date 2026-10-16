@@ -1,0 +1,86 @@
+# Build and publish the navigator site to GitHub Pages.
+#
+# The site is static: one page per state plus an index, built by `cli.py export` from atlas.db. The database
+# is the state that makes change detection work (first_seen, program_change), so it has to survive between
+# runs: it lives on the gh-pages branch (gzipped) next to the site it was built from, and is restored from there
+# at the start of every run. gh-pages is a single orphan commit, force-pushed each time, so history never grows.
+# Nothing generated is ever committed to main.
+#
+#   schedule          daily: run every connector, then build and publish
+#   workflow_dispatch same, with a switch to skip the connectors
+#   push to main      build and publish only, from the stored database (a UI change goes live on merge
+#                     without re-reading the sources)
+
+name: site
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+    inputs:
+      run_connectors:
+        description: "Run the connectors before building"
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --frozen
+
+      - name: Restore the database from gh-pages
+        run: |
+          if git fetch --depth=1 origin gh-pages 2>/dev/null; then
+            git show origin/gh-pages:atlas.db.gz | gunzip > atlas.db && echo "restored atlas.db ($(du -h atlas.db | cut -f1))"
+          else
+            echo "no gh-pages branch yet: starting from an empty database"
+          fi
+          uv run python cli.py init-db
+
+      - name: Run the connectors
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_connectors)
+        run: |
+          failed=""
+          for c in md_dhcd md_commerce md_mht grants_gov sam_assistance_listings; do
+            echo "::group::$c"
+            if ! uv run python cli.py run "$c"; then
+              failed="$failed $c"
+              echo "::warning title=$c failed::the run table records the error; the site is built from the last good read"
+            fi
+            echo "::endgroup::"
+          done
+          echo "failed connectors:${failed:- none}"
+
+      - name: Build the site
+        run: |
+          uv run python cli.py export --out site
+          uv run python -c "import sqlite3; sqlite3.connect('atlas.db').execute(\"VACUUM INTO 'site/atlas.db'\")"
+          gzip -6 site/atlas.db          # ~84 MB raw today, ~15 MB gzipped; GitHub refuses files over 100 MB
+          touch site/.nojekyll
+          du -sh site site/atlas.db.gz
+
+      - name: Publish to gh-pages
+        run: |
+          cd site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "site: built $(date -u +%Y-%m-%dT%H:%MZ) from ${GITHUB_SHA::7} (${{ github.event_name }})"
+          git push --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages

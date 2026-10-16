@@ -10,7 +10,7 @@ import typer
 import db
 from pipeline.diff import latest_run_id, render
 from pipeline.run import CONNECTORS, run_connector
-from scripts import export_html
+from scripts import build_site
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 DbOpt = Annotated[str, typer.Option("--db", help="SQLite file")]
@@ -116,14 +116,16 @@ def aln(
 
 @app.command()
 def export(
-    out: Annotated[Path, typer.Option(help="where to write the page")] = export_html.DEFAULT_OUT,
+    out: Annotated[Path, typer.Option(help="directory to write the site into (wiped first)")] = build_site.DEFAULT_OUT,
     db_path: DbOpt = db.DEFAULT_DB,
 ) -> None:
-    """Write the open-programs page (v_municipal_page) as one self-contained HTML file."""
+    """Build the navigator site (index + one page per state) from the navigator views."""
     conn = db.connect(db_path)
     db.apply_schema(conn)
-    path, n = export_html.write(conn, out)
-    typer.echo(f"{path}: {n} programs")
+    path, counts = build_site.write(conn, out)
+    md_page = conn.execute("SELECT COUNT(*) FROM v_municipal_page").fetchone()[0]
+    typer.echo(f"{path}: index + {len(counts)} state pages")
+    typer.echo(f"  MD: {counts.get('MD', 0)} rows (v_municipal_page: {md_page})")
 
 
 if __name__ == "__main__":

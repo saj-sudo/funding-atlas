@@ -48,9 +48,9 @@ The navigator UI should lead with 1 and 3. A plain table shows only 4.
 **v0.1 (Maryland, shipped 2026-10-15):** CLI, SQLite, five connectors, relevance tiers, one static page.
 
 **v0.2 (in progress):**
-- A navigator UI that people want to use: state picker for all 50 states (federal rows everywhere, state coverage
-  stated honestly per state), a landing view of new / closing soon / status changes, faceted filters, detail panel,
-  change feed. Hosted on GitHub Pages, rebuilt on a schedule.
+- Navigator site (shipped 2026-10-15): state picker for all 50 states and DC (federal rows everywhere, state coverage
+  stated per state), a landing strip of new / closing soon / status changes, faceted filters with counts, a detail
+  panel, a change feed. GitHub Pages, rebuilt daily.
 - Maryland depth: the big municipal funders (DNR, MDOT, MDE, MEA, GOCPP, MDEM) are not yet connected.
 - Expansion beyond Maryland, platform-first: survey each state's central grants portal, build one connector per
   platform, treat a state as configuration. Mid-Atlantic first.
@@ -118,7 +118,10 @@ position; deferred until a reader says the business rows bother them.
 | `v_open_for_municipalities` | 0002 | open or forecasted, municipality eligible, US or MD, not past deadline |
 | `v_opportunity_listing` | 0003 | federal notices joined to SAM.gov listings by ALN |
 | `v_aln_coverage` | 0003 | how many notices resolve to a listing, per connector |
-| `v_municipal_page` | 0004 | the static page as data: likely + possible, with text columns and flattened tags |
+| `v_municipal_page` | 0004 | the Maryland page as data: likely + possible, with text columns and flattened tags; now the comparison row for the site |
+| `v_navigator_program` | 0005 | `v_municipal_page` for every jurisdiction: open or forecasted, municipality eligible, likely or possible, with `state` |
+| `v_navigator_change` | 0005 | the change log for those records, any status (a round that just closed is the change that matters) |
+| `v_navigator_coverage` | 0005 | per state: agencies and records read, open municipal rows, last successful read |
 
 ## Connector contract
 
@@ -132,4 +135,4 @@ base per platform with per-state configuration.
 ## Licensing
 
 Decided 2026-10-15: MIT for the code, ODbL for the records. Verbatim eligibility text is public government text and is
-republished as such with the source URL on every row. LICENSE files land with the hosting session.
+republished as such with the source URL on every row. `LICENSE` (MIT) and `LICENSE-DATA` (ODbL) are in the repo root.

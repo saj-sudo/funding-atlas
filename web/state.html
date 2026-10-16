@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<style>
+{{CSS}}
+</style>
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <label>State <select id="state-switch" aria-label="Switch state"></select></label>
+    <span class="gen">Built {{GENERATED}}</span>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <div class="coverage" id="coverage" aria-label="Coverage"></div>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON.</p></noscript>
+  </section>
+
+  <section class="pulse" aria-label="What changed">
+    <button class="tile new" id="tile-new" aria-pressed="false" data-quick="new">
+      <span class="k">New this week</span><span class="v num" id="n-new">0</span><span class="d">first seen by the registry in the last 7 days</span>
+    </button>
+    <button class="tile closing" id="tile-closing" aria-pressed="false" data-quick="closing">
+      <span class="k">Closing within 30 days</span><span class="v num" id="n-closing">0</span><span class="d">deadline between today and 30 days out</span>
+    </button>
+    <button class="tile changed" id="tile-changed" aria-pressed="false" data-quick="changed">
+      <span class="k">Status changed</span><span class="v num" id="n-changed">0</span><span class="d">open, forecasted or closed flipped in the last 7 days</span>
+    </button>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search name, agency, number, summary" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort">Sort <select id="sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filters <span class="n num" id="filters-n" hidden>0</span></button>
+      <span class="count num" id="count" role="status" aria-live="polite"></span>
+    </div>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters"><a class="skip inside" href="#results">Skip filters, go to results</a><div id="facet-list"></div></aside>
+      <div class="results" id="results"></div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Open the source page</a>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{{DATA}}</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>
