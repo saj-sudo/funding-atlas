@@ -1,4 +1,4 @@
-"""Build the navigator site: one page per state plus an index, from the navigator views (migration 0005).
+"""Build the navigator site: one page per state plus an index, from the navigator views (migrations 0005 and 0006).
 
   uv run python cli.py export                     # writes site/ from atlas.db
   uv run python scripts/build_site.py --out site
@@ -38,6 +38,7 @@ UPDATED_DAYS = 7       # source changed within this many days -> "updated"
 CLOSING_DAYS = 30      # closes within this many days -> "closing soon"
 FEED_N = 200           # change-feed rows per state page: the newest N federal plus the newest N of that state
 INDEX_FEED_N = 20      # change-feed rows on the index
+BETWEEN_MONTHS = 15    # mirrors v_navigator_between (migration 0006): last deadline within this many months
 
 CONNECTOR_LABEL = {
     "grants_gov": "Grants.gov",
@@ -96,6 +97,11 @@ def runs(conn: sqlite3.Connection) -> dict[str, dict[str, str | None]]:
 
 def load_programs(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_program")]
+
+
+def load_between(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    """State programs a town could apply to that are closed or past their deadline: the page's appendix."""
+    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_between")]
 
 
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
@@ -205,6 +211,10 @@ def shape_program(row: dict[str, Any], run_info: dict[str, dict[str, str | None]
         "is_new": is_new,
         "is_updated": is_updated,
         "days_to_close": days_to(row["closes_at"], today),
+        # v_navigator_between only: days since the last stated deadline, and the last time the change log saw
+        # the record flip to open or forecasted (null until observed; never computed from a calendar).
+        "days_since_deadline": row.get("days_since_deadline"),
+        "last_reopened": row.get("last_reopened"),
     }
 
 
@@ -243,6 +253,7 @@ def state_payload(
     code: str,
     *,
     programs: list[dict[str, Any]],
+    between: list[dict[str, Any]],
     changes: list[dict[str, Any]],
     coverage: dict[str, dict[str, Any]],
     connectors: dict[str, list[str]],
@@ -251,7 +262,8 @@ def state_payload(
     generated_at: str,
 ) -> dict[str, Any]:
     rows = [p for p in programs if p["state"] is None or p["state"] == code]
-    listed = {p["id"] for p in rows}
+    between_rows = [p for p in between if p["state"] == code]          # state rows only, by construction
+    listed = {p["id"] for p in rows} | {p["id"] for p in between_rows}
     # Newest N federal plus newest N state rows, merged: a day of 1,000 federal changes must not push the
     # state's own log off its page.
     fed = [c for c in changes if c["state"] is None][:FEED_N]
@@ -266,7 +278,8 @@ def state_payload(
         "repo_url": REPO_URL,
         "state": {"code": code, "name": STATE_NAME[code]},
         "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
-        "rules": {"new_days": NEW_DAYS, "updated_days": UPDATED_DAYS, "closing_days": CLOSING_DAYS, "feed_n": FEED_N},
+        "rules": {"new_days": NEW_DAYS, "updated_days": UPDATED_DAYS, "closing_days": CLOSING_DAYS, "feed_n": FEED_N,
+                  "between_months": BETWEEN_MONTHS},
         "coverage": {
             "federal": {
                 "open": federal_open,
@@ -276,6 +289,7 @@ def state_payload(
                 "agencies": cov["n_agencies"],
                 "programs": cov["n_programs"],
                 "open": cov["n_open_municipal"],
+                "between": cov["n_between_rounds"],
                 "last_ok": cov["last_ok"],
                 "sources": sources_for(connectors.get(code, []), run_info),
             },
@@ -283,6 +297,7 @@ def state_payload(
         "excluded_unlikely": excluded,
         "questions": list(READER_QUESTIONS),
         "programs": rows,
+        "between": between_rows,
         "changes": feed,
     }
 
@@ -305,6 +320,7 @@ def index_payload(
             "agencies": cov["n_agencies"] if cov else 0,
             "programs": cov["n_programs"] if cov else 0,
             "open": cov["n_open_municipal"] if cov else 0,
+            "between": cov["n_between_rounds"] if cov else 0,
             "last_ok": cov["last_ok"] if cov else None,
         })
     return {
@@ -374,6 +390,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     today = date.fromisoformat(generated_at[:10])
     run_info = runs(conn)
     programs = [shape_program(r, run_info, today) for r in load_programs(conn)]
+    between = [shape_program(r, run_info, today) for r in load_between(conn)]
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
@@ -382,7 +399,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         typer.echo(f"warning: records with a jurisdiction that is not a state page: {', '.join(unknown)}", err=True)
     states = {
         code: state_payload(
-            code, programs=programs, changes=changes, coverage=coverage, connectors=connectors,
+            code, programs=programs, between=between, changes=changes, coverage=coverage, connectors=connectors,
             run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at,
         )
         for code, _, _, _ in STATES
@@ -429,9 +446,10 @@ def main(
     db.apply_schema(conn)
     path, counts = write(conn, out)
     md_page = conn.execute("SELECT COUNT(*) FROM v_municipal_page").fetchone()[0]
+    md_between = conn.execute("SELECT COUNT(*) FROM v_navigator_between WHERE state = 'MD'").fetchone()[0]
     typer.echo(f"{path}: index + {len(counts)} state pages")
     typer.echo(f"  federal rows on every page: {counts.get('VA', 0)}")
-    typer.echo(f"  MD: {counts.get('MD', 0)} rows (v_municipal_page: {md_page})")
+    typer.echo(f"  MD: {counts.get('MD', 0)} rows (v_municipal_page: {md_page}), {md_between} between rounds")
     for code, n in counts.items():
         if n != counts.get("VA", 0) and code != "MD":
             typer.echo(f"  {code}: {n} rows")
