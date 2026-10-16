@@ -45,6 +45,7 @@ CONNECTOR_LABEL = {
     "md_dhcd": "Maryland DHCD",
     "md_commerce": "Maryland Commerce",
     "md_mht": "Maryland Historical Trust",
+    "md_mea": "Maryland Energy Administration",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

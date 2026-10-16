@@ -14,6 +14,7 @@ uv run python cli.py run sam_assistance_listings --limit 25   # full run: ~2,900
 uv run python cli.py run md_dhcd                              # Maryland DHCD: ~200 page fetches, about 2 minutes
 uv run python cli.py run md_commerce                          # Maryland Commerce: ~40 pages, under a minute
 uv run python cli.py run md_mht                               # Maryland Historical Trust: ~35 pages, under a minute
+uv run python cli.py run md_mea                               # Maryland Energy Administration: 5 indexes + ~35 pages, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
