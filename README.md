@@ -34,9 +34,10 @@ surveyed there too, and stopped on its robots.txt.
 
 ## The site
 
-`cli.py export` builds `site/` (gitignored) from three views in migration 0005: `v_navigator_program` (every open or
-forecasted program a local government can apply to, any state), `v_navigator_change` (the change log) and
-`v_navigator_coverage` (what was read per state). Each state page is one self-contained HTML file with its data
+`cli.py export` builds `site/` (gitignored) from four views in migrations 0005 and 0006: `v_navigator_program` (every open or
+forecasted program a local government can apply to, any state), `v_navigator_between` (its collapsed appendix: closed or
+past-deadline state programs within 15 months of their last deadline, for the next round), `v_navigator_change` (the
+change log) and `v_navigator_coverage` (what was read per state). Each state page is one self-contained HTML file with its data
 embedded as JSON and no external requests, so `site/md/index.html` also works as an email attachment or offline.
 The page markup, stylesheet and script live in `web/`; `scripts/build_site.py` only queries SQL and fills them in.
 

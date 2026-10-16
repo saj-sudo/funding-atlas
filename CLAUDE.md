@@ -20,7 +20,7 @@ connector or one feature per session, no abstractions before the third real case
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
 - `scripts/build_site.py` (`cli.py export`): builds `site/` (index + one page per state) from the navigator views
-  (migration 0005). The markup, stylesheet and script are real files in `web/` with `{{SLOT}}` placeholders; Python
+  (migrations 0005 and 0006). The markup, stylesheet and script are real files in `web/` with `{{SLOT}}` placeholders; Python
   only queries SQL and fills them in. No framework, no build step, no external requests from the pages.
 - `.github/workflows/site.yml`: daily connector runs + rebuild, published to the `gh-pages` branch together with
   `atlas.db` (the database is restored from there at the start of each run). Generated files never land on `main`.
