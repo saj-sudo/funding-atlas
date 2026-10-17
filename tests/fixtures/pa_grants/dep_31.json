@@ -1,0 +1,89 @@
+{
+ "hit": {
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/dep/31",
+  "copapwpfundingtype": [
+   "Loan"
+  ],
+  "copapwpfundingsource": [
+   "Federal"
+  ],
+  "copapwpfundingagency": [
+   "Environmental Protection"
+  ],
+  "copapwpgrantcycle": "Revolving Loan Fund",
+  "copapwpopendate": 1735300800000,
+  "copapwpapplicantcategory": "Municipality",
+  "copapwppopulationserved": [
+   "Pennsylvania local governments"
+  ],
+  "copapwppagetitle": "Municipal Opportunities for Retrofits and Energy Efficiency (MORE) program",
+  "copapwpminimumaward": 5000,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Energy"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality"
+  ],
+  "copapwpoverview": "The MORE Loan is a revolving loan fund to help local governments achieve their energy efficiency projects, small or large. The MORE Loan offers below-market interest rates; however, MORE Grant recipients can buy down their interest rate to as low as 0%.",
+  "copapwpfundingdetails": "No matching required",
+  "copapwpbadges": [
+   "Accepting applications"
+  ],
+  "copapwpclosedate": 32487825600000,
+  "copapwpshortdescription": "The MORE Loan is a revolving loan fund to help local governments achieve their energy efficiency projects, small or large. The MORE Loan offers below-market interest rates; however, MORE Grant recipients can buy down their interest rate to as low as 0%.",
+  "copapwpapplicationstatus": "Accepting applications"
+ },
+ "detail": {
+  "slug": "dep31",
+  "last_modified": "2026-10-16T17:01:22Z",
+  "title": "Municipal Opportunities for Retrofits and Energy Efficiency (MORE) program",
+  "status": "Accepting applications",
+  "category": "Energy",
+  "populationServedType": "Pennsylvania local governments",
+  "populationServedGeography": "Commonwealth wide",
+  "issuingAgency": "Environmental Protection",
+  "shortIssuingAgency": "dep",
+  "overview": "The MORE Loan is a revolving loan fund to help local governments achieve their energy efficiency projects, small or large. The MORE Loan offers below-market interest rates; however, MORE Grant recipients can buy down their interest rate to as low as 0%. ",
+  "openDate": "2024-12-27T12:00:00-00:00",
+  "closeDate": "2999-07-01T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Revolving Loan Fund",
+  "applicantType": "Municipality ",
+  "applicantCategory": "Municipality",
+  "eligibility": "Borrowers must have a level 2 commercial energy audit and energy conservation measure project design/scope to apply for the loan. MORE Loans can be used for the following:<br /><br />Energy efficiency upgrades<br />Building retrofits<br />On-site renewable energy generation projects (must be paired with energy efficiency measures to qualify)<br /><br />Each local government borrower must provide NEIF with a copy of the proceedings submitted to, as well as the approval from, the Pennsylvania Department of Community and Economic Development (DCED) stating that the debt to be incurred by the borrower, or by any local government unit guaranteeing its debt, in connection with the project funding is approved under the Local Government Unit Debt Act (LGUDA), 53 Pa.C.S. § 8001 et seq. The loan cannot be closed without prior approval by DCED. More information about the LGUDA approval requirements and process can be found on DCED’s website(opens in a new tab) and questions should be directed to DCED at RA-DCLGUDA@pa.gov or (717) 783-8452.",
+  "reportingMonitoring": "",
+  "fundingType": "Loan",
+  "matchingFundsRequirements": "",
+  "totalFundsToBeAwarded": "9000000",
+  "minimumAward": "5000",
+  "maximumAward": "",
+  "anticipatedFunding": "",
+  "fundingSource": "Federal",
+  "linkToApply": "https://commercial.neifund.org/apply?_gl=1*10wxm4c*_gcl_au*MzY1NTU0NDUzLjE3ODYzODkxMTQ.",
+  "shortDescription": "The MORE Loan is a revolving loan fund to help local governments achieve their energy efficiency projects, small or large. The MORE Loan offers below-market interest rates; however, MORE Grant recipients can buy down their interest rate to as low as 0%. ",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/dep.html",
+  "issuingAgencyGrantNumber": 31.0,
+  "pointOfContact": {
+   "name": "aschmeider@pa.gov"
+  },
+  "processSteps": [],
+  "additionalResources": [
+   {
+    "title": "Administrator Page",
+    "url": "https://www.dep.pa.gov/Business/Energy/OfficeofPollutionPrevention/FinancialOptions/Energy-Accelerator-Program/Pages/Municipal-Opportunities-for-Retrofits-and-Energy-Efficiency.aspx"
+   },
+   {
+    "title": "MORE Program Informational Webinar",
+    "url": "https://www.pa.gov/agencies/dep/programs-and-services/energy-programs-office/financial-options/energy-accelerator-program/municipal-opportunities-for-retrofits-and-energy-efficiency"
+   }
+  ],
+  "FAQs": [
+   {
+    "question": "What can the funding be used for under this program?",
+    "answer": "Eligible applicants can apply for up to $50,000 for any one or all of the following uses:  Level 2 commercial energy audits; Energy Conservation Measure (ECM_)Project design and MORE Loan application development; interest rate buydown on a MORE Loan."
+   }
+  ]
+ }
+}

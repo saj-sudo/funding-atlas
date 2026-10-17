@@ -1,0 +1,79 @@
+{
+ "hit": {
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/pccd/63",
+  "copapwpfundingtype": [
+   "Grant"
+  ],
+  "copapwpfundingsource": [
+   "Federal"
+  ],
+  "copapwpfundingagency": [
+   "Pennsylvania Commission on Crime and Delinquency"
+  ],
+  "copapwpgrantcycle": "Annual",
+  "copapwpopendate": 1784721600000,
+  "copapwpapplicantcategory": "Any municipality; Applicants may also be a public or quasi-public body, or its representative duly authorized to act on behalf of one or more municipalities.",
+  "copapwppopulationserved": [
+   "All pennsylvanians"
+  ],
+  "copapwppagetitle": "2026-27 Regional Policing Assistance Program",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 200000,
+  "copapwpcategory": [
+   "Law, justice, & legal services"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality"
+  ],
+  "copapwpoverview": "The goal(s) and objective(s) of the Regional Policing Assistance Program are to improve the following: uniformity and consistency of enforcement across municipalities; recruitment; distribution and deployment of police personnel; training and personnel efficiency; career enhancement opportunities; enhanced professionalism; and reduction of costs.",
+  "copapwpfundingdetails": "No matching required",
+  "copapwpbadges": [
+   "Accepting applications"
+  ],
+  "copapwpshortdescription": "The goal(s) and objective(s) of the Regional Policing Assistance Program are to improve the following: uniformity and consistency of enforcement across municipalities; recruitment; distribution and deployment of police personnel; training and personnel efficiency; career enhancement opportunities...",
+  "copapwpapplicationstatus": "Accepting applications"
+ },
+ "detail": {
+  "slug": "pccd63",
+  "last_modified": "2026-10-16T17:01:27Z",
+  "title": "2026-27 Regional Policing Assistance Program",
+  "status": "Accepting applications",
+  "category": "Law, justice, & legal services",
+  "populationServedType": "All pennsylvanians",
+  "populationServedGeography": "",
+  "issuingAgency": "Pennsylvania Commission on Crime and Delinquency",
+  "shortIssuingAgency": "pccd",
+  "overview": "The goal(s) and objective(s) of the Regional Policing Assistance Program are to improve the following: uniformity and consistency of enforcement across municipalities; recruitment; distribution and deployment of police personnel; training and personnel efficiency; career enhancement opportunities; enhanced professionalism; and reduction of costs.  ",
+  "openDate": "2026-07-22T12:00:00-00:00",
+  "closeDate": "",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Annual",
+  "applicantType": "Any municipality; Applicants may also be a public or quasi-public body, or its representative duly authorized to act on behalf of one or more municipalities.  ",
+  "applicantCategory": "Municipality",
+  "eligibility": "Eligibility for these funds is open to any municipality – a city, borough, township, or home-rule municipality.  Applicants may also be a public or quasi-public body, or its representative duly authorized to act on behalf of one or more municipalities.  ",
+  "reportingMonitoring": "Programmatic and fiscal reports must be submitted through Egrants on a quarterly basis.",
+  "fundingType": "Grant",
+  "matchingFundsRequirements": "",
+  "totalFundsToBeAwarded": "$1 million",
+  "minimumAward": "",
+  "maximumAward": "200000",
+  "anticipatedFunding": "Applicants may apply for up to $200,000 to form a new regional police department or up to $100,000 to expand an existing regional police department by adding a chartered municipality or municipalities. ",
+  "fundingSource": "Federal",
+  "linkToApply": "https://portal.pccd.pa.gov/eGrants?ReturnUrl=%2f",
+  "shortDescription": "The goal(s) and objective(s) of the Regional Policing Assistance Program are to improve the following: uniformity and consistency of enforcement across municipalities; recruitment; distribution and deployment of police personnel; training and personnel efficiency; career enhancement opportunities...",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/pccd.html",
+  "issuingAgencyGrantNumber": 63.0,
+  "pointOfContact": {
+   "name": ""
+  },
+  "processSteps": [],
+  "additionalResources": [
+   {
+    "title": "2026-27 Regional Policing Assistance Program",
+    "url": "https://www.pa.gov/content/dam/copapwp-pagov/en/pccd/documents/funding/documents/funding-announcements/2026/2026-27%20regional%20policing%20assistance%20program%20fa.pdf"
+   }
+  ],
+  "FAQs": []
+ }
+}

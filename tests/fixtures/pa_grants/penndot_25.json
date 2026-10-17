@@ -1,0 +1,91 @@
+{
+ "hit": {
+  "copapwpmatchingrequirements": "30% of the amount requested",
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/penndot/25",
+  "copapwpfundingtype": [
+   "Grant"
+  ],
+  "copapwpfundingsource": [
+   "State"
+  ],
+  "copapwpfundingagency": [
+   "Transportation"
+  ],
+  "copapwpgrantcycle": "Annual",
+  "copapwpopendate": 1789387200000,
+  "copapwpapplicantcategory": "Municipalities; Councils of governments; Businesses; Economic development organizations; Public transportation agencies; Ports and rail freight entities",
+  "copapwppopulationserved": [
+   "Municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities"
+  ],
+  "copapwppagetitle": "Multimodal Transportation Fund (MTF) Program",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 3000000,
+  "copapwpcategory": [
+   "Transportation"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality",
+   " Public Agency"
+  ],
+  "copapwpoverview": "The program is intended to provide financial assistance to municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities to improve transportation assets that enhance communities, pedestrian safety, and transit revitalization.",
+  "copapwpbadges": [
+   "Accepting applications",
+   "Matching required"
+  ],
+  "copapwpclosedate": 1793361600000,
+  "copapwpshortdescription": "The program is intended to provide financial assistance to municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities to improve transportation assets that enhance communities, pedestrian safety, and...",
+  "copapwpapplicationstatus": "Accepting applications"
+ },
+ "detail": {
+  "slug": "penndot25",
+  "last_modified": "2026-10-16T17:01:25Z",
+  "title": "Multimodal Transportation Fund (MTF) Program",
+  "status": "Accepting applications",
+  "category": "Transportation",
+  "populationServedType": "Municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities",
+  "populationServedGeography": "Statewide ",
+  "issuingAgency": "Transportation",
+  "shortIssuingAgency": "penndot",
+  "overview": "The program is intended to provide financial assistance to municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities to improve transportation assets that enhance communities, pedestrian safety, and transit revitalization.",
+  "openDate": "2026-09-14T12:00:00-00:00",
+  "closeDate": "2026-10-30T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Annual",
+  "applicantType": "Municipalities; Councils of governments; Businesses; Economic development organizations; Public transportation agencies; Ports and rail freight entities",
+  "applicantCategory": "Municipality; Public Agency",
+  "eligibility": "Multimodal Transportation Fund Success Manual (pa.gov)",
+  "reportingMonitoring": "N/A ",
+  "fundingType": "Grant ",
+  "matchingFundsRequirements": "30% of the amount requested ",
+  "totalFundsToBeAwarded": "40000000",
+  "minimumAward": "",
+  "maximumAward": "3000000",
+  "anticipatedFunding": "$1 million per awardee ",
+  "fundingSource": "State",
+  "linkToApply": "https://grants.pa.gov/Login.aspx",
+  "shortDescription": "The program is intended to provide financial assistance to municipalities, councils of governments, businesses, economic development organizations, public transportation agencies, and ports and rail freight entities to improve transportation assets that enhance communities, pedestrian safety, and...",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/penndot.html",
+  "issuingAgencyGrantNumber": 25.0,
+  "pointOfContact": {
+   "name": "Dave Bratina    dabratina@pa.gov   717-705-1230 "
+  },
+  "processSteps": [
+   {
+    "stepNumber": 1.0,
+    "description": "Multimodal Transportation Fund Success Manual (pa.gov)"
+   }
+  ],
+  "additionalResources": [
+   {
+    "title": "MTF Fund Success Manual ",
+    "url": "https://www.penndot.pa.gov/ProjectAndPrograms/MultimodalProgram/Documents/PennDOT MTF Success Manual 7-3-2024.pdf"
+   },
+   {
+    "title": "Instructions to apply for MTF grants through eGrants (ESA) ",
+    "url": "https://www.penndot.pa.gov/ProjectAndPrograms/MultimodalProgram/Documents/MTF ESAW Application Instructions.pdf"
+   }
+  ],
+  "FAQs": []
+ }
+}

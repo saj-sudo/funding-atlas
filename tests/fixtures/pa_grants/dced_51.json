@@ -1,0 +1,93 @@
+{
+ "hit": {
+  "copapwpmatchingrequirements": "Multimodal Transportation Fund shall be matched by local funding in an amount not less than 30% of the non-federal share of the project costs.",
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/dced/51",
+  "copapwpfundingtype": [
+   "Grant"
+  ],
+  "copapwpfundingsource": [
+   "Commonwealth Financing Authority (CFA)"
+  ],
+  "copapwpfundingagency": [
+   "Community & Economic Development"
+  ],
+  "copapwpgrantcycle": "Annual",
+  "copapwpopendate": 1772366400000,
+  "copapwpapplicantcategory": "Businesses; Municipalities;Councils of Governments; Businesses; Economic Development Organizations; Public Transportation Agencies;\nPorts-Rail/Freight",
+  "copapwppagetitle": "Multimodal Transportation Fund (MTF)",
+  "copapwpminimumaward": 100000,
+  "copapwpmaximumaward": 3000000,
+  "copapwpcategory": [
+   "Community & economic development"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality",
+   " Public Agency",
+   " Other Legal Entity",
+   " Business"
+  ],
+  "copapwpoverview": "The Multimodal Transportation Fund provides grants to encourage economic development and ensure that a safe and reliable system of transportation is available to the residents of the commonwealth.",
+  "copapwpbadges": [
+   "Closed",
+   "Matching required"
+  ],
+  "copapwpclosedate": 1785499200000,
+  "copapwpshortdescription": "The Multimodal Transportation Fund provides grants to encourage economic development and ensure that a safe and reliable system of transportation is available to the residents of the commonwealth.",
+  "copapwpapplicationstatus": "Closed"
+ },
+ "detail": {
+  "slug": "dced51",
+  "last_modified": "2026-10-16T17:01:20Z",
+  "title": "Multimodal Transportation Fund (MTF)",
+  "status": "Closed",
+  "category": "Community & economic development",
+  "populationServedType": "",
+  "populationServedGeography": "",
+  "issuingAgency": "Community & Economic Development",
+  "shortIssuingAgency": "dced",
+  "overview": "The Multimodal Transportation Fund provides grants to encourage economic development and ensure that a safe and reliable system of transportation is available to the residents of the commonwealth.",
+  "openDate": "2026-03-01T12:00:00-00:00",
+  "closeDate": "2026-07-31T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Annual",
+  "applicantType": "Businesses; Municipalities;Councils of Governments; Businesses; Economic Development Organizations; Public Transportation Agencies;\nPorts-Rail/Freight",
+  "applicantCategory": "Municipality; Public Agency; Other Legal Entity; Business",
+  "eligibility": "Grants are available for projects with a total cost of $100,000 or more.  Grants shall not exceed $3,000,000 for any project. Financial assistance under the Multimodal Transportation Fund shall be matched by local funding in an amount not less than 30% of the non-federal share of the project costs.  $100 fee",
+  "reportingMonitoring": "",
+  "fundingType": "Grant",
+  "matchingFundsRequirements": "Multimodal Transportation Fund shall be matched by local funding in an amount not less than 30% of the non-federal share of the project costs.",
+  "totalFundsToBeAwarded": "",
+  "minimumAward": "100000",
+  "maximumAward": "3000000",
+  "anticipatedFunding": "",
+  "fundingSource": "Commonwealth Financing Authority (CFA)",
+  "linkToApply": "https://grants.pa.gov",
+  "shortDescription": "The Multimodal Transportation Fund provides grants to encourage economic development and ensure that a safe and reliable system of transportation is available to the residents of the commonwealth.",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/dced.html",
+  "issuingAgencyGrantNumber": 51.0,
+  "pointOfContact": {
+   "name": "CFA Program Office, ra-dcedcbf@pa.gov, 717.787.6245"
+  },
+  "processSteps": [],
+  "additionalResources": [
+   {
+    "title": "Program Page",
+    "url": "https://dced.pa.gov/programs/multimodal-transportation-fund/"
+   },
+   {
+    "title": "Guidelines",
+    "url": "https://dced.pa.gov/download/multimodal-transportation-fund-mtf-guidelines/?wpdmdl=82892"
+   },
+   {
+    "title": "FAQ",
+    "url": "https://dced.pa.gov/multimodal-transportation-fund-mtf-faqs/"
+   },
+   {
+    "title": "Application Checklist",
+    "url": "https://dced.pa.gov/download/checklist-2024-multimodal-transportation-fund-application/?wpdmdl=89366"
+   }
+  ],
+  "FAQs": []
+ }
+}

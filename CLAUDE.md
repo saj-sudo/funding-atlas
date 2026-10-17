@@ -14,8 +14,9 @@ connector or one feature per session, no abstractions before the third real case
 - Python 3.12, `uv`, SQLite via `sqlite3` (Postgres later), `httpx`, `pydantic` for the record model, `typer` CLI.
 - `connectors/`: one module per source exposing `fetch(limit, prior) -> list[RawRecord]`,
   `normalize(raw) -> Program`, `resolve_missing(source_id)`. Keep them dumb. Maryland's Drupal agencies share
-  `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; a new platform base
-  is extracted only when the second site on that platform forces it.
+  `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; `pa_grants` reads a
+  search index plus one JSON record per page; a new platform base is extracted only when the second site on that
+  platform forces it.
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
@@ -41,7 +42,7 @@ connector or one feature per session, no abstractions before the third real case
 ## Current state (2026-10-17)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
-`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`). Milestones 1 to 8 shipped; the site is live at
-https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). The Mid-Atlantic survey
-(`docs/surveys/mid_atlantic.md`) found no shared vendor platform; next up is milestone 9, `pa_grants` on pa.gov's Coveo
-grants index (377 records), then `wv_grants`. See the roadmap.
+`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (Pennsylvania's pa.gov Coveo grants index, 377
+records, the first state outside Maryland). Milestones 1 to 8 and 9.1 shipped; the site is live at
+https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). Next up: the WebGrants
+spot-check (roadmap 8.1), then `wv_grants`. See the roadmap.

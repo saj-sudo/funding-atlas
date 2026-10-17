@@ -1,0 +1,81 @@
+{
+ "hit": {
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/dced/57",
+  "copapwpfundingtype": [
+   "Tax credit"
+  ],
+  "copapwpfundingsource": [
+   "State"
+  ],
+  "copapwpfundingagency": [
+   "Community & Economic Development"
+  ],
+  "copapwpgrantcycle": "Annual",
+  "copapwpopendate": 1714564800000,
+  "copapwpapplicantcategory": "Nonprofit; 501(c)(3) organizations",
+  "copapwppagetitle": "Neighborhood Assistance Program Neighborhood Partnership Program (NAP-NPP)",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Community & economic development"
+  ],
+  "copapwpapplicanttype": [
+   "Nonprofit"
+  ],
+  "copapwpoverview": "Tax credit program to encourage businesses to invest in projects which improve distressed areas.",
+  "copapwpfundingdetails": "No matching required",
+  "copapwpbadges": [
+   "Accepting applications"
+  ],
+  "copapwpclosedate": 2066817600000,
+  "copapwpshortdescription": "Tax credit program to encourage businesses to invest in projects which improve distressed areas.",
+  "copapwpapplicationstatus": "Accepting applications"
+ },
+ "detail": {
+  "slug": "dced57",
+  "last_modified": "2026-10-16T17:01:20Z",
+  "title": "Neighborhood Assistance Program Neighborhood Partnership Program (NAP-NPP)",
+  "status": "Accepting applications",
+  "category": "Community & economic development",
+  "populationServedType": "",
+  "populationServedGeography": "",
+  "issuingAgency": "Community & Economic Development",
+  "shortIssuingAgency": "dced",
+  "overview": "Tax credit program to encourage businesses to invest in projects which improve distressed areas.",
+  "openDate": "2024-05-01T12:00:00-00:00",
+  "closeDate": "2035-06-30T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Annual",
+  "applicantType": "Nonprofit; 501(c)(3) organizations",
+  "applicantCategory": "Nonprofit",
+  "eligibility": "Eligible applicants are neighborhood organizations that hold a ruling from the Internal Revenue Service as nonprofit, 501(c)(3) organizations who have secured at least $100,000 in contributions from contributors through a Memorandum of Understanding and have created an advisory committee to oversee the project.<br /><br />Projects in this category are considered large scale and must operate for a minimum of five years guided by an established revitalization or strategic plan and an advisory committee. Project minimum is $100,000 and must serve clients who are low-income, and residents of economically distressed neighborhoods specified by a strategic plan. Projects fall under one of the following categories: affordable housing, community services, education, community economic development, job training, crime prevention, and neighborhood assistance or conservation. Projects are designed to improve access to job and economic opportunities, quality education, affordable housing, quality-of-life amenities, and other key factors in building healthy communities.",
+  "reportingMonitoring": "",
+  "fundingType": "Tax credit",
+  "matchingFundsRequirements": "",
+  "totalFundsToBeAwarded": "",
+  "minimumAward": "",
+  "maximumAward": "",
+  "anticipatedFunding": "",
+  "fundingSource": "State",
+  "linkToApply": "https://grants.pa.gov",
+  "shortDescription": "Tax credit program to encourage businesses to invest in projects which improve distressed areas.",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/dced.html",
+  "issuingAgencyGrantNumber": 57.0,
+  "pointOfContact": {
+   "name": "Center for Community Services, ra-dcednapmail@pa.gov, 717-787-1984"
+  },
+  "processSteps": [],
+  "additionalResources": [
+   {
+    "title": "Program Page",
+    "url": "https://dced.pa.gov/programs/neighborhood-assistance-program-nap/"
+   },
+   {
+    "title": "Guidelines",
+    "url": "https://dced.pa.gov/download/neighborhood-assistance-program-nap-guidelines/?wpdmdl=86209"
+   }
+  ],
+  "FAQs": []
+ }
+}

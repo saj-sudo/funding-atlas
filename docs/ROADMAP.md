@@ -15,6 +15,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 7 | Maryland depth | 2026-10-16 | `md_mea` (28 records) and `md_dnr` (20) on a new `MarylandSharePointConnector` base (`connectors/maryland_sharepoint.py`); shared applicant table gains `municipal`; GOCPP surveyed and stopped on its robots.txt; MDEM, MDOT, MDE surveyed, no listing to read. Maryland open municipal rows 6 → 13 on the day (the roadmap's "from 5" baseline had grown to 6 that morning when MHT's Maritime round opened). Acceptance was 15: the shortfall is seasonal (CPP's and GOCPP's rounds are closed in October) and the GOCPP block, not a loosened rule | `connectors/md_mea.md`, `md_dnr.md`, `md_gocpp.md`, `maryland_sharepoint.md` |
 | 6 | Navigator UI and hosting | 2026-10-15 | `LICENSE` + `LICENSE-DATA`; migration 0005 (`v_navigator_program`, `v_navigator_change`, `v_navigator_coverage`); `scripts/build_site.py` + `web/`: index with a tile-grid state map, 51 state pages with the new / closing / status-changed strip, faceted filters with counts, card list, detail panel, change log; `.github/workflows/site.yml` publishing to `gh-pages` daily; Lighthouse accessibility 100 on both page types; the Maryland page carries exactly the `v_municipal_page` rows | this file, decisions log, README |
 | 8 | Mid-Atlantic portal survey | 2026-10-17 | DE, PA, VA, DC, WV, NJ surveyed live, Maryland as control; one table, every URL fetched on the day. No commercial grants vendor has a public listing in any of the six; the structured sources are state-run indexes: pa.gov's Coveo grants index (377 grants, 17 agencies, labelled status, dates, applicant types, 22 open to municipalities) and grants.wv.gov's `AvailableGrants` JSON (124 items, dates, eligibility text, 5 active). NJ DCA's IntelliGrants RFP page is public (8 structured RFPs); VA has a hand-kept Governor's table and Drupal agencies; DE has no state listing; DC has no municipalities and a notice feed | `docs/surveys/mid_atlantic.md` |
+| 9.1 | Pennsylvania: `pa_grants` | 2026-10-17 | the first state outside Maryland, fed by pa.gov's Coveo grants index plus the JSON record each grant page embeds; labelled status (`Accepting applications` / `Closed`, a closed record with a future open date is forecasted), dates, applicant categories plus the shared keyword tagger over the free-text applicant line, award range, match, cycle wording as `closes_at_text`, `rolling` from the cycle. 377 records from 17 agencies in the index on the day, 84 accepting applications, 22 of them open to municipalities; search key read from the page each run; every detail page refetched (about ten minutes) | `connectors/pa_grants.md` |
 
 ## Next
 
@@ -48,12 +49,20 @@ this client (Akamai 403, TLS through the proxy, Incapsula challenge) and are rec
 is a University of Delaware Looker Studio dashboard, JavaScript only, not fetched; DC agency grants pages answer Drupal
 "Access denied" to anonymous requests.
 
+### 8.1 WebGrants spot-check (half a session, no code)
+
+Montana (`funding.mt.gov`, "WebGrants - State of Montana") and Iowa (`iowagrants.gov`) serve public WebGrants listings; Euna's
+AmpliFund and eCivis public pages redirect to a login. Check what a WebGrants opportunity page states (status? dates?
+eligibility?), find two more WebGrants states, and decide whether one `webgrants` connector unlocks several states or
+stays a per-state job. State-run indexes seen in passing, each a `pa_grants`-shaped connector of its own: California
+(`grants.ca.gov`, open-data API), Illinois (GATA CSFA catalog), New York (Grants Management), Texas (eGrants).
+
 ### 9. Platform connectors
 
 The survey found no commercial grants-management vendor with a public listing in two or more states, so the "platform" is
 the state-run central index. One connector per session, in this order:
 
-1. **`pa_grants`** (Pennsylvania): enumerate from the pa.gov Coveo index (`searchHub: "All Grants"`, public search key
+1. **`pa_grants`** (Pennsylvania, shipped 2026-10-17, see Done): enumerate from the pa.gov Coveo index (`searchHub: "All Grants"`, public search key
    read from `/grants/search` at run time), one record per `/grants/search/grant-details/<agency>/<n>` page, whose
    server-rendered JSON carries `status`, `openDate`, `closeDate`, `applicantType`, `applicantCategory`, `eligibility`,
    `matchingFundsRequirements`, `linkToApply`, `pointOfContact`, `last_modified`. 377 records, 84 accepting applications,
@@ -123,6 +132,12 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-17 | DC out of the municipal scope | the District has no municipalities; its clearinghouse is a feed of RFA notices with a release date and a PDF, no status or deadline field | `docs/surveys/mid_atlantic.md` |
 | 2026-10-17 | Blocked or unreadable hosts recorded, not worked around | VA DEQ (Akamai 403), VDEM (TLS through the proxy), NJ DEP (Incapsula challenge), DC agency grants pages (Drupal access denied), the Delaware Looker Studio portal (JavaScript only); same rule as GOCPP | `docs/surveys/mid_atlantic.md` |
 | 2026-10-17 | CMS is not a platform | MD, VA and DC agencies are all Drupal and MD and WV share a SharePoint release, but the markup differs per theme and WV's data comes from an API; `maryland_drupal.py` and `maryland_sharepoint.py` do not transfer, and no CMS base is extracted ahead of a second site | `docs/surveys/mid_atlantic.md` |
+| 2026-10-17 | pa.gov's Coveo search key is read from the search page every run | it is a public token in the page markup and rotates on site rebuilds; a hard-coded key is a connector that silently returns nothing one day | `connectors/pa_grants.md` decision 1 |
+| 2026-10-17 | `Public Agency` and `Other Legal Entity` tag no applicant type | one category covers counties, state agencies, authorities and special districts; tagging all four would invent eligibility; the free-text applicant line names the real ones and the shared keyword tagger reads it (third reuse, still no `connectors/text.py`) | `connectors/pa_grants.md` decision 2 |
+| 2026-10-17 | Placeholder close dates (2035-12-31, 2999-07-01) are kept; `rolling` comes from the cycle wording | the record keeps what the source states; `Reoccurring`, `Continuous`, `Revolving Loan Fund` say rolling, a far-off date does not | `connectors/pa_grants.md` decision 3 |
+| 2026-10-17 | A closed record with a future open date is forecasted only when its close date is not before the open date | `dmva/1` opens 2026-11-02 (forecasted); `pema/14` opens 2028 and closed 2018, an inconsistent record kept as closed | `connectors/pa_grants.md` status rules |
+| 2026-10-17 | Every pa.gov detail page is refetched each run | the Coveo hit carries only the indexer's dates; the record's `last_modified` is stored in the payload, outside the hash, as the future gate | `connectors/pa_grants.md` |
+| 2026-10-17 | WebGrants spot-check after Pennsylvania, not before | Montana and Iowa serve public WebGrants listings, the first vendor platform seen with a public face; Pennsylvania is the neighbour with the biggest labelled-status source, so it ships first | this file, 8.1 |
 
 ## Open questions (do not resolve in code yet)
 
