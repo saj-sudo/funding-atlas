@@ -4,6 +4,22 @@ Milestone 9, connector 1. Written 2026-10-17 from the Mid-Atlantic survey (`docs
 parser, per CLAUDE.md: URL, a sample of the raw data, the field mapping. The first state connector outside Maryland
 and the first fed by a search index rather than by agency pages.
 
+## Implemented (2026-10-17, same day)
+
+`connectors/pa_grants.py` follows this doc. First live run on a fresh database: 377 records added in 9 m 33 s (84 open,
+2 forecasted, 291 closed; 314 grants, 20 loans, 16 tax credits, 13 other, 14 with no stated type; 82 pass-through), 0
+errors, every detail page readable. The second run, ten minutes later: 0 changed, 0 missing. On the Pennsylvania page
+(`v_navigator_program WHERE state='PA'`): 29 open rows (26 likely, 3 possible), every open municipality-tagged record,
+and 68 between rounds. The predicted 22 became 29 because the free-text applicant line tags municipalities the
+category field does not (`Municipalities` in `applicantType` on records whose `applicantCategory` says only `Public
+Agency`).
+
+Known gaps, because the record does not say it: 83 records carry no applicant tag at all (`applicantCategory` is
+`Public Agency`, `Other Legal Entity` or empty, and the free-text line names nothing in the keyword map); 14 records
+have no funding type; 17 of the 29 open municipal rows close on a placeholder date (`2035-12-31`, `2999-07-01`) and
+read as "closes 2035" on the page, which is the source's wording for no deadline. A display rule for placeholder dates
+is a navigator decision, not a connector one.
+
 ## The source
 
 Pennsylvania's "Discover State Grants" portal, `https://www.pa.gov/grants`, is an Adobe Experience Manager site whose
