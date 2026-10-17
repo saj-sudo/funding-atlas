@@ -21,8 +21,8 @@ Known gaps, all because the page does not say it the way the rules read:
 - The Grants Gateway is one solicitation for six programs. One record, named "Grants Gateway", with the latest of its
   application deadlines (December 11, 2026) and no applicant tags: the page describes eligible projects, not
   applicants.
-- `\bindividuals?\b` in the shared keyword table matches "individual private ... lands" on the Keep Maryland Beautiful
-  page (same adjective weakness as MEA's school pages).
+- (Fixed the same day, milestone 7.1.) `individual` used to tag the adjective in "individual private ... lands" on the
+  Keep Maryland Beautiful page; the shared table now matches the noun only.
 - The Waterway Improvement Fund's H1 is "Grants managed by Waterway Improvement and Infrastructure Program"; the
   `<title>` ("State Waterway Improvement Fund Grants") reads better, but the H1 is the rule on every other page.
 

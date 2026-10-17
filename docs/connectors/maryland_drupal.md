@@ -92,7 +92,7 @@ local-government tags, both correct. MHT: 8 of 11.
 `units? of (general )?local government`, `local governments?` → municipality, county; `municipalit\w*`, *`municipal`*, `cities`,
 `towns?` → municipality; `count(y|ies)` → county; `non-?profits?`, `501(c)(3)`, **`not-for-profit`** → nonprofit;
 `for-profits?`, `business(es)?`, `retailers?`, `developers?` → business; `homeowners?`, `households?`, `residents?`,
-`renters?` → household; `individuals?` → individual; `housing authorit\w*` → housing_authority; `schools?`,
+`renters?` → household; *`individuals`, or `individual` followed by punctuation or a function word (milestone 7.1: the adjective in "individual school facilities" never tags)* → individual; `housing authorit\w*` → housing_authority; `schools?`,
 `local education agenc\w*` → school; **`tribal|tribes?`** → tribe; **`state (government )?agenc\w*`** → state;
 **`colleges?|universit\w*|institutions? of higher education`** → higher_ed. Scanned over the who-may-apply sections
 only; the matched phrase is stored as `source_code`.
@@ -102,3 +102,11 @@ of municipal corporations", neither of which `municipalit\w*` matches. Ripple on
 by re-running them on a database loaded that morning: one change, the Town Manager Circuit Rider Program ("Municipal
 governments, county governments or private organizations may sponsor") gains a municipality tag, which is correct;
 Commerce and MHT unchanged.
+
+Milestone 7.1 (2026-10-16) made `individual` a noun-only match after MEA's "individual school facilities" and DNR's
+"individual private ... lands" tagged individuals. Ripple over every stored Maryland payload, re-normalized offline:
+four records lose an `individual` tag and none gains one. MEA's Decarbonizing Public Schools ("individual school
+facilities") and Affordable Electrification Outreach ("the individual identified to receive funding", a recipient, not
+an applicant), DNR's Keep Maryland Beautiful ("individual private ... lands"), and DHCD's Independent Living Tax Credit
+("alarms ... to assist an individual with a sensory disability", a beneficiary in a list of eligible improvements). The
+ten records whose pages list "Individuals" as applicants keep the tag.

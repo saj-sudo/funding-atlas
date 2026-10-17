@@ -241,6 +241,16 @@ def test_normalize_invents_nothing_from_a_bare_box():
     assert p.record_hash
 
 
+@pytest.mark.parametrize("text, tagged", [
+    ("Individuals", True), ("Businesses and individuals.", True), ("Individuals and groups of homeowners", True),
+    ("any individual who owns a home", True), ("An individual may apply", True), ("nonprofits, schools and individual", True),
+    ("individual school facilities", False), ("Projects on individual private, commercial private, community-owned lands", False),
+    ("funding directly to the individual identified to receive it", False), ("on an individual basis", False),
+])
+def test_individual_is_a_noun_or_nothing(text, tagged):
+    assert (("individual" in {t.value for t in md.applicant_types_for(text)}) is tagged)
+
+
 def test_applicant_tags_come_from_who_sections_only():
     html = ('<main><div class="usa-prose maryland-toc-target">'
             '<h2>Eligible participants</h2><p>Small municipalities with populations of 5,000 or less are eligible.</p>'
