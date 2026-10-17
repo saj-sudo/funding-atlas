@@ -38,9 +38,10 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-16)
+## Current state (2026-10-17)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
-`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`). Milestones 1 to 7 shipped; the site is live at
-https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). Next up: Mid-Atlantic
-portal survey. See the roadmap.
+`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`). Milestones 1 to 8 shipped; the site is live at
+https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). The Mid-Atlantic survey
+(`docs/surveys/mid_atlantic.md`) found no shared vendor platform; next up is milestone 9, `pa_grants` on pa.gov's Coveo
+grants index (377 records), then `wv_grants`. See the roadmap.

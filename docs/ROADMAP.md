@@ -14,6 +14,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 7.1 | Between rounds | 2026-10-16 | migration 0006: `v_navigator_between` (state programs for local governments that are closed or past their stated deadline, within 15 months of it) and `n_between_rounds` on the coverage view; a third, collapsed group on every state page with the last deadline, the source's cycle wording and an observed reopening date once the change log has one; the count on the index tile and the coverage line. Maryland shows 14 today (CDBG, Technical Assistance Grant, Circuit Rider, L-GEM, CPP, MHT's annual grants) | migration 0006 header, this file |
 | 7 | Maryland depth | 2026-10-16 | `md_mea` (28 records) and `md_dnr` (20) on a new `MarylandSharePointConnector` base (`connectors/maryland_sharepoint.py`); shared applicant table gains `municipal`; GOCPP surveyed and stopped on its robots.txt; MDEM, MDOT, MDE surveyed, no listing to read. Maryland open municipal rows 6 → 13 on the day (the roadmap's "from 5" baseline had grown to 6 that morning when MHT's Maritime round opened). Acceptance was 15: the shortfall is seasonal (CPP's and GOCPP's rounds are closed in October) and the GOCPP block, not a loosened rule | `connectors/md_mea.md`, `md_dnr.md`, `md_gocpp.md`, `maryland_sharepoint.md` |
 | 6 | Navigator UI and hosting | 2026-10-15 | `LICENSE` + `LICENSE-DATA`; migration 0005 (`v_navigator_program`, `v_navigator_change`, `v_navigator_coverage`); `scripts/build_site.py` + `web/`: index with a tile-grid state map, 51 state pages with the new / closing / status-changed strip, faceted filters with counts, card list, detail panel, change log; `.github/workflows/site.yml` publishing to `gh-pages` daily; Lighthouse accessibility 100 on both page types; the Maryland page carries exactly the `v_municipal_page` rows | this file, decisions log, README |
+| 8 | Mid-Atlantic portal survey | 2026-10-17 | DE, PA, VA, DC, WV, NJ surveyed live, Maryland as control; one table, every URL fetched on the day. No commercial grants vendor has a public listing in any of the six; the structured sources are state-run indexes: pa.gov's Coveo grants index (377 grants, 17 agencies, labelled status, dates, applicant types, 22 open to municipalities) and grants.wv.gov's `AvailableGrants` JSON (124 items, dates, eligibility text, 5 active). NJ DCA's IntelliGrants RFP page is public (8 structured RFPs); VA has a hand-kept Governor's table and Drupal agencies; DE has no state listing; DC has no municipalities and a notice feed | `docs/surveys/mid_atlantic.md` |
 
 ## Next
 
@@ -40,27 +41,33 @@ Shipped: MEA and DNR, and the SharePoint base they share. Still open, none block
   pages each. Candidates for a hand-listed `HAND_ADDED`-style connector on the SharePoint base if outreach asks for
   Bikeways, Urban Tree, or the water and sewer financing rows by name.
 
-### 8. Mid-Atlantic portal survey
+### 8. Mid-Atlantic portal survey (shipped 2026-10-17, see Done)
 
-Goal: know where each neighbouring state lists its pass-through money, before writing any parser.
-
-States: DE, PA, VA, DC, WV, NJ. Maryland as the control row.
-
-For each: central grants portal URL (if any); platform vendor (recognise WebGrants, AmpliFund, eCivis / Euna,
-SmartSimple, Submittable, Fluxx, custom); whether it lists programs with status and dates or only awards and
-applications; robots.txt and sitemap; the top three agencies for local governments if there is no portal; one raw
-sample per promising source.
-
-Output: `docs/surveys/mid_atlantic.md`, one table, every cell filled or marked "not found", every URL verified live on
-the survey date. No code.
-
-Acceptance: the table, plus a ranked list of platform connectors to build and the states each one unlocks.
+`docs/surveys/mid_atlantic.md`. Left open, none blocking: Virginia DEQ and VDEM and New Jersey DEP could not be read by
+this client (Akamai 403, TLS through the proxy, Incapsula challenge) and are recorded as not verified; the Delaware index
+is a University of Delaware Looker Studio dashboard, JavaScript only, not fetched; DC agency grants pages answer Drupal
+"Access denied" to anonymous requests.
 
 ### 9. Platform connectors
 
-One connector per platform the survey finds in two or more states. A state is configuration (base URL, agency map,
-jurisdiction code), not a module. Extract a shared platform base only when the second state on that platform forces
-it, the same rule that produced `maryland_drupal.py`. One platform per session.
+The survey found no commercial grants-management vendor with a public listing in two or more states, so the "platform" is
+the state-run central index. One connector per session, in this order:
+
+1. **`pa_grants`** (Pennsylvania): enumerate from the pa.gov Coveo index (`searchHub: "All Grants"`, public search key
+   read from `/grants/search` at run time), one record per `/grants/search/grant-details/<agency>/<n>` page, whose
+   server-rendered JSON carries `status`, `openDate`, `closeDate`, `applicantType`, `applicantCategory`, `eligibility`,
+   `matchingFundsRequirements`, `linkToApply`, `pointOfContact`, `last_modified`. 377 records, 84 accepting applications,
+   22 open to municipalities on the survey date. Doc first: `docs/connectors/pa_grants.md` with the field mapping; decide
+   there how far-future placeholder close dates (`2035-12-31`) become `rolling`, and that `Tax credit` and `Loan` rows
+   keep their funding type.
+2. **`wv_grants`** (West Virginia): one `POST https://apps.wv.gov/SharePoint/api/search` with `siteurl=grants.wv.gov`,
+   `listname=AvailableGrants`; JSON, no HTML. Status from dates by the page's own rule (`PostedDate <= today <= DueDate1`
+   is active), `Forecasted` text to `closes_at_text`, `Modified` stored and excluded from the hash. 124 records, most of
+   them stale 2022 to 2023 rounds; the diff is the product.
+3. **`nj_dca_sage`** (New Jersey DCA): `dcasage.intelligrants.com/RFPMailingRequest_List.asp`, 8 structured RFPs, when
+   New Jersey outreach starts. Becomes a platform connector if a second IntelliGrants instance exposes the same page.
+4. Agency connectors (VA DHCD Drupal 10, VA DCJS solicitation view, DE DNREC WordPress) only when a town asks. A state
+   is configuration where the platform allows it; a new parsing base is extracted at the second site that forces it.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -111,6 +118,11 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-16 | Reopening dates are observed, never computed | `last_reopened` is the change log's last closed-to-open flip and stays null until one has happened; no "expected next round" is derived from a calendar | migration 0006 |
 | 2026-10-16 | A keyword tags an applicant only in noun position | `individual` matched the adjective ("individual school facilities", "individual private lands"); plural always, singular only before punctuation or a function word; four records lose a wrong tag, none gains one | `connectors/maryland_drupal.md` |
 | 2026-10-16 | No `connectors/text.py` yet | the SharePoint base imports the text helpers from the Drupal module, as `md_mht` already imported `parse_date` from Grants.gov; a third platform base forces the move | `connectors/maryland_sharepoint.md` |
+| 2026-10-17 | Milestone 9 starts with pa.gov's grants index, not a vendor platform | the survey found no WebGrants, AmpliFund, eCivis, SmartSimple, Submittable or Fluxx public listing in any of the six states; vendor systems (IntelliGrants, CGI Advantage, eGrants, CAMS, OGMS) are logins; the structured, status-bearing source is Pennsylvania's state-run Coveo index, 377 records from 17 agencies | `docs/surveys/mid_atlantic.md` |
+| 2026-10-17 | West Virginia second, as a JSON connector | one POST returns the whole list with dates and eligibility text; the list is thin and stale, so the value is the diff when rounds are re-posted | `docs/surveys/mid_atlantic.md` |
+| 2026-10-17 | DC out of the municipal scope | the District has no municipalities; its clearinghouse is a feed of RFA notices with a release date and a PDF, no status or deadline field | `docs/surveys/mid_atlantic.md` |
+| 2026-10-17 | Blocked or unreadable hosts recorded, not worked around | VA DEQ (Akamai 403), VDEM (TLS through the proxy), NJ DEP (Incapsula challenge), DC agency grants pages (Drupal access denied), the Delaware Looker Studio portal (JavaScript only); same rule as GOCPP | `docs/surveys/mid_atlantic.md` |
+| 2026-10-17 | CMS is not a platform | MD, VA and DC agencies are all Drupal and MD and WV share a SharePoint release, but the markup differs per theme and WV's data comes from an API; `maryland_drupal.py` and `maryland_sharepoint.py` do not transfer, and no CMS base is extracted ahead of a second site | `docs/surveys/mid_atlantic.md` |
 
 ## Open questions (do not resolve in code yet)
 
