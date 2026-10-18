@@ -1,0 +1,200 @@
+{
+ "totalCount": 377,
+ "totalCountFiltered": 377,
+ "searchUid": "cb88e78f-6616-49a7-b203-47d4530ea4b7",
+ "pipeline": "All Grants",
+ "results": [
+  {
+   "title": "GIFA 20-02 - Family and Recovery Support Services",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/ddap/17",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/ddap/17",
+   "raw": {
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/ddap/17",
+    "copapwpfundingtype": [
+     "Grant"
+    ],
+    "copapwpfundingagency": [
+     "Department of Drug and Alcohol Programs"
+    ],
+    "copapwpgrantcycle": "Other",
+    "copapwpopendate": 948110400000,
+    "copapwppagetitle": "GIFA 20-02 - Family and Recovery Support Services",
+    "copapwpminimumaward": 0,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Health & human services"
+    ],
+    "copapwpoverview": "DDAP is accepting applications from entities with a capacity to deliver recovery support services to individuals with OUD and their families.  Services include the delivery of recovery coaching through Certified Recovery Specialists (CRS), Certified Family Recovery Specialists (CFRS), telephonic supports, the provision of education and employment supports (e.g. job coaching, resume writing, engagement in General Educational Development (GED) services, life-skills support groups and delivery of substance-free social activities, etc.). Family support services include the delivery of family support, psychoeducational, skills groups, family specific programming, family mentoring and support, and facilitating recovery focused social activities for individuals with OUD and their families.",
+    "copapwpfundingdetails": "No matching required",
+    "copapwpbadges": [
+     "Closed"
+    ],
+    "copapwpclosedate": 951134400000,
+    "copapwpshortdescription": "DDAP is accepting applications from entities with a capacity to deliver recovery support services to individuals with OUD and their families.  Services include the delivery of recovery coaching through Certified Recovery Specialists (CRS), Certified Family Recovery Specialists (CFRS), telephonic ...",
+    "copapwpapplicationstatus": "Closed"
+   }
+  },
+  {
+   "title": "GIFA 20-01 - Employment Support Services",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/ddap/18",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/ddap/18",
+   "raw": {
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/ddap/18",
+    "copapwpfundingtype": [
+     "Grant"
+    ],
+    "copapwpfundingagency": [
+     "Department of Drug and Alcohol Programs"
+    ],
+    "copapwpgrantcycle": "Other",
+    "copapwpopendate": 948110400000,
+    "copapwppagetitle": "GIFA 20-01 - Employment Support Services",
+    "copapwpminimumaward": 0,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Employment, labor, & training"
+    ],
+    "copapwpoverview": "DDAP is accepting applications from entities with the capacity to deliver employment support services to individuals in recovery from OUD seeking to enter the workforce. Employment support services under this project include but are not limited: vocational assessments, resume writing, interviewing skills, job placement, and transportation assistance related to employment. Applicants must identify at least one employer partner that is committed to providing employment opportunities to individuals in recovery from OUD.",
+    "copapwpfundingdetails": "No matching required",
+    "copapwpbadges": [
+     "Closed"
+    ],
+    "copapwpclosedate": 951134400000,
+    "copapwpshortdescription": "DDAP is accepting applications from entities with the capacity to deliver employment support services to individuals in recovery from OUD seeking to enter the workforce. Employment support services under this project include but are not limited: vocational assessments, resume writing, interviewin...",
+    "copapwpapplicationstatus": "Closed"
+   }
+  },
+  {
+   "title": "Public Assistance - DR 4408",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/pema/14",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/pema/14",
+   "raw": {
+    "copapwpmatchingrequirements": "0.25",
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/pema/14",
+    "copapwpfundingtype": [
+     "Disaster reimbursement"
+    ],
+    "copapwpfundingagency": [
+     "Emergency Management Agency"
+    ],
+    "copapwpgrantcycle": "Other - based upon Federally declared disaster event.",
+    "copapwpopendate": 1858939200000,
+    "copapwpapplicantcategory": "Municipality; Authorities; Critical not for profit",
+    "copapwppagetitle": "Public Assistance - DR 4408",
+    "copapwpminimumaward": 3200,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Community & economic development"
+    ],
+    "copapwpapplicanttype": [
+     "Nonprofit",
+     " Municipality",
+     " Public Agency"
+    ],
+    "copapwpoverview": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+    "copapwpbadges": [
+     "Closed",
+     "Matching required"
+    ],
+    "copapwpclosedate": 1545912000000,
+    "copapwpshortdescription": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+    "copapwpapplicationstatus": "Closed"
+   }
+  },
+  {
+   "title": "GIFA 19-01 Pregnancy Support Services",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/ddap/21",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/ddap/21",
+   "raw": {
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/ddap/21",
+    "copapwpfundingtype": [
+     "Grant"
+    ],
+    "copapwpfundingagency": [
+     "Department of Drug and Alcohol Programs"
+    ],
+    "copapwpgrantcycle": "Other",
+    "copapwpopendate": 1565784000000,
+    "copapwppagetitle": "​GIFA 19-01 Pregnancy Support Services",
+    "copapwpminimumaward": 0,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Health & human services"
+    ],
+    "copapwpoverview": "DDAP is accepting applications for providers who will provide pregnancy support services or make referrals to address the needs of pregnant and postpartum women with OUD. In addition, these community providers will facilitate or make referrals for outpatient Medication-Assisted Treatment (MAT).",
+    "copapwpfundingdetails": "No matching required",
+    "copapwpbadges": [
+     "Closed"
+    ],
+    "copapwpclosedate": 1568289600000,
+    "copapwpshortdescription": "DDAP is accepting applications for providers who will provide pregnancy support services or make referrals to address the needs of pregnant and postpartum women with OUD. In addition, these community providers will facilitate or make referrals for outpatient Medication-Assisted Treatment (MAT).",
+    "copapwpapplicationstatus": "Closed"
+   }
+  },
+  {
+   "title": "GIFA 19-03 Opioid Prevention in Higher Education",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/ddap/20",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/ddap/20",
+   "raw": {
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/ddap/20",
+    "copapwpfundingtype": [
+     "Grant"
+    ],
+    "copapwpfundingagency": [
+     "Department of Drug and Alcohol Programs"
+    ],
+    "copapwpgrantcycle": "Other",
+    "copapwpopendate": 1567512000000,
+    "copapwpapplicantcategory": "Non-Profit; Accredited Colleges; Accredited Universities; Accredited Community Colleges; Post-Secondary Institutions of Higher Education;  Collegiate collaboratives within Pennsylvania",
+    "copapwppagetitle": "GIFA 19-03 Opioid Prevention in Higher Education",
+    "copapwpminimumaward": 0,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Health & human services"
+    ],
+    "copapwpapplicanttype": [
+     "Nonprofit",
+     " School"
+    ],
+    "copapwpoverview": "DDAP is accepting applications from non-profit, accredited colleges, universities, post-secondary institutions of higher education and collegiate collaboratives within Pennsylvania with an emphasis on preventing and reducing Opioid Use Disorder (OUD). The primary goal of the effort is to prevent and reduce use and misuse of opioids by college students.",
+    "copapwpfundingdetails": "No matching required",
+    "copapwpbadges": [
+     "Closed"
+    ],
+    "copapwpclosedate": 1570104000000,
+    "copapwpshortdescription": "DDAP is accepting applications from non-profit, accredited colleges, universities, post-secondary institutions of higher education and collegiate collaboratives within Pennsylvania with an emphasis on preventing and reducing Opioid Use Disorder (OUD). The primary goal of the effort is to prevent ...",
+    "copapwpapplicationstatus": "Closed"
+   }
+  },
+  {
+   "title": "GIFA 19-02 Community Recovery Support Services",
+   "uri": "https://www.pa.gov/en/grants/search/grant-details/ddap/22",
+   "clickUri": "https://www.pa.gov/en/grants/search/grant-details/ddap/22",
+   "raw": {
+    "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/ddap/22",
+    "copapwpfundingtype": [
+     "Grant"
+    ],
+    "copapwpfundingagency": [
+     "Department of Drug and Alcohol Programs"
+    ],
+    "copapwpgrantcycle": "Other",
+    "copapwpopendate": 1567512000000,
+    "copapwppagetitle": "​GIFA 19-02 Community Recovery Support Services",
+    "copapwpminimumaward": 0,
+    "copapwpmaximumaward": 0,
+    "copapwpcategory": [
+     "Health & human services"
+    ],
+    "copapwpoverview": "DDAP is accepting applications for Recovery Community Organizations (RCOs) who will expand or enhance recovery support services to individuals with an opioid use disorder (OUD).  Such services include the delivery of recovery coaching through Certified Recovery Specialists (CRS), telephonic supports, the provision of education and employment supports, e.g. job coaching, resume writing, engagement in GED services, additional life-skills support groups and delivery of substance-free social activities, etc.  It is the expectation that such RCOs embrace individuals seeking services regardless of their recovery pathway.",
+    "copapwpfundingdetails": "No matching required",
+    "copapwpbadges": [
+     "Closed"
+    ],
+    "copapwpclosedate": 1570104000000,
+    "copapwpshortdescription": "DDAP is accepting applications for Recovery Community Organizations (RCOs) who will expand or enhance recovery support services to individuals with an opioid use disorder (OUD).  Such services include the delivery of recovery coaching through Certified Recovery Specialists (CRS), telephonic suppo...",
+    "copapwpapplicationstatus": "Closed"
+   }
+  }
+ ]
+}

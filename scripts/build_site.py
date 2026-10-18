@@ -39,6 +39,7 @@ CLOSING_DAYS = 30      # closes within this many days -> "closing soon"
 FEED_N = 200           # change-feed rows per state page: the newest N federal plus the newest N of that state
 INDEX_FEED_N = 20      # change-feed rows on the index
 BETWEEN_MONTHS = 15    # mirrors v_navigator_between (migration 0006): last deadline within this many months
+PLACEHOLDER_YEARS = 5  # a close date this far out is a portal's way of saying "no deadline" (pa.gov uses 2035-12-31 and 2999-07-01)
 
 CONNECTOR_LABEL = {
     "grants_gov": "Grants.gov",
@@ -48,6 +49,8 @@ CONNECTOR_LABEL = {
     "md_mht": "Maryland Historical Trust",
     "md_mea": "Maryland Energy Administration",
     "md_dnr": "Maryland DNR",
+    "pa_grants": "Pennsylvania grants portal (pa.gov)",
+    "wv_grants": "West Virginia grants portal (grants.wv.gov)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
@@ -161,6 +164,15 @@ def days_to(iso: str | None, today: date) -> int | None:
     return None if not iso else (date.fromisoformat(iso[:10]) - today).days
 
 
+def is_placeholder(iso: str | None, today: date) -> bool:
+    """True when a close date lies more than PLACEHOLDER_YEARS past today (see the constant)."""
+    if not iso:
+        return False
+    try:
+        return date.fromisoformat(iso[:10]) > today.replace(year=today.year + PLACEHOLDER_YEARS)
+    except ValueError:
+        return False
+
 def shape_program(row: dict[str, Any], run_info: dict[str, dict[str, str | None]], today: date) -> dict[str, Any]:
     first_ok = (run_info.get(row["source_connector"]) or {}).get("first_ok")
     # 'new' means new to the registry after the source's first full read: on the first run everything is
@@ -211,6 +223,9 @@ def shape_program(row: dict[str, Any], run_info: dict[str, dict[str, str | None]
         "is_new": is_new,
         "is_updated": is_updated,
         "days_to_close": days_to(row["closes_at"], today),
+        # A stated date more than PLACEHOLDER_YEARS out is kept as the source states it but shown as "no deadline
+        # stated": pa.gov writes 2035-12-31 and 2999-07-01 on recurring programs and loans.
+        "deadline_placeholder": is_placeholder(row["closes_at"], today),
         # v_navigator_between only: days since the last stated deadline, and the last time the change log saw
         # the record flip to open or forecasted (null until observed; never computed from a calendar).
         "days_since_deadline": row.get("days_since_deadline"),

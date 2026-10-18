@@ -1,0 +1,141 @@
+{
+ "hit": {
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/dmva/1",
+  "copapwpfundingtype": [
+   "Grant",
+   " grant agreement"
+  ],
+  "copapwpfundingsource": [
+   "State"
+  ],
+  "copapwpfundingagency": [
+   "Department of Military and Veterans Affairs"
+  ],
+  "copapwpgrantcycle": "Annual",
+  "copapwpopendate": 1793620800000,
+  "copapwpanticipatedfundingdate": 1814443200000,
+  "copapwpapplicantcategory": "Non-Profits that have 501(c)(3) status and a mission of serving Pennsylvania veterans; Veteran Service Organizations (VSOs) with 501(c)(3) or 501(c)(19) status; County Director of Veterans Affairs; Pennsylvania Association of County Directors of Veterans' Affairs.",
+  "copapwppopulationserved": [
+   "Pennsylvania veterans and family members"
+  ],
+  "copapwppagetitle": "Veterans’ Trust Fund",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Veterans & military"
+  ],
+  "copapwpapplicanttype": [
+   "Nonprofit",
+   " Other Legal Entity"
+  ],
+  "copapwpoverview": "The Veterans Trust Fund (VTF) grant is for new, innovative, and/or expanded programs or services that increase or improve services to veterans in their county, region, or across the Commonwealth.",
+  "copapwpfundingdetails": "No matching required",
+  "copapwpbadges": [
+   "Closed"
+  ],
+  "copapwpclosedate": 1797595200000,
+  "copapwpshortdescription": "The Veterans Trust Fund (VTF) grant is for new, innovative, and/or expanded programs or services that increase or improve services to veterans in their county, region, or across the Commonwealth.",
+  "copapwpapplicationstatus": "Closed"
+ },
+ "detail": {
+  "slug": "dmva1",
+  "last_modified": "2026-10-16T17:01:24Z",
+  "title": "Veterans’ Trust Fund",
+  "status": "Closed",
+  "category": "Veterans & military",
+  "populationServedType": "Pennsylvania veterans and family members",
+  "populationServedGeography": "Pennsylvania veterans and family members",
+  "issuingAgency": "Department of Military and Veterans Affairs",
+  "shortIssuingAgency": "dmva",
+  "overview": "The Veterans Trust Fund (VTF) grant is for new, innovative, and/or expanded programs or services that increase or improve services to veterans in their county, region, or across the Commonwealth.",
+  "openDate": "2026-11-02T12:00:00-00:00",
+  "closeDate": "2026-12-18T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "2027-07-01T12:00:00-00:00",
+  "grantCycle": "Annual",
+  "applicantType": "Non-Profits that have 501(c)(3) status and a mission of serving Pennsylvania veterans; Veteran Service Organizations (VSOs) with 501(c)(3) or 501(c)(19) status; County Director of Veterans Affairs; Pennsylvania Association of County Directors of Veterans' Affairs.  ",
+  "applicantCategory": "Nonprofit; Other Legal Entity",
+  "eligibility": "Eligible applicants are: <br />1. 501(c)3 nonprofit organizations with a mission of serving Pennsylvania veterans and their families<br />2. 501(c)19 Veterans' Service Organizations<br />3. County directors of veterans affairs (individually or jointly)<br />4. Pennsylvania Association of County Directors of Veterans Affairs<br /><br />Grant project CANNOT be used for:<br />1.  New construction projects (Exception - Grant applications for renovations/repairs projects to an existing building are eligible for award).<br />2.  The purchase of vehicle(s).<br />3. Administrative personnel costs exceeding 10% of the requested dollar amount.  Administrative costs are those expenses incurred by grant recipients in support of the day-to-day operations of their organization. These overhead costs are the expenses that are not directly tied to a specific program purpose.",
+  "reportingMonitoring": "Awardees are required to submit quarterly reports during the period of performance. Additionally, a financial statement is due after grant expires.  ",
+  "fundingType": "Grant; grant agreement",
+  "matchingFundsRequirements": "",
+  "totalFundsToBeAwarded": "800000",
+  "minimumAward": "",
+  "maximumAward": "Maximum award for Nonprofits and VSOs is $40,000. \nMaximum award for County Directors is $15,000.",
+  "anticipatedFunding": "",
+  "fundingSource": "State",
+  "linkToApply": "https://grants.pa.gov/Login.aspx",
+  "shortDescription": "The Veterans Trust Fund (VTF) grant is for new, innovative, and/or expanded programs or services that increase or improve services to veterans in their county, region, or across the Commonwealth.",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/dmva.html",
+  "issuingAgencyGrantNumber": 1.0,
+  "pointOfContact": {
+   "name": "ra-mvvettrustfund@pa.gov"
+  },
+  "processSteps": [
+   {
+    "stepNumber": 1.0,
+    "description": "All grants must be submitted through the eGrants Public Portal. <a href=\"https://grants.pa.gov/Login.aspx\" rel=\"noopener\">https://grants.pa.gov/Login.aspx</a>"
+   },
+   {
+    "stepNumber": 2.0,
+    "description": "If your organization does not have a Commonwealth SAP Vendor number, you must apply for one: <a href=\"https://pasupplierportal.state.pa.us/irj/portal/anonymous\" rel=\"noopener\">https://pasupplierportal.state.pa.us/irj/portal/anonymous</a>  This will take a few days to process."
+   },
+   {
+    "stepNumber": 3.0,
+    "description": "Log in with your Keystone Login. You must register for a Keystone Login if you do not have an account: <a href=\"https://keystonelogin.pa.gov/\" rel=\"noopener\">https://keystonelogin.pa.gov/</a>"
+   },
+   {
+    "stepNumber": 4.0,
+    "description": "Enter your project name, click \"No\" for needing help, then click \"Create a New Application\". The next page you will search for \"VTF\". It will populate at the bottom."
+   },
+   {
+    "stepNumber": 5.0,
+    "description": "Complete your application and be as specific as possible. Ensure all required information and attachments are provided; missing required information may result in administrative rejection without review. \nApplications will be accepted until December 18, 2026. Selected applicants will be notified in Spring 2027 and will be required to sign a contract. Awards are anticipated to be disbursed in July 2027."
+   }
+  ],
+  "additionalResources": [
+   {
+    "title": "Veterans' Trust Fund",
+    "url": "https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund"
+   },
+   {
+    "title": "Request For Applications",
+    "url": "https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=Request%20for%20Application"
+   },
+   {
+    "title": "Application Instructions",
+    "url": "https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=application%20instructions"
+   }
+  ],
+  "FAQs": [
+   {
+    "question": "Where can I find more information?",
+    "answer": "Our Request for Applications provide many details regarding the priority areas, application process, and requirements. <a href=\"https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=Request%20for%20Application\" rel=\"noopener\">https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=Request%20for%20Application</a>"
+   },
+   {
+    "question": "Do I need an SAP Vendor number to complete the application?",
+    "answer": "Yes. Applying for an SAP Vendor number can be done here: <a href=\"https://pasupplierportal.state.pa.us/irj/portal/anonymous\" rel=\"noopener\">https://pasupplierportal.state.pa.us/irj/portal/anonymous</a>"
+   },
+   {
+    "question": "Are we able to submit a paper application?",
+    "answer": "No. All grant applications must be completed through the eGrants portal."
+   },
+   {
+    "question": "I made a mistake on my application. What do I do?",
+    "answer": "If the application is not yet submitted, you can make any needed edits. <br />If you submitted the application, you will need to withdraw the application and start a new application."
+   },
+   {
+    "question": "I am a veteran (or spouse of a veteran, family member, etc.) looking for help. Is this grant for me?",
+    "answer": "No. This grant is available only to 501(c)3 non-profits, 501(c)19 veterans service organizations, and county directors of veterans affairs. "
+   },
+   {
+    "question": "I need help finding an EIN. Where do I go for that?",
+    "answer": "Contact the IRS for assistance with an EIN. <a href=\"https://www.irs.gov/businesses/employer-identification-number\" rel=\"noopener\">https://www.irs.gov/businesses/employer-identification-number</a>"
+   },
+   {
+    "question": "I've never used eGrants. Do you have a guide?",
+    "answer": "Yes! Here is a link to our application guide: <a href=\"https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=application%20instructions\" rel=\"noopener\">https://www.pa.gov/agencies/dmva/pennsylvania-veterans/pa-vetconnect/state-veterans-programs/financial-assistance/veterans-trust-fund#:~:text=application%20instructions</a>"
+   }
+  ]
+ }
+}

@@ -1,0 +1,89 @@
+{
+ "hit": {
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/dced/2",
+  "copapwpfundingtype": [
+   "Grant"
+  ],
+  "copapwpfundingsource": [
+   "State"
+  ],
+  "copapwpfundingagency": [
+   "Community & Economic Development"
+  ],
+  "copapwpgrantcycle": "Reoccurring",
+  "copapwpopendate": 1704110400000,
+  "copapwpapplicantcategory": "Financially distressed local governments",
+  "copapwppagetitle": "Act 47",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Community & economic development"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality"
+  ],
+  "copapwpoverview": "Provides loan and grant funds to financially distressed local governments as well as technical assistance to formulate financial recovery plans.",
+  "copapwpfundingdetails": "No matching required",
+  "copapwpbadges": [
+   "Accepting applications"
+  ],
+  "copapwpclosedate": 2082715200000,
+  "copapwpshortdescription": "Provides loan and grant funds to financially distressed local governments as well as technical assistance to formulate financial recovery plans.",
+  "copapwpapplicationstatus": "Accepting applications"
+ },
+ "detail": {
+  "slug": "dced2",
+  "last_modified": "2026-10-16T17:01:20Z",
+  "title": "Act 47",
+  "status": "Accepting applications",
+  "category": "Community & economic development",
+  "populationServedType": "",
+  "populationServedGeography": "",
+  "issuingAgency": "Community & Economic Development",
+  "shortIssuingAgency": "dced",
+  "overview": "Provides loan and grant funds to financially distressed local governments as well as technical assistance to formulate financial recovery plans.",
+  "openDate": "2024-01-01T12:00:00-00:00",
+  "closeDate": "2035-12-31T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Reoccurring",
+  "applicantType": "Financially distressed local governments",
+  "applicantCategory": "Municipality",
+  "eligibility": "1. Technical Assistance Projects that:<br />*provide services to a community or region to enhance business developlment.<br />*Meet the criteria for immediate, permanent job creation/retention or strategic plan impementation.<br />2. Construction and infrastructure development including site preparation, water,sewer, broadband, or other needed improvements.<br />3. Industrial site development.<br />4. Local access road<br />5Local government assistance projects providing for service consolidation, management assistance or any other arrangements directed to more effective delivery of programs and services.<br />6. Acquisition and development business incubator or multi-tenant facilities.<br />7. Destination or asset-based tourism.<br />8. Not-for-profit entities.",
+  "reportingMonitoring": "",
+  "fundingType": "Grant",
+  "matchingFundsRequirements": "",
+  "totalFundsToBeAwarded": "",
+  "minimumAward": "",
+  "maximumAward": "",
+  "anticipatedFunding": "",
+  "fundingSource": "State",
+  "linkToApply": "https://grants.pa.gov",
+  "shortDescription": "Provides loan and grant funds to financially distressed local governments as well as technical assistance to formulate financial recovery plans.",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/dced.html",
+  "issuingAgencyGrantNumber": 2.0,
+  "pointOfContact": {
+   "name": "Center for Local Government Services, ra-dcedclgs@pa.gov,  888.223.6837"
+  },
+  "processSteps": [],
+  "additionalResources": [
+   {
+    "title": "Program Page",
+    "url": "https://dced.pa.gov/programs/act-47/"
+   },
+   {
+    "title": "Program Guidelines",
+    "url": "https://dced.pa.gov/download/municipalfinancialrecoveryact-pdf/?wpdmdl=58034"
+   },
+   {
+    "title": "FAQS",
+    "url": "https://dced.pa.gov/local-government/act-47-financial-distress/"
+   },
+   {
+    "title": "Altoona Case Study",
+    "url": "https://dced.pa.gov/download/altoona-case-study-2018/?wpdmdl=81874"
+   }
+  ],
+  "FAQs": []
+ }
+}

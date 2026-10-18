@@ -1,0 +1,91 @@
+{
+ "hit": {
+  "copapwpmatchingrequirements": "75% federal share\n25% local share",
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/pema/10",
+  "copapwpfundingtype": [
+   "Grant"
+  ],
+  "copapwpfundingsource": [
+   "Federal"
+  ],
+  "copapwpfundingagency": [
+   "Emergency Management Agency"
+  ],
+  "copapwpgrantcycle": "Upon Disaster Declaration",
+  "copapwpopendate": 1641038400000,
+  "copapwpapplicantcategory": "Cities; Townships; Counties; Special district governments; State agencies.",
+  "copapwppagetitle": "Hazard Mitigation Grant Program (HMGP)",
+  "copapwpminimumaward": 0,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Community & economic development"
+  ],
+  "copapwpapplicanttype": [
+   "Municipality",
+   " Public Agency"
+  ],
+  "copapwpoverview": "FEMA’s Hazard Mitigation Grant Program provides funding to state, local, tribal and territorial governments so they can rebuild in a way that reduces, or mitigates, future disaster losses in their communities. This grant funding is available after a presidentially declared disaster.  In this program, homeowners and businesses cannot apply for a grant. However a local community may apply for funding on a primary dwellings behalf.",
+  "copapwpbadges": [
+   "Closed",
+   "Matching required"
+  ],
+  "copapwpclosedate": 1648209600000,
+  "copapwpshortdescription": "FEMA’s Hazard Mitigation Grant Program provides funding to state, local, tribal and territorial governments so they can rebuild in a way that reduces, or mitigates, future disaster losses in their communities. This grant funding is available after a presidentially declared disaster.  In this prog...",
+  "copapwpapplicationstatus": "Closed"
+ },
+ "detail": {
+  "slug": "pema10",
+  "last_modified": "2026-10-16T17:01:29Z",
+  "title": "Hazard Mitigation Grant Program (HMGP)",
+  "status": "Closed",
+  "category": "Community & economic development",
+  "populationServedType": "",
+  "populationServedGeography": "",
+  "issuingAgency": "Emergency Management Agency",
+  "shortIssuingAgency": "pema",
+  "overview": "FEMA’s Hazard Mitigation Grant Program provides funding to state, local, tribal and territorial governments so they can rebuild in a way that reduces, or mitigates, future disaster losses in their communities. This grant funding is available after a presidentially declared disaster.  In this program, homeowners and businesses cannot apply for a grant. However a local community may apply for funding on a primary dwellings behalf.",
+  "openDate": "2022-01-01T12:00:00-00:00",
+  "closeDate": "2022-03-25T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Upon Disaster Declaration",
+  "applicantType": "Cities; Townships; Counties; Special district governments; State agencies. ",
+  "applicantCategory": "Municipality; Public Agency",
+  "eligibility": "https://www.fema.gov/grants/mitigation/hazard-mitigation/before-you-apply",
+  "reportingMonitoring": "",
+  "fundingType": "Grant",
+  "matchingFundsRequirements": "75% federal share\n25% local share",
+  "totalFundsToBeAwarded": "Pending",
+  "minimumAward": "",
+  "maximumAward": "",
+  "anticipatedFunding": "",
+  "fundingSource": "Federal",
+  "linkToApply": "https://www.esa.dced.state.pa.us/Login.aspx",
+  "shortDescription": "FEMA’s Hazard Mitigation Grant Program provides funding to state, local, tribal and territorial governments so they can rebuild in a way that reduces, or mitigates, future disaster losses in their communities. This grant funding is available after a presidentially declared disaster.  In this prog...",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/pema.html",
+  "issuingAgencyGrantNumber": 10.0,
+  "pointOfContact": {
+   "name": "Richard Deal\nState Hazard Mitigation Officer\nPA Emergency Management Agency \n717-651-2711\nrdeal@pa.gov"
+  },
+  "processSteps": [
+   {
+    "stepNumber": 1.0,
+    "description": "Project must be cost-effective"
+   },
+   {
+    "stepNumber": 2.0,
+    "description": "Project must be both feasible and and effective at mitigating the risks of the hazard(s) for which the project was designed. "
+   },
+   {
+    "stepNumber": 3.0,
+    "description": "Project aligns with the applicable Hazard Mitigation Plan\n\n\n"
+   },
+   {
+    "stepNumber": 4.0,
+    "description": "Project must meet all Environmental and Historic Preservation (EHP) requirements. \n\n\n\n"
+   }
+  ],
+  "additionalResources": [],
+  "FAQs": []
+ }
+}

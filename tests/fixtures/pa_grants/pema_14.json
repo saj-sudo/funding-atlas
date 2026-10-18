@@ -1,0 +1,77 @@
+{
+ "hit": {
+  "copapwpmatchingrequirements": "0.25",
+  "copapwpurl": "https://www.pa.gov/en/grants/search/grant-details/pema/14",
+  "copapwpfundingtype": [
+   "Disaster reimbursement"
+  ],
+  "copapwpfundingagency": [
+   "Emergency Management Agency"
+  ],
+  "copapwpgrantcycle": "Other - based upon Federally declared disaster event.",
+  "copapwpopendate": 1858939200000,
+  "copapwpapplicantcategory": "Municipality; Authorities; Critical not for profit",
+  "copapwppagetitle": "Public Assistance - DR 4408",
+  "copapwpminimumaward": 3200,
+  "copapwpmaximumaward": 0,
+  "copapwpcategory": [
+   "Community & economic development"
+  ],
+  "copapwpapplicanttype": [
+   "Nonprofit",
+   " Municipality",
+   " Public Agency"
+  ],
+  "copapwpoverview": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+  "copapwpbadges": [
+   "Closed",
+   "Matching required"
+  ],
+  "copapwpclosedate": 1545912000000,
+  "copapwpshortdescription": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+  "copapwpapplicationstatus": "Closed"
+ },
+ "detail": {
+  "slug": "pema14",
+  "last_modified": "2026-10-16T17:01:29Z",
+  "title": "Public Assistance - DR 4408",
+  "status": "Closed",
+  "category": "Community & economic development",
+  "populationServedType": "",
+  "populationServedGeography": "",
+  "issuingAgency": "Emergency Management Agency",
+  "shortIssuingAgency": "pema",
+  "overview": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+  "openDate": "2028-11-27T12:00:00-00:00",
+  "closeDate": "2018-12-27T12:00:00-00:00",
+  "decisionDate": "",
+  "anticipatedFundingDate": "",
+  "grantCycle": "Other - based upon Federally declared disaster event.",
+  "applicantType": "Municipality; Authorities; Critical not for profit",
+  "applicantCategory": "Nonprofit; Municipality; Public Agency",
+  "eligibility": "Applicant must be a state, territory, tribe, local government, or certain type of nonprofit organization.",
+  "reportingMonitoring": "",
+  "fundingType": "Disaster reimbursement",
+  "matchingFundsRequirements": "0.25",
+  "totalFundsToBeAwarded": "101205094.22",
+  "minimumAward": "3200",
+  "maximumAward": "",
+  "anticipatedFunding": "",
+  "fundingSource": "",
+  "linkToApply": "https://grantee.fema.gov",
+  "shortDescription": "FEMA recovery program to assist municipalities and certain private non-profits recover from a declared disaster event by FEMA.",
+  "issuingAgencyUrl": "https://www.pa.gov/en/agencies/pema.html",
+  "issuingAgencyGrantNumber": 14.0,
+  "pointOfContact": {
+   "name": "ra-empublicassistance@pa.gov"
+  },
+  "processSteps": [],
+  "additionalResources": [],
+  "FAQs": [
+   {
+    "question": "How do I get started with applying for this grant?",
+    "answer": "Contact your county emergency management agency."
+   }
+  ]
+ }
+}

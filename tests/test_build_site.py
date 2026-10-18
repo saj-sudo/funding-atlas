@@ -245,3 +245,15 @@ def test_a_reopening_is_observed_from_the_change_log(conn):
     spring = next(p for p in site["states"]["MD"]["between"] if p["name"] == "Spring Round")
     assert spring["last_reopened"] == t3
 
+
+def test_placeholder_dates_are_flagged_not_dropped():
+    from datetime import date as _date
+
+    from scripts.build_site import is_placeholder
+
+    today = _date(2026, 10, 18)
+    assert is_placeholder("2035-12-31", today) is True and is_placeholder("2999-07-01", today) is True
+    assert is_placeholder("2031-10-18", today) is False and is_placeholder("2031-10-19", today) is True
+    assert is_placeholder("2027-06-30", today) is False and is_placeholder(None, today) is False
+    assert is_placeholder("not a date", today) is False
+
