@@ -42,7 +42,8 @@ connector or one feature per session, no abstractions before the third real case
 ## Current state (2026-10-18)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
-`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (Pennsylvania's pa.gov Coveo grants index, 377
-records). Milestones 1 to 8.2 and 9.1 shipped; the site is live at https://saj-sudo.github.io/funding-atlas/. GOCPP is
-blocked by its robots.txt (ask the office). The 50-state census (`docs/surveys/state_portals.md`) ranks what comes next:
-`wv_grants`, then `ca_grants` (one CSV, 2,023 rows), `il_csfa`, a `webgrants` storefront connector (IA, MT). See the roadmap.
+`md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
+(grants.wv.gov JSON API, 124 records). Milestones 1 to 8.2, 9.1 and 9.2 shipped. **The live site answers 404: the
+repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
+the build. GOCPP is blocked by its robots.txt (ask the office). Next per the census (`docs/surveys/state_portals.md`):
+`ca_grants` (one CSV, 2,023 rows), `il_csfa`, a `webgrants` storefront connector (IA, MT). See the roadmap.

@@ -17,6 +17,7 @@ uv run python cli.py run md_mht                               # Maryland Histori
 uv run python cli.py run md_mea                               # Maryland Energy Administration: 5 indexes + ~35 pages, under a minute
 uv run python cli.py run md_dnr                               # Maryland DNR: 1 index + ~22 pages, under a minute
 uv run python cli.py run pa_grants                            # Pennsylvania pa.gov grants index: 4 search pages + ~377 detail pages, about 10 minutes
+uv run python cli.py run wv_grants                            # West Virginia grants.wv.gov: one JSON request, ~124 items, seconds
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -31,7 +32,8 @@ joined by ALN through `v_opportunity_listing`), three Maryland agencies on the s
 parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`, sharing
 `connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading), and
 `pa_grants`, the first state outside Maryland: Pennsylvania's pa.gov grants index (a Coveo search index plus one JSON
-record per grant page, 377 grants from 17 agencies with a labelled status). Each
+record per grant page, 377 grants from 17 agencies with a labelled status), and `wv_grants`, West Virginia's grants portal
+read through its JSON API (one request, 124 items, status from the page's own date rule). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 
