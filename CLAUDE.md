@@ -39,10 +39,10 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-17)
+## Current state (2026-10-18)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (Pennsylvania's pa.gov Coveo grants index, 377
-records, the first state outside Maryland). Milestones 1 to 8 and 9.1 shipped; the site is live at
-https://saj-sudo.github.io/funding-atlas/. GOCPP is blocked by its robots.txt (ask the office). Next up: the WebGrants
-spot-check (roadmap 8.1), then `wv_grants`. See the roadmap.
+records). Milestones 1 to 8.2 and 9.1 shipped; the site is live at https://saj-sudo.github.io/funding-atlas/. GOCPP is
+blocked by its robots.txt (ask the office). The 50-state census (`docs/surveys/state_portals.md`) ranks what comes next:
+`wv_grants`, then `ca_grants` (one CSV, 2,023 rows), `il_csfa`, a `webgrants` storefront connector (IA, MT). See the roadmap.

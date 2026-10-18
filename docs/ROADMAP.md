@@ -16,6 +16,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 6 | Navigator UI and hosting | 2026-10-15 | `LICENSE` + `LICENSE-DATA`; migration 0005 (`v_navigator_program`, `v_navigator_change`, `v_navigator_coverage`); `scripts/build_site.py` + `web/`: index with a tile-grid state map, 51 state pages with the new / closing / status-changed strip, faceted filters with counts, card list, detail panel, change log; `.github/workflows/site.yml` publishing to `gh-pages` daily; Lighthouse accessibility 100 on both page types; the Maryland page carries exactly the `v_municipal_page` rows | this file, decisions log, README |
 | 8 | Mid-Atlantic portal survey | 2026-10-17 | DE, PA, VA, DC, WV, NJ surveyed live, Maryland as control; one table, every URL fetched on the day. No commercial grants vendor has a public listing in any of the six; the structured sources are state-run indexes: pa.gov's Coveo grants index (377 grants, 17 agencies, labelled status, dates, applicant types, 22 open to municipalities) and grants.wv.gov's `AvailableGrants` JSON (124 items, dates, eligibility text, 5 active). NJ DCA's IntelliGrants RFP page is public (8 structured RFPs); VA has a hand-kept Governor's table and Drupal agencies; DE has no state listing; DC has no municipalities and a notice feed | `docs/surveys/mid_atlantic.md` |
 | 9.1 | Pennsylvania: `pa_grants` | 2026-10-17 | the first state outside Maryland, fed by pa.gov's Coveo grants index plus the JSON record each grant page embeds; labelled status (`Accepting applications` / `Closed`, a closed record with a future open date is forecasted), dates, applicant categories plus the shared keyword tagger over the free-text applicant line, award range, match, cycle wording as `closes_at_text`, `rolling` from the cycle. first live run 377 added (84 open, 2 forecasted, 291 closed), second run 0 changed; the Pennsylvania page shows 29 open municipal rows (26 likely) and 68 between rounds; search key read from the page each run; every detail page refetched (about ten minutes) | `connectors/pa_grants.md` |
+| 8.2 | 50-state portal census (light) | 2026-10-18 | every state plus DC, one row each: portal, vendor, public listing, access, verdict; folds in the WebGrants spot-check (8.1). Three states are one connector away (CA: an open-data CSV of 2,023 grants with a labelled status; IL: the CSFA opportunity and program lists; IA: a WebGrants storefront with a Status column), WebGrants is the one vendor with a public listing in two states (IA, MT agencies), NJ and TX are small builds, NY needs a deeper look behind a PeopleSoft shell, 18 states are agency-by-agency, 10 hosts block this client, 7 states have no state-run index at the URLs found | `docs/surveys/state_portals.md` |
 
 ## Next
 
@@ -49,13 +50,12 @@ this client (Akamai 403, TLS through the proxy, Incapsula challenge) and are rec
 is a University of Delaware Looker Studio dashboard, JavaScript only, not fetched; DC agency grants pages answer Drupal
 "Access denied" to anonymous requests.
 
-### 8.1 WebGrants spot-check (half a session, no code)
+### 8.1 / 8.2 WebGrants spot-check and 50-state census (shipped 2026-10-18, see Done)
 
-Montana (`funding.mt.gov`, "WebGrants - State of Montana") and Iowa (`iowagrants.gov`) serve public WebGrants listings; Euna's
-AmpliFund and eCivis public pages redirect to a login. Check what a WebGrants opportunity page states (status? dates?
-eligibility?), find two more WebGrants states, and decide whether one `webgrants` connector unlocks several states or
-stays a per-state job. State-run indexes seen in passing, each a `pa_grants`-shaped connector of its own: California
-(`grants.ca.gov`, open-data API), Illinois (GATA CSFA catalog), New York (Grants Management), Texas (eGrants).
+`docs/surveys/state_portals.md`. Open, none blocking: the ten blocked hosts (AK, CO, ID, KS, ME, MI, MN's listing, NM, RI,
+OK's OGX) need a check from an ordinary browser to tell a bot wall from a proxy block; the JS shells (NY SFS, UT Looker
+Studio, WY hub, KY DLG Portal, NV discovery) were recorded, not reverse-engineered; WebGrants was looked for only where a
+state turned it up, so a third storefront state may exist.
 
 ### 9. Platform connectors
 
@@ -73,10 +73,18 @@ the state-run central index. One connector per session, in this order:
    `listname=AvailableGrants`; JSON, no HTML. Status from dates by the page's own rule (`PostedDate <= today <= DueDate1`
    is active), `Forecasted` text to `closes_at_text`, `Modified` stored and excluded from the hash. 124 records, most of
    them stale 2022 to 2023 rounds; the diff is the product.
-3. **`nj_dca_sage`** (New Jersey DCA): `dcasage.intelligrants.com/RFPMailingRequest_List.asp`, 8 structured RFPs, when
-   New Jersey outreach starts. Becomes a platform connector if a second IntelliGrants instance exposes the same page.
-4. Agency connectors (VA DHCD Drupal 10, VA DCJS solicitation view, DE DNREC WordPress) only when a town asks. A state
-   is configuration where the platform allows it; a new parsing base is extracted at the second site that forces it.
+3. **`ca_grants`** (California): one CSV from `data.ca.gov` (`california-grants-portal-data.csv`), 2,023 rows with a labelled
+   `Status` (active / closed / forecasted), open date, deadline, applicant type, funding source, match, amounts, `LastUpdated`
+   and `GrantURL`. No HTML. Doc question: the applicant-type vocabulary and the free-text notes that name cities and counties.
+4. **`il_csfa`** (Illinois): the CSFA opportunity list (title, agency, application date range, award range) and program list
+   as HTML tables on `omb.illinois.gov/public/gata/csfa/`. Listed means open; "No end date" is rolling.
+5. **`webgrants`** (Iowa, Montana agencies): the WebGrants storefront, `storefrontFOList.do` plus one detail page per
+   opportunity, a labelled `Status`; states and agency hosts as configuration. Decide in the doc what a round that leaves
+   the storefront becomes.
+6. **`nj_dca_sage`** (New Jersey DCA) and **`tx_egrants`** (Texas Governor's Office): small, structured, public; when outreach
+   reaches those states.
+7. New York SFS: a deeper look for the Grant Opportunity Portal's endpoint. Agency connectors (VA, MA, OR, and the rest)
+   only when a town asks; NC's and WA's seed lists and VA's Governor's table say which agencies first.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -138,6 +146,10 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-17 | A closed record with a future open date is forecasted only when its close date is not before the open date | `dmva/1` opens 2026-11-02 (forecasted); `pema/14` opens 2028 and closed 2018, an inconsistent record kept as closed | `connectors/pa_grants.md` status rules |
 | 2026-10-17 | Every pa.gov detail page is refetched each run | the Coveo hit carries only the indexer's dates; the record's `last_modified` is stored in the payload, outside the hash, as the future gate | `connectors/pa_grants.md` |
 | 2026-10-17 | WebGrants spot-check after Pennsylvania, not before | Montana and Iowa serve public WebGrants listings, the first vendor platform seen with a public face; Pennsylvania is the neighbour with the biggest labelled-status source, so it ships first | this file, 8.1 |
+| 2026-10-18 | California next after West Virginia, then Illinois, then a `webgrants` connector | the census ranked public indexes by records per session: CA is one CSV with a labelled status (2,023 rows), IL two HTML tables, WebGrants two states on one parser | `docs/surveys/state_portals.md` |
+| 2026-10-18 | WebGrants storefront is the one vendor platform worth a connector | public in Iowa and on Montana's agency hosts with identical columns and a `Status` field; every other vendor's public face is a login or a JS shell | `docs/surveys/state_portals.md` |
+| 2026-10-18 | Blocked hosts and JS shells are recorded, not circumvented | ten states refuse this client (Akamai, CloudFront, Cloudflare, DataDome, Radware, Azure WAF, proxy resets); whether a browser sees the same is for the operator to check once; the GOCPP rule | `docs/surveys/state_portals.md` |
+| 2026-10-18 | ADECA's `ClaudeBot` disallow is flagged for the operator | the only robots file in the census naming an AI crawler; the connector's agent is not ClaudeBot and the file has no rule for other agents, but the operator decides whether to read the site at all | `docs/surveys/state_portals.md` |
 
 ## Open questions (do not resolve in code yet)
 
