@@ -103,3 +103,21 @@ def test_normalize_real_fixtures():
         assert p.applicant_types, "eligibility codes did not map; check APPLICANT_CODES against the fixture"
         assert p.eligibility_text
         assert p.alns
+
+
+def test_agency_name_prefers_the_agency_table_over_the_typed_synopsis_field():
+    payload = {
+        "hit": {"id": "3", "title": "T", "oppStatus": "posted", "agency": "Federal Highway Administration", "agencyCode": "DOT-FHWA"},
+        "detail": {"agencyDetails": {"agencyName": "Federal Highway Administration", "agencyCode": "DOT-FHWA"},
+                   "synopsis": {"agencyName": "Jeffrey Brown Management and Program Analyst", "agencyCode": "69A345",
+                                "responseDateDesc": "Due by 5:00 PM &quot;Eastern&quot; time &amp; no later"}},
+    }
+    p = gg.normalize(RawRecord(source_connector="grants_gov", source_id="3", payload=payload))
+    assert p.administering_agency == "Federal Highway Administration" and p.agency_code == "DOT-FHWA"
+    assert p.closes_at_text == 'Due by 5:00 PM "Eastern" time & no later'
+    # Without agency details, the search hit's agency wins; the synopsis field is the last resort.
+    payload["detail"].pop("agencyDetails")
+    assert gg.normalize(RawRecord(source_connector="grants_gov", source_id="3", payload=payload)).administering_agency == "Federal Highway Administration"
+    payload["hit"].pop("agency")
+    assert gg.normalize(RawRecord(source_connector="grants_gov", source_id="3", payload=payload)).administering_agency == "Jeffrey Brown Management and Program Analyst"
+

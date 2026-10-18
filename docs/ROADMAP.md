@@ -88,11 +88,19 @@ the state-run central index. One connector per session, in this order:
 
 ### 10. Data cleanup (small, rides any session)
 
-- Grants.gov `administering_agency` sometimes holds a contact name or an office code ("Jeffrey Brown Management and
-  Program Analyst", "69A345 Office of the Under Secretary for Policy"). Prefer the agency derived from `agencyCode`.
-- Grants.gov close-date text keeps HTML entities (`&quot;`). Unescape it the way titles are.
-- Run the full SAM catalog before any outreach so listing lines fill in (2 of 128 federal rows today, from a
-  60-listing test run).
+Done 2026-10-18 (polish before outreach):
+- Grants.gov `administering_agency` now comes from the record's `agencyDetails` (Grants.gov's agency table), then the
+  search hit's agency, and only then the free-text synopsis field that held contact names and office codes. On the live
+  database that corrects 89 of 955 records (14 of the 128 federal rows on the Maryland page); the one odd name left,
+  "69A345 Office of the Under Secretary for Policy", is how Grants.gov's own agency table spells that office.
+- Grants.gov close-date text is unescaped (`&quot;` and friends), the way titles already were.
+- The SAM catalog runs in full in the daily workflow: 2,869 listings on the live database, every one of the 955
+  Grants.gov opportunities with an ALN resolves to a listing (`v_aln_coverage`: 2,532 ALN references, 0 unmatched).
+- Placeholder close dates (pa.gov's 2035-12-31 and 2999-07-01) render as "no deadline stated" with the source's date
+  beside it, sort with the undated rows and leave the Deadline facet's "Has a date" bucket; the record keeps the date.
+  `PLACEHOLDER_YEARS = 5` in `scripts/build_site.py`.
+
+Still open:
 - Nine DHCD records have no applicant tags (State Revitalization Programs, Main Street Improvement Grant, others
   listed in `connectors/md_dhcd.md`); SRP and MIP are municipal rounds and will not surface when they reopen.
 
@@ -150,6 +158,8 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-18 | WebGrants storefront is the one vendor platform worth a connector | public in Iowa and on Montana's agency hosts with identical columns and a `Status` field; every other vendor's public face is a login or a JS shell | `docs/surveys/state_portals.md` |
 | 2026-10-18 | Blocked hosts and JS shells are recorded, not circumvented | ten states refuse this client (Akamai, CloudFront, Cloudflare, DataDome, Radware, Azure WAF, proxy resets); whether a browser sees the same is for the operator to check once; the GOCPP rule | `docs/surveys/state_portals.md` |
 | 2026-10-18 | ADECA's `ClaudeBot` disallow is flagged for the operator | the only robots file in the census naming an AI crawler; the connector's agent is not ClaudeBot and the file has no rule for other agents, but the operator decides whether to read the site at all | `docs/surveys/state_portals.md` |
+| 2026-10-18 | A close date more than five years out is shown as "no deadline stated", never dropped | pa.gov writes 2035-12-31 and 2999-07-01 to mean no deadline; a reader seeing "closes in 110 months" would think the page is broken; the record keeps the source's date and the rule lives in the exporter, not the connector | `scripts/build_site.py` |
+| 2026-10-18 | Grants.gov agency names come from the agency table, not the typed synopsis field | the synopsis field held contact names ("Teresa M Parker-Reeser Grants Officer") on 14 of 128 federal rows on the Maryland page | `connectors/grants_gov.py` |
 
 ## Open questions (do not resolve in code yet)
 

@@ -142,7 +142,7 @@
         lab: function (v) { return v === 'likely' ? 'Likely' : 'Possible'; }, order: ['likely', 'possible'], open: true },
       { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: cap, open: true },
       { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: cap, open: true },
-      { key: 'deadline', label: 'Deadline', get: function (p) { return [p.closes_at ? 'dated' : p.rolling ? 'rolling' : p.closes_text ? 'text' : 'none']; },
+      { key: 'deadline', label: 'Deadline', get: function (p) { return [p.closes_at && !p.deadline_placeholder ? 'dated' : p.rolling ? 'rolling' : p.closes_text ? 'text' : 'none']; },
         lab: function (v) { return { dated: 'Has a date', rolling: 'Rolling or year-round', text: 'Described in words', none: 'Not stated' }[v]; },
         order: ['dated', 'rolling', 'text', 'none'], open: true },
       { key: 'category', label: 'Category', get: function (p) { return p.categories.length ? p.categories : ['none']; },
@@ -221,7 +221,7 @@
       return true;
     }
     function closeKey(p) {
-      return p.closes_at ? '0' + p.closes_at : p.closes_text ? '1' : p.rolling ? '2' : '3';
+      return p.closes_at && !p.deadline_placeholder ? '0' + p.closes_at : p.closes_text ? '1' : p.rolling ? '2' : '3';
     }
     var SORTS = {
       closing: function (a, b) { return closeKey(a).localeCompare(closeKey(b)) || a.name.localeCompare(b.name); },
@@ -318,6 +318,10 @@
 
     // ---- results ----
     function closesHtml(p) {
+      if (p.closes_at && p.deadline_placeholder) {
+        // The source states a far-off date (2035, 2999) as its way of saying "no deadline"; show that, keep the date.
+        return '<span><b>' + (p.rolling ? 'Rolling' : 'No deadline stated') + '</b> · source lists ' + h(fmtDate(p.closes_at)) + '</span>';
+      }
       if (p.closes_at) {
         var soon = isSoon(p);
         return '<span class="' + (soon ? 'soon' : '') + '"><b>' + h(relDays(p.days_to_close)) + '</b> · ' + h(fmtDate(p.closes_at)) + '</span>';

@@ -160,6 +160,19 @@ def _data(detail: dict[str, Any]) -> dict[str, Any]:
     return detail.get("data", detail) if isinstance(detail.get("data"), dict) else detail
 
 
+def agency_name(data: dict[str, Any], syn: dict[str, Any], hit: dict[str, Any]) -> str | None:
+    """The agency's name from the record's agency details, then the search hit, then the synopsis. The synopsis
+    field is free text an agency types in, and sometimes holds a contact name or an office code ("Jeffrey Brown
+    Management and Program Analyst", "69A345 Office of the Under Secretary for Policy"); the other two come from
+    Grants.gov's agency table."""
+    details = data.get("agencyDetails") or {}
+    for value in (details.get("agencyName"), hit.get("agency"), syn.get("agencyName")):
+        name = _clean_text(html.unescape(str(value or "")))
+        if name:
+            return name
+    return None
+
+
 def normalize(raw: RawRecord) -> Program:
     hit: dict[str, Any] = raw.payload.get("hit") or {}
     detail: dict[str, Any] = raw.payload.get("detail") or {}
@@ -197,8 +210,8 @@ def normalize(raw: RawRecord) -> Program:
         name=_clean_text(html.unescape(hit.get("title") or data.get("opportunityTitle") or "")),
         level="federal",
         jurisdiction="US",
-        administering_agency=syn.get("agencyName") or hit.get("agency"),
-        agency_code=syn.get("agencyCode") or hit.get("agencyCode"),
+        administering_agency=agency_name(data, syn, hit),
+        agency_code=(data.get("agencyDetails") or {}).get("agencyCode") or syn.get("agencyCode") or hit.get("agencyCode"),
         funding_type=funding_type,
         funding_source="direct",
         amount_min=parse_int(syn.get("awardFloor")),
@@ -210,7 +223,7 @@ def normalize(raw: RawRecord) -> Program:
         or parse_date(syn.get("estSynopsisPostingDate")),
         closes_at=parse_date(hit.get("closeDate")) or parse_date(syn.get("responseDate"))
         or parse_date(syn.get("estApplicationResponseDate")),
-        closes_at_text=_clean_text(syn.get("responseDateDesc")) or None,
+        closes_at_text=_clean_text(html.unescape(str(syn.get("responseDateDesc") or ""))) or None,
         rolling=None,
         summary=strip_html(syn.get("synopsisDesc") or syn.get("forecastDesc")) or None,
         eligibility_text=strip_html(syn.get("applicantEligibilityDesc")) or None,
