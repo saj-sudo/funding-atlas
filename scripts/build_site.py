@@ -54,6 +54,7 @@ CONNECTOR_LABEL = {
     "ca_grants": "California Grants Portal (grants.ca.gov)",
     "il_csfa": "Illinois Catalog of State Financial Assistance (GATA)",
     "webgrants": "WebGrants storefronts (Iowa, Montana)",
+    "tx_egrants": "Texas Office of the Governor eGrants",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

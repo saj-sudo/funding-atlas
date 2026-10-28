@@ -21,6 +21,7 @@ uv run python cli.py run wv_grants                            # West Virginia gr
 uv run python cli.py run ca_grants                            # California Grants Portal: one CSV from data.ca.gov, ~2,025 rows, seconds
 uv run python cli.py run il_csfa                              # Illinois CSFA opportunity list: 1 list + ~70 detail pages, under a minute
 uv run python cli.py run webgrants                            # WebGrants storefronts (Iowa, Montana Agriculture, Montana FWP): 3 lists + ~40 detail pages, under a minute
+uv run python cli.py run tx_egrants                           # Texas Governor eGrants: Active page + 6 archive pages, ~147 rounds, seconds
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -39,7 +40,8 @@ record per grant page, 377 grants from 17 agencies with a labelled status), and 
 read through its JSON API (one request, 124 items, status from the page's own date rule), and `ca_grants`, the California Grants Portal's
 daily open-data CSV (one file, about 2,025 grants with a labelled status), and `il_csfa`, Illinois's Catalog of State Financial Assistance (the list of
 rounds posted now, 119 rows; the native ones read with their program's eligibility), and `webgrants`, the one vendor platform with a public
-listing in two states: the WebGrants storefronts of Iowa and Montana's agency hosts (the state is configuration; about 40 rounds). Each
+listing in two states: the WebGrants storefronts of Iowa and Montana's agency hosts (the state is configuration; about 40 rounds), and
+`tx_egrants`, the Texas Governor's eGrants announcements (the Active page plus the archive, about 147 rounds, each stating who may apply). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 
