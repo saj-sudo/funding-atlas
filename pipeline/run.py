@@ -16,6 +16,7 @@ from connectors import (
     md_dnr,
     md_mea,
     md_mht,
+    nj_dca_sage,
     pa_grants,
     sam_assistance_listings,
     tx_egrants,
@@ -38,6 +39,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "il_csfa": il_csfa,
     "webgrants": webgrants,
     "tx_egrants": tx_egrants,
+    "nj_dca_sage": nj_dca_sage,
 }
 
 

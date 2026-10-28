@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_connectors)
         run: |
           failed=""
-          for c in md_dhcd md_commerce md_mht md_mea md_dnr pa_grants wv_grants ca_grants il_csfa webgrants tx_egrants grants_gov sam_assistance_listings; do
+          for c in md_dhcd md_commerce md_mht md_mea md_dnr pa_grants wv_grants ca_grants il_csfa webgrants tx_egrants nj_dca_sage grants_gov sam_assistance_listings; do
             echo "::group::$c"
             if ! uv run python cli.py run "$c"; then
               failed="$failed $c"
