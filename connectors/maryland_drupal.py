@@ -102,9 +102,16 @@ def page_name(main_html: str) -> str:
     return clean(h1.get_text(" ")) if h1 else ""
 
 
-def _prose(main_html: str) -> Tag:
-    soup = BeautifulSoup(main_html, "html.parser")
-    return soup.select_one(".usa-prose.maryland-toc-target") or soup
+def prose_container(soup: BeautifulSoup) -> Tag | BeautifulSoup:
+    """The element whose children are the page body (<p>, <h2>, <ul>, ...). The site serves two markups: one element
+    carrying both classes (`<div class="usa-prose maryland-toc-target">`, every page crawled before 2026-10-28) and
+    two nested ones (`<div class="maryland-toc-target"><div class="usa-prose">`, seen on newly published pages). On
+    neither match the whole page is returned and no <h2> section is found, so the failure is silent."""
+    return soup.select_one(".usa-prose.maryland-toc-target") or soup.select_one(".maryland-toc-target .usa-prose") or soup
+
+
+def _prose(main_html: str) -> Tag | BeautifulSoup:
+    return prose_container(BeautifulSoup(main_html, "html.parser"))
 
 
 def body_sections(main_html: str) -> list[tuple[str, str]]:

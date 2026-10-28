@@ -34,6 +34,7 @@ from connectors.maryland_drupal import (
     MarylandDrupalConnector,
     body_sections,
     clean,
+    prose_container,
     section_lines,
     sentences,
     source_id_for,
@@ -72,7 +73,7 @@ def open_paths(main_html: str) -> set[str]:
     """Paths linked under the 'Open funding opportunities' heading of the how-to-apply page. The links
     point at mht.prod.maryland.gov, so match on path only."""
     soup = BeautifulSoup(main_html, "html.parser")
-    prose = soup.select_one(".usa-prose.maryland-toc-target") or soup
+    prose = prose_container(soup)
     out: set[str] = set()
     inside = False
     for el in prose.children:
