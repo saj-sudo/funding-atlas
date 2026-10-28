@@ -33,50 +33,12 @@ import httpx
 from bs4 import BeautifulSoup, Tag
 
 from connectors.sam_assistance_listings import clean
-from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
+from connectors.text import FUNDING_TYPE_KEYWORDS, LOCATION_CONTEXT_RE, applicant_types_for, funding_type_for  # noqa: F401  (re-exported: the md_* modules and tests import them from here)
+from pipeline.models import CategoryTag, Program, RawRecord
 
 PAGE_DELAY_S = 0.3
 TIMEOUT_S = 30.0
 USER_AGENT = "funding-atlas/0.1 (+https://github.com/saj-sudo/funding-atlas)"
-
-# Phrase regex -> applicant types, scanned over the who-may-apply sections only, never the whole page.
-# The matched phrase is stored as source_code so the inference is auditable in SQL. Shared by all three
-# agencies; a phrase that is wrong for one of them is wrong for all and gets fixed here.
-APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
-    (r"units? of (?:general )?local government", ("municipality", "county")),
-    (r"local governments?", ("municipality", "county")),
-    (r"municipalit\w*", ("municipality",)),
-    (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
-    (r"\bcities\b", ("municipality",)),
-    (r"\btowns?\b", ("municipality",)),
-    (r"\bcount(?:y|ies)\b", ("county",)),
-    (r"\bnon-?profits?\b", ("nonprofit",)),
-    (r"\bnot-for-profits?\b", ("nonprofit",)),
-    (r"501\s?\(c\)\s?\(3\)", ("nonprofit",)),
-    (r"(?<!not-)\bfor-profits?\b", ("business",)),
-    (r"\bbusiness(?:es)?\b", ("business",)),
-    (r"\bretailers?\b", ("business",)),
-    (r"\bdevelopers?\b", ("business",)),
-    (r"\bhomeowners?\b", ("household",)),
-    (r"\bhouseholds?\b", ("household",)),
-    (r"\bresidents?\b", ("household",)),
-    (r"\brenters?\b", ("household",)),
-    # The noun only: plural always, singular when a function word or punctuation follows ("any individual who",
-    # "an individual may apply"). The adjective ("individual school facilities") never tags.
-    (r"\bindividuals\b|\bindividual\b(?=\s*(?:$|[,.;:)]|(?:and|or|who|that|which|may|can|must|is|are|applying|seeking)\b))",
-     ("individual",)),
-    (r"housing authorit\w*", ("housing_authority",)),
-    (r"\bschools?\b", ("school",)),
-    (r"local education agenc\w*", ("school",)),
-    (r"\btrib(?:al|es?)\b", ("tribe",)),
-    (r"\bstate (?:government )?agenc\w*", ("state",)),
-    (r"\bcolleges?\b|\buniversit\w*|institutions? of higher education", ("higher_ed",)),
-)
-
-# Name keyword -> funding_type, first match wins.
-FUNDING_TYPE_KEYWORDS: tuple[tuple[str, str], ...] = (
-    ("tax credit", "tax_credit"), ("loan", "loan"), ("voucher", "voucher"), ("grant", "grant"),
-)
 
 # Applicant tags are read from lines that talk about who applies or qualifies. A line that names a
 # place ("in 4+ cities outside Maryland", "within a Tier 1 County") or a condition is not an applicant
@@ -95,12 +57,6 @@ CONDITION_LEAD_IN_RE = re.compile(
     r"|criteria|requirements)\s*:$",
     re.I,
 )
-# A place word right after a spatial preposition is a place, not an applicant: "in 4+ cities outside
-# Maryland", "within a Tier 1 County", "located in a designated rural county".
-LOCATION_CONTEXT_RE = re.compile(
-    r"\b(?:in|within|outside|inside|into|across|throughout|near|serving|serve)\s+(?:[\w$%+,'’/()-]+\s+){0,3}$", re.I
-)
-
 MATCH_NOT_REQUIRED_RE = re.compile(r"match(?:ing)?(?: funds?)? (?:is|are) not required", re.I)
 MATCH_REQUIRED_RE = re.compile(r"match(?:ing)?(?: funds?)? (?:is|are) required", re.I)
 ELIGIBILITY_HEADING_RE = re.compile(r"eligib", re.I)
@@ -265,35 +221,11 @@ def sentences(text: str) -> list[str]:
     return [s.strip() for s in _sentence_re.split(clean(text)) if s.strip()]
 
 
-def applicant_types_for(applicant_text: str | list[str] | None) -> list[ApplicantTag]:
-    """Keyword tags over applicant lines. The first match of each phrase that is not in a location
-    context wins; the matched phrase is the tag's source_code."""
-    lines = [applicant_text] if isinstance(applicant_text, str) else list(applicant_text or [])
-    tags: list[ApplicantTag] = []
-    for pattern, values in APPLICANT_KEYWORDS:
-        phrase = next(
-            (m.group(0).lower() for line in lines for m in re.finditer(pattern, line, re.I)
-             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()])),
-            None,
-        )
-        if phrase:
-            tags += [ApplicantTag(value=v, source_code=phrase) for v in values]
-    return tags
-
-
 def match_required_for(text: str) -> bool | None:
     if MATCH_NOT_REQUIRED_RE.search(text):
         return False
     if MATCH_REQUIRED_RE.search(text):
         return True
-    return None
-
-
-def funding_type_for(name: str) -> str | None:
-    n = name.lower()
-    for keyword, ft in FUNDING_TYPE_KEYWORDS:
-        if keyword in n:
-            return ft
     return None
 
 

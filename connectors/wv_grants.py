@@ -20,8 +20,8 @@ from typing import Any
 import httpx
 
 from connectors.grants_gov import parse_date, strip_html
-from connectors.maryland_drupal import applicant_types_for, funding_type_for
 from connectors.sam_assistance_listings import clean
+from connectors.text import applicant_types_for, funding_type_for
 from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "wv_grants"
