@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CSFA | GATA | Illinois.gov
+</title><link href="Common.css" rel="stylesheet" />
+
+    <style>
+        .banner { background-color:#c8dcff; padding:5px; border-radius:4px; font-weight:bold; }
+
+
+        .tblList { border-collapse:collapse; width:100%; }
+        .tblList th { border-bottom:solid 1px #102952; padding:4px; padding-right:10px; background-color:#c8dcff; text-align:left; white-space:nowrap; width:1px; vertical-align:top; }
+        .tblList td { border-bottom:solid 1px #102952; padding:4px; }
+
+        .datahead { font-weight:bold; margin-top:15px; margin-bottom:5px; }
+        .data { margin-bottom:20px; border-bottom:solid 1px #c8dcff; padding-bottom:20px; }
+
+        .gms { display:inline-block; background-color:#a4ffd1; font-size:70%; border-radius:5px; padding:0px 3px 2px 2px; border:solid 1px green; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            parent.postMessage(document.body.scrollHeight, "*");
+            if (self == top) { document.body.style.padding = "10px" }
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./Program.aspx?csfa=450" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2153A54A" />
+    <div>
+
+
+        <div class="bc np">
+            <a href="Default.aspx">CSFA Home</a> /
+            <span id="spanFromProgramList">
+                <a href="HTTPS://OMB.ILLINOIS.GOV/PUBLIC/GATA/CSFA/AGENCYLIST.ASPX" id="lnk_AgencyList">Agency List</a> /
+                <a href="ProgramList.aspx?Agency=588" id="lnk_ProgramList">Program List</a> /
+            </span>
+
+            
+            Program
+
+        </div>
+
+
+        
+        
+        <div id="divFound">
+
+            <div style="padding:5px 0px 25px 5px;">
+                <div id="div_Program_Name" style="font-size:150%">Emergency Management Performance Grants</div>
+                <div id="div_Popular_Name">EMPG</div>
+                <div id="div_CSFA">CSFA Number: 588-40-0450</div>
+            </div>
+
+
+            <div class="banner">STATE AGENCY INFORMATION</div>
+
+            <div class="datahead">Agency Name</div>
+            <div id="div_Agency" class="data">Illinois Emergency Management Agency and Office of Homeland Security (588)</div>
+
+            <div id="Agency_ID">
+                <div class="datahead">Agency Identification</div>
+                <div id="div_Agency_ID" class="data">588</div>
+            </div>
+
+            <div class="datahead">Agency Contact</div>
+            <div id="div_Agency_Contact" class="data">Nichole Strayer<div> 217.524-7890</div><div><a href='mailto:nichole.strayer@illinois.gov'>nichole.strayer@illinois.gov</a></div></div>
+
+
+            <div class="banner">PROGRAM INFORMATION</div>
+
+            <div id="view_Short_Desc">
+                <div class="datahead">Short Description</div>
+                <div id="div_Short_Desc" class="data">To support a comprehensive, all-hazard emergency preparedness system by building and sustaining the core capabilities contained in the National Preparedness Goal</div>
+            </div>
+
+            <div id="view_Fed_Authorization">
+                <div class="datahead">Federal Authorization</div>
+                <div id="div_Fed_Authorization" class="data">Post-Katrina Emergency Management Reform Act of 2006</div>
+            </div>
+
+            <div id="view_IL_Statute_Authorization">
+                <div class="datahead">Illinois Statue Authorization</div>
+                <div id="div_IL_Statute_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_IL_Rules_Authorization">
+                <div class="datahead">Illinois Administrative Rules Authorization</div>
+                <div id="div_IL_Rules_Authorization" class="data">Section 662 of the Post Katrina Emergency Management Reform Act (6 U.S.C § 762) and the Robert T. Stafford Disaster Relief and Emergency Assistance Act, as amended (42 U.S.C. § 5121 et seq.), the Earthquake Hazards Reduction Act of 1977, as amended (Pub. L. No. 95-124) (42 U.S.C. §§ 7701 et seq.); and the National Flood Insurance Act of 1968, as amended (Pub. L. No. 90-448) (42 U.S.C. §§ 4001 et seq.).</div>
+            </div>
+
+            <div id="view_Objective">
+                <div class="datahead">Objective</div>
+                <div id="div_Objective" class="data">To support a comprehensive, all-hazard emergency preparedness system by building and sustaining the core capabilities contained in the National Preparedness Goal. Examples include: Completing the Threat and Hazard Identification and Risk Assessment (THIRA) process; Strengthening a state or community's emergency management governance structures; Updating and approving specific emergency plans; Designing and conducting exercises that enable whole community stakeholders to examine and validate core capabilities and the plans needed to deliver them to the targets identified through the THIRA; Targeting training and verifying identified capabilities; Initiating or achieving a whole community approach to security and emergency management.</div>
+            </div>
+
+            <div id="view_Prime_Recipient">
+                <div class="datahead">Prime Recipient</div>
+                <div id="div_Prime_Recipient" class="data">Yes</div>
+            </div>
+
+            <div id="view_Program_Terms">
+                <div class="datahead">UGA Program Terms</div>
+                <div id="div_Program_Terms" class="data">All Financial and Performance reporting shall be submitted to IEMA as specified in the grant agreement. Failure to comply with reporting requirements as specified in the grant agreement may result in Stop Pay status.</div>
+            </div>
+
+            <div id="view_Eligible_Applicants">
+                <div class="datahead">Eligible Applicants</div>
+                <div id="div_Eligible_Applicants" class="data">Government Organizations; </div>
+            </div>
+
+            <div id="view_Applicant_Eligibility">
+                <div class="datahead">Applicant Eligibility</div>
+                <div id="div_Applicant_Eligibility" class="data">Funding under this program is ultimately used by emergency management organizations and programs of States</div>
+            </div>
+
+            <div id="view_Beneficiary_Eligibility">
+                <div class="datahead">Beneficiary Eligibility</div>
+                <div id="div_Beneficiary_Eligibility" class="data">N/A</div>
+            </div>
+
+            <div id="view_Types_Assistance">
+                <div class="datahead">Types of Assistance</div>
+                <div id="div_Types_Assistance" class="data">Formula Grants</div>
+            </div>
+
+            <div id="view_Subject_Area">
+                <div class="datahead">Subject / Service Area</div>
+                <div id="div_Subject_Area" class="data">Public Safety</div>
+            </div>
+
+            <div id="view_Credentials_Documentation">
+                <div class="datahead">Credentials / Documentation</div>
+                <div id="div_Credentials_Documentation" class="data">N/A</div>
+            </div>
+
+            <div id="view_Preapplication_Coordination">
+                <div class="datahead">Preapplication Coordination</div>
+                <div id="div_Preapplication_Coordination" class="data">This program is eligible for coverage under E.O. 12372, "Intergovernmental Review of Federal Programs."</div>
+            </div>
+
+            <div id="view_Application_Procedures">
+                <div class="datahead">Application Procedures</div>
+                <div id="div_Application_Procedures" class="data">applicants are required to develop and submit a Work Plan</div>
+            </div>
+
+            <div id="view_Criteria_Selecting_Proposals">
+                <div class="datahead">Criteria Selecting Proposals</div>
+                <div id="div_Criteria_Selecting_Proposals" class="data">As the EMPG is a formula grant, funding is awarded to all eligible recipients and the award amounts are predetermined, as noted in the applicable NOFO which are available online</div>
+            </div>
+
+            <div id="view_Award_Procedures">
+                <div class="datahead">Award Procedures</div>
+                <div id="div_Award_Procedures" class="data">Applications or plans are reviewed by DHS/FEMA program and administrative staff. Any issues or concerns noted in the application will be negotiated with the successful applicant prior to award being issued</div>
+            </div>
+
+            <div id="view_Deadlines">
+                <div class="datahead">Deadlines</div>
+                <div id="div_Deadlines" class="data">N/A</div>
+            </div>
+
+            <div id="view_Range_Times">
+                <div class="datahead">Range of Approval or Disapproval Time</div>
+                <div id="div_Range_Times" class="data">N/A</div>
+            </div>
+
+            <div id="view_Appeals">
+                <div class="datahead">Appeals</div>
+                <div id="div_Appeals" class="data">N/A</div>
+            </div>
+
+            <div id="view_Renewals">
+                <div class="datahead">Renewals</div>
+                <div id="div_Renewals" class="data">N/A</div>
+            </div>
+
+            <div id="view_Formula_Matching">
+                <div class="datahead">Formula Matching Requirements</div>
+                <div id="div_Formula_Matching" class="data">Statutory formula ; State cost match (cash or in-kind) requirement In FY 2022, shall not exceed 50 percent of the total budget.</div>
+            </div>
+
+            <div id="view_Uses_Restrictions">
+                <div class="datahead">Uses and Restrictions</div>
+                <div id="div_Uses_Restrictions" class="data">May only be used for the purpose set forth in the grant, and must be consistent with the statutory authority for the award. Grant funds may not be used for matching funds for other Federal grants/cooperative agreements, lobbying, or intervention in Federal regulatory or adjudicatory proceedings. In addition, Federal funds may not be used to sue the Federal government or any other government entity. Pre-award costs are allowable only with the written consent of DHS and if they are included in the award agreement. Federal employees are prohibited from serving in any capacity (paid or unpaid) on any proposal submitted under this program. Federal employees may not receive funds under this award. EMPG Program grantees may only fund projects that were included in the Work Plan that was submitted to and approved by a FEMA Program Analyst. For more information, please see the FY2015 EMPG Program Notice of Funding Opportunity (NOFO). DHS grant funds may only be used for the purpose set forth in the grant, and must be consistent with the statutory authority for the award. Grant funds may not be used for matching funds for other Federal grants/cooperative agreements, lobbying, or intervention in Federal regulatory or adjudicatory proceedings. In addition, Federal funds may not be used to sue the Federal government or any other government entity. Pre-award costs are allowable only with the written consent of DHS and if they are included in the award agreement. Federal employees are prohibited from serving in any capacity (paid or unpaid) on any proposal submitted under this program. Federal employees may not receive funds under this award. EMPG Program grantees may only fund projects that were included in the Work Plan that was submitted to and approved by a FEMA Program Analyst.</div>
+            </div>
+
+            <div id="view_Reports">
+                <div class="datahead">Reports</div>
+                <div id="div_Reports" class="data">Program, cash, progress, expenditure and performance reporting are required quarterly.</div>
+            </div>
+
+            <div id="view_Audits">
+                <div class="datahead">Audits</div>
+                <div id="div_Audits" class="data">In accordance with the provisions of 2 CFR 200, Subpart F - Audit Requirements, nonfederal entities that expend financial assistance of $750,000 or more in Federal awards will have a single or a program-specific audit conducted for that year.</div>
+            </div>
+
+            <div id="view_Records">
+                <div class="datahead">Records</div>
+                <div id="div_Records" class="data">Financial records, supporting documents, statistical records, and all other non-federal entity records pertinent to a federal award generally must be maintained for at least three years from the date the final Federal Financial Report (FFR) is submitted.</div>
+            </div>
+
+            <div id="view_Account_Identification">
+                <div class="datahead">Account Identification</div>
+                <div id="div_Account_Identification" class="data">N/A</div>
+            </div>
+
+            <div id="view_Obligations">
+                <div class="datahead">Obligations</div>
+                <div id="div_Obligations" class="data">10712809.00</div>
+            </div>
+
+            <div id="view_Financial_Assistance">
+                <div class="datahead">Range and Average of Financial Assistance</div>
+                <div id="div_Financial_Assistance" class="data">N/A</div>
+            </div>
+
+            <div id="view_Program_Accomplishments">
+                <div class="datahead">Program Accomplishments</div>
+                <div id="div_Program_Accomplishments" class="data">N/A</div>
+            </div>
+
+            <div id="view_Regulations_Guidelines_Literature">
+                <div class="datahead">Regulations, Guidelines, and Literature</div>
+                <div id="div_Regulations_Guidelines_Literature" class="data">Indirect cost restrictions and limitations:
+ICR is allowable under the EMPG grant program.</div>
+            </div>
+
+            <div id="view_Assistance_Location">
+                <div class="datahead">Regional or Local Assistance Location</div>
+                <div id="div_Assistance_Location" class="data">2200 South Dirksen Parkway  Springfield, IL 62703</div>
+            </div>
+
+            <div id="view_Headquarters_Office">
+                <div class="datahead">Headquarters Office</div>
+                <div id="div_Headquarters_Office" class="data">2200 South Dirksen Parkway  Springfield, IL 62703</div>
+            </div>
+
+            <div id="view_Program_Website">
+                <div class="datahead">Program Website</div>
+                <div id="div_Program_Website" class="data">http://www.fema.gov/government/grant/index.shtm</div>
+            </div>
+
+            <div id="view_Related_Programs">
+                <div class="datahead">Related Programs</div>
+                <div id="div_Related_Programs" class="data">97.008 Non-Profit Security Program; 97.067 Homeland Security</div>
+            </div>
+
+            <div id="view_Example_Projects">
+                <div class="datahead">Example Projects</div>
+                <div id="div_Example_Projects" class="data">N/A</div>
+            </div>
+
+            <div id="view_Published_Date">
+                <div class="datahead">Published Date</div>
+                <div id="div_Published_Date" class="data">10/1/2021</div>
+            </div>
+
+
+            <!------------------------->
+            <!-- EXCEPTIONS 4/2/2026 -->
+            <!------------------------->
+            <div id="view_Exceptions">
+                <div class="datahead">GATA Exceptions</div>
+                <div id="div_Exceptions" class="data">Application; Merit Based Review; Notice of Funding Opportunity; Uniform Agreement; </div>
+            </div>
+
+
+
+
+            <!------------------------->
+            <!-- FUNDING INFORMATION -->
+            <!------------------------->
+
+            <div class="banner">FUNDING INFORMATION</div>
+
+            <div id="view_Funding_By_FY">
+                <div class="datahead">Funding By Fiscal Year</div>
+                <div id="div_Funding_By_FY" class="data">FY 2015 : $11,005,166<br />FY 2016 : $11,005,166<br />FY 2017 : $10,927,764<br />FY 2018 : $10,848,380<br />FY 2019 : $10,785,720<br />FY 2020 : $10,714,815<br />FY 2021 : $10,796,972<br />FY 2022 : $12,329,319<br />FY 2023 : $1,061,854,500<br />FY 2024 : $9,504,284<br /></div>
+            </div>
+
+            <div class="datahead">Federal Funding</div>
+            <div id="div_Federal_Funding" class="data"><a href='https://sam.gov/fal/c3051fb7d9294b0382662e7872b0cefc/view' target='_blank'>97.042 - Emergency Management Performance Grants</a><br /></div>
+
+
+            <div class="datahead">Notice of Funding Opportunities</div>
+            <style>
+                #tbl_NOFOs { margin-top:15px; }
+                #tbl_NOFOs th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_NOFOs td { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; vertical-align:top; white-space:nowrap; }
+                #tbl_NOFOs td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Funding_Opportunities" class="data">
+                <table id="tbl_NOFOs">
+	<thead>
+		<tr>
+			<th></th><th>Agency ID</th><th>Award Range</th><th>Application Range</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td><a href='Opportunity.aspx?nofo=2004'>Details</a></td><td>DHS-21-GPD-042-05-01</td><td>$0 - $0</td><td>General announcement open for a period of time with no specific due dates for applications.</td>
+		</tr>
+	</tbody>
+</table>
+            </div>
+
+
+
+            <!----------------------->
+            <!-- TOP ACTIVE AWARDS -->
+            <!----------------------->
+
+            <div id="div_Top_Awards" class="banner">ACTIVE AWARDS</div>
+
+            <style>
+                #tbl_Awards { margin-top:15px; }
+                #tbl_Awards th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_Awards td { border:solid 1px #c8dcff; text-align:center; padding:3px 5px 3px 5px; vertical-align:top; }
+                #tbl_Awards td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Awards" class="data">
+                <table id="tbl_Awards">
+	<tbody>
+		<tr>
+			<td colspan="5" style="border:0;">None</td>
+		</tr>
+	</tbody>
+</table>
+                <div id="div_Awards_All" style="margin-top:5px; padding-left:5px;">
+                    <a href="AwardList.aspx?CSFA=450&inactive" id="lnk_All_Awards">View Inactive Awards: 1202</a>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+</body>
+</html>

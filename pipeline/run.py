@@ -10,6 +10,7 @@ from types import ModuleType
 from connectors import (
     ca_grants,
     grants_gov,
+    il_csfa,
     md_commerce,
     md_dhcd,
     md_dnr,
@@ -32,6 +33,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "pa_grants": pa_grants,
     "wv_grants": wv_grants,
     "ca_grants": ca_grants,
+    "il_csfa": il_csfa,
 }
 
 

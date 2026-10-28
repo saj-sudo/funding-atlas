@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CSFA | GATA | Illinois.gov
+</title><link href="Common.css" rel="stylesheet" />
+
+    <style>
+        .banner { background-color:#c8dcff; padding:5px; border-radius:4px; font-weight:bold; }
+
+
+        .tblList { border-collapse:collapse; width:100%; }
+        .tblList th { border-bottom:solid 1px #102952; padding:4px; padding-right:10px; background-color:#c8dcff; text-align:left; white-space:nowrap; width:1px; vertical-align:top; }
+        .tblList td { border-bottom:solid 1px #102952; padding:4px; }
+
+        .datahead { font-weight:bold; margin-top:15px; margin-bottom:5px; }
+        .data { margin-bottom:20px; border-bottom:solid 1px #c8dcff; padding-bottom:20px; }
+
+        .gms { display:inline-block; background-color:#a4ffd1; font-size:70%; border-radius:5px; padding:0px 3px 2px 2px; border:solid 1px green; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            parent.postMessage(document.body.scrollHeight, "*");
+            if (self == top) { document.body.style.padding = "10px" }
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./Program.aspx?csfa=2608" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2153A54A" />
+    <div>
+
+
+        <div class="bc np">
+            <a href="Default.aspx">CSFA Home</a> /
+            <span id="spanFromProgramList">
+                <a href="HTTPS://OMB.ILLINOIS.GOV/PUBLIC/GATA/CSFA/AGENCYLIST.ASPX" id="lnk_AgencyList">Agency List</a> /
+                <a href="ProgramList.aspx?Agency=420" id="lnk_ProgramList">Program List</a> /
+            </span>
+
+            
+            Program
+
+        </div>
+
+
+        
+        
+        <div id="divFound">
+
+            <div style="padding:5px 0px 25px 5px;">
+                <div id="div_Program_Name" style="font-size:150%">Business Attraction Prime Sites</div>
+                
+                <div id="div_CSFA">CSFA Number: 420-45-2608</div>
+            </div>
+
+
+            <div class="banner">STATE AGENCY INFORMATION</div>
+
+            <div class="datahead">Agency Name</div>
+            <div id="div_Agency" class="data">Department Of Commerce And Economic Opportunity (420)</div>
+
+            <div id="Agency_ID">
+                <div class="datahead">Agency Identification</div>
+                <div id="div_Agency_ID" class="data">88-1, 20-4</div>
+            </div>
+
+            <div class="datahead">Agency Contact</div>
+            <div id="div_Agency_Contact" class="data">Joy Wolfe<div> xxx-xxx-xxxx</div><div><a href='mailto:ceo.obd@illinois.gov'>ceo.obd@illinois.gov</a></div></div>
+
+
+            <div class="banner">PROGRAM INFORMATION</div>
+
+            <div id="view_Short_Desc">
+                <div class="datahead">Short Description</div>
+                <div id="div_Short_Desc" class="data">Rebuild Illinois Prime Sites grants are available to businesses that are relocating or expanding operations in Illinois, will create and/or retain jobs, commit to a substantial capital expenditure investment, and have been approved for either an EDGE, HIB, REV, or MICRO program.</div>
+            </div>
+
+            <div id="view_Fed_Authorization">
+                <div class="datahead">Federal Authorization</div>
+                <div id="div_Fed_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_IL_Statute_Authorization">
+                <div class="datahead">Illinois Statue Authorization</div>
+                <div id="div_IL_Statute_Authorization" class="data">30 ILCS 750</div>
+            </div>
+
+            <div id="view_IL_Rules_Authorization">
+                <div class="datahead">Illinois Administrative Rules Authorization</div>
+                <div id="div_IL_Rules_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_Objective">
+                <div class="datahead">Objective</div>
+                <div id="div_Objective" class="data">The intent of the Business Attraction Prime Sites capital grant program is to assist companies with large-scale capital investment projects that commit to significant job creation and/or retention in the state of Illinois.</div>
+            </div>
+
+            <div id="view_Prime_Recipient">
+                <div class="datahead">Prime Recipient</div>
+                <div id="div_Prime_Recipient" class="data">Yes</div>
+            </div>
+
+            <div id="view_Program_Terms">
+                <div class="datahead">UGA Program Terms</div>
+                <div id="div_Program_Terms" class="data">Information about the Program Specific Terms and requirements can be found within the Notice of Funding Opportunity.</div>
+            </div>
+
+            <div id="view_Eligible_Applicants">
+                <div class="datahead">Eligible Applicants</div>
+                <div id="div_Eligible_Applicants" class="data">Nonprofit Organizations; For-Profit Organizations; </div>
+            </div>
+
+            <div id="view_Applicant_Eligibility">
+                <div class="datahead">Applicant Eligibility</div>
+                <div id="div_Applicant_Eligibility" class="data">Businesses that are relocating to or expanding operations in Illinois.
+Received confirmation of eligibility for an EDGE, HIB, REV or MICRO credit or has a pending application for the EDGE, HIB, REV or MICRO programs that is ultimately approved.
+Jobs must be located at the project site where the capital project is located and must be full-time working directly for the company.
+Companies eligible must operate in one the of the following industries from the 2024 Illinois Economic Plan:
+•	Quantum Computing, AI & Microelectronics		
+•	Life Sciences	
+•	Clean Energy Production & Manufacturing		
+•	Advanced Manufacturing 
+•	Next Generation Agriculture, Ag Tech & Food Processing 	
+•	Transportation, Distribution & Logistics
+
+The Prime Sites grant originates from Rebuild Illinois capital funds, grant funds must be expensed to infrastructure and capital equipment expenditures and are subject to Bondability Guidelines.
+Jobs committed and the total amount of the project’s capital expenditures required are listed below with the grant award formula amounts:  
+•	EDGE Tier 1 or HIB grant amounts equal to $5,000 per new job created and the company must commit to:
+o	40 new jobs and $40M investment; or, 
+o	100 new jobs and $20M in investment.
+•	EDGE Tier 2 grant amounts equal to $10,000 per new job committed and $5,000 per jobs retained and the company must commit to:
+o	100 new jobs and $50M investment. 
+•	REV or MICRO grant amounts: 
+o	REV or MICRO Tier 1, $5,000 per new job created.
+o	REV or MICRO Tier 2, $10,000 per new job created, and/or $5,000 per retained jobs.
+For REV and MICRO program participants, 10 new jobs must be committed, there is no minimum requirement for retained jobs, nor capital investment commitment. 
+Standard GATA pre-qualification is required.</div>
+            </div>
+
+            <div id="view_Beneficiary_Eligibility">
+                <div class="datahead">Beneficiary Eligibility</div>
+                <div id="div_Beneficiary_Eligibility" class="data">N/A</div>
+            </div>
+
+            <div id="view_Types_Assistance">
+                <div class="datahead">Types of Assistance</div>
+                <div id="div_Types_Assistance" class="data">Project Grants</div>
+            </div>
+
+            <div id="view_Subject_Area">
+                <div class="datahead">Subject / Service Area</div>
+                <div id="div_Subject_Area" class="data">Economic Development</div>
+            </div>
+
+            <div id="view_Credentials_Documentation">
+                <div class="datahead">Credentials / Documentation</div>
+                <div id="div_Credentials_Documentation" class="data">Received confirmation of eligibility for an EDGE, HIB, REV or MICRO credit or has a pending application with one of the qualifying programs (EDGE, HIB, REV or MICRO) and is ultimately approved.</div>
+            </div>
+
+            <div id="view_Preapplication_Coordination">
+                <div class="datahead">Preapplication Coordination</div>
+                <div id="div_Preapplication_Coordination" class="data">N/A</div>
+            </div>
+
+            <div id="view_Application_Procedures">
+                <div class="datahead">Application Procedures</div>
+                <div id="div_Application_Procedures" class="data">This opportunity will accept applications on a rolling basis and award projects that meet the requirements and prerequisites set forth in the Notice of Funding Opportunity Supplement and receive the minimum score required for funding.</div>
+            </div>
+
+            <div id="view_Criteria_Selecting_Proposals">
+                <div class="datahead">Criteria Selecting Proposals</div>
+                <div id="div_Criteria_Selecting_Proposals" class="data">Awards issued as long as the project receives all required program approvals for the proposed capital project.</div>
+            </div>
+
+            <div id="view_Award_Procedures">
+                <div class="datahead">Award Procedures</div>
+                <div id="div_Award_Procedures" class="data">This opportunity will accept applications on a rolling basis and award projects that meet the requirements and prerequisites set forth in the Notice of Funding Opportunity Supplement and receive the minimum score required for funding.</div>
+            </div>
+
+            <div id="view_Deadlines">
+                <div class="datahead">Deadlines</div>
+                <div id="div_Deadlines" class="data">N/A</div>
+            </div>
+
+            <div id="view_Range_Times">
+                <div class="datahead">Range of Approval or Disapproval Time</div>
+                <div id="div_Range_Times" class="data">N/A</div>
+            </div>
+
+            <div id="view_Appeals">
+                <div class="datahead">Appeals</div>
+                <div id="div_Appeals" class="data">The Merit Based Review process is subject to appeal. However, competitive grant appeals are limited to the evaluation process. Evaluation scores may not be protested. Only the evaluation process is subject to appeal. The appeal must be submitted in writing to the Department within 14 calendar days after the date that the grant award notice has been published. The written appeal shall include the name and address of the appealing party, the identification of the grant and a statement of reasons for the appeal. To file an appeal, applicants must submit the appeal in writing and in accordance with the Merit-Based Application Review Appeals Process listed on the Grant Opportunities page of the DCEO website: https://www2.illinois.gov/dceo/AboutDCEO/GrantOpportunities/Pages/MeritAppReview.aspx.</div>
+            </div>
+
+            <div id="view_Renewals">
+                <div class="datahead">Renewals</div>
+                <div id="div_Renewals" class="data">Once a finalized grant agreement has been executed, the funds will be dispersed in increments based on documented spending of both grant and matching funds.  DCEO will reimburse approved capital expenditures as they are incurred and reported, as long as grant and match funds are being expended at an equal rate.  Final reimbursement will occur once the grantee shows that all capital expenditures - including required match funds - have been expended.  DCEO anticipates that the final reimbursement will occur within two years of executing the grant agreement, with the option for a one-year extension.  Longer timelines may be authorized when project schedules require additional time to meet expenditure thresholds.  Grant close out will transpire after the Grantee meets their project “placed in service” dates from the qualifying program agreement and demonstrates the full capital expenditure have been paid and FTE/job retention numbers have been met.
+If the grantee fails to create sufficient new or retained jobs for the grant amount received by the end of the grant period, DCEO may claw back a portion of grant funds disbursed.</div>
+            </div>
+
+            <div id="view_Formula_Matching">
+                <div class="datahead">Formula Matching Requirements</div>
+                <div id="div_Formula_Matching" class="data">This grant opportunity requires a 1:1 match requirement, which means the grantee must expense an equal amount of grant funds received towards the budgeted grant allocations.</div>
+            </div>
+
+            <div id="view_Uses_Restrictions">
+                <div class="datahead">Uses and Restrictions</div>
+                <div id="div_Uses_Restrictions" class="data">This grant program originates from Rebuild Illinois capital funds, therefore, expenditures for these funds are subject to Bondability Guidelines (see guidelines at the same webpage where this NOFO is posted).  
+
+Eligible projects may include new construction and renovation of industrial and commercial facilities, including associated infrastructure improvements and the purchase and installation of durable equipment. Construction or renovation of facilities to be used as warehouses are not eligible. 
+
+Eligible expenses for these funds include architectural planning and engineering design; land and building acquisition; costs related to site selection, preparation and improvement; utility work; new construction of buildings and structures; reconstruction or improvement of existing buildings or structures; and original furnishings and durable equipment, including scientific instruments and apparatuses with a long useful life. 
+
+Ineligible expenses include operational expenses, lease payments for rental of equipment or facilities, costs of staff or resident labor and material outside of project construction, expenditures to acquire or construct temporary facilities, purchase of automobiles, trucks, farm equipment, boats or rolling stock, and livestock or laboratory animals. 
+
+Pre-Award costs are allowed for Business Attraction Prime Site grants back to the effective date of the prequalifying program.  
+
+Applicants must submit a Project Narrative that describes in detail how the award will be 
+executed. The project narrative should include enough information for DCEO to understand the scope of the project, the budget, including a detailed breakdown of the costs associated with each budget line and any additional necessary detail to enable DCEO to manage the grant agreement activity against planned project performance.</div>
+            </div>
+
+            <div id="view_Reports">
+                <div class="datahead">Reports</div>
+                <div id="div_Reports" class="data">Standard GATA reporting (Periodic Performance Report, Periodic Financial Report and audits, if required) and Corporate Accountability</div>
+            </div>
+
+            <div id="view_Audits">
+                <div class="datahead">Audits</div>
+                <div id="div_Audits" class="data">If required by level of expenditure of grant funding during the grantee's fiscal year.</div>
+            </div>
+
+            <div id="view_Records">
+                <div class="datahead">Records</div>
+                <div id="div_Records" class="data">N/A</div>
+            </div>
+
+            <div id="view_Account_Identification">
+                <div class="datahead">Account Identification</div>
+                <div id="div_Account_Identification" class="data">001 GRF</div>
+            </div>
+
+            <div id="view_Obligations">
+                <div class="datahead">Obligations</div>
+                <div id="div_Obligations" class="data">Various</div>
+            </div>
+
+            <div id="view_Financial_Assistance">
+                <div class="datahead">Range and Average of Financial Assistance</div>
+                <div id="div_Financial_Assistance" class="data">Various</div>
+            </div>
+
+            <div id="view_Program_Accomplishments">
+                <div class="datahead">Program Accomplishments</div>
+                <div id="div_Program_Accomplishments" class="data">N/A</div>
+            </div>
+
+            <div id="view_Regulations_Guidelines_Literature">
+                <div class="datahead">Regulations, Guidelines, and Literature</div>
+                <div id="div_Regulations_Guidelines_Literature" class="data">N/A</div>
+            </div>
+
+            <div id="view_Assistance_Location">
+                <div class="datahead">Regional or Local Assistance Location</div>
+                <div id="div_Assistance_Location" class="data">N/A</div>
+            </div>
+
+            <div id="view_Headquarters_Office">
+                <div class="datahead">Headquarters Office</div>
+                <div id="div_Headquarters_Office" class="data">1011 South 2nd Street
+Springfield, IL 62704</div>
+            </div>
+
+            <div id="view_Program_Website">
+                <div class="datahead">Program Website</div>
+                <div id="div_Program_Website" class="data">https://dceo.illinois.gov/businesshelp/primesites.html</div>
+            </div>
+
+            <div id="view_Related_Programs">
+                <div class="datahead">Related Programs</div>
+                <div id="div_Related_Programs" class="data">Incentives and Tax Credits: https://dceo.illinois.gov/businesshelp/incentivesandtaxcredits.html</div>
+            </div>
+
+            <div id="view_Example_Projects">
+                <div class="datahead">Example Projects</div>
+                <div id="div_Example_Projects" class="data">N/A</div>
+            </div>
+
+            <div id="view_Published_Date">
+                <div class="datahead">Published Date</div>
+                <div id="div_Published_Date" class="data">10/19/2021</div>
+            </div>
+
+
+            <!------------------------->
+            <!-- EXCEPTIONS 4/2/2026 -->
+            <!------------------------->
+            <div id="view_Exceptions">
+                <div class="datahead">GATA Exceptions</div>
+                <div id="div_Exceptions" class="data">Indirect Cost Rate; Notice of Funding Opportunity; Other; </div>
+            </div>
+
+
+
+
+            <!------------------------->
+            <!-- FUNDING INFORMATION -->
+            <!------------------------->
+
+            <div class="banner">FUNDING INFORMATION</div>
+
+            <div id="view_Funding_By_FY">
+                <div class="datahead">Funding By Fiscal Year</div>
+                <div id="div_Funding_By_FY" class="data">FY 2022 : $1<br />FY 2023 : $33,581,935<br />FY 2024 : $60,000,000<br />FY 2025 : $1<br /></div>
+            </div>
+
+            <div class="datahead">Federal Funding</div>
+            <div id="div_Federal_Funding" class="data">None</div>
+
+
+            <div class="datahead">Notice of Funding Opportunities</div>
+            <style>
+                #tbl_NOFOs { margin-top:15px; }
+                #tbl_NOFOs th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_NOFOs td { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; vertical-align:top; white-space:nowrap; }
+                #tbl_NOFOs td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Funding_Opportunities" class="data">
+                <table id="tbl_NOFOs">
+	<thead>
+		<tr>
+			<th></th><th>Agency ID</th><th>Award Range</th><th>Application Range</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td><a href='Opportunity.aspx?nofo=2023'>Details</a></td><td>1</td><td>$250000 - $25000000</td><td>09/20/2021 - 06/30/2027 : 11:59pm</td>
+		</tr>
+	</tbody>
+</table>
+            </div>
+
+
+
+            <!----------------------->
+            <!-- TOP ACTIVE AWARDS -->
+            <!----------------------->
+
+            <div id="div_Top_Awards" class="banner">TOP 5 ACTIVE AWARDS</div>
+
+            <style>
+                #tbl_Awards { margin-top:15px; }
+                #tbl_Awards th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_Awards td { border:solid 1px #c8dcff; text-align:center; padding:3px 5px 3px 5px; vertical-align:top; }
+                #tbl_Awards td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Awards" class="data">
+                <table id="tbl_Awards">
+	<thead>
+		<tr>
+			<th>Agency ID</th><th>Grantee Name</th><th>Comptroller Name</th><th>Start Date</th><th>End Date</th><th>Amount</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td style="text-align:left;">22-881013</td><td style="text-align:left;">Rivian Automotive, LLC</td><td style="text-align:left;">RIVIAN LLC                      </td><td>05/01/2024</td><td>06/30/2030</td><td>25,000,000</td>
+		</tr><tr>
+			<td style="text-align:left;">22-881008</td><td style="text-align:left;">Gotion, Inc.</td><td style="text-align:left;">GOTION INC                      </td><td>01/01/2024</td><td>06/30/2029</td><td>25,000,000</td>
+		</tr><tr>
+			<td style="text-align:left;">25-881001</td><td style="text-align:left;">Wieland Rolled Products North America, LLC</td><td style="text-align:left;">WIELAND ROLLED PRODUCTS         </td><td>07/01/2024</td><td>03/31/2029</td><td>4,000,000</td>
+		</tr><tr>
+			<td style="text-align:left;">26-881003</td><td style="text-align:left;">Tangent Technologies Acquisition Parent LLC</td><td style="text-align:left;">TANGENT TECHNOLOGIES            </td><td>03/01/2026</td><td>06/30/2028</td><td>3,390,000</td>
+		</tr><tr>
+			<td style="text-align:left;">26-881004</td><td style="text-align:left;">Lanco International, Inc</td><td style="text-align:left;">LANCO INTERNATIONAL             </td><td>04/01/2026</td><td>06/30/2029</td><td>2,330,000</td>
+		</tr>
+	</tbody>
+</table>
+                <div id="div_Awards_All" style="margin-top:5px; padding-left:5px;">
+                    <a href="AwardList.aspx?CSFA=2608" id="lnk_All_Awards">View All Awards</a>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+</body>
+</html>
