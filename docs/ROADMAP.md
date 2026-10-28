@@ -18,6 +18,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 9.1 | Pennsylvania: `pa_grants` | 2026-10-17 | the first state outside Maryland, fed by pa.gov's Coveo grants index plus the JSON record each grant page embeds; labelled status (`Accepting applications` / `Closed`, a closed record with a future open date is forecasted), dates, applicant categories plus the shared keyword tagger over the free-text applicant line, award range, match, cycle wording as `closes_at_text`, `rolling` from the cycle. first live run 377 added (84 open, 2 forecasted, 291 closed), second run 0 changed; the Pennsylvania page shows 29 open municipal rows (26 likely) and 68 between rounds; search key read from the page each run; every detail page refetched (about ten minutes) | `connectors/pa_grants.md` |
 | 8.2 | 50-state portal census (light) | 2026-10-18 | every state plus DC, one row each: portal, vendor, public listing, access, verdict; folds in the WebGrants spot-check (8.1). Three states are one connector away (CA: an open-data CSV of 2,023 grants with a labelled status; IL: the CSFA opportunity and program lists; IA: a WebGrants storefront with a Status column), WebGrants is the one vendor with a public listing in two states (IA, MT agencies), NJ and TX are small builds, NY needs a deeper look behind a PeopleSoft shell, 18 states are agency-by-agency, 10 hosts block this client, 7 states have no state-run index at the URLs found | `docs/surveys/state_portals.md` |
 | 9.2 | West Virginia: `wv_grants` | 2026-10-18 | grants.wv.gov's `AvailableGrants` list through the state's JSON API: one POST, 124 records, no HTML. Status by the page's own date rule (active, future-posted), then the MEA rules for `Forecasted` text (a month or season still ahead is a forecast, a past one is a stale page, dateless wording is cycle text for the between-rounds group); `Pass-through` is the only funding-source claim; categories by division keyword with the division as source code. First run 124 added (5 open, 1 forecasted, 83 closed, 35 unknown), second run 0 changed; 1 open municipal row on the WV page, 0 between rounds (the county-only solid-waste rounds do not carry a `municipality` tag) | `connectors/wv_grants.md` |
+| 9.3 | California: `ca_grants` | 2026-10-27 | the California Grants Portal's daily open-data CSV on data.ca.gov: one GET (6.6 MB) through the dataset download path, because data.ca.gov's robots.txt disallows `/api/`; no HTML. The portal's labelled status taken as is (active, closed, forecasted); `Public Agency` and `Other Legal Entity` tag nothing and `ApplicantTypeNotes` goes through the shared keyword tagger (fourth reuse); `Ongoing` deadlines are rolling; text open dates (`Fall 2026`) are kept as text. First run 2,025 added (164 open, 3 forecasted, 1,858 closed) in five seconds, second run 0 changed; the California page shows 28 open municipal rows (all likely) from 73 agencies and 52 between rounds | `connectors/ca_grants.md` |
 
 ## Next
 
@@ -74,7 +75,7 @@ the state-run central index. One connector per session, in this order:
    `listname=AvailableGrants`; JSON, no HTML. Status from dates by the page's own rule (`PostedDate <= today <= DueDate1`
    is active), `Forecasted` text to `closes_at_text`, `Modified` stored and excluded from the hash. 124 records, most of
    them stale 2022 to 2023 rounds; the diff is the product.
-3. **`ca_grants`** (California): one CSV from `data.ca.gov` (`california-grants-portal-data.csv`), 2,023 rows with a labelled
+3. **`ca_grants`** (California, shipped 2026-10-27, see Done): one CSV from `data.ca.gov` (`california-grants-portal-data.csv`), 2,023 rows with a labelled
    `Status` (active / closed / forecasted), open date, deadline, applicant type, funding source, match, amounts, `LastUpdated`
    and `GrantURL`. No HTML. Doc question: the applicant-type vocabulary and the free-text notes that name cities and counties.
 4. **`il_csfa`** (Illinois): the CSFA opportunity list (title, agency, application date range, award range) and program list
@@ -102,6 +103,8 @@ Done 2026-10-18 (polish before outreach):
   `PLACEHOLDER_YEARS = 5` in `scripts/build_site.py`.
 
 Still open:
+- The shared applicant tagger matches `cities` but not `city`: California's "a city, county, or city and county" tags
+  `county` only. Fixing the shared pattern moves other connectors' hashes, so it waits for its own session.
 - Nine DHCD records have no applicant tags (State Revitalization Programs, Main Street Improvement Grant, others
   listed in `connectors/md_dhcd.md`); SRP and MIP are municipal rounds and will not surface when they reopen.
 
@@ -164,6 +167,10 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-18 | West Virginia's `Forecasted` text is read like MEA's cycle sentences | the page calls any item with text "Forecasted", including "Spring 2023"; a date still ahead is a forecast, a past one is a stale page (closed if the due date passed, else unknown), dateless wording ("Annual deadline of April 1st") is cycle text kept in `closes_at_text` | `connectors/wv_grants.md` decision 1 |
 | 2026-10-18 | `Formula` and `Entitlement` are not pass-through on grants.wv.gov | `TypeOfGrant` says how the money is competed, not whose it is; only the four items that say `Pass-through` get the tag | `connectors/wv_grants.md` decision 2 |
 | 2026-10-18 | The live site is down because the repository is private | GitHub Pages on a free account serves public repositories only (the 2026-10-15 decision); `saj-sudo.github.io/funding-atlas` answers 404 on every path while `gh-pages` holds a build from 2026-10-17 18:48 and the daily workflow succeeds; making the repository public again, or moving Pages to a paid plan, is the operator's call | this file |
+| 2026-10-27 | California's CSV is read through the dataset download path, not the CKAN API | `data.ca.gov/robots.txt` disallows `/api/`; the download path is allowed and 302s to signed storage; the resource id is a constant, so a replaced resource fails the run loudly | `connectors/ca_grants.md` decision 1 |
+| 2026-10-27 | California's `Public Agency` tags no applicant type | the pa_grants rule: it covers state departments, JPAs, special districts, cities and counties, and 149 of 164 active rows carry it; the notes tag 28 active rows `municipality` | `connectors/ca_grants.md` decision 2 |
+| 2026-10-27 | One estimated award amount is both the minimum and the maximum | `EstAmounts` is the per-award estimate; a single figure is the source's one number, not a ceiling; total funds stay in the payload | `connectors/ca_grants.md` decision 3 |
+| 2026-10-27 | "Housing, Community and Economic Development" maps to housing | the label leads with housing; the portal word stays as `source_code` | `connectors/ca_grants.md` decision 4 |
 
 ## Open questions (do not resolve in code yet)
 
