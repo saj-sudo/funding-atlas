@@ -21,7 +21,7 @@ import httpx
 
 from connectors.grants_gov import parse_date, strip_html
 from connectors.sam_assistance_listings import clean
-from connectors.text import applicant_types_for
+from connectors.text import applicant_types_for, portal_applicant, portal_categories
 from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "ca_grants"
@@ -36,20 +36,6 @@ JURISDICTION = "CA"
 
 STATUS_MAP = {"active": "open", "closed": "closed", "forecasted": "forecasted"}
 FUNDING_TYPES = {"grant": "grant", "loan": "loan"}
-
-# ApplicantType values -> applicant_type. "Public Agency" and "Other Legal Entity" tag nothing on purpose
-# (decision 2 in the doc): ApplicantTypeNotes names the real ones.
-APPLICANT_CATEGORIES: dict[str, str] = {
-    "nonprofit": "nonprofit", "tribal government": "tribe", "business": "business", "individual": "individual",
-}
-
-# Portal category, lower-cased -> category. Anything else is `other`, the portal's word kept as source_code.
-CATEGORIES: dict[str, str] = {
-    "environment & water": "water", "energy": "energy", "transportation": "transportation",
-    "parks & recreation": "parks", "health & human services": "health", "employment, labor & training": "workforce",
-    "housing, community and economic development": "housing",
-    "law, justice, and legal services": "public_safety", "disaster prevention & relief": "public_safety",
-}
 
 ROLLING_RE = re.compile(r"ongoing|rolling|continuous", re.I)
 RANGE_RE = re.compile(r"^between\s+\$?([\d,]+(?:\.\d+)?)\s+and\s+\$?([\d,]+(?:\.\d+)?)$", re.I)
@@ -165,7 +151,7 @@ def closes_text_for(row: dict[str, Any]) -> str | None:
 def applicant_tags(row: dict[str, Any]) -> list[ApplicantTag]:
     tags: list[ApplicantTag] = []
     for part in _parts(row.get("ApplicantType")):
-        value = APPLICANT_CATEGORIES.get(part.lower())
+        value = portal_applicant(part)
         if value and all(t.value != value for t in tags):
             tags.append(ApplicantTag(value=value, source_code=part))
     for tag in applicant_types_for(clean(row.get("ApplicantTypeNotes")) or None):
@@ -175,8 +161,8 @@ def applicant_tags(row: dict[str, Any]) -> list[ApplicantTag]:
 
 
 def category_tags(row: dict[str, Any]) -> list[CategoryTag]:
-    return [CategoryTag(value=CATEGORIES.get(part.lower(), "other"), source_code=part)
-            for part in _parts(row.get("Categories"))]
+    return [CategoryTag(value=value, source_code=part)
+            for part in _parts(row.get("Categories")) for value in portal_categories(part)]
 
 
 def eligibility_text_for(row: dict[str, Any]) -> str | None:

@@ -173,7 +173,11 @@ def test_categories_map_and_keep_the_portal_word():
     assert normalize("190509").category_pairs() == [
         ("other", "Disadvantaged Communities"), ("parks", "Parks & Recreation"), ("water", "Environment & Water"),
     ]
-    assert normalize("150669").category_pairs() == [("housing", "Housing, Community and Economic Development")]
+    # a label that names two topics carries both, as it does for pa.gov's and Illinois's economic development
+    assert normalize("150669").category_pairs() == [
+        ("housing", "Housing, Community and Economic Development"),
+        ("infrastructure", "Housing, Community and Economic Development"),
+    ]
 
 
 def test_eligibility_text_and_structured():

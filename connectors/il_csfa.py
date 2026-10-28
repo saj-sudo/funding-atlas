@@ -23,7 +23,7 @@ from bs4 import BeautifulSoup, Tag
 
 from connectors.grants_gov import parse_date
 from connectors.sam_assistance_listings import clean
-from connectors.text import applicant_types_for, funding_type_for
+from connectors.text import applicant_types_for, funding_type_for, portal_applicant, portal_categories
 from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "il_csfa"
@@ -43,19 +43,6 @@ AGENCY_RE = re.compile(r"^(.*?)\s*\((\d+)\)\s*$")
 NOFO_RE = re.compile(r"nofo=(\d+)")
 CSFA_RE = re.compile(r"csfa=(\d+)")
 NO_END = "no end date"
-
-# Program "Eligible Applicants" -> applicant_type. "Government Organizations", "Education Organizations" and
-# "Other" tag nothing on purpose (decision 2 in the doc): the free-text Applicant Eligibility names the real ones.
-APPLICANT_CATEGORIES: dict[str, str] = {
-    "nonprofit organizations": "nonprofit", "for-profit organizations": "business", "small businesses": "business",
-    "individuals": "individual", "public housing organizations": "housing_authority",
-}
-
-# Program "Subject Area" -> category; anything else is `other`, the portal's words kept as source_code.
-CATEGORIES: dict[str, str] = {
-    "economic development": "infrastructure", "public safety": "public_safety", "human services": "health",
-}
-
 
 # ---------- HTTP ----------
 
@@ -229,7 +216,7 @@ def applicant_tags(program: dict[str, str] | None) -> list[ApplicantTag]:
         return []
     tags: list[ApplicantTag] = []
     for part in (p.strip() for p in program.get("div_Eligible_Applicants", "").split(";")):
-        value = APPLICANT_CATEGORIES.get(part.lower())
+        value = portal_applicant(part)
         if value and all(t.value != value for t in tags):
             tags.append(ApplicantTag(value=value, source_code=part))
     text = program.get("div_Applicant_Eligibility", "")
@@ -241,7 +228,7 @@ def applicant_tags(program: dict[str, str] | None) -> list[ApplicantTag]:
 
 def category_tags(program: dict[str, str] | None) -> list[CategoryTag]:
     subject = (program or {}).get("div_Subject_Area", "")
-    return [CategoryTag(value=CATEGORIES.get(subject.lower(), "other"), source_code=subject)] if subject else []
+    return [CategoryTag(value=value, source_code=subject) for value in portal_categories(subject)] if subject else []
 
 
 def eligible_list(program: dict[str, str] | None) -> list[str]:

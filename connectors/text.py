@@ -18,10 +18,13 @@ from pipeline.models import ApplicantTag
 APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
     (r"local governments?", ("municipality", "county")),
+    # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
+    # apply for the credit"), not the applicant.
+    (r"(?<!the )local jurisdictions?", ("municipality", "county")),
     (r"municipalit\w*", ("municipality",)),
     (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
-    (r"\bcities\b", ("municipality",)),
-    (r"\btowns?\b", ("municipality",)),
+    (r"\bcit(?:y|ies)\b", ("municipality",)),
+    (r"\b(?:towns?|villages?|townships?|boroughs?)\b", ("municipality",)),
     (r"\bcount(?:y|ies)\b", ("county",)),
     (r"\bnon-?profits?\b", ("nonprofit",)),
     (r"\bnot-for-profits?\b", ("nonprofit",)),
@@ -58,6 +61,16 @@ LOCATION_CONTEXT_RE = re.compile(
 )
 
 
+def _named_city(line: str, m: re.Match[str]) -> bool:
+    """`Baltimore City` and `City of Philadelphia` name one city; they do not say that cities may apply. A lower-case
+    `city` after a capitalized word ("California city or county") is a type and stays."""
+    if m.group(0).lower() != "city":
+        return False
+    if m.group(0)[0].isupper() and re.search(r"[A-Z][a-z]+\s$", line[:m.start()]):
+        return True
+    return bool(re.match(r"\s+of\s+[A-Z]", line[m.end():]))
+
+
 def applicant_types_for(applicant_text: str | list[str] | None) -> list[ApplicantTag]:
     """Keyword tags over applicant lines. The first match of each phrase that is not in a location
     context wins; the matched phrase is the tag's source_code."""
@@ -66,7 +79,7 @@ def applicant_types_for(applicant_text: str | list[str] | None) -> list[Applican
     for pattern, values in APPLICANT_KEYWORDS:
         phrase = next(
             (m.group(0).lower() for line in lines for m in re.finditer(pattern, line, re.I)
-             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()])),
+             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()]) and not _named_city(line, m)),
             None,
         )
         if phrase:
@@ -80,3 +93,51 @@ def funding_type_for(name: str) -> str | None:
         if keyword in n:
             return ft
     return None
+
+
+# ---------- portal vocabularies ----------
+#
+# The state portals that label their own rows (pa.gov, the California Grants Portal, Illinois CSFA) each use
+# their own words for the same few things. One table per kind, so a label means the same thing in every state.
+# Labels are compared lower-cased, with "&" read as "and" and commas dropped, so "Employment, Labor, & Training"
+# (pa.gov) and "Employment, Labor & Training" (California) are one entry. The portal's own word is always kept
+# as the tag's source_code, so any mapping here can be redone in SQL.
+
+def portal_label(text: str) -> str:
+    return re.sub(r"\s+", " ", text.lower().replace("&", " and ").replace(",", " ")).strip()
+
+
+# Applicant label -> applicant_type. Labels that cover many kinds of body tag NOTHING on purpose: `Public Agency`
+# and `Other Legal Entity` (California, pa.gov), `Government Organizations` (Illinois) take in state departments,
+# special districts, tribes, cities and counties alike, and `Education Organizations` takes in K-12 and colleges.
+# The free-text eligibility line names the real ones and applicant_types_for reads it.
+PORTAL_APPLICANTS: dict[str, str] = {
+    "municipality": "municipality", "school": "school",
+    "nonprofit": "nonprofit", "nonprofit organizations": "nonprofit",
+    "business": "business", "for-profit organizations": "business", "small businesses": "business",
+    "individual": "individual", "individuals": "individual",
+    "tribal government": "tribe", "native american tribal organization or government": "tribe",
+    "public housing organizations": "housing_authority",
+}
+
+# Topic label -> categories. A label that names two topics carries both (as DHCD's energy-home-repair section
+# does). Economic development reads as infrastructure everywhere, as the Grants.gov community development code
+# does. Anything not listed is `other`.
+PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
+    "transportation": ("transportation",), "energy": ("energy",), "environment and water": ("water",),
+    "housing": ("housing",), "parks and recreation": ("parks",),
+    "health and human services": ("health",), "human services": ("health",),
+    "employment labor and training": ("workforce",),
+    "law justice and legal services": ("public_safety",), "public safety": ("public_safety",),
+    "disaster prevention and relief": ("public_safety",),
+    "community and economic development": ("infrastructure",), "economic development": ("infrastructure",),
+    "housing community and economic development": ("housing", "infrastructure"),
+}
+
+
+def portal_applicant(label: str) -> str | None:
+    return PORTAL_APPLICANTS.get(portal_label(label))
+
+
+def portal_categories(label: str) -> tuple[str, ...]:
+    return PORTAL_CATEGORIES.get(portal_label(label), ("other",))
