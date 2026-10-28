@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CSFA | GATA | Illinois.gov
+</title><link href="Common.css" rel="stylesheet" />
+
+    <style>
+        .banner { background-color:#c8dcff; padding:5px; border-radius:4px; font-weight:bold; }
+
+
+        .tblList { border-collapse:collapse; width:100%; }
+        .tblList th { border-bottom:solid 1px #102952; padding:4px; padding-right:10px; background-color:#c8dcff; text-align:left; white-space:nowrap; width:1px; vertical-align:top; }
+        .tblList td { border-bottom:solid 1px #102952; padding:4px; }
+
+        .datahead { font-weight:bold; margin-top:15px; margin-bottom:5px; }
+        .data { margin-bottom:20px; border-bottom:solid 1px #c8dcff; padding-bottom:20px; }
+
+        .gms { display:inline-block; background-color:#a4ffd1; font-size:70%; border-radius:5px; padding:0px 3px 2px 2px; border:solid 1px green; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            parent.postMessage(document.body.scrollHeight, "*");
+            if (self == top) { document.body.style.padding = "10px" }
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./Program.aspx?csfa=3295" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2153A54A" />
+    <div>
+
+
+        <div class="bc np">
+            <a href="Default.aspx">CSFA Home</a> /
+            <span id="spanFromProgramList">
+                <a href="HTTPS://OMB.ILLINOIS.GOV/PUBLIC/GATA/CSFA/AGENCYLIST.ASPX" id="lnk_AgencyList">Agency List</a> /
+                <a href="ProgramList.aspx?Agency=420" id="lnk_ProgramList">Program List</a> /
+            </span>
+
+            
+            Program
+
+        </div>
+
+
+        
+        
+        <div id="divFound">
+
+            <div style="padding:5px 0px 25px 5px;">
+                <div id="div_Program_Name" style="font-size:150%">Illinois Grocery Initiative</div>
+                
+                <div id="div_CSFA">CSFA Number: 420-35-3295</div>
+            </div>
+
+
+            <div class="banner">STATE AGENCY INFORMATION</div>
+
+            <div class="datahead">Agency Name</div>
+            <div id="div_Agency" class="data">Department Of Commerce And Economic Opportunity (420)</div>
+
+            <div id="Agency_ID">
+                <div class="datahead">Agency Identification</div>
+                <div id="div_Agency_ID" class="data">20-1, 19-2</div>
+            </div>
+
+            <div class="datahead">Agency Contact</div>
+            <div id="div_Agency_Contact" class="data">John O'Conner<div> 217-782-6022</div><div><a href='mailto:CEO.GroceryInitiative@illinois.gov'>CEO.GroceryInitiative@illinois.gov</a></div></div>
+
+
+            <div class="banner">PROGRAM INFORMATION</div>
+
+            <div id="view_Short_Desc">
+                <div class="datahead">Short Description</div>
+                <div id="div_Short_Desc" class="data">This program aims to combat food insecurity by offering competitive grants to support the establishment of new grocery stores in food deserts by reimbursing successful applicants for eligible capital and non-capital costs.</div>
+            </div>
+
+            <div id="view_Fed_Authorization">
+                <div class="datahead">Federal Authorization</div>
+                <div id="div_Fed_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_IL_Statute_Authorization">
+                <div class="datahead">Illinois Statue Authorization</div>
+                <div id="div_IL_Statute_Authorization" class="data">Public Act 103-0561</div>
+            </div>
+
+            <div id="view_IL_Rules_Authorization">
+                <div class="datahead">Illinois Administrative Rules Authorization</div>
+                <div id="div_IL_Rules_Authorization" class="data">Part 645</div>
+            </div>
+
+            <div id="view_Objective">
+                <div class="datahead">Objective</div>
+                <div id="div_Objective" class="data">Intended result is the establishment of New Stores in Food Deserts and improved access to fresh foods in these communities.</div>
+            </div>
+
+            <div id="view_Prime_Recipient">
+                <div class="datahead">Prime Recipient</div>
+                <div id="div_Prime_Recipient" class="data">Yes</div>
+            </div>
+
+            <div id="view_Program_Terms">
+                <div class="datahead">UGA Program Terms</div>
+                <div id="div_Program_Terms" class="data">Grant recipients must make good-faith efforts to accommodate SNAP and WIC payments.</div>
+            </div>
+
+            <div id="view_Eligible_Applicants">
+                <div class="datahead">Eligible Applicants</div>
+                <div id="div_Eligible_Applicants" class="data">Nonprofit Organizations; For-Profit Organizations; Small Businesses; Individuals; Government Organizations; </div>
+            </div>
+
+            <div id="view_Applicant_Eligibility">
+                <div class="datahead">Applicant Eligibility</div>
+                <div id="div_Applicant_Eligibility" class="data">Existing, operational grocery stores (not convenience or general stores)
+Small, independent grocers (<500 employees and <5 existing grocery locations)
+Bricks & Mortar locations only
+Offers (or will offer) SNAP and WIC benefits
+Ownership types can include independently owned for-profit, cooperative & not-for-profit
+<30% of revenue from alcohol and tobacco sales</div>
+            </div>
+
+            <div id="view_Beneficiary_Eligibility">
+                <div class="datahead">Beneficiary Eligibility</div>
+                <div id="div_Beneficiary_Eligibility" class="data">Communities with limited access to fresh foods.</div>
+            </div>
+
+            <div id="view_Types_Assistance">
+                <div class="datahead">Types of Assistance</div>
+                <div id="div_Types_Assistance" class="data">Project Grants</div>
+            </div>
+
+            <div id="view_Subject_Area">
+                <div class="datahead">Subject / Service Area</div>
+                <div id="div_Subject_Area" class="data">Economic Development</div>
+            </div>
+
+            <div id="view_Credentials_Documentation">
+                <div class="datahead">Credentials / Documentation</div>
+                <div id="div_Credentials_Documentation" class="data">N/A</div>
+            </div>
+
+            <div id="view_Preapplication_Coordination">
+                <div class="datahead">Preapplication Coordination</div>
+                <div id="div_Preapplication_Coordination" class="data">N/A</div>
+            </div>
+
+            <div id="view_Application_Procedures">
+                <div class="datahead">Application Procedures</div>
+                <div id="div_Application_Procedures" class="data">Standard submissions via the State Of Illinois Grant Management System</div>
+            </div>
+
+            <div id="view_Criteria_Selecting_Proposals">
+                <div class="datahead">Criteria Selecting Proposals</div>
+                <div id="div_Criteria_Selecting_Proposals" class="data">The Department may depart from a strict ranking by score as needed to promote diversity and equity across multiple dimensions, including regional balance across the state; an appropriate mix of urban, suburban, and rural communities; a mix of ownership types (including local government-owned stores); and coverage of areas with the greatest need.</div>
+            </div>
+
+            <div id="view_Award_Procedures">
+                <div class="datahead">Award Procedures</div>
+                <div id="div_Award_Procedures" class="data">Awards based on merit review. Funds disbursed per reimbursement based on quarterly reporting.</div>
+            </div>
+
+            <div id="view_Deadlines">
+                <div class="datahead">Deadlines</div>
+                <div id="div_Deadlines" class="data">N/A</div>
+            </div>
+
+            <div id="view_Range_Times">
+                <div class="datahead">Range of Approval or Disapproval Time</div>
+                <div id="div_Range_Times" class="data">30-45 days</div>
+            </div>
+
+            <div id="view_Appeals">
+                <div class="datahead">Appeals</div>
+                <div id="div_Appeals" class="data">The Merit Based Review process is subject to appeal. However, competitive grant appeals are limited to the evaluation process. Evaluation scores may not be protested. Only the evaluation process is subject to appeal. The appeal must be submitted in writing to the Department within 14 calendar days after the date that the grant award notice has been published. The written appeal shall include the name and address of the appealing party, the identification of the grant and a statement of reasons for the appeal. To file an appeal, applicants must submit the appeal in writing and in accordance with the Merit-Based Application Review Appeals Process listed on the Grant Opportunities page of the DCEO website: https://www2.illinois.gov/dceo/AboutDCEO/GrantOpportunities/Pages/MeritAppReview.aspx.</div>
+            </div>
+
+            <div id="view_Renewals">
+                <div class="datahead">Renewals</div>
+                <div id="div_Renewals" class="data">Extensions as needed</div>
+            </div>
+
+            <div id="view_Formula_Matching">
+                <div class="datahead">Formula Matching Requirements</div>
+                <div id="div_Formula_Matching" class="data">1:3 cash matching (25% of project cost). Projects incorporating a pharmacy will have a lower match (15% of project costs).</div>
+            </div>
+
+            <div id="view_Uses_Restrictions">
+                <div class="datahead">Uses and Restrictions</div>
+                <div id="div_Uses_Restrictions" class="data">Funds can be used for:
+*Land acquisition and related expenses
+*Site development
+*Construction of a new facility
+*Renovations of an existing facility
+*Furniture, fixtures, and equipment
+*Working capital for specified first-year operating expenses
+*Energy efficient HVAC, refrigeration & lighting equipment</div>
+            </div>
+
+            <div id="view_Reports">
+                <div class="datahead">Reports</div>
+                <div id="div_Reports" class="data">quarterly reporting using PPR and PFR.</div>
+            </div>
+
+            <div id="view_Audits">
+                <div class="datahead">Audits</div>
+                <div id="div_Audits" class="data">N/A</div>
+            </div>
+
+            <div id="view_Records">
+                <div class="datahead">Records</div>
+                <div id="div_Records" class="data">N/A</div>
+            </div>
+
+            <div id="view_Account_Identification">
+                <div class="datahead">Account Identification</div>
+                <div id="div_Account_Identification" class="data">419-42045-4900-0100; 419-42045-4900-0025</div>
+            </div>
+
+            <div id="view_Obligations">
+                <div class="datahead">Obligations</div>
+                <div id="div_Obligations" class="data">$8M allocated for this round</div>
+            </div>
+
+            <div id="view_Financial_Assistance">
+                <div class="datahead">Range and Average of Financial Assistance</div>
+                <div id="div_Financial_Assistance" class="data">$100,000-$1,500,000</div>
+            </div>
+
+            <div id="view_Program_Accomplishments">
+                <div class="datahead">Program Accomplishments</div>
+                <div id="div_Program_Accomplishments" class="data">8 grants awarded to date. Too early in program development for notable outcomes</div>
+            </div>
+
+            <div id="view_Regulations_Guidelines_Literature">
+                <div class="datahead">Regulations, Guidelines, and Literature</div>
+                <div id="div_Regulations_Guidelines_Literature" class="data">N/A</div>
+            </div>
+
+            <div id="view_Assistance_Location">
+                <div class="datahead">Regional or Local Assistance Location</div>
+                <div id="div_Assistance_Location" class="data">420-Department Of Commerce And Economic Opportunity</div>
+            </div>
+
+            <div id="view_Headquarters_Office">
+                <div class="datahead">Headquarters Office</div>
+                <div id="div_Headquarters_Office" class="data">555 W Monroe St, 12th Floor Chicago, IL 60661, 1011 S 2nd St Springfield, IL 62704, 1020 S Spring St Springfield, IL 62704</div>
+            </div>
+
+            <div id="view_Program_Website">
+                <div class="datahead">Program Website</div>
+                <div id="div_Program_Website" class="data">https://dceo.illinois.gov/illinois-grocery-initiative.html</div>
+            </div>
+
+            <div id="view_Related_Programs">
+                <div class="datahead">Related Programs</div>
+                <div id="div_Related_Programs" class="data">New Stores in Food Deserts
+Equipment Upgrades Program</div>
+            </div>
+
+            <div id="view_Example_Projects">
+                <div class="datahead">Example Projects</div>
+                <div id="div_Example_Projects" class="data">Grants to build or renovate buildings, grants to subsidize operations at new stores</div>
+            </div>
+
+            <div id="view_Published_Date">
+                <div class="datahead">Published Date</div>
+                <div id="div_Published_Date" class="data"></div>
+            </div>
+
+
+            <!------------------------->
+            <!-- EXCEPTIONS 4/2/2026 -->
+            <!------------------------->
+            <div id="view_Exceptions">
+                <div class="datahead">GATA Exceptions</div>
+                <div id="div_Exceptions" class="data">Indirect Cost Rate; Other; </div>
+            </div>
+
+
+
+
+            <!------------------------->
+            <!-- FUNDING INFORMATION -->
+            <!------------------------->
+
+            <div class="banner">FUNDING INFORMATION</div>
+
+            <div id="view_Funding_By_FY">
+                <div class="datahead">Funding By Fiscal Year</div>
+                <div id="div_Funding_By_FY" class="data">FY 2024 : $20,000,000<br />FY 2025 : $13,500,000<br />FY 2026 : $13,000,000<br />FY 2027 : $22,550,000<br /></div>
+            </div>
+
+            <div class="datahead">Federal Funding</div>
+            <div id="div_Federal_Funding" class="data">None</div>
+
+
+            <div class="datahead">Notice of Funding Opportunities</div>
+            <style>
+                #tbl_NOFOs { margin-top:15px; }
+                #tbl_NOFOs th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_NOFOs td { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; vertical-align:top; white-space:nowrap; }
+                #tbl_NOFOs td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Funding_Opportunities" class="data">
+                <table id="tbl_NOFOs">
+	<thead>
+		<tr>
+			<th></th><th>Agency ID</th><th>Award Range</th><th>Application Range</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td><a href='Opportunity.aspx?nofo=4240'>Details</a></td><td>FY27-1</td><td>$500000 - $5200000</td><td>09/10/2026 - 12/09/2026 : 5:00 PM</td>
+		</tr><tr>
+			<td><a href='Opportunity.aspx?nofo=4334'>Details</a></td><td>FY27-2</td><td>$25000 - $250000</td><td>General announcement open for a period of time with no specific due dates for applications.</td>
+		</tr><tr>
+			<td><a href='Opportunity.aspx?nofo=4335'>Details</a></td><td>FY27-3</td><td>$100000 - $1500000</td><td>09/10/2026 - 06/30/2027 : 5:00 PM</td>
+		</tr>
+	</tbody>
+</table>
+            </div>
+
+
+
+            <!----------------------->
+            <!-- TOP ACTIVE AWARDS -->
+            <!----------------------->
+
+            <div id="div_Top_Awards" class="banner">TOP 5 ACTIVE AWARDS</div>
+
+            <style>
+                #tbl_Awards { margin-top:15px; }
+                #tbl_Awards th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_Awards td { border:solid 1px #c8dcff; text-align:center; padding:3px 5px 3px 5px; vertical-align:top; }
+                #tbl_Awards td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Awards" class="data">
+                <table id="tbl_Awards">
+	<thead>
+		<tr>
+			<th>Agency ID</th><th>Grantee Name</th><th>Comptroller Name</th><th>Start Date</th><th>End Date</th><th>Amount</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td style="text-align:left;">24-191004</td><td style="text-align:left;">OUR MARKET AT THE PLAZA CO OP</td><td style="text-align:left;">OUR MARKET AT THE PLAZA CO OP   </td><td>02/01/2025</td><td>01/31/2027</td><td>2,400,000</td>
+		</tr><tr>
+			<td style="text-align:left;">25-191002</td><td style="text-align:left;">City of Venice</td><td style="text-align:left;">CITY OF VENICE                  </td><td>05/01/2025</td><td>04/30/2027</td><td>2,400,000</td>
+		</tr><tr>
+			<td style="text-align:left;">25-191004</td><td style="text-align:left;">Al RAAWI LLC</td><td style="text-align:left;">AL RAAWI LLC                    </td><td>06/01/2025</td><td>05/31/2027</td><td>2,399,975</td>
+		</tr><tr>
+			<td style="text-align:left;">25-191001</td><td style="text-align:left;">Angela Joyner Bradley dba HeartStrong Meals, LLC</td><td style="text-align:left;"></td><td>03/01/2026</td><td>02/28/2027</td><td>2,399,832</td>
+		</tr><tr>
+			<td style="text-align:left;">25-191003</td><td style="text-align:left;">Kinnarkumar Patel dba Mr Market LLC</td><td style="text-align:left;"></td><td>01/01/2026</td><td>12/31/2026</td><td>2,398,989</td>
+		</tr>
+	</tbody>
+</table>
+                <div id="div_Awards_All" style="margin-top:5px; padding-left:5px;">
+                    <a href="AwardList.aspx?CSFA=3295" id="lnk_All_Awards">View All Awards</a>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+</body>
+</html>

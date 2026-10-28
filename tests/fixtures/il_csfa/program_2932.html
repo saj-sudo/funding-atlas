@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CSFA | GATA | Illinois.gov
+</title><link href="Common.css" rel="stylesheet" />
+
+    <style>
+        .banner { background-color:#c8dcff; padding:5px; border-radius:4px; font-weight:bold; }
+
+
+        .tblList { border-collapse:collapse; width:100%; }
+        .tblList th { border-bottom:solid 1px #102952; padding:4px; padding-right:10px; background-color:#c8dcff; text-align:left; white-space:nowrap; width:1px; vertical-align:top; }
+        .tblList td { border-bottom:solid 1px #102952; padding:4px; }
+
+        .datahead { font-weight:bold; margin-top:15px; margin-bottom:5px; }
+        .data { margin-bottom:20px; border-bottom:solid 1px #c8dcff; padding-bottom:20px; }
+
+        .gms { display:inline-block; background-color:#a4ffd1; font-size:70%; border-radius:5px; padding:0px 3px 2px 2px; border:solid 1px green; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            parent.postMessage(document.body.scrollHeight, "*");
+            if (self == top) { document.body.style.padding = "10px" }
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./Program.aspx?csfa=2932" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2153A54A" />
+    <div>
+
+
+        <div class="bc np">
+            <a href="Default.aspx">CSFA Home</a> /
+            <span id="spanFromProgramList">
+                <a href="HTTPS://OMB.ILLINOIS.GOV/PUBLIC/GATA/CSFA/AGENCYLIST.ASPX" id="lnk_AgencyList">Agency List</a> /
+                <a href="ProgramList.aspx?Agency=420" id="lnk_ProgramList">Program List</a> /
+            </span>
+
+            
+            Program
+
+        </div>
+
+
+        
+        
+        <div id="divFound">
+
+            <div style="padding:5px 0px 25px 5px;">
+                <div id="div_Program_Name" style="font-size:150%">SSBCI Technical Assistance Grant Program</div>
+                <div id="div_Popular_Name">SSBCI Technical Assistance</div>
+                <div id="div_CSFA">CSFA Number: 420-35-2932</div>
+            </div>
+
+
+            <div class="banner">STATE AGENCY INFORMATION</div>
+
+            <div class="datahead">Agency Name</div>
+            <div id="div_Agency" class="data">Department Of Commerce And Economic Opportunity (420)</div>
+
+            <div id="Agency_ID">
+                <div class="datahead">Agency Identification</div>
+                <div id="div_Agency_ID" class="data">93-1</div>
+            </div>
+
+            <div class="datahead">Agency Contact</div>
+            <div id="div_Agency_Contact" class="data">Shivani Chokshi<div> xxx-xxx-xxxx</div><div><a href='mailto:ceo.ssbci.vc.ta@illinois.gov'>ceo.ssbci.vc.ta@illinois.gov</a></div></div>
+
+
+            <div class="banner">PROGRAM INFORMATION</div>
+
+            <div id="view_Short_Desc">
+                <div class="datahead">Short Description</div>
+                <div id="div_Short_Desc" class="data">The Illinois Department of Commerce and Economic Opportunity (DCEO) is the SSBCI implementing entity for the State of Illinois. Through this Notice of Funding Opportunity (NOFO), DCEO is seeking grantees to provide technical assistance to eligible VSB and SEDI-owned businesses that are applying for, preparing to apply for, or have previously applied for a SSBCI capital program or other federal or other jurisdiction small business program.</div>
+            </div>
+
+            <div id="view_Fed_Authorization">
+                <div class="datahead">Federal Authorization</div>
+                <div id="div_Fed_Authorization" class="data">Title III of the Small Business Jobs Act of 2010 (SBJA), Pub. L. 111-240, as amended by the American Rescue Plan Act of 2021 (ARPA), Pub. L. 117-2 (codified at 12 U.S.C. §§ 5701 et seq.).</div>
+            </div>
+
+            <div id="view_IL_Statute_Authorization">
+                <div class="datahead">Illinois Statue Authorization</div>
+                <div id="div_IL_Statute_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_IL_Rules_Authorization">
+                <div class="datahead">Illinois Administrative Rules Authorization</div>
+                <div id="div_IL_Rules_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_Objective">
+                <div class="datahead">Objective</div>
+                <div id="div_Objective" class="data">The SSBCI VC TA Program is intended to provide grant funds to eligible recipients to provide legal, accounting, and financial advisory services either directly or through legal, accounting, or financial advisory firms to very small businesses (VSB) and business enterprises owned and controlled by socially and economically disadvantaged individuals (SEDI-owned businesses) that are applying for, preparing to apply for, or have previously applied for a SSBCI capital program or other federal or other jurisdiction small business program.</div>
+            </div>
+
+            <div id="view_Prime_Recipient">
+                <div class="datahead">Prime Recipient</div>
+                <div id="div_Prime_Recipient" class="data">Yes</div>
+            </div>
+
+            <div id="view_Program_Terms">
+                <div class="datahead">UGA Program Terms</div>
+                <div id="div_Program_Terms" class="data">CODE of FEDERAL REGULATIONS Title 2: Grants and Agreements PART 200 - Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (2 CFR 200) Grant Accountability and Transparency Act (GATA), 30 ILCS 708/1 Illinois Administrative Code Grant recipients will be required to comply with Treasury’s TA Grant Program Guidelines, the SBJA, as amended (codified at 12 U.S.C. § 5701 et seq., referred to herein as “the SSBCI statute”), and other SSBCI guidance, including Frequently Asked Questions (FAQs) that Treasury may publish from time to time. TA grant recipients will be required to comply with U.S. Treasury technical assistance guidelines, the SBJA, as amended (codified at 12 U.S.C. § 5701 et seq., referred to herein as “the SSBCI statute”), and other SSBCI guidance, including Frequently Asked Questions (FAQs) that Treasury may publish from time to time. Because awards under the TA Grant Program are considered federal financial assistance, eligible recipients must also comply with the Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance), 2 C.F.R. Part 200, unless otherwise specified in the U.S. Treasury technical assistance guidelines</div>
+            </div>
+
+            <div id="view_Eligible_Applicants">
+                <div class="datahead">Eligible Applicants</div>
+                <div id="div_Eligible_Applicants" class="data">For-Profit Organizations; Nonprofit Organizations; Small Businesses; </div>
+            </div>
+
+            <div id="view_Applicant_Eligibility">
+                <div class="datahead">Applicant Eligibility</div>
+                <div id="div_Applicant_Eligibility" class="data">Eligible applicants include: Legal, Accounting, or Financial advisory Non-Profit or For-Profit entities. Applicants may administer TA services directly or contract with legal, accounting, and financial advisory firms to provide TA services. In accordance with 12 U.S.C. § 5708(e)(1), a subrecipient may be an entity of the eligible recipient (e.g., a state entity), or a legal, accounting, or financial advisory nonprofit or for-profit entity, and a third-party contractor may be a legal, accounting, or financial advisory nonprofit or for-profit entity. Eligible applicants may not be suspended, debarred, or otherwise excluded from or ineligible for participation in federal assistance programs or activities pursuant to 31 C.F.R. § 19.300.</div>
+            </div>
+
+            <div id="view_Beneficiary_Eligibility">
+                <div class="datahead">Beneficiary Eligibility</div>
+                <div id="div_Beneficiary_Eligibility" class="data">Businesses owned by socially and economically disadvantaged individuals (SEDI ) or very small businesses (VSBs ) participating in, or seeking assistance from the state’s State Small Business Credit Initiative (SSBCI) -funded program.</div>
+            </div>
+
+            <div id="view_Types_Assistance">
+                <div class="datahead">Types of Assistance</div>
+                <div id="div_Types_Assistance" class="data">Formula Grants</div>
+            </div>
+
+            <div id="view_Subject_Area">
+                <div class="datahead">Subject / Service Area</div>
+                <div id="div_Subject_Area" class="data">Economic Development</div>
+            </div>
+
+            <div id="view_Credentials_Documentation">
+                <div class="datahead">Credentials / Documentation</div>
+                <div id="div_Credentials_Documentation" class="data">Uniform Grant Application, Uniform Budget, Conflict of Interest Disclosure, Mandatory Disclosures, Program Application</div>
+            </div>
+
+            <div id="view_Preapplication_Coordination">
+                <div class="datahead">Preapplication Coordination</div>
+                <div id="div_Preapplication_Coordination" class="data">Applications are due by deadline identified in the Notice of Funding Opportunity Supplement. All applications received by the deadline will be scored on merit and finalists will be notified via a Notice of State Award.</div>
+            </div>
+
+            <div id="view_Application_Procedures">
+                <div class="datahead">Application Procedures</div>
+                <div id="div_Application_Procedures" class="data">Application submission format will be via a Smartsheet application form, URL will be available at the time of application release.</div>
+            </div>
+
+            <div id="view_Criteria_Selecting_Proposals">
+                <div class="datahead">Criteria Selecting Proposals</div>
+                <div id="div_Criteria_Selecting_Proposals" class="data">Applications will be graded using the Merit Review Process and scored on the criteria specified in the Review and Selection criteria of the NOFO.</div>
+            </div>
+
+            <div id="view_Award_Procedures">
+                <div class="datahead">Award Procedures</div>
+                <div id="div_Award_Procedures" class="data">A merit-based review will be used to select grantees. Funds will be disbursed on a reimbursement basis.</div>
+            </div>
+
+            <div id="view_Deadlines">
+                <div class="datahead">Deadlines</div>
+                <div id="div_Deadlines" class="data">See NOFO for deadlines.</div>
+            </div>
+
+            <div id="view_Range_Times">
+                <div class="datahead">Range of Approval or Disapproval Time</div>
+                <div id="div_Range_Times" class="data">60 days</div>
+            </div>
+
+            <div id="view_Appeals">
+                <div class="datahead">Appeals</div>
+                <div id="div_Appeals" class="data">The Merit Based Review process is subject to appeal. However, competitive grant appeals are limited to the evaluation process. Evaluation scores may not be protested. Only the evaluation process is subject to appeal. The appeal must be submitted in writing to the Department within 14 calendar days after the date that the grant award notice has been published. The written appeal shall include the name and address of the appealing party, the identification of the grant and a statement of reasons for the appeal. To file an appeal, applicants must submit the appeal in writing and in accordance with the Merit-Based Application Review Appeals Process listed on the Grant Opportunities page of the DCEO website: https://www2.illinois.gov/dceo/AboutDCEO/GrantOpportunities/Pages/MeritAppReview.aspx.</div>
+            </div>
+
+            <div id="view_Renewals">
+                <div class="datahead">Renewals</div>
+                <div id="div_Renewals" class="data">N/A</div>
+            </div>
+
+            <div id="view_Formula_Matching">
+                <div class="datahead">Formula Matching Requirements</div>
+                <div id="div_Formula_Matching" class="data">N/A</div>
+            </div>
+
+            <div id="view_Uses_Restrictions">
+                <div class="datahead">Uses and Restrictions</div>
+                <div id="div_Uses_Restrictions" class="data">Eligible expenses under this opportunity include the costs of providing legal, accounting, and financial advisory services to eligible beneficiaries. In accordance with 2 C.F.R. § 200.455, costs required for the establishment or reorganization of a recipient, subrecipient, or contractor under an award are generally not eligible.</div>
+            </div>
+
+            <div id="view_Reports">
+                <div class="datahead">Reports</div>
+                <div id="div_Reports" class="data">The Department shall monitor the performance of each TA provider and require quarterly reports from each provider at such time and in such a manner as prescribed by Uniform Grant Agreement Reporting Schedule.</div>
+            </div>
+
+            <div id="view_Audits">
+                <div class="datahead">Audits</div>
+                <div id="div_Audits" class="data">N/A</div>
+            </div>
+
+            <div id="view_Records">
+                <div class="datahead">Records</div>
+                <div id="div_Records" class="data">N/A</div>
+            </div>
+
+            <div id="view_Account_Identification">
+                <div class="datahead">Account Identification</div>
+                <div id="div_Account_Identification" class="data">506-42045-4900-0099</div>
+            </div>
+
+            <div id="view_Obligations">
+                <div class="datahead">Obligations</div>
+                <div id="div_Obligations" class="data">$2,250,000.00</div>
+            </div>
+
+            <div id="view_Financial_Assistance">
+                <div class="datahead">Range and Average of Financial Assistance</div>
+                <div id="div_Financial_Assistance" class="data">$2,250,000.00</div>
+            </div>
+
+            <div id="view_Program_Accomplishments">
+                <div class="datahead">Program Accomplishments</div>
+                <div id="div_Program_Accomplishments" class="data">Each TA provider must provide a report on the financial advisory, legal, and/or accounting services for loan and/or equity programs to eligible beneficiaries. This report must include a summary of the businesses (SEDI and VSB) engaged (or contacted), businesses (SEDI and VSB) assisted, referrals made, the issue resolution percentage and funds allocated.</div>
+            </div>
+
+            <div id="view_Regulations_Guidelines_Literature">
+                <div class="datahead">Regulations, Guidelines, and Literature</div>
+                <div id="div_Regulations_Guidelines_Literature" class="data">https://home.treasury.gov/system/files/136/SSBCI-Technical-Assistance-Guidelines-April-2022.pdf</div>
+            </div>
+
+            <div id="view_Assistance_Location">
+                <div class="datahead">Regional or Local Assistance Location</div>
+                <div id="div_Assistance_Location" class="data">N/A</div>
+            </div>
+
+            <div id="view_Headquarters_Office">
+                <div class="datahead">Headquarters Office</div>
+                <div id="div_Headquarters_Office" class="data">555 W Monroe St, 12th Floor Chicago, IL 60661, 1011 S 2nd St Springfield, IL 62704, 1020 S Spring St Springfield, IL 62704</div>
+            </div>
+
+            <div id="view_Program_Website">
+                <div class="datahead">Program Website</div>
+                <div id="div_Program_Website" class="data">See NOFO</div>
+            </div>
+
+            <div id="view_Related_Programs">
+                <div class="datahead">Related Programs</div>
+                <div id="div_Related_Programs" class="data">SSBCI Technical Assistance Grant Program</div>
+            </div>
+
+            <div id="view_Example_Projects">
+                <div class="datahead">Example Projects</div>
+                <div id="div_Example_Projects" class="data">N/A</div>
+            </div>
+
+            <div id="view_Published_Date">
+                <div class="datahead">Published Date</div>
+                <div id="div_Published_Date" class="data">7/19/2024</div>
+            </div>
+
+
+            <!------------------------->
+            <!-- EXCEPTIONS 4/2/2026 -->
+            <!------------------------->
+            <div id="view_Exceptions">
+                <div class="datahead">GATA Exceptions</div>
+                <div id="div_Exceptions" class="data">Uniform Agreement; Other; </div>
+            </div>
+
+
+
+
+            <!------------------------->
+            <!-- FUNDING INFORMATION -->
+            <!------------------------->
+
+            <div class="banner">FUNDING INFORMATION</div>
+
+            <div id="view_Funding_By_FY">
+                <div class="datahead">Funding By Fiscal Year</div>
+                <div id="div_Funding_By_FY" class="data">FY 2023 : $47,594,806<br />FY 2024 : $6,450,000<br />FY 2025 : $190,053,602<br />FY 2026 : $204,907,984<br /></div>
+            </div>
+
+            <div class="datahead">Federal Funding</div>
+            <div id="div_Federal_Funding" class="data"><a href='https://sam.gov/fal/90d699e1fe7c4949ab6c34ae29700d24/view' target='_blank'>21.031 - State Small Business Credit Initiative Technical Assistance Grant Program</a><br /></div>
+
+
+            <div class="datahead">Notice of Funding Opportunities</div>
+            <style>
+                #tbl_NOFOs { margin-top:15px; }
+                #tbl_NOFOs th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_NOFOs td { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; vertical-align:top; white-space:nowrap; }
+                #tbl_NOFOs td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Funding_Opportunities" class="data">
+                <table id="tbl_NOFOs">
+	<thead>
+		<tr>
+			<th></th><th>Agency ID</th><th>Award Range</th><th>Application Range</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td><a href='Opportunity.aspx?nofo=4337'>Details</a></td><td>FY27-1</td><td>Not Applicable</td><td>09/30/2026 - 10/30/2026 : 5:00 PM</td>
+		</tr>
+	</tbody>
+</table>
+            </div>
+
+
+
+            <!----------------------->
+            <!-- TOP ACTIVE AWARDS -->
+            <!----------------------->
+
+            <div id="div_Top_Awards" class="banner">ACTIVE AWARDS</div>
+
+            <style>
+                #tbl_Awards { margin-top:15px; }
+                #tbl_Awards th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_Awards td { border:solid 1px #c8dcff; text-align:center; padding:3px 5px 3px 5px; vertical-align:top; }
+                #tbl_Awards td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Awards" class="data">
+                <table id="tbl_Awards">
+	<thead>
+		<tr>
+			<th>Agency ID</th><th>Grantee Name</th><th>Comptroller Name</th><th>Start Date</th><th>End Date</th><th>Amount</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td style="text-align:left;">24-931001</td><td style="text-align:left;">Law And The Fam, LLC.</td><td style="text-align:left;">LAW AND THE FAM LLC             </td><td>01/15/2026</td><td>05/31/2027</td><td>700,000</td>
+		</tr><tr>
+			<td style="text-align:left;">24-931002</td><td style="text-align:left;">Greater Waukegan Development Coalition</td><td style="text-align:left;">GREATER WAUKEGAN DEVELOPMENT    </td><td>01/15/2026</td><td>05/31/2027</td><td>700,000</td>
+		</tr><tr>
+			<td style="text-align:left;">24-931003</td><td style="text-align:left;">Anderson's Enterprise Management Corporation</td><td style="text-align:left;">ANDERSONS ENTERPRISE MGMT CORP  </td><td>01/15/2026</td><td>05/31/2027</td><td>700,000</td>
+		</tr><tr>
+			<td style="text-align:left;">24-931005</td><td style="text-align:left;">Hunzinger and Co.</td><td style="text-align:left;">HUNZINGER & CO                  </td><td>01/15/2026</td><td>05/31/2027</td><td>700,000</td>
+		</tr><tr>
+			<td style="text-align:left;">24-931006</td><td style="text-align:left;">Justine Peterson Housing & Reinvestment Corporation</td><td style="text-align:left;">JUSTINE PETERSEN HOUSING &      </td><td>01/15/2026</td><td>05/31/2027</td><td>700,000</td>
+		</tr>
+	</tbody>
+</table>
+                
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+</body>
+</html>

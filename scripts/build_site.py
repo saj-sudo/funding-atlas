@@ -51,6 +51,8 @@ CONNECTOR_LABEL = {
     "md_dnr": "Maryland DNR",
     "pa_grants": "Pennsylvania grants portal (pa.gov)",
     "wv_grants": "West Virginia grants portal (grants.wv.gov)",
+    "ca_grants": "California Grants Portal (grants.ca.gov)",
+    "il_csfa": "Illinois Catalog of State Financial Assistance (GATA)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

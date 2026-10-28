@@ -20,7 +20,9 @@ and a warm run ~170 (about two minutes and 75 seconds at 0.3 s each). To force a
 
 Out of scope here (no box on the page): multifamily financing programs (Rental Housing, LIHTC, HOME,
 NHTF), the sub-programs of State Revitalization Programs (Community Legacy, Facade, Strategic Demolition,
-BRNI, NCSED, SEED), and anything that only lives in a public notice. Individual and household programs
+BRNI, NCSED, SEED) as records of their own, and anything that only lives in a public notice. The SRP page
+itself defers to those pages for eligibility ("For eligibility ... review the funding programs"), so each
+run reads them once and the SRP record takes its applicant tags from them (`sub_programs` in the payload). Individual and household programs
 (home repair loans, EmPOWER, WAP, MEAP, HCVP) are ingested because their box is there; the municipal view
 filters them out by applicant type.
 """
@@ -28,14 +30,21 @@ filters them out by applicant type.
 from __future__ import annotations
 
 import re
+import time
 from datetime import date
 from typing import Any
+from urllib.parse import urlparse
+
+import httpx
+from bs4 import BeautifulSoup
 
 from connectors.grants_gov import parse_date
 from connectors.maryland_drupal import (  # noqa: F401  (re-exported for tests and the probe script)
     ELIGIBILITY_HEADING_RE,
     MONTH_YEAR_RE,
+    PAGE_DELAY_S,
     MarylandDrupalConnector,
+    applicant_lines,
     applicant_types_for,
     body_sections,
     clean,
@@ -44,14 +53,30 @@ from connectors.maryland_drupal import (  # noqa: F401  (re-exported for tests a
     page_name,
     page_payload,
     parse_box,
+    section_lines_by_heading,
     source_id_for,
 )
+from pipeline.models import Program, RawRecord
 
 CONNECTOR = "md_dhcd"
 BASE = "https://dhcd.maryland.gov"
 SITEMAP_URL = BASE + "/sitemap.xml"
 AGENCY = "Maryland Department of Housing and Community Development"
 AGENCY_CODE = "MD-DHCD"
+
+# State Revitalization Programs is an umbrella page: its eligibility lives on the pages it links to, one level down.
+SRP_ID = "neighborhood-revitalization/community-development-funding/state-revitalization-programs"
+
+# "Award categories" opens with the applicant statement on the Housing Leadership Awards page ("Awards will be made
+# to local jurisdictions in four different categories"), which has no section headed as eligibility.
+APPLICANT_HEADING_RE = re.compile(r"eligib|award categor", re.I)
+
+# A sub-program's eligibility section states the applicants, then conditions: "a hospital institution in the State
+# that: Has a group of ... diagnostic and treatment services for two or more unrelated individuals". Everything from
+# the lead-in on describes the applicant, it does not name one. And "for projects located in ... counties" says
+# where the project is, not who applies.
+CONDITION_LEAD_IN_MID_RE = re.compile(r"\b(?:that|who|which|must)\s*:")
+PROJECT_LOCATION_RE = re.compile(r"\s+for projects (?:located|within|in)\b.*$", re.I)
 
 # Sitemap paths that are never program pages.
 SKIP_PATH = re.compile(
@@ -191,6 +216,74 @@ class Dhcd(MarylandDrupalConnector):
     SECTION_CATEGORIES = SECTION_CATEGORIES
     PASS_THROUGH = PASS_THROUGH
     THING_HEADING_RE = THING_HEADING_RE
+    ELIGIBILITY_HEADING_RE = APPLICANT_HEADING_RE
+    APPLICANT_HEADING_RE = APPLICANT_HEADING_RE
+
+    # -- State Revitalization Programs borrows eligibility from its sub-program pages --
+
+    @staticmethod
+    def sub_program_ids(main_html: str) -> list[str]:
+        """The pages linked from the SRP page one level under its own path, in link order, once each."""
+        ids: list[str] = []
+        for a in BeautifulSoup(main_html, "html.parser").find_all("a", href=True):
+            parts = urlparse(a["href"]).path.strip("/").split("/")
+            sid = "/".join(parts)
+            if len(parts) == len(SRP_ID.split("/")) + 1 and sid.startswith(SRP_ID + "/") and sid not in ids:
+                ids.append(sid)
+        return ids
+
+    def sub_program(self, sid: str, main_html: str) -> dict[str, Any]:
+        """One sub-program's name and the lines of its who-may-apply sections (without the headings)."""
+        sections = section_lines_by_heading(main_html)
+        raw_lines = [line for heading, body in sections if self.is_applicant_heading(heading) for line in applicant_lines(body)]
+        lines: list[str] = []
+        for line in raw_lines:
+            lead_in = CONDITION_LEAD_IN_MID_RE.search(line)
+            text = PROJECT_LOCATION_RE.sub("", line[: lead_in.end() - 1] if lead_in else line).strip()
+            if text:
+                lines.append(text)
+            if lead_in:
+                break
+        return {"id": sid, "name": page_name(main_html), "applicants": lines}
+
+    def before_fetch(self, client: httpx.Client) -> dict[str, Any]:
+        """Read the SRP page and its sub-program pages once a run. Any page that cannot be read leaves the context
+        empty, so the SRP record keeps the copy stored last run rather than losing a sub-program's applicants."""
+        try:
+            resp = client.get(f"{BASE}/{SRP_ID}")
+            resp.raise_for_status()
+            page = page_payload(f"{BASE}/{SRP_ID}", None, resp.text)
+            subs: list[dict[str, Any]] = []
+            for sid in self.sub_program_ids(page["main_html"]) if page else []:
+                time.sleep(PAGE_DELAY_S)
+                sub = client.get(f"{BASE}/{sid}")
+                sub.raise_for_status()
+                sub_page = page_payload(f"{BASE}/{sid}", None, sub.text)
+                if sub_page:
+                    subs.append(self.sub_program(sid, sub_page["main_html"]))
+        except httpx.HTTPError:
+            return {}
+        return {"srp": subs} if subs else {}
+
+    def annotate(self, payload: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
+        if "srp" in context and source_id_for(payload.get("url") or "") == SRP_ID:
+            return {**payload, "sub_programs": context["srp"]}
+        return payload
+
+    def normalize(self, raw: RawRecord, today: date | None = None) -> Program:
+        program = super().normalize(raw, today)
+        subs = raw.payload.get("sub_programs") or []
+        if not subs:
+            return program
+        tags = list(program.applicant_types)
+        seen = {(t.value, t.source_code) for t in tags}
+        for tag in applicant_types_for([line for sub in subs for line in sub["applicants"]]):
+            if (tag.value, tag.source_code) not in seen:
+                tags.append(tag)
+                seen.add((tag.value, tag.source_code))
+        blocks = [f"{sub['name']}:\n" + "\n".join(sub["applicants"]) for sub in subs if sub["applicants"]]
+        text = "\n\n".join(filter(None, [program.eligibility_text, *blocks]))
+        return program.model_copy(update={"applicant_types": tags, "eligibility_text": text or None})
 
     def is_record(self, payload: dict[str, Any]) -> bool:
         return has_status_label(parse_box(payload.get("main_html") or ""))

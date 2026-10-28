@@ -21,12 +21,20 @@ Three things changed between the mapping below and the code, all on the side of 
 - **`Next funding cycle` is kept in `closes_at_text`** (MEAP), never parsed into a date column.
 
 Known gaps, all because the page does not say it, so the record does not either:
-- Seven records have no applicant tags: State Revitalization Programs (eligibility lives on the sub-program pages,
-  which have no box), Main Street Improvement Grant ("Main Street Maryland communities" is not in the keyword map),
-  Main Street Tier Structure, Maryland Housing Leadership Awards ("local jurisdictions", under an "Award categories"
-  heading), Homelessness Solutions Program, Housing Choice Voucher Program, Lead Hazard Reduction. SRP and MIP are
-  municipal rounds, so when they reopen they will show in the diff but not in `v_open_for_municipalities` until
-  either the keyword map grows or SRP borrows eligibility from its sub-pages. Decide at milestone 4.
+- **Cleaned up 2026-10-28.** State Revitalization Programs now takes its applicant tags from its six sub-program pages
+  (Baltimore Regional Neighborhood Initiative, Community Legacy, Facade Improvement, National Capital SED, SEED,
+  Strategic Demolition): `before_fetch` reads the SRP page and the pages it links one level down, once a run, and
+  `annotate` stamps `sub_programs` (name and applicant lines) into the SRP payload. Each sub-program's lines are cut at
+  a condition lead-in ("a hospital institution in the State that:") and lose their "for projects located in ..."
+  clause, so the SEED fund's definition of a hospital ("two or more unrelated individuals") and BRNI's counties do not
+  tag. SRP tags: municipality and county ("Local governments"), nonprofit ("Nonprofit Community Development
+  Organizations"), higher_ed ("institution of higher education"). If any of the seven pages cannot be read the stored
+  copy stands. Maryland Housing Leadership Awards names its applicants under an "Award categories" heading ("Awards will
+  be made to local jurisdictions"), which `APPLICANT_HEADING_RE` now includes; it tags municipality and county.
+- Still untagged because the page does not say: Main Street Improvement Grant ("Main Street Maryland communities" and
+  "community development organizations" are the eligible applicants; neither is a municipality in the source's words, and
+  the earlier note that it is a municipal round was an assumption), Main Street Tier Structure, Homelessness Solutions
+  Program, Housing Choice Voucher Program, Lead Hazard Reduction.
 - Milestone 4 moved the applicant scan to line level (see `maryland_drupal.md`, "Applicant lines"): MEAP and
   Housing Rehabilitation join the untagged list (nine now), CDBG drops the entitlement-county tags from its "Who is
   not eligible" section, NourishMD gains `for-profit`. Everything else, including every local-government tag, is

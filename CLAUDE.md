@@ -17,6 +17,9 @@ connector or one feature per session, no abstractions before the third real case
   `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; `pa_grants` reads a
   search index plus one JSON record per page; a new platform base is extracted only when the second site on that
   platform forces it.
+- `connectors/text.py`: the rules every state shares: the applicant tagger, the funding-type keyword, and the tables that
+  turn a portal's own applicant and topic labels into ours. A rule that is wrong for one source is wrong for all and is
+  fixed there; a portal label is added to the table once, not per connector.
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
@@ -39,11 +42,12 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-18)
+## Current state (2026-10-28)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
-(grants.wv.gov JSON API, 124 records). Milestones 1 to 8.2, 9.1 and 9.2 shipped. **The live site answers 404: the
+(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list, 119 records). Milestones 1 to 8.2 and
+9.1 to 9.4 shipped. **The live site answers 404: the
 repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
 the build. GOCPP is blocked by its robots.txt (ask the office). Next per the census (`docs/surveys/state_portals.md`):
-`ca_grants` (one CSV, 2,023 rows), `il_csfa`, a `webgrants` storefront connector (IA, MT). See the roadmap.
+a `webgrants` storefront connector (IA, MT), then NJ and TX. See the roadmap.

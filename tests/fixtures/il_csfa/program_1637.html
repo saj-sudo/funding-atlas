@@ -1,0 +1,353 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	CSFA | GATA | Illinois.gov
+</title><link href="Common.css" rel="stylesheet" />
+
+    <style>
+        .banner { background-color:#c8dcff; padding:5px; border-radius:4px; font-weight:bold; }
+
+
+        .tblList { border-collapse:collapse; width:100%; }
+        .tblList th { border-bottom:solid 1px #102952; padding:4px; padding-right:10px; background-color:#c8dcff; text-align:left; white-space:nowrap; width:1px; vertical-align:top; }
+        .tblList td { border-bottom:solid 1px #102952; padding:4px; }
+
+        .datahead { font-weight:bold; margin-top:15px; margin-bottom:5px; }
+        .data { margin-bottom:20px; border-bottom:solid 1px #c8dcff; padding-bottom:20px; }
+
+        .gms { display:inline-block; background-color:#a4ffd1; font-size:70%; border-radius:5px; padding:0px 3px 2px 2px; border:solid 1px green; }
+    </style>
+
+    <script>
+        window.onload = function () {
+            parent.postMessage(document.body.scrollHeight, "*");
+            if (self == top) { document.body.style.padding = "10px" }
+        }
+    </script>
+</head>
+<body>
+    <form method="post" action="./Program.aspx?csfa=1637" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2153A54A" />
+    <div>
+
+
+        <div class="bc np">
+            <a href="Default.aspx">CSFA Home</a> /
+            <span id="spanFromProgramList">
+                <a href="HTTPS://OMB.ILLINOIS.GOV/PUBLIC/GATA/CSFA/AGENCYLIST.ASPX" id="lnk_AgencyList">Agency List</a> /
+                <a href="ProgramList.aspx?Agency=420" id="lnk_ProgramList">Program List</a> /
+            </span>
+
+            
+            Program
+
+        </div>
+
+
+        
+        
+        <div id="divFound">
+
+            <div style="padding:5px 0px 25px 5px;">
+                <div id="div_Program_Name" style="font-size:150%">Community Development Block Grant Disaster Response Program</div>
+                <div id="div_Popular_Name">CDBG Disaster Response Program</div>
+                <div id="div_CSFA">CSFA Number: 420-75-1637</div>
+            </div>
+
+
+            <div class="banner">STATE AGENCY INFORMATION</div>
+
+            <div class="datahead">Agency Name</div>
+            <div id="div_Agency" class="data">Department Of Commerce And Economic Opportunity (420)</div>
+
+            <div id="Agency_ID">
+                <div class="datahead">Agency Identification</div>
+                <div id="div_Agency_ID" class="data">24-7</div>
+            </div>
+
+            <div class="datahead">Agency Contact</div>
+            <div id="div_Agency_Contact" class="data">Wendy Bell<div> 217-558-4200</div><div><a href='mailto:ceo.ocd@illinois.gov'>ceo.ocd@illinois.gov</a></div></div>
+
+
+            <div class="banner">PROGRAM INFORMATION</div>
+
+            <div id="view_Short_Desc">
+                <div class="datahead">Short Description</div>
+                <div id="div_Short_Desc" class="data">This program is designed for communities experiencing an imminent and urgent threat to public health and safety as indicated by a disaster declaration by the Governor of the State of Illinois.</div>
+            </div>
+
+            <div id="view_Fed_Authorization">
+                <div class="datahead">Federal Authorization</div>
+                <div id="div_Fed_Authorization" class="data">Housing and Community Development (HCD) Act of 1974; 20 ILCS 605/605-915; 20 ILCS 605/605-945; 20 ILCS 605/605-950</div>
+            </div>
+
+            <div id="view_IL_Statute_Authorization">
+                <div class="datahead">Illinois Statue Authorization</div>
+                <div id="div_IL_Statute_Authorization" class="data">N/A</div>
+            </div>
+
+            <div id="view_IL_Rules_Authorization">
+                <div class="datahead">Illinois Administrative Rules Authorization</div>
+                <div id="div_IL_Rules_Authorization" class="data">Title 47, Section 110</div>
+            </div>
+
+            <div id="view_Objective">
+                <div class="datahead">Objective</div>
+                <div id="div_Objective" class="data">Responding to emergency conditions that threaten public health and safety.</div>
+            </div>
+
+            <div id="view_Prime_Recipient">
+                <div class="datahead">Prime Recipient</div>
+                <div id="div_Prime_Recipient" class="data">Yes</div>
+            </div>
+
+            <div id="view_Program_Terms">
+                <div class="datahead">UGA Program Terms</div>
+                <div id="div_Program_Terms" class="data">Program-Specific Terms and requirements can be found at 24 CFR Part 570, 2 CFR 200 and program information at https://www2.illinois.gov/dceo/CommunityDevelopment/Pages/default.aspx</div>
+            </div>
+
+            <div id="view_Eligible_Applicants">
+                <div class="datahead">Eligible Applicants</div>
+                <div id="div_Eligible_Applicants" class="data">Government Organizations; </div>
+            </div>
+
+            <div id="view_Applicant_Eligibility">
+                <div class="datahead">Applicant Eligibility</div>
+                <div id="div_Applicant_Eligibility" class="data">Only units of general local government (i.e., cities, villages, townships and counties) that have received a Gubernatorial Disaster Declaration may apply for funding. Municipalities must not be a HUD direct Entitlement community or be located in an urban county that receives "entitlement" funds. County and township applicants should not include areas that are incorporated within a city or village. Incorporated . All applicants must be registered and have completed the Internal Control Questionnaire (ICQ) for the current year available at: https://grants.illinois.gov/portal/ prior to application submission. Applications submitted by communities who have not registered or completed the ICQ for the current year will not be considered for review.</div>
+            </div>
+
+            <div id="view_Beneficiary_Eligibility">
+                <div class="datahead">Beneficiary Eligibility</div>
+                <div id="div_Beneficiary_Eligibility" class="data">Communities that have experienced a Gubernatorial-declared disaster.</div>
+            </div>
+
+            <div id="view_Types_Assistance">
+                <div class="datahead">Types of Assistance</div>
+                <div id="div_Types_Assistance" class="data">Project Grants</div>
+            </div>
+
+            <div id="view_Subject_Area">
+                <div class="datahead">Subject / Service Area</div>
+                <div id="div_Subject_Area" class="data">Public Safety</div>
+            </div>
+
+            <div id="view_Credentials_Documentation">
+                <div class="datahead">Credentials / Documentation</div>
+                <div id="div_Credentials_Documentation" class="data">Projects must meet the following minimum thresholds: 1. Application must be for an area included in a Disaster Declaration by the Governor of the State of Illinois. 2. The community must be unable to finance the activity on its own; and 3. The community has exhausted all other options/sources for funding the activity. DOCUMENTATION REQUIREMENTS 1. Each application must include the UGLG’s most recent audit. If unavailable, please contact the Department to determine potential alternative documentation. 2. All required application forms must be completed with appropriate backup documentation. 3. The Department reserves the right to designate an application “DO NOT FUND”, and not complete the rest of its’ review for the following reasons: - - Using self-created forms. Forged, copied, taped, pasted or any alterations to original signatures or dates. 4. The project must qualify for the National Objective of Urgent Need, however, the percentage of Low-to-Moderate income persons in the area must be provided. If the area meets or exceeds 51% LMI, the National Objective of LMI will be utilized in the grant award.</div>
+            </div>
+
+            <div id="view_Preapplication_Coordination">
+                <div class="datahead">Preapplication Coordination</div>
+                <div id="div_Preapplication_Coordination" class="data">N/A</div>
+            </div>
+
+            <div id="view_Application_Procedures">
+                <div class="datahead">Application Procedures</div>
+                <div id="div_Application_Procedures" class="data">All original Application Forms and Materials as shown in the Guidebook must be utilized. The Guidebook and Application is available online at: https://www2.illinois.gov/dceo/CommunityDevelopment/Pages/default.aspx All Letters, Notices, Resolutions, Agreements or other communication provided by the unit of local government as part of the application must be of the exact verbiage contained in the Guidebook, be on the applicant community’s official letterhead and have original signatures where required. All application forms and certifications requiring signature must be signed by the Chief Elected Official of the applicant community, unless otherwise noted. A standard application package must be submitted to and reviewed by DCEO. Each package must contain the following items: 1. Uniform Grant Application in fillable PDF format. 2. Uniform Budget utilizing the template provided by DCEO for this project. 3. Conflict of Interest Disclosure 4. Mandatory Disclosures 5. Letter of Transmittal 6. Project Summary 7. Governor's Disaster Declaration 8. Project Maps 9. Fair Housing Resolution NO ELECRONIC SUBMISSIONS OF ANY KIND WILL BE ALLOWED !</div>
+            </div>
+
+            <div id="view_Criteria_Selecting_Proposals">
+                <div class="datahead">Criteria Selecting Proposals</div>
+                <div id="div_Criteria_Selecting_Proposals" class="data">N/A</div>
+            </div>
+
+            <div id="view_Award_Procedures">
+                <div class="datahead">Award Procedures</div>
+                <div id="div_Award_Procedures" class="data">Applications meeting the Eligibility Criteria will be funded until all available funds are exhausted. Successful applicants will receive a Notice of State Award Finalist (NOSAF) specifying terms and conditions of the grant. This will include completion of a Programmatic Risk Assessment Questionnaire (PRAQ) to be answered by the Grantee and the Grant Administrator, completion of Environmentals, clearance of special conditions resulting from the application review. Grantees are expected to meet all special conditions within 90 days of the NOSAF date or the Department may withdraw the Notice of State Award Finalist (NOSAF). DCEO Once terms are accepted, and the conditions met, the Grantee will receive a Notice of State Award (NOSA) which includes information regarding your entity, grant funding, grant terms and conditions, and specific conditions assigned to the grant based on the risk assessments. In order to receive the formal Grant Agreement, the Grantee must indicate agreement to the contents of the NOSA by remitting Funds are disbursed on a reimbursement basis once demonstration of viable and approved incurred costs has been received.</div>
+            </div>
+
+            <div id="view_Deadlines">
+                <div class="datahead">Deadlines</div>
+                <div id="div_Deadlines" class="data">This program is ongoing for use as needed.</div>
+            </div>
+
+            <div id="view_Range_Times">
+                <div class="datahead">Range of Approval or Disapproval Time</div>
+                <div id="div_Range_Times" class="data">60 days</div>
+            </div>
+
+            <div id="view_Appeals">
+                <div class="datahead">Appeals</div>
+                <div id="div_Appeals" class="data">The Merit Based Review process is subject to appeal. However, competitive grant appeals are limited to the evaluation process. Evaluation scores may not be protested. Only the evaluation process is subject to appeal. The appeal must be submitted in writing to the Department within 14 calendar days after the date that the grant award notice has been published. The written appeal shall include the name and address of the appealing party, the identification of the grant and a statement of reasons for the appeal. To file an appeal, applicants must submit the appeal in writing and in accordance with the Merit-Based Application Review Appeals Process listed on the Grant Opportunities page of the DCEO website: https://www2.illinois.gov/dceo/AboutDCEO/GrantOpportunities/Pages/MeritAppReview.aspx.</div>
+            </div>
+
+            <div id="view_Renewals">
+                <div class="datahead">Renewals</div>
+                <div id="div_Renewals" class="data">No</div>
+            </div>
+
+            <div id="view_Formula_Matching">
+                <div class="datahead">Formula Matching Requirements</div>
+                <div id="div_Formula_Matching" class="data">N/A</div>
+            </div>
+
+            <div id="view_Uses_Restrictions">
+                <div class="datahead">Uses and Restrictions</div>
+                <div id="div_Uses_Restrictions" class="data">When emergency conditions threaten the public health and safety and/or immediate action is necessary to stop physical deterioration after a disaster has occurred, certain activities are allowed on an interim or temporary basis. Under these circumstances acceptable activities include: • Debris removal; • Clearance of streets including snow removal and similar activities; • Temporary or permanent street repair that does not alter environmental conditions and is limited to protection, repair, or restoration activities necessary only to control or arrest the effects from the disaster; • Activity Delivery for required documentation and compliance. Activity Delivery must be charged on an hourly basis and cannot exceed $5,000 per grant award.</div>
+            </div>
+
+            <div id="view_Reports">
+                <div class="datahead">Reports</div>
+                <div id="div_Reports" class="data">Quarterly reports are submitted to track fiscal spending and project completion. Monitoring visits are conducted as needed based on an established risk analysis.</div>
+            </div>
+
+            <div id="view_Audits">
+                <div class="datahead">Audits</div>
+                <div id="div_Audits" class="data">N/A</div>
+            </div>
+
+            <div id="view_Records">
+                <div class="datahead">Records</div>
+                <div id="div_Records" class="data">N/A</div>
+            </div>
+
+            <div id="view_Account_Identification">
+                <div class="datahead">Account Identification</div>
+                <div id="div_Account_Identification" class="data">875-42075-4900-1000 CDBG PROGRAM ADMIN, TECHNICAL ASSISTANCE AND GRANTS</div>
+            </div>
+
+            <div id="view_Obligations">
+                <div class="datahead">Obligations</div>
+                <div id="div_Obligations" class="data">2021: $32,644.81          2022 to date: 0</div>
+            </div>
+
+            <div id="view_Financial_Assistance">
+                <div class="datahead">Range and Average of Financial Assistance</div>
+                <div id="div_Financial_Assistance" class="data">Maximum award: $250,000</div>
+            </div>
+
+            <div id="view_Program_Accomplishments">
+                <div class="datahead">Program Accomplishments</div>
+                <div id="div_Program_Accomplishments" class="data">Assistance in clean-up after a tornado</div>
+            </div>
+
+            <div id="view_Regulations_Guidelines_Literature">
+                <div class="datahead">Regulations, Guidelines, and Literature</div>
+                <div id="div_Regulations_Guidelines_Literature" class="data">https://dceo.illinois.gov/communitydevelopment.html</div>
+            </div>
+
+            <div id="view_Assistance_Location">
+                <div class="datahead">Regional or Local Assistance Location</div>
+                <div id="div_Assistance_Location" class="data">Statewide in local governments that do not receive direct entitlement funding from HUD.</div>
+            </div>
+
+            <div id="view_Headquarters_Office">
+                <div class="datahead">Headquarters Office</div>
+                <div id="div_Headquarters_Office" class="data">500 East Monroe Springfield, IL 62701 and 555 W Monroe St, 12th Floor Chicago, IL 60661</div>
+            </div>
+
+            <div id="view_Program_Website">
+                <div class="datahead">Program Website</div>
+                <div id="div_Program_Website" class="data">https://dceo.illinois.gov/communitydevelopment.html</div>
+            </div>
+
+            <div id="view_Related_Programs">
+                <div class="datahead">Related Programs</div>
+                <div id="div_Related_Programs" class="data">Community Development Block Grant Economic Development Program, Community Development Public Infrastructure Program, Community Development Block Grant Housing Rehabilitation Program,</div>
+            </div>
+
+            <div id="view_Example_Projects">
+                <div class="datahead">Example Projects</div>
+                <div id="div_Example_Projects" class="data">cleanup of debris, repair of streets</div>
+            </div>
+
+            <div id="view_Published_Date">
+                <div class="datahead">Published Date</div>
+                <div id="div_Published_Date" class="data"></div>
+            </div>
+
+
+            <!------------------------->
+            <!-- EXCEPTIONS 4/2/2026 -->
+            <!------------------------->
+            <div id="view_Exceptions">
+                <div class="datahead">GATA Exceptions</div>
+                <div id="div_Exceptions" class="data">Indirect Cost Rate; Other; </div>
+            </div>
+
+
+
+
+            <!------------------------->
+            <!-- FUNDING INFORMATION -->
+            <!------------------------->
+
+            <div class="banner">FUNDING INFORMATION</div>
+
+            <div id="view_Funding_By_FY">
+                <div class="datahead">Funding By Fiscal Year</div>
+                <div id="div_Funding_By_FY" class="data">FY 2019 : $2,000,000<br />FY 2021 : $2,000,000<br />FY 2022 : $2,120,450<br />FY 2023 : $1,304,606<br />FY 2024 : $1<br /></div>
+            </div>
+
+            <div class="datahead">Federal Funding</div>
+            <div id="div_Federal_Funding" class="data"><a href='https://sam.gov/fal/138aad88ecca47a098da7b1198c730a8/view' target='_blank'>14.228 - Community Development Block Grants/State's program and Non-Entitlement Grants in Hawaii</a><br /></div>
+
+
+            <div class="datahead">Notice of Funding Opportunities</div>
+            <style>
+                #tbl_NOFOs { margin-top:15px; }
+                #tbl_NOFOs th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_NOFOs td { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; vertical-align:top; white-space:nowrap; }
+                #tbl_NOFOs td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Funding_Opportunities" class="data">
+                <table id="tbl_NOFOs">
+	<thead>
+		<tr>
+			<th></th><th>Agency ID</th><th>Award Range</th><th>Application Range</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td><a href='Opportunity.aspx?nofo=2010'>Details</a></td><td>24-7 CDBG Disaster Response Program</td><td>$0 - $250000</td><td>General announcement open for a period of time with no specific due dates for applications.</td>
+		</tr>
+	</tbody>
+</table>
+            </div>
+
+
+
+            <!----------------------->
+            <!-- TOP ACTIVE AWARDS -->
+            <!----------------------->
+
+            <div id="div_Top_Awards" class="banner">ACTIVE AWARDS</div>
+
+            <style>
+                #tbl_Awards { margin-top:15px; }
+                #tbl_Awards th { border:solid 1px #c8dcff; padding:3px 5px 3px 5px; }
+                #tbl_Awards td { border:solid 1px #c8dcff; text-align:center; padding:3px 5px 3px 5px; vertical-align:top; }
+                #tbl_Awards td:nth-child(2) { white-space:normal; }
+            </style>
+            <div id="div_Awards" class="data">
+                <table id="tbl_Awards">
+	<thead>
+		<tr>
+			<th>Agency ID</th><th>Grantee Name</th><th>Comptroller Name</th><th>Start Date</th><th>End Date</th><th>Amount</th>
+		</tr>
+	</thead><tbody>
+		<tr>
+			<td style="text-align:left;">19-247001</td><td style="text-align:left;">County of Fulton</td><td style="text-align:left;">COUNTY OF FULTON                </td><td>05/01/2026</td><td>10/31/2026</td><td>148,853</td>
+		</tr><tr>
+			<td style="text-align:left;">20-247001</td><td style="text-align:left;">Liverpool Township</td><td style="text-align:left;">TOWNSHIP OF LIVERPOOL           </td><td>05/01/2026</td><td>10/31/2026</td><td>89,192</td>
+		</tr><tr>
+			<td style="text-align:left;">20-247002</td><td style="text-align:left;">Buckheart Township</td><td style="text-align:left;">TOWNSHIP OF BUCKHEART           </td><td>05/01/2026</td><td>10/31/2026</td><td>45,151</td>
+		</tr>
+	</tbody>
+</table>
+                <div id="div_Awards_All" style="margin-top:5px; padding-left:5px;">
+                    <a href="AwardList.aspx?CSFA=1637&inactive" id="lnk_All_Awards">View Inactive Awards: 10</a>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    </form>
+</body>
+</html>

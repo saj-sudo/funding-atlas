@@ -302,3 +302,137 @@ def test_place_words_after_a_spatial_preposition_are_not_applicants():
 def test_hash_is_stable_across_normalize_calls():
     assert normalize(TAG).record_hash == normalize(TAG).record_hash
     assert normalize(TAG).record_hash != normalize(NOURISH).record_hash
+
+
+# ---------- the site's two body markups ----------
+
+SRP = md.SRP_ID
+AWARDS = "policy-and-legislation/housing-starts-here-executive-order/maryland-housing-leadership-awards"
+CSRAP = "housing/homeless-solutions/community-schools-rental-assistance-program"
+SUBS = [
+    f"{SRP}/{slug}" for slug in (
+        "baltimore-regional-neighborhood-initiative", "community-legacy-program", "maryland-facade-improvement-program",
+        "national-capital-strategic-economic-development-fund", "seed-community-development-anchor-institution-fund",
+        "strategic-demolition-fund",
+    )
+]
+
+
+def test_both_body_markups_give_the_same_sections():
+    old = '<main><div class="usa-prose maryland-toc-target"><h2>Eligible applicants</h2><p>Local governments</p></div></main>'
+    new = '<main><div class="maryland-toc-target"><div class="usa-prose"><h2>Eligible applicants</h2><p>Local governments</p></div></div></main>'
+    assert md.section_lines_by_heading(old) == md.section_lines_by_heading(new) == [("Eligible applicants", [("p", "Local governments")])]
+
+
+def test_a_nested_usa_prose_inside_the_old_markup_is_not_taken_for_the_body():
+    html = ('<main><div class="usa-prose maryland-toc-target"><h2>Eligible applicants</h2><p>Cities</p>'
+            '<div class="usa-prose"><p>Aside</p></div></div></main>')
+    assert [h for h, _ in md.section_lines_by_heading(html)] == ["Eligible applicants"]
+
+
+def test_a_page_on_the_new_markup_keeps_its_eligibility():
+    """Community Schools Rental Assistance was published on the new markup and read as empty before 2026-10-28."""
+    assert 'class="maryland-toc-target"' in payload(CSRAP)["main_html"]
+    p = normalize(CSRAP)
+    assert [(t.value, t.source_code) for t in p.applicant_types] == [("household", "household")]
+    assert p.eligibility_text.startswith("To qualify for assistance from CSRAP")
+
+
+# ---------- Maryland Housing Leadership Awards ----------
+
+def test_awards_page_names_its_applicants_under_award_categories():
+    p = normalize(AWARDS)
+    assert p.status == "open" and p.closes_at == date(2026, 11, 1)
+    assert sorted((t.value, t.source_code) for t in p.applicant_types) == [
+        ("county", "local jurisdictions"), ("municipality", "local jurisdictions"),
+    ]
+    assert p.eligibility_text.startswith("Awards will be made to local jurisdictions")
+
+
+# ---------- State Revitalization Programs borrows from its sub-program pages ----------
+
+def test_sub_program_ids_are_the_pages_one_level_under_srp_in_link_order():
+    ids = md.SITE.sub_program_ids(payload(SRP)["main_html"])
+    assert ids == SUBS
+    assert not [i for i in ids if "reinvest-baltimore" in i or i == SRP]
+
+
+def sub(sid: str) -> dict:
+    return md.SITE.sub_program(sid, payload(sid)["main_html"])
+
+
+def test_sub_program_applicant_lines_stop_at_the_condition_and_drop_the_project_location():
+    seed = sub(f"{SRP}/seed-community-development-anchor-institution-fund")
+    assert len(seed["applicants"]) == 1 and seed["applicants"][0].endswith("in the state or a hospital institution in the state that")
+    assert "unrelated individuals" not in " ".join(seed["applicants"])
+    brni = " ".join(sub(f"{SRP}/baltimore-regional-neighborhood-initiative")["applicants"])
+    assert "Anne Arundel" not in brni and "Community Development Organizations" in brni
+    legacy = sub(LEGACY)["applicants"]
+    assert legacy[0] == "The following entities may apply for Community Legacy funding" and "Local governments" in legacy
+
+
+class _Client:
+    """Serves the saved pages; `broken` ids raise."""
+
+    def __init__(self, broken=()):
+        self.broken, self.calls = set(broken), []
+
+    def get(self, url):
+        import httpx
+        self.calls.append(url)
+        sid = url.removeprefix(md.BASE + "/")
+        if sid in self.broken:
+            raise httpx.ConnectError("down")
+        html = payload(sid)["main_html"]
+
+        class R:
+            text = f"<html><body><main>{html}</main></body></html>"
+
+            def raise_for_status(self):
+                pass
+        return R()
+
+
+def test_before_fetch_reads_the_srp_page_and_every_sub_program_once(monkeypatch):
+    monkeypatch.setattr(md.time, "sleep", lambda s: None)
+    client = _Client()
+    context = md.SITE.before_fetch(client)
+    assert [s["id"] for s in context["srp"]] == SUBS
+    assert client.calls == [f"{md.BASE}/{sid}" for sid in [SRP, *SUBS]]
+
+
+def test_before_fetch_with_an_unreadable_page_returns_nothing_so_the_stored_copy_stands(monkeypatch):
+    monkeypatch.setattr(md.time, "sleep", lambda s: None)
+    assert md.SITE.before_fetch(_Client(broken={SUBS[2]})) == {}
+    assert md.SITE.before_fetch(_Client(broken={SRP})) == {}
+
+
+def test_annotate_stamps_only_the_srp_page():
+    context = {"srp": [{"id": "x", "name": "X", "applicants": ["Local governments"]}]}
+    assert md.SITE.annotate(payload(SRP), context)["sub_programs"] == context["srp"]
+    assert "sub_programs" not in md.SITE.annotate(payload(TAG), context)
+    assert md.SITE.annotate(payload(SRP), {}) == payload(SRP)
+
+
+def srp_record() -> RawRecord:
+    stamped = md.SITE.annotate(payload(SRP), {"srp": [sub(sid) for sid in SUBS]})
+    return RawRecord(source_connector=md.CONNECTOR, source_id=SRP, payload=stamped)
+
+
+def test_srp_takes_its_applicant_tags_from_the_sub_programs():
+    p = md.normalize(srp_record(), today=TODAY)
+    assert {t.value for t in p.applicant_types} == {"municipality", "county", "nonprofit", "higher_ed"}
+    assert "individual" not in {t.value for t in p.applicant_types}
+    assert "Strategic Demolition Fund:" in p.eligibility_text and "Community Legacy Program:" in p.eligibility_text
+    assert p.status == "closed"
+
+
+def test_srp_without_the_sub_program_context_is_what_it_was():
+    p = normalize(SRP)
+    assert p.applicant_types == []
+
+
+def test_srp_tags_are_deduplicated():
+    p = md.normalize(srp_record(), today=TODAY)
+    pairs = [(t.value, t.source_code) for t in p.applicant_types]
+    assert len(pairs) == len(set(pairs))

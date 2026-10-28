@@ -27,8 +27,8 @@ from typing import Any
 import httpx
 
 from connectors.grants_gov import parse_date, parse_int, strip_html
-from connectors.maryland_drupal import applicant_types_for
 from connectors.sam_assistance_listings import clean
+from connectors.text import applicant_types_for, portal_applicant, portal_categories
 from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "pa_grants"
@@ -54,20 +54,6 @@ FUNDING_TYPES: dict[str, str] = {
     "grant": "grant", "loan": "loan", "loan program": "loan", "tax credit": "tax_credit", "tax refund": "tax_credit",
     "reimbursement": "other", "reimbursement agreement": "other", "disaster reimbursement": "other",
     "fund": "other", "incentitive payment": "other", "incentive payment": "other",
-}
-
-# applicantCategory values -> applicant_type. "Public Agency" and "Other Legal Entity" tag nothing on purpose
-# (decision 2 in the doc): the free-text applicantType line names the real ones.
-APPLICANT_CATEGORIES: dict[str, str] = {
-    "municipality": "municipality", "nonprofit": "nonprofit", "school": "school", "business": "business",
-    "individual": "individual", "native american tribal organization or government": "tribe",
-}
-
-CATEGORIES: dict[str, str] = {
-    "transportation": "transportation", "energy": "energy", "environment & water": "water", "housing": "housing",
-    "parks & recreation": "parks", "health & human services": "health",
-    "employment, labor, & training": "workforce", "law, justice, & legal services": "public_safety",
-    "community & economic development": "infrastructure",
 }
 
 ROLLING_RE = re.compile(r"continuous|rolling|re-?occurring|revolving", re.I)
@@ -274,7 +260,7 @@ def rolling_for(value: Any) -> bool | None:
 def applicant_tags(rec: dict[str, Any]) -> list[ApplicantTag]:
     tags: list[ApplicantTag] = []
     for part in _parts(rec.get("applicantCategory")):
-        value = APPLICANT_CATEGORIES.get(part.lower())
+        value = portal_applicant(part)
         if value and all(t.value != value for t in tags):
             tags.append(ApplicantTag(value=value, source_code=part))
     for tag in applicant_types_for(_text(rec.get("applicantType")) or None):
@@ -284,7 +270,8 @@ def applicant_tags(rec: dict[str, Any]) -> list[ApplicantTag]:
 
 
 def category_tags(rec: dict[str, Any]) -> list[CategoryTag]:
-    return [CategoryTag(value=CATEGORIES.get(part.lower(), "other"), source_code=part) for part in _parts(rec.get("category"))]
+    return [CategoryTag(value=value, source_code=part)
+            for part in _parts(rec.get("category")) for value in portal_categories(part)]
 
 
 def eligibility_text_for(rec: dict[str, Any]) -> str | None:

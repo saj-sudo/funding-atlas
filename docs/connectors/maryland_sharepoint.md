@@ -58,6 +58,8 @@ facts), `classify_page`, `normalize`.
    `last_seen` older than the connector's last successful run.
 4. **A 404 on an index link is skipped, not fatal.** Dead links are a fact of hand-curated indexes (6 of 34 on MEA,
    2 of 23 on DNR). An index that itself fails to load aborts the run.
-5. **No `connectors/text.py` yet.** `clean`, `sentences`, `applicant_types_for`, `funding_type_for`, `parse_date`
-   and the HTTP constants are imported from where they live (`maryland_drupal.py`, `grants_gov.py`,
-   `sam_assistance_listings.py`), as `md_mht` already does. A third platform base is the case that forces the move.
+5. **`connectors/text.py` did not exist yet (superseded 2026-10-28).** `clean`, `sentences`, `parse_date` and the HTTP
+   constants are still imported from where they live (`maryland_drupal.py`, `grants_gov.py`,
+   `sam_assistance_listings.py`). `applicant_types_for` and `funding_type_for` moved to `connectors/text.py` when
+   Pennsylvania, West Virginia, California and Illinois were importing them from a Maryland module; this module
+   imports them back, so nothing here changed.

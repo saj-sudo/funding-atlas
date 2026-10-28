@@ -166,8 +166,9 @@ to use when the run gets too slow. The payload is `{"hit": <copapwp* fields>, "d
    silently returns nothing one day.
 2. **`Public Agency` and `Other Legal Entity` tag nothing.** `Public Agency` covers counties, state agencies, authorities
    and special districts at once; tagging all four would invent eligibility. The free-text line names the real ones and
-   the shared keyword tagger reads it. Third reuse of `applicant_types_for` (Drupal, SharePoint, now this); still no
-   `connectors/text.py`.
+   the shared keyword tagger reads it. The label table is now shared with California and Illinois
+   (`connectors/text.py` `PORTAL_APPLICANTS`, `PORTAL_CATEGORIES`, moved there 2026-10-28), so `Nonprofit organizations`
+   also tags nonprofit and `Community & Economic Development` is the same infrastructure as everywhere else.
 3. **Placeholder dates are kept.** `2035-12-31` and `2999-07-01` are how the portal says "no deadline"; the record keeps
    them and `rolling` comes from `grantCycle`, never from the distance of a date.
 4. **`Federal` money is `pass_through` with no ALN.** The record never names a listing; the ALN column stays empty

@@ -18,6 +18,8 @@ uv run python cli.py run md_mea                               # Maryland Energy 
 uv run python cli.py run md_dnr                               # Maryland DNR: 1 index + ~22 pages, under a minute
 uv run python cli.py run pa_grants                            # Pennsylvania pa.gov grants index: 4 search pages + ~377 detail pages, about 10 minutes
 uv run python cli.py run wv_grants                            # West Virginia grants.wv.gov: one JSON request, ~124 items, seconds
+uv run python cli.py run ca_grants                            # California Grants Portal: one CSV from data.ca.gov, ~2,025 rows, seconds
+uv run python cli.py run il_csfa                              # Illinois CSFA opportunity list: 1 list + ~70 detail pages, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -33,7 +35,9 @@ parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`,
 `connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading), and
 `pa_grants`, the first state outside Maryland: Pennsylvania's pa.gov grants index (a Coveo search index plus one JSON
 record per grant page, 377 grants from 17 agencies with a labelled status), and `wv_grants`, West Virginia's grants portal
-read through its JSON API (one request, 124 items, status from the page's own date rule). Each
+read through its JSON API (one request, 124 items, status from the page's own date rule), and `ca_grants`, the California Grants Portal's
+daily open-data CSV (one file, about 2,025 grants with a labelled status), and `il_csfa`, Illinois's Catalog of State Financial Assistance (the list of
+rounds posted now, 119 rows; the native ones read with their program's eligibility). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 
