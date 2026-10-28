@@ -119,3 +119,16 @@ def test_economic_development_means_the_same_thing_in_every_state():
     """pa.gov, Illinois and California name it differently; all three read as infrastructure."""
     for label in ("Community & Economic Development", "Economic Development", "Housing, Community and Economic Development"):
         assert "infrastructure" in portal_categories(label)
+
+
+@pytest.mark.parametrize("label, expected", [
+    ("Community Development", ("infrastructure",)),
+    ("Disaster Assistance", ("public_safety",)),
+    ("Disaster Preparedness", ("public_safety",)),
+    ("Child Health", ("health",)),
+    ("Health", ("health",)),
+    ("Prevention/Treatment", ("health",)),
+    ("Historic Preservation", ("other",)),
+])
+def test_webgrants_storefront_categories(label, expected):
+    assert portal_categories(label) == expected

@@ -18,6 +18,7 @@ from connectors import (
     md_mht,
     pa_grants,
     sam_assistance_listings,
+    webgrants,
     wv_grants,
 )
 from pipeline.upsert import mark_missing, upsert
@@ -34,6 +35,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "wv_grants": wv_grants,
     "ca_grants": ca_grants,
     "il_csfa": il_csfa,
+    "webgrants": webgrants,
 }
 
 

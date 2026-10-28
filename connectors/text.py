@@ -132,6 +132,9 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "disaster prevention and relief": ("public_safety",),
     "community and economic development": ("infrastructure",), "economic development": ("infrastructure",),
     "housing community and economic development": ("housing", "infrastructure"),
+    "community development": ("infrastructure",),
+    "disaster assistance": ("public_safety",), "disaster preparedness": ("public_safety",),
+    "health": ("health",), "child health": ("health",), "prevention/treatment": ("health",),
 }
 
 
