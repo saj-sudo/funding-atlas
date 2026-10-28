@@ -19,6 +19,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 8.2 | 50-state portal census (light) | 2026-10-18 | every state plus DC, one row each: portal, vendor, public listing, access, verdict; folds in the WebGrants spot-check (8.1). Three states are one connector away (CA: an open-data CSV of 2,023 grants with a labelled status; IL: the CSFA opportunity and program lists; IA: a WebGrants storefront with a Status column), WebGrants is the one vendor with a public listing in two states (IA, MT agencies), NJ and TX are small builds, NY needs a deeper look behind a PeopleSoft shell, 18 states are agency-by-agency, 10 hosts block this client, 7 states have no state-run index at the URLs found | `docs/surveys/state_portals.md` |
 | 9.2 | West Virginia: `wv_grants` | 2026-10-18 | grants.wv.gov's `AvailableGrants` list through the state's JSON API: one POST, 124 records, no HTML. Status by the page's own date rule (active, future-posted), then the MEA rules for `Forecasted` text (a month or season still ahead is a forecast, a past one is a stale page, dateless wording is cycle text for the between-rounds group); `Pass-through` is the only funding-source claim; categories by division keyword with the division as source code. First run 124 added (5 open, 1 forecasted, 83 closed, 35 unknown), second run 0 changed; 1 open municipal row on the WV page, 0 between rounds (the county-only solid-waste rounds do not carry a `municipality` tag) | `connectors/wv_grants.md` |
 | 9.3 | California: `ca_grants` | 2026-10-27 | the California Grants Portal's daily open-data CSV on data.ca.gov: one GET (6.6 MB) through the dataset download path, because data.ca.gov's robots.txt disallows `/api/`; no HTML. The portal's labelled status taken as is (active, closed, forecasted); `Public Agency` and `Other Legal Entity` tag nothing and `ApplicantTypeNotes` goes through the shared keyword tagger (fourth reuse); `Ongoing` deadlines are rolling; text open dates (`Fall 2026`) are kept as text. First run 2,025 added (164 open, 3 forecasted, 1,858 closed) in five seconds, second run 0 changed; the California page shows 28 open municipal rows (all likely) from 73 agencies and 52 between rounds | `connectors/ca_grants.md` |
+| 9.4 | Illinois: `il_csfa` | 2026-10-28 | the Catalog of State Financial Assistance's opportunity list (GATA, omb.illinois.gov): one static table of the rounds posted now, 119 rows, plus a native opportunity page and its program page for the 35 that have one (eligibility, funding source, match, CSFA number) and the list alone for the 84 GMS rows that link out to AmpliFund (never fetched). Status from the list's own dates; `No end date` is rolling; `Government Organizations` tags nothing and the program's free-text eligibility decides. First run 119 added in 27 seconds, second run 0 changed; the Illinois page shows 11 open municipal rows (all likely) from 16 agencies, 0 between rounds | `connectors/il_csfa.md` |
 
 ## Next
 
@@ -78,7 +79,7 @@ the state-run central index. One connector per session, in this order:
 3. **`ca_grants`** (California, shipped 2026-10-27, see Done): one CSV from `data.ca.gov` (`california-grants-portal-data.csv`), 2,023 rows with a labelled
    `Status` (active / closed / forecasted), open date, deadline, applicant type, funding source, match, amounts, `LastUpdated`
    and `GrantURL`. No HTML. Doc question: the applicant-type vocabulary and the free-text notes that name cities and counties.
-4. **`il_csfa`** (Illinois): the CSFA opportunity list (title, agency, application date range, award range) and program list
+4. **`il_csfa`** (Illinois, shipped 2026-10-28, see Done): the CSFA opportunity list (title, agency, application date range, award range) and program list
    as HTML tables on `omb.illinois.gov/public/gata/csfa/`. Listed means open; "No end date" is rolling.
 5. **`webgrants`** (Iowa, Montana agencies): the WebGrants storefront, `storefrontFOList.do` plus one detail page per
    opportunity, a labelled `Status`; states and agency hosts as configuration. Decide in the doc what a round that leaves
@@ -103,8 +104,9 @@ Done 2026-10-18 (polish before outreach):
   `PLACEHOLDER_YEARS = 5` in `scripts/build_site.py`.
 
 Still open:
-- The shared applicant tagger matches `cities` but not `city`: California's "a city, county, or city and county" tags
-  `county` only. Fixing the shared pattern moves other connectors' hashes, so it waits for its own session.
+- The shared applicant tagger matches `cities` but not `city`, `villages` or `townships`: California's "a city, county,
+  or city and county" tags `county` only, and Illinois's "cities, villages, townships and counties" gets its tags from
+  `cities` and `counties`. Fixing the shared pattern moves other connectors' hashes, so it waits for its own session.
 - Nine DHCD records have no applicant tags (State Revitalization Programs, Main Street Improvement Grant, others
   listed in `connectors/md_dhcd.md`); SRP and MIP are municipal rounds and will not surface when they reopen.
 
@@ -171,6 +173,9 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-27 | California's `Public Agency` tags no applicant type | the pa_grants rule: it covers state departments, JPAs, special districts, cities and counties, and 149 of 164 active rows carry it; the notes tag 28 active rows `municipality` | `connectors/ca_grants.md` decision 2 |
 | 2026-10-27 | One estimated award amount is both the minimum and the maximum | `EstAmounts` is the per-award estimate; a single figure is the source's one number, not a ceiling; total funds stay in the payload | `connectors/ca_grants.md` decision 3 |
 | 2026-10-27 | "Housing, Community and Economic Development" maps to housing | the label leads with housing; the portal word stays as `source_code` | `connectors/ca_grants.md` decision 4 |
+| 2026-10-28 | Illinois GMS rows are read from the list alone; AmpliFund pages are not fetched | 84 of 119 rows link out to a second vendor host that serves no robots rules; the list already gives a title, agency, dates and award range; the 60 DNR rows are the open question once someone has looked at the Illinois page | `connectors/il_csfa.md` decision 1 |
+| 2026-10-28 | A round that leaves Illinois's list is `unknown`, closed only if its native page still shows an ended range | the list is "posted now" and a round that ends is dropped, which the source does not state as a closure; the WebGrants question answered the same way | `connectors/il_csfa.md` |
+| 2026-10-28 | `Government Organizations`, `Education Organizations` and `Other` tag no applicant type | the pa_grants and ca_grants rule again; 13 of the 23 native rounds that carry `Government Organizations` get no municipal tag, several plausibly town programs, because the source does not say | `connectors/il_csfa.md` decision 2 |
 
 ## Open questions (do not resolve in code yet)
 
