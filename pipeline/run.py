@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 from types import ModuleType
 
 from connectors import (
+    ca_grants,
     grants_gov,
     md_commerce,
     md_dhcd,
@@ -30,6 +31,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "md_dnr": md_dnr,
     "pa_grants": pa_grants,
     "wv_grants": wv_grants,
+    "ca_grants": ca_grants,
 }
 
 
