@@ -169,9 +169,8 @@ posted date is not mapped. Attachments and contact names stay in the payload.
    pa_grants and ca_grants rule: `Government Organizations` covers state agencies, local governments, tribes and
    districts alike (23 of 33 programs carry it). `Nonprofit Organizations` → nonprofit, `For-Profit Organizations` and
    `Small Businesses` → business, `Individuals` → individual, `Public Housing Organizations` → housing_authority.
-   `Applicant Eligibility` goes through the shared keyword tagger (fifth reuse). The tagger does not know `villages` or
-   `townships`, so "cities, villages, townships and counties" tags municipality and county from `cities` and `counties`;
-   the rest rides on the data-cleanup item below.
+   `Applicant Eligibility` goes through the shared keyword tagger in `connectors/text.py`, which knows `city`, `village`,
+   `township`, `borough` and `local jurisdiction` since 2026-10-28. The label table is shared with pa.gov and California.
 3. **Subject Area maps by the portal's word, once per program.** Economic Development → infrastructure (the pa.gov
    "Community & Economic Development" rule), Public Safety → public_safety, Human Services → health; Government
    Services, Education, and "Quality of Natural, Cultural, and Environmental Resources" (a mix of parks, water and arts)
@@ -190,7 +189,7 @@ posted date is not mapped. Attachments and contact names stay in the payload.
   are plausibly town programs (Downstate Transit Improvement Fund, Transportation Alternatives for large MPOs, Regional
   Site Readiness, Redeploy Illinois, Lead Service Line Inventory), and the source does not say so; they stay off the
   town view until it does (reading each round's NOFO attachment is out of scope).
-- The shared tagger does not match `villages`, `townships` or `city` (the same gap as California's).
+- The tagger reads `Baltimore City` and `City of Philadelphia` as named places, not as "cities may apply".
 
 ## Out of scope
 

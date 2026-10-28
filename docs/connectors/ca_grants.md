@@ -150,18 +150,18 @@ reused; if the process has none, the connector reads the file once more.
 2. **`Public Agency` and `Other Legal Entity` tag nothing; the notes decide.** The pa_grants decision 2 rule: Public
    Agency covers state departments, special districts, JPAs, cities and counties alike, and 149 of the 164 active rows
    carry it. `Nonprofit` → nonprofit, `Tribal Government` → tribe, `Business` → business, `Individual` → individual;
-   `ApplicantTypeNotes` goes through the shared keyword tagger (`connectors.maryland_drupal.applicant_types_for`, fourth
-   reuse). On the day that tags 28 of the 164 active rows `municipality` and 40 `county`. Not `Description`: it mixes
+   `ApplicantTypeNotes` goes through the shared keyword tagger (`connectors/text.py`). On the day that tags 28 of the 164 active rows `municipality` and 40 `county`. Not `Description`: it mixes
    eligibility with project rules and place names, and the tagger is built for who-may-apply lines.
 3. **One estimated amount is both the minimum and the maximum.** `EstAmounts` is the estimated award size; a single
    figure is the source's one number for it, not a ceiling. Total funds (`EstAvailFunds`) are not an award size and
    stay in the payload.
 4. **Categories by the portal's own vocabulary.** Environment & Water → water; Energy → energy; Transportation →
    transportation; Parks & Recreation → parks; Health & Human Services → health; Employment, Labor & Training →
-   workforce; Housing, Community and Economic Development → housing (the label leads with housing; pa.gov's separate
-   "Community & Economic Development" maps to infrastructure); Law, Justice, and Legal Services and Disaster Prevention
-   & Relief → public_safety; everything else (Disadvantaged Communities, Education, Agriculture, Libraries and Arts,
-   ...) → other, with the portal's word as `source_code` so SQL can redo the map.
+   workforce; Housing, Community and Economic Development → **housing and infrastructure** (changed 2026-10-28: the label
+   names two topics, and pa.gov's "Community & Economic Development" and Illinois's "Economic Development" are
+   infrastructure; the table is shared in `connectors/text.py`); Law, Justice, and Legal Services and Disaster
+   Prevention & Relief → public_safety; everything else (Disadvantaged Communities, Education, Agriculture, Libraries
+   and Arts, ...) → other, with the portal's word as `source_code` so SQL can redo the map.
 5. **Forecasted open text is kept as text.** `Fall 2026` is not a date; it goes to `closes_at_text` as `Opens: Fall
    2026` and `opens_at` stays null. The status is the portal's label, not derived from the text.
 
@@ -169,8 +169,10 @@ reused; if the process has none, the connector reads the file once more.
 
 - 56 active rows have no `ApplicantTypeNotes`; when their `ApplicantType` is only Public Agency they carry no applicant
   tag and stay off the municipal views, by decision 2.
-- The shared tagger matches `cities`, not `city`: "a city, county, or city and county" tags `county` only. Changing the
-  shared pattern would move other connectors' hashes; it is a data-cleanup item, not this connector's.
+- Fixed 2026-10-28: the shared tagger now matches `city`, `village`, `township`, `borough` and `local jurisdiction`
+  ("a city, county, or city and county" tagged `county` only before). On the stored file that moved 378 California
+  records (73 from the tagger, the rest from the housing and infrastructure label) and lifted the California page's open
+  municipal rows from 28 to 39.
 
 ## Out of scope
 

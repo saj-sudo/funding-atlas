@@ -17,6 +17,9 @@ connector or one feature per session, no abstractions before the third real case
   `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; `pa_grants` reads a
   search index plus one JSON record per page; a new platform base is extracted only when the second site on that
   platform forces it.
+- `connectors/text.py`: the rules every state shares: the applicant tagger, the funding-type keyword, and the tables that
+  turn a portal's own applicant and topic labels into ours. A rule that is wrong for one source is wrong for all and is
+  fixed there; a portal label is added to the table once, not per connector.
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.

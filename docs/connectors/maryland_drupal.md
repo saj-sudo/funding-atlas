@@ -27,7 +27,11 @@ Enterprise Zones are designated for local jurisdictions).
 - `sitemap.xml` with `<loc>` and `<lastmod>` per page. Enumerate from it; skip paths that are never programs.
 - `<main>` wrapping the page; `<h1>` is the program name; `<meta name="description">` is the summary;
   `<meta property="og:updated_time">` moves when the page is edited.
-- Body in `<div class="usa-prose maryland-toc-target">` organized by `<h2>` sections. Eligibility sections are headed
+- Body in `<div class="usa-prose maryland-toc-target">` organized by `<h2>` sections. **Two markups (found 2026-10-28):**
+  newly published pages nest it as `<div class="maryland-toc-target"><div class="usa-prose">`. `prose_container()` takes
+  the old exact form first, then the nested one; with neither it falls back to the whole page and finds no `<h2>`
+  sections, which looks like a page with no eligibility and no status wording and fails silently (Maritime Heritage
+  Grant read closed while open; Community Schools Rental Assistance lost its renter eligibility). Eligibility sections are headed
   `Eligible applicants`, `Who is eligible to apply?` (DHCD), `Who Can Apply`, `Who This Is For` (Commerce),
   `Eligible applicants`, `Eligibility` (MHT).
 - Optional `div.maryland-summary-box` component (DHCD uses it for Application status; MHT for a "now open" banner).

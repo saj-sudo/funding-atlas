@@ -20,6 +20,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 9.2 | West Virginia: `wv_grants` | 2026-10-18 | grants.wv.gov's `AvailableGrants` list through the state's JSON API: one POST, 124 records, no HTML. Status by the page's own date rule (active, future-posted), then the MEA rules for `Forecasted` text (a month or season still ahead is a forecast, a past one is a stale page, dateless wording is cycle text for the between-rounds group); `Pass-through` is the only funding-source claim; categories by division keyword with the division as source code. First run 124 added (5 open, 1 forecasted, 83 closed, 35 unknown), second run 0 changed; 1 open municipal row on the WV page, 0 between rounds (the county-only solid-waste rounds do not carry a `municipality` tag) | `connectors/wv_grants.md` |
 | 9.3 | California: `ca_grants` | 2026-10-27 | the California Grants Portal's daily open-data CSV on data.ca.gov: one GET (6.6 MB) through the dataset download path, because data.ca.gov's robots.txt disallows `/api/`; no HTML. The portal's labelled status taken as is (active, closed, forecasted); `Public Agency` and `Other Legal Entity` tag nothing and `ApplicantTypeNotes` goes through the shared keyword tagger (fourth reuse); `Ongoing` deadlines are rolling; text open dates (`Fall 2026`) are kept as text. First run 2,025 added (164 open, 3 forecasted, 1,858 closed) in five seconds, second run 0 changed; the California page shows 28 open municipal rows (all likely) from 73 agencies and 52 between rounds | `connectors/ca_grants.md` |
 | 9.4 | Illinois: `il_csfa` | 2026-10-28 | the Catalog of State Financial Assistance's opportunity list (GATA, omb.illinois.gov): one static table of the rounds posted now, 119 rows, plus a native opportunity page and its program page for the 35 that have one (eligibility, funding source, match, CSFA number) and the list alone for the 84 GMS rows that link out to AmpliFund (never fetched). Status from the list's own dates; `No end date` is rolling; `Government Organizations` tags nothing and the program's free-text eligibility decides. First run 119 added in 27 seconds, second run 0 changed; the Illinois page shows 11 open municipal rows (all likely) from 16 agencies, 0 between rounds | `connectors/il_csfa.md` |
+| 10.1 | One tagger, one vocabulary, DHCD cleanup | 2026-10-28 | the applicant tagger and funding-type rule moved to `connectors/text.py` (pa, wv, ca, il no longer import a Maryland module); `city`, `village`, `township`, `borough` and `local jurisdiction` tag a municipality, a named city (`Baltimore City`, `City of Philadelphia`) and `the local jurisdiction` do not; pa.gov, California and Illinois portal labels read from one table (economic development is infrastructure in every state, California's compound housing, community and economic development carries both housing and infrastructure). Measured on all 3,700 stored records: 389 hashes move, 378 of them California, none in Maryland. DHCD: Housing Leadership Awards takes its applicants from "Award categories", State Revitalization Programs takes them from its six sub-program pages (local governments, nonprofit community development organizations, institutions of higher education). **Found on the way:** the Maryland site now serves some pages on a different body markup, which `_prose()` read as empty; Maritime Heritage Grant was showing closed while open (deadline Nov 13) and Community Schools Rental Assistance had lost its renter eligibility. Both fixed. On the live data: Maryland open municipal rows 12 → 14, California 28 → 39 | `connectors/text.py`, `connectors/md_dhcd.md`, `connectors/maryland_drupal.md` |
 
 ## Next
 
@@ -103,12 +104,19 @@ Done 2026-10-18 (polish before outreach):
   beside it, sort with the undated rows and leave the Deadline facet's "Has a date" bucket; the record keeps the date.
   `PLACEHOLDER_YEARS = 5` in `scripts/build_site.py`.
 
-Still open:
-- The shared applicant tagger matches `cities` but not `city`, `villages` or `townships`: California's "a city, county,
-  or city and county" tags `county` only, and Illinois's "cities, villages, townships and counties" gets its tags from
-  `cities` and `counties`. Fixing the shared pattern moves other connectors' hashes, so it waits for its own session.
-- Nine DHCD records have no applicant tags (State Revitalization Programs, Main Street Improvement Grant, others
-  listed in `connectors/md_dhcd.md`); SRP and MIP are municipal rounds and will not surface when they reopen.
+Done 2026-10-28 (10.1): the shared tagger matches `city`, `village`, `township`, `borough` and `local jurisdiction`; portal
+labels share one table; the DHCD records the source names an applicant for (Housing Leadership Awards, State Revitalization
+Programs) are tagged.
+
+Still open, none of them fixable without inventing a fact:
+- Main Street Improvement Grant lists "Main Street Maryland communities" and "community development organizations" as
+  eligible and never says municipality, so it stays untagged. The 2026-10-16 note that it is a municipal round was an
+  assumption; ask DHCD, or Saj decides to read "Main Street Maryland communities" as municipal.
+- 13 of the 23 Illinois rounds that list only `Government Organizations` carry no municipal tag (their free text is `N/A`
+  or `SEE NOFO`); several are plausibly town programs. Reading each round's NOFO attachment is the fix.
+- Homelessness Solutions, Housing Choice Voucher, Lead Hazard Reduction and Tier Structure name no applicant type.
+- The tagger reads `Baltimore City` as a named place, so a program for "county governments, including Baltimore City"
+  tags county only.
 
 ### Outreach (tracked, not a milestone)
 
@@ -176,6 +184,12 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-28 | Illinois GMS rows are read from the list alone; AmpliFund pages are not fetched | 84 of 119 rows link out to a second vendor host that serves no robots rules; the list already gives a title, agency, dates and award range; the 60 DNR rows are the open question once someone has looked at the Illinois page | `connectors/il_csfa.md` decision 1 |
 | 2026-10-28 | A round that leaves Illinois's list is `unknown`, closed only if its native page still shows an ended range | the list is "posted now" and a round that ends is dropped, which the source does not state as a closure; the WebGrants question answered the same way | `connectors/il_csfa.md` |
 | 2026-10-28 | `Government Organizations`, `Education Organizations` and `Other` tag no applicant type | the pa_grants and ca_grants rule again; 13 of the 23 native rounds that carry `Government Organizations` get no municipal tag, several plausibly town programs, because the source does not say | `connectors/il_csfa.md` decision 2 |
+| 2026-10-28 | `connectors/text.py` exists now | supersedes 2026-10-16 "No `connectors/text.py` yet": the tagger and funding-type rule served six connectors in five states from a Maryland module; moved verbatim, every stored record re-normalized to the same hash, the Maryland modules import the names back | `connectors/text.py` |
+| 2026-10-28 | Portal labels are one table, a label naming two topics carries both | pa.gov's "Community & Economic Development", Illinois's "Economic Development" and California's "Housing, Community and Economic Development" are one subject; DHCD's energy-home-repair already carried two categories | `connectors/text.py` `PORTAL_CATEGORIES` |
+| 2026-10-28 | A named city does not tag a municipality; `the local jurisdiction` does not either | `Baltimore City` and `City of Philadelphia` are one place, and "takes the letter to the local jurisdiction" names the reviewer, not the applicant; without the guards Philadelphia's Local Share Account and Maryland's county formula would have landed on every town's page | `connectors/text.py` |
+| 2026-10-28 | State Revitalization Programs takes its applicants from its sub-program pages | the umbrella page says "for eligibility, review the funding programs"; each run reads the six linked pages once, and a page that cannot be read leaves the stored copy standing | `connectors/md_dhcd.md` |
+| 2026-10-28 | Main Street Improvement Grant stays untagged | the page names "Main Street Maryland communities" and never says municipality; the 2026-10-16 "municipal round" was an assumption, not the source | `connectors/md_dhcd.md` |
+| 2026-10-28 | The body selector accepts both Maryland markups, the old exact form first | the site serves `<div class="usa-prose maryland-toc-target">` on older pages and nested `maryland-toc-target` > `usa-prose` on new ones; the old form is tried first so nothing that parsed before parses differently | `connectors/maryland_drupal.md` |
 
 ## Open questions (do not resolve in code yet)
 
