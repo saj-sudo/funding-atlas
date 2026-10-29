@@ -27,9 +27,55 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 
 ## Next
 
+### Start here (updated 2026-10-29)
+
+**Before anything else.** PR #12 (`webgrants`, `tx_egrants`, `nj_dca_sage`, 197 records) is open. Once it merges, start from the
+latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`), not on top of the old branch. The first
+daily run after the merge adds those 197 records to the published database; they appear as `added` in the change log.
+
+**The next session: New York.** One read-only look, then either a connector or a recorded stop.
+- Where: `https://grantsmanagement.ny.gov/search-funding-sfs`, which leads to the SFS Vendor Portal's Grant Opportunity
+  Portal (PeopleSoft). What the census knows (`docs/surveys/state_portals.md`): the state says a username and password are
+  not necessary, the portal is a JavaScript shell, the old Grants Gateway host no longer resolves, `robots.txt` is standard.
+- What to look for: an endpoint or export visible without running a browser (a JSON or XML call named in the static page,
+  a documented feed, an open-data export the state publishes, as California's CSV is). Check `robots.txt` first.
+- **Stop rule (CLAUDE.md):** if the only way in is to run the page's JavaScript, record that in the census and the decisions
+  log and stop. A headless-browser workaround needs Saj's yes first.
+- If an endpoint exists: doc first (`docs/connectors/ny_*.md`: URL, a raw sample, field mapping), then fixtures, parser,
+  tests, wiring, two live runs, the same shape as `docs/connectors/tx_egrants.md`.
+
+**After New York.** Agency-by-agency connectors only when outreach names a town. The census says which agencies first: NC's
+and WA's seed lists, Virginia's Governor's table. Outreach itself is gated on the site being reachable (below).
+
+**Waiting on Saj (not code).**
+- The live site answers 404 because the repository is private (decision 2026-10-18): make it public, or move Pages to a
+  paid plan. Outreach waits on this.
+- Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
+  them that way (milestone 10).
+- GOCPP: ask the office for crawl permission or a feed (milestone 7). ADECA's `ClaudeBot` disallow: decide whether to read
+  Alabama at all (decision 2026-10-18).
+- The ten blocked hosts (AK, CO, ID, KS, ME, MI, MN's listing, NM, RI, OK's OGX) need one check from an ordinary browser to
+  tell a bot wall from a proxy block (milestone 8.1/8.2).
+
+**Small follow-ups, any session** (each is detailed in the doc named):
+- Shared tagger (`connectors/text.py`): "local units of government" in that word order is not matched; `residents` tags a
+  household on a business grant; `Baltimore City` is read as a named place (milestone 10).
+- Illinois (`il_csfa.md`): read the AmpliFund pages for the 60 DNR rows, and each NOFO for the 13 `Government Organizations`
+  rounds with no municipal tag. Both are decisions to make, not bugs.
+- `webgrants.md`: the "round left the storefront is `unknown`" rule is unverified until a round actually leaves; other
+  Montana agency hosts and other states' storefronts were not searched for; 27 of 40 pages state no eligibility.
+- `nj_dca_sage.md`: the empty-list check is a guess at what a page with no RFPs looks like (a wrong guess aborts the run,
+  which is the safe direction).
+- `tx_egrants.md`: the Funding Sources page (federal or state money) is not read, so `funding_source` is `direct` throughout.
+- Maryland depth (milestone 7): MDEM (two programs), MDOT and MDE (hand-listed pages) when outreach asks for them.
+- Census gaps: 18 agency-by-agency states, 7 with no state index found, 10 blocked (`docs/surveys/state_portals.md`).
+
+Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open notes they carry.
+
 ### 6. Navigator UI and hosting (shipped, see Done)
 
-Live at https://saj-sudo.github.io/funding-atlas/. Left for a later session, none blocking: shareable filter links
+Built and published to `gh-pages`; https://saj-sudo.github.io/funding-atlas/ answers 404 until the repository is public (see
+"Waiting on Saj"). Left for a later session, none blocking: shareable filter links
 are in the URL hash already; a per-state RSS or JSON feed of the change log; the Grants.gov data-cleanup items under
 milestone 10 show on the page as they are in the database (`&quot;` in deadline text, contact names as agencies).
 
@@ -66,8 +112,9 @@ state turned it up, so a third storefront state may exist.
 
 ### 9. Platform connectors
 
-The survey found no commercial grants-management vendor with a public listing in two or more states, so the "platform" is
-the state-run central index. One connector per session, in this order:
+The Mid-Atlantic survey (2026-10-17) found no commercial grants-management vendor with a public listing, so milestone 9
+began with state-run central indexes. The 50-state census (8.2) then found one vendor with public listings in two states,
+WebGrants (Iowa, Montana), built as item 5. One connector per session, in this order:
 
 1. **`pa_grants`** (Pennsylvania, shipped 2026-10-17, see Done): enumerate from the pa.gov Coveo index (`searchHub: "All Grants"`, public search key
    read from `/grants/search` at run time), one record per `/grants/search/grant-details/<agency>/<n>` page, whose
@@ -89,8 +136,9 @@ the state-run central index. One connector per session, in this order:
    opportunity, a labelled `Status`; states and agency hosts as configuration. Decide in the doc what a round that leaves
    the storefront becomes.
 6. **`tx_egrants`** (Texas Governor's Office) and **`nj_dca_sage`** (New Jersey DCA), both shipped 2026-10-28, see Done.
-7. New York SFS: a deeper look for the Grant Opportunity Portal's endpoint. Agency connectors (VA, MA, OR, and the rest)
-   only when a town asks; NC's and WA's seed lists and VA's Governor's table say which agencies first.
+7. New York SFS: a deeper look for the Grant Opportunity Portal's endpoint, with a stop rule if the only way in is running
+   its JavaScript (the steps are under "Start here"). Agency connectors (VA, MA, OR, and the rest) only when a town asks;
+   NC's and WA's seed lists and VA's Governor's table say which agencies first.
 
 ### 10. Data cleanup (small, rides any session)
 

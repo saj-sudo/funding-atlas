@@ -42,7 +42,7 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-28)
+## Current state (2026-10-29)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
@@ -51,4 +51,5 @@ Milestones 1 to 8.2, 9.1 to 9.7 and 10.1 shipped. **The live site answers 404: t
 repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
 the build. GOCPP is blocked by its robots.txt (ask the office). Next per the census (`docs/surveys/state_portals.md`):
 a look at New York's SFS Grant Opportunity Portal (a JavaScript shell; likely say-so-and-stop), then agency connectors
-only when outreach names a town. See the roadmap.
+only when outreach names a town. **Start with the "Start here" block at the top of the roadmap's Next section**: the next
+action, what waits on Saj, and the open follow-ups in one place.
