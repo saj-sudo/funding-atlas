@@ -42,12 +42,14 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-28)
+## Current state (2026-10-29)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
-(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list, 119 records). Milestones 1 to 8.2 and
-9.1 to 9.4 shipped. **The live site answers 404: the
+(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list, 119 records), `webgrants` (Iowa and Montana storefronts, 40 records), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records).
+Milestones 1 to 8.2, 9.1 to 9.7 and 10.1 shipped. **The live site answers 404: the
 repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
 the build. GOCPP is blocked by its robots.txt (ask the office). Next per the census (`docs/surveys/state_portals.md`):
-a `webgrants` storefront connector (IA, MT), then NJ and TX. See the roadmap.
+a look at New York's SFS Grant Opportunity Portal (a JavaScript shell; likely say-so-and-stop), then agency connectors
+only when outreach names a town. **Start with the "Start here" block at the top of the roadmap's Next section**: the next
+action, what waits on Saj, and the open follow-ups in one place.
