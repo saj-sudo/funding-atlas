@@ -23,6 +23,7 @@ uv run python cli.py run il_csfa                              # Illinois CSFA op
 uv run python cli.py run webgrants                            # WebGrants storefronts (Iowa, Montana Agriculture, Montana FWP): 3 lists + ~40 detail pages, under a minute
 uv run python cli.py run nj_dca_sage                          # New Jersey DCA SAGE: one page, ~10 RFPs, seconds
 uv run python cli.py run tx_egrants                           # Texas Governor eGrants: Active page + 6 archive pages, ~147 rounds, seconds
+uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -43,7 +44,8 @@ daily open-data CSV (one file, about 2,025 grants with a labelled status), and `
 rounds posted now, 119 rows; the native ones read with their program's eligibility), and `webgrants`, the one vendor platform with a public
 listing in two states: the WebGrants storefronts of Iowa and Montana's agency hosts (the state is configuration; about 40 rounds), and
 `tx_egrants`, the Texas Governor's eGrants announcements (the Active page plus the archive, about 147 rounds, each stating who may apply), and
-`nj_dca_sage`, New Jersey DCA's public SAGE list (one page, about 10 RFPs). Each
+`nj_dca_sage`, New Jersey DCA's public SAGE list (one page, about 10 RFPs), and `ny_sfs`, New York's SFS Grant Opportunity Portal
+(PeopleSoft, read through its own form posts: about 30 open rows with an abstract each, plus the closed grid). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 

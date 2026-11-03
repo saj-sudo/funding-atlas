@@ -118,6 +118,8 @@ PORTAL_APPLICANTS: dict[str, str] = {
     "individual": "individual", "individuals": "individual",
     "tribal government": "tribe", "native american tribal organization or government": "tribe",
     "public housing organizations": "housing_authority",
+    # New York SFS (the portal's five eligibility labels; `Governmental Entity` is the broad one and tags nothing)
+    "not-for-profit": "nonprofit", "for profit": "business", "tribal organization": "tribe",
 }
 
 # Topic label -> categories. A label that names two topics carries both (as DHCD's energy-home-repair section
@@ -135,6 +137,11 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "community development": ("infrastructure",),
     "disaster assistance": ("public_safety",), "disaster preparedness": ("public_safety",),
     "health": ("health",), "child health": ("health",), "prevention/treatment": ("health",),
+    # New York SFS service areas; the other six (agricultural, education, environmental, family, government supports)
+    # name none of our categories and fall to `other`
+    "health services": ("health",), "housing and shelter services": ("housing",),
+    "workforce development": ("workforce",), "public safety supports": ("public_safety",),
+    "justice services": ("public_safety",), "public transportation services": ("transportation",),
 }
 
 
