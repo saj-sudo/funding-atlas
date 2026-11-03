@@ -1,6 +1,8 @@
 # Maryland SharePoint (mdgov theme): platform notes and the shared base
 
-Milestone 7. MEA and DNR run on the same SharePoint theme; MDEM, MDOT and MDE (not yet connected) do too. The base
+Milestone 7. MEA, DNR, MDEM and MDE run on the same SharePoint theme and the base (MDEM's pages name the rich-text
+control `ctl00`/`ctl01`, so the body selector falls back to the id suffix, 2026-11-03); MDOT's pages are the theme's
+newer Bootstrap layout with no rich-text body and are read by a hand-listed connector instead. The base
 was extracted at DNR, the second site, the way `maryland_drupal.py` was extracted at Commerce: `md_mea` was written
 standalone first, and the extraction commit left every MEA fixture's `record_hash` unchanged.
 

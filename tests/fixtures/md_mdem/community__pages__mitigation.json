@@ -1,0 +1,20 @@
+{
+ "url": "https://mdem.maryland.gov/community/Pages/Mitigation.aspx",
+ "title": "Hazard Mitigation",
+ "description": "An official website of the State of Maryland.",
+ "main_html": "<section class=\"mdgov-section\">\n<div id=\"ctl00_PlaceHolderMain_editmodepanel2\">\n<h1 class=\"mdgov-section__heading\">Hazard Mitigation</h1>\n</div>\n<div id=\"ctl00_PlaceHolderMain_ctl00_label\" style=\"display:none\">Main_Content</div><div aria-labelledby=\"ctl00_PlaceHolderMain_ctl00_label\" class=\"ms-rtestate-field\" id=\"ctl00_PlaceHolderMain_ctl00__ControlWrapper_RichHtmlField\" style=\"display:inline\"><p style=\"text-align:center;\"><b>This page has moved!</b><br/></p><p style=\"text-align:center;\"><br/>Check out our Hazard Mitigation grants and planning efforts at their new home:<br/><a href=\"/Pages/hazard-mitigation.aspx\"><strong>https://mdem.maryland.gov/Pages/hazard-mitigation.aspx</strong><br/></a><br/></p><p><br/></p></div>\n</section>",
+ "content_hash": "b6ed8a62151e779ad7a34ad031c872d0c34c3fecb3681b4a809c5f2362cc192d",
+ "roster": {
+  "title": "Flood Mitigation Assistance (FMA)",
+  "description": "Annual competitive grant funding aiming to reduce or eliminate flood risks and/or provide dedicated funding for flood risk mitigation planning.",
+  "eligible_lines": [
+   "Local Governments and State Agencies",
+   "(Individuals, businesses, and organizations are not eligible, but a government/agency may sponsor the project on their behalf)"
+  ],
+  "applications_open": false,
+  "apply_url": "https://www.fema.gov/grants/mitigation/floods",
+  "deadline": null,
+  "deadline_text": null
+ },
+ "listed": true
+}

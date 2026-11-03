@@ -41,6 +41,7 @@ from connectors.maryland_sharepoint import (
     MarylandSharePointConnector,
     body_div,
     canonical_url,
+    future_marker,
     main_section,
     page_h1,
     page_sentences,
@@ -104,25 +105,8 @@ NOT_A_DEADLINE_RE = re.compile(r"\breports?\b|\bnotif|\baward", re.I)   # report
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible\b|\bmay apply\b|\bavailable to\b|\bopen to\b|\bapplicants?\b|\bapplications? from\b", re.I
 )
-_MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
-           "november", "december")
-
 
 # ---------- pure helpers (no I/O) ----------
-
-def future_marker(text: str, today: date) -> tuple[bool, date | None]:
-    """(is in the future, full date or None) for 'April 2027' or 'July 15, 2026'."""
-    m = DATE_RE.search(text)
-    if m:
-        d = parse_text_date(m.group(0))
-        return (d is not None and d > today), d
-    m = re.search(rf"({MONTH}) (\d{{4}})", text, re.I)
-    if m:
-        month = next((i + 1 for i, name in enumerate(_MONTHS) if name.startswith(m.group(1).lower()[:3])), None)
-        year = int(m.group(2))
-        return (month is not None and (year, month) > (today.year, today.month)), None
-    return False, None
-
 
 def deadline_sentences(sents: list[str]) -> list[tuple[date, str]]:
     """(date, sentence) for every sentence about applications that carries a deadline word and a full date, in
