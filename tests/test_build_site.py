@@ -257,3 +257,92 @@ def test_placeholder_dates_are_flagged_not_dropped():
     assert is_placeholder("2027-06-30", today) is False and is_placeholder(None, today) is False
     assert is_placeholder("not a date", today) is False
 
+
+
+# ---------- the change feed (Atom + JSON) ----------
+
+def test_feed_files_exist_for_root_and_every_state(conn, tmp_path):
+    out, counts = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    assert (out / "feed.xml").exists() and (out / "changes.json").exists()
+    for code in counts:
+        assert (out / code.lower() / "feed.xml").exists() and (out / code.lower() / "changes.json").exists()
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    assert '<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">' in page
+    assert '<link rel="alternate" type="application/atom+xml"' in (out / "index.html").read_text(encoding="utf-8")
+
+
+def test_atom_parses_ids_unique_and_scoped_to_the_state(conn, tmp_path):
+    import xml.etree.ElementTree as ET
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    md = ET.parse(out / "md" / "feed.xml").getroot()
+    assert md.find("a:title", ns).text == "Funding Atlas: changes (Maryland and federal)"
+    assert md.find("a:updated", ns).text == GEN and md.find("a:id", ns).text == build_site.SITE_URL + "md/feed.xml"
+    entries = md.findall("a:entry", ns)
+    assert entries, "the Maryland feed has entries"
+    ids = [e.find("a:id", ns).text for e in entries]
+    assert len(ids) == len(set(ids)) and all(i.startswith(build_site.FEED_ID_PREFIX) for i in ids)
+    assert {e.find("a:category", ns).get("term") for e in entries} <= {"federal", "MD"}
+    assert all(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", e.find("a:updated", ns).text) for e in entries)
+    flip = next(e for e in entries if e.find("a:title", ns).text == "changed: Will Close Later")
+    assert flip.find("a:summary", ns).text == "status open → closed · Maryland DHCD · Maryland"
+    assert flip.find("a:link", ns).get("href") == build_site.SITE_URL + "md/#p=" + quote_slug(conn, "Will Close Later")
+    va = ET.parse(out / "va" / "feed.xml").getroot()
+    assert {e.find("a:category", ns).get("term") for e in va.findall("a:entry", ns)} <= {"federal", "VA"}
+    root = ET.parse(out / "feed.xml").getroot()
+    assert root.find("a:title", ns).text == "Funding Atlas: changes (every source)"
+    assert len(root.findall("a:entry", ns)) <= build_site.FEED_N
+    assert {e.find("a:category", ns).get("term") for e in root.findall("a:entry", ns)} >= {"federal", "MD", "VA"}
+
+
+def quote_slug(conn, name):
+    from urllib.parse import quote
+    return quote(conn.execute("SELECT slug FROM program WHERE name = ?", (name,)).fetchone()[0])
+
+
+def test_changes_json_equals_the_pages_embedded_changes(conn, tmp_path):
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))["changes"]
+    data = json.loads((out / "md" / "changes.json").read_text(encoding="utf-8"))
+    assert data["state"] == "MD" and data["generated_at"] == GEN and data["feed"]["atom"].endswith("/md/feed.xml")
+    assert [c["id"] for c in data["changes"]] == [c["id"] for c in embedded]
+    assert all("summary" in c and "link" in c for c in data["changes"])
+    root = json.loads((out / "changes.json").read_text(encoding="utf-8"))
+    assert root["state"] is None and len(root["changes"]) <= build_site.FEED_N
+
+
+def test_describe_change_wording():
+    d = build_site.describe_change
+    assert d({"type": "added", "fields": []}) == "added to the registry"
+    assert d({"type": "missing", "fields": [{"field": "status", "old": "open", "new": "unknown"}]}) == "no longer listed by the source · status open → unknown"
+    assert d({"type": "changed", "fields": [{"field": "status", "old": "open", "new": "closed"},
+                                            {"field": "eligibility_text", "old": "a", "new": "b"}]}) == "status open → closed · also eligibility text"
+    assert d({"type": "changed", "fields": [{"field": "summary", "old": "a", "new": "b"}]}) == "summary"
+    assert d({"type": "changed", "fields": [{"field": "closes_at", "old": None, "new": "2026-12-01"},
+                                            {"field": "amount_max", "old": 1000, "new": 2500000}]}) == "closes (blank) → 2026-12-01 · max award $1,000 → $2,500,000"
+    assert d({"type": "changed", "fields": []}) == "changed"
+
+
+def test_field_label_mirrors_app_js():
+    js = (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    block = re.search(r"var FIELD_LABEL = \{(.*?)\};", js, re.S).group(1)
+    pairs = dict(re.findall(r"(\w+): '([^']*)'", block))
+    assert pairs == build_site.FIELD_LABEL
+
+
+def test_feed_link_uses_the_state_page_when_listed():
+    c = {"slug": "a-b", "state": "MD", "listed": True, "source_url": "https://x/1"}
+    assert build_site.feed_link(c, "MD") == build_site.SITE_URL + "md/#p=a-b"
+    assert build_site.feed_link({**c, "state": None}, "VA") == build_site.SITE_URL + "va/#p=a-b"      # a federal notice on Virginia's page
+    assert build_site.feed_link({**c, "state": None}, None) == "https://x/1"                          # the root feed has no page for it
+    assert build_site.feed_link({**c, "listed": False}, "MD") == "https://x/1"
+
+
+def test_control_characters_do_not_break_atom():
+    import xml.etree.ElementTree as ET
+    entry = {"id": 1, "at": GEN, "type": "added", "name": "Bad\x00name\x07", "slug": "x", "state": "MD", "level": "state",
+             "agency": "A\x1f", "connector": "md_dhcd", "listed": True, "source_url": "https://x/1", "fields": []}
+    text = build_site.render_atom([entry], state="MD", self_url="https://s/md/feed.xml", alternate_url="https://s/md/", updated=GEN)
+    root = ET.fromstring(text)
+    assert root.find("{http://www.w3.org/2005/Atom}entry/{http://www.w3.org/2005/Atom}title").text == "added: Badname"

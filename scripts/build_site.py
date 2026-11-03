@@ -10,17 +10,25 @@ attachment, and offline. Python here only queries SQL and shapes JSON; the page 
 Nothing here reads a source or invents a value: a NULL in the database is null in the JSON and blank on the page.
 The only derived fields are display rules about the registry's own metadata (is_new, is_updated, days_to_close),
 and the rules are stated in the page footer.
+
+Beside every page sits its change log as a feed: `feed.xml` (Atom) and `changes.json`, the same rows the page's
+Changes tab shows (the newest FEED_N federal plus the newest FEED_N of that state), and at the site root the newest
+FEED_N across every source. An entry's id is a tag URI over the change-log row id, so it never changes; its summary
+is the same wording web/app.js renders (FIELD_LABEL is kept in both places and a test holds them equal).
 """
 
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sqlite3
 import sys
+import xml.etree.ElementTree as ET
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Annotated, Any
+from urllib.parse import quote
 
 import typer
 
@@ -39,6 +47,9 @@ CLOSING_DAYS = 30      # closes within this many days -> "closing soon"
 FEED_N = 200           # change-feed rows per state page: the newest N federal plus the newest N of that state
 INDEX_FEED_N = 20      # change-feed rows on the index
 BETWEEN_MONTHS = 15    # mirrors v_navigator_between (migration 0006): last deadline within this many months
+ATOM_NS = "http://www.w3.org/2005/Atom"
+FEED_ID_PREFIX = "tag:saj-sudo.github.io,2026:funding-atlas/change/"   # a permanent id per change-log row
+FEED_TITLE = "Funding Atlas: changes"
 PLACEHOLDER_YEARS = 5  # a close date this far out is a portal's way of saying "no deadline" (pa.gov uses 2035-12-31 and 2999-07-01)
 
 CONNECTOR_LABEL = {
@@ -274,6 +285,107 @@ def shape_change(row: dict[str, Any], listed_ids: set[int]) -> dict[str, Any]:
     }
 
 
+# ---------- the change feed (Atom + JSON), the same wording as web/app.js ----------
+
+FIELD_LABEL = {
+    "status": "status", "closes_at": "closes", "opens_at": "opens", "closes_at_text": "deadline wording",
+    "amount_max": "max award", "amount_min": "min award", "match_required": "match required", "match_pct": "match %",
+    "name": "name", "summary": "summary", "eligibility_text": "eligibility text", "funding_type": "funding type",
+    "administering_agency": "agency", "applicant_types": "applicant tags", "categories": "categories",
+    "alns": "listings cited", "rolling": "rolling", "source_url": "source URL", "external_number": "number",
+}
+LEAD_FIELDS = ("status", "closes_at", "amount_max", "opens_at")
+_CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def fmt_val(field: str, v: Any) -> str:
+    if v is None or v == "":
+        return "(blank)"
+    if field in ("amount_max", "amount_min"):
+        try:
+            return f"${float(v):,.0f}"
+        except (TypeError, ValueError):
+            return str(v)
+    if field in ("match_required", "rolling"):
+        return "yes" if v else "no"
+    if isinstance(v, list):
+        return f"{len(v)} values"
+    if isinstance(v, dict):
+        return "changed"
+    text = str(v)
+    return text if len(text) <= 40 else text[:39] + "…"
+
+
+def describe_change(c: dict[str, Any]) -> str:
+    """One line of plain text per change: the port of describe() in web/app.js."""
+    lead: list[str] = []
+    rest: list[str] = []
+    for f in c["fields"]:
+        if f["field"] in LEAD_FIELDS:
+            lead.append(f"{FIELD_LABEL[f['field']]} {fmt_val(f['field'], f['old'])} → {fmt_val(f['field'], f['new'])}")
+        else:
+            rest.append(FIELD_LABEL.get(f["field"], f["field"].replace("_", " ")))
+    out = " · ".join(lead)
+    if c["type"] == "added":
+        out = "added to the registry" + (" · " + out if out else "")
+    if c["type"] == "missing":
+        out = "no longer listed by the source" + (" · " + out if out else "")
+    if rest:
+        out += (" · " if out else "") + ("also " if lead or c["type"] != "changed" else "") + ", ".join(rest)
+    return out or "changed"
+
+
+def feed_link(c: dict[str, Any], state: str | None) -> str:
+    """The program on the state page it is listed on, else the source's own page."""
+    page = state or c.get("state")
+    if c.get("listed") and page:
+        return f"{SITE_URL}{page.lower()}/#p={quote(c['slug'] or '')}"
+    return c.get("source_url") or SITE_URL
+
+
+def _who(c: dict[str, Any]) -> str:
+    where = "federal" if c.get("level") == "federal" else (STATE_NAME.get(c.get("state") or "", c.get("state")) or c.get("level") or "")
+    return f"{c.get('agency') or CONNECTOR_LABEL.get(c.get('connector'), c.get('connector'))} · {where}"
+
+
+def _text(value: Any) -> str:
+    return _CONTROL_RE.sub("", str(value if value is not None else ""))
+
+
+def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: str, alternate_url: str, updated: str) -> str:
+    """An Atom feed of the change entries. Built with the standard library; the library escapes the text."""
+    feed = ET.Element("feed", xmlns=ATOM_NS)
+    where = f"{STATE_NAME[state]} and federal" if state else "every source"
+    ET.SubElement(feed, "title").text = f"{FEED_TITLE} ({where})"
+    ET.SubElement(feed, "subtitle").text = "Programs a local government could apply to: added, changed or no longer listed, as read from each source."
+    ET.SubElement(feed, "id").text = self_url
+    ET.SubElement(feed, "updated").text = updated
+    ET.SubElement(feed, "link", rel="self", href=self_url, type="application/atom+xml")
+    ET.SubElement(feed, "link", rel="alternate", href=alternate_url, type="text/html")
+    ET.SubElement(ET.SubElement(feed, "author"), "name").text = "Funding Atlas"
+    for c in entries:
+        e = ET.SubElement(feed, "entry")
+        ET.SubElement(e, "id").text = f"{FEED_ID_PREFIX}{c['id']}"
+        ET.SubElement(e, "title").text = _text(f"{c['type']}: {c['name']}")
+        ET.SubElement(e, "updated").text = c["at"]
+        ET.SubElement(e, "link", rel="alternate", href=feed_link(c, state), type="text/html")
+        ET.SubElement(e, "category", term=c.get("state") or "federal")
+        ET.SubElement(ET.SubElement(e, "author"), "name").text = _text(c.get("agency") or CONNECTOR_LABEL.get(c.get("connector"), c.get("connector")))
+        ET.SubElement(e, "summary", type="text").text = _text(f"{describe_change(c)} · {_who(c)}")
+    return '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(feed, encoding="unicode")
+
+
+def changes_json(entries: list[dict[str, Any]], *, state: str | None, generated_at: str, base: str) -> str:
+    """The same entries as JSON: {generated_at, site_url, state, feed, changes}."""
+    return json.dumps({
+        "generated_at": generated_at,
+        "site_url": SITE_URL,
+        "state": state,
+        "feed": {"atom": base + "feed.xml", "json": base + "changes.json"},
+        "changes": [{**c, "link": feed_link(c, state), "summary": describe_change(c)} for c in entries],
+    }, ensure_ascii=False, separators=(",", ":"))
+
+
 def sources_for(codes: list[str], run_info: dict[str, dict[str, str | None]]) -> list[dict[str, Any]]:
     return [
         {"connector": c, "label": CONNECTOR_LABEL.get(c, c), "last_ok": (run_info.get(c) or {}).get("last_ok")}
@@ -440,7 +552,10 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         programs=programs, changes=changes, coverage=coverage, connectors=connectors,
         run_info=run_info, generated_at=generated_at,
     )
-    return {"index": index, "states": states}
+    # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
+    listed_all = {p["id"] for p in programs} | {p["id"] for p in between}
+    feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
+    return {"index": index, "states": states, "feed": feed}
 
 
 def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
@@ -457,11 +572,19 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     out.mkdir(parents=True)
     (out / ".nojekyll").write_text("")
     (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
+    generated_at = site["index"]["generated_at"]
+    (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",
+                                              alternate_url=SITE_URL, updated=generated_at), encoding="utf-8")
+    (out / "changes.json").write_text(changes_json(site["feed"], state=None, generated_at=generated_at, base=SITE_URL), encoding="utf-8")
     counts: dict[str, int] = {}
     for code, data in site["states"].items():
         d = out / code.lower()
         d.mkdir()
         (d / "index.html").write_text(render_state(data, css, js, state_tpl), encoding="utf-8")
+        base = f"{SITE_URL}{code.lower()}/"
+        (d / "feed.xml").write_text(render_atom(data["changes"], state=code, self_url=base + "feed.xml",
+                                                alternate_url=base, updated=generated_at), encoding="utf-8")
+        (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         counts[code] = len(data["programs"])
     return out, counts
 

@@ -75,6 +75,11 @@ from `gh-pages`, runs every connector (a failing source is logged, not fatal), r
 database without touching the sources. Nothing generated is committed to `main`. One-time setup: in the repository's
 Settings, Pages, set the source to "Deploy from a branch", branch `gh-pages`, folder `/ (root)`.
 
+Every page has its change log as a feed beside it: `/md/feed.xml` (Atom, for a feed reader, Outlook or Slack's RSS app)
+and `/md/changes.json` for each state, `/feed.xml` and `/changes.json` for every source. An entry is one logged change
+(added, changed, no longer listed) on a program a local government could apply to, with the same wording as the
+page's Changes tab; entry ids are permanent, so a reader never re-announces one.
+
 The database behind the live site is downloadable at `/atlas.db.gz` on the site (SQLite; about 84 MB unpacked today, most of it the raw payloads that let warm runs skip unchanged records).
 
 ## Licenses
