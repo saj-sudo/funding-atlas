@@ -72,6 +72,13 @@ def test_a_lower_case_city_after_a_proper_noun_is_still_a_type():
     assert values("Operated by a California city or county") == {"municipality", "county"}
 
 
+def test_not_for_profit_is_an_applicant_not_a_negation():
+    from connectors.maryland_drupal import NEGATION_RE
+    assert not NEGATION_RE.search("Counties, municipalities, not-for-profit organizations and for-profit businesses.")
+    assert not NEGATION_RE.search("Not-for-profit organization dedicated to youth.")
+    assert NEGATION_RE.search("Nonprofits are not eligible.") and NEGATION_RE.search("cannot apply")
+
+
 def test_condition_and_negation_behaviour_is_unchanged():
     assert "individual" not in values("Individual school facilities")
     assert values(["Nonprofits and for-profit businesses"]) == {"nonprofit", "business"}

@@ -123,6 +123,14 @@ PORTAL_APPLICANTS: dict[str, str] = {
     "public housing organizations": "housing_authority",
     # New York SFS (the portal's five eligibility labels; `Governmental Entity` is the broad one and tags nothing)
     "not-for-profit": "nonprofit", "for profit": "business", "tribal organization": "tribe",
+    # Illinois AmpliFund pages, which also use the Grants.gov applicant vocabulary beside the CSFA labels
+    "state governments": "state", "county governments": "county", "city or township governments": "municipality",
+    "special district governments": "special_district",
+    "native american tribal governments (federally recognized)": "tribe",
+    "nonprofits with 501(c)(3) status (excludes institutions of higher education)": "nonprofit",
+    "nonprofits without 501(c)(3) status (excludes institutions of higher education)": "nonprofit",
+    "public and state controlled institutions of higher education": "higher_ed",
+    "private institutions of higher education": "higher_ed",
 }
 
 # Topic label -> categories. A label that names two topics carries both (as DHCD's energy-home-repair section

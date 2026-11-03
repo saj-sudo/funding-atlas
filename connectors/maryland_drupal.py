@@ -51,7 +51,7 @@ APPLICANT_MARKER_RE = re.compile(
     r"|\bopen to\b|\bawarded to\b|\bgo(?:es)? to\b|\bserves?\b|\bbenefit",
     re.I,
 )
-NEGATION_RE = re.compile(r"\b(?:not|cannot|ineligible|except|excluding|unless)\b", re.I)
+NEGATION_RE = re.compile(r"\b(?:not(?!-for-profit)|cannot|ineligible|except|excluding|unless)\b", re.I)   # "not-for-profit" names an applicant
 CONDITION_LEAD_IN_RE = re.compile(
     r"\b(?:that|must|if|which|who|whose|company|business|businesses|you|categories|tracks|following"
     r"|criteria|requirements)\s*:$",

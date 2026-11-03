@@ -2,7 +2,10 @@
 (trimmed), the agency table, and the opportunity and program pages of the native rows as fixtures, and print what the
 connector sees on each.
   uv run python scripts/probe_il_csfa.py
-Writes tests/fixtures/il_csfa/: OpportunityList.html, AgencyList.html, opportunity_<n>.html, program_<n>.html."""
+Writes tests/fixtures/il_csfa/: OpportunityList.html, AgencyList.html, opportunity_<n>.html, program_<n>.html.
+  uv run python scripts/probe_il_csfa.py --amplifund
+adds the GMS rows named in AMPLIFUND_ROWS to the saved list (their live `<tr>`) and saves amplifund_<guid>.html for
+every GMS row on the saved list, contact name, phone and email replaced by placeholders."""
 
 from __future__ import annotations
 
@@ -34,8 +37,50 @@ CASES = {
 }
 
 
+# Titles of GMS rows worth a fixture beyond the three the list probe keeps: a negated applicant sentence, and the
+# Grants.gov-style labels.
+AMPLIFUND_ROWS = ("PR - Wildlife Restoration (FY27)", "NOFO# 3342 - 0726 SCIP: Local FRO Implementation Support")
+
+
+def scrub_contacts(page_html: str, fields: dict[str, str]) -> str:
+    soup = BeautifulSoup(page_html, "html.parser")
+    for group in soup.select("div.display-group"):
+        label, field = group.select_one(".display-label"), group.select_one(".display-field")
+        if label is not None and field is not None and label.get_text(strip=True) in il.AMPLIFUND_CONTACT:
+            field.string = "Contact Placeholder"
+    return str(soup)
+
+
+def add_amplifund() -> None:
+    saved = BeautifulSoup((FIXTURES / "OpportunityList.html").read_text(encoding="utf-8"), "html.parser")
+    with il._client() as client:
+        live = BeautifulSoup(il._get(client, il.LIST_URL), "html.parser")
+        have = {r["source_id"] for r in il.parse_list(str(saved))}
+        body = saved.find("table", id="tblList").find("tbody")
+        for tr in live.find("table", id="tblList").find("tbody").find_all("tr"):
+            link = tr.find("a", href=True)
+            if link is not None and link.get_text(strip=True) in AMPLIFUND_ROWS:
+                sid = f"gms-{(il.amplifund_target(link['href']) or '').rstrip('/').rsplit('/', 1)[-1]}"
+                if sid not in have:
+                    body.append(tr)
+                    print(f"added {sid}: {link.get_text(strip=True)}")
+        (FIXTURES / "OpportunityList.html").write_text(str(saved), encoding="utf-8")
+        for row in il.parse_list(str(saved)):
+            if row["kind"] != "gms":
+                continue
+            time.sleep(il.DELAY_S)
+            page = il._get(client, row["url"])
+            (FIXTURES / f"amplifund_{row['source_id'][4:]}.html").write_text(scrub_contacts(page, {}), encoding="utf-8")
+            fields = il.parse_amplifund(page)
+            print(f"{row['source_id'][:18]}: {row['title'][:45]!r} | {fields.get('Eligible Applicants')!r} | {fields.get('Funding Sources')!r}"
+                  f" | {fields.get('Fund Activity Categories')!r} | {(fields.get('Additional Eligibility Information') or fields.get('Applicant Eligibility Information') or '')[:80]!r}")
+
+
 def main() -> None:
     FIXTURES.mkdir(parents=True, exist_ok=True)
+    if "--amplifund" in sys.argv:
+        add_amplifund()
+        return
     with il._client() as client:
         list_html = il._get(client, il.LIST_URL)
         agency_html = il._get(client, il.AGENCY_URL)
