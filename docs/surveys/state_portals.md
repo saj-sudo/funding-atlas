@@ -55,7 +55,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **NH** | none; `https://nhcdfa.org/` (CDFA) | WordPress | prose (CDBG); `nh.gov` 403 | | 200 / 403 | agency connectors | |
 | **NJ** | DCA SAGE public RFP list | IntelliGrants | RFPs with deadlines | | 200 | small build | carried over |
 | **NM** | `https://www.nmdfa.state.nm.us/` | | unreachable: 502 and connection reset through the proxy (`robots.txt` alone answered 200) | | 000 | blocked (proxy) | `grants.nm.gov` does not resolve |
-| **NY** | `https://grantsmanagement.ny.gov/search-funding-sfs` → the SFS Vendor Portal's Grant Opportunity Portal | PeopleSoft (Statewide Financial System) | public per the state ("a username and password are not necessary"), but the portal is a JS shell; the old Grants Gateway host no longer resolves | robots standard | 200 | deeper look | the one public index whose endpoint needs a session to find |
+| **NY** | `https://grantsmanagement.ny.gov/search-funding-sfs` → the SFS Vendor Portal's Grant Opportunity Portal (`esupplier.sfs.ny.gov`) | PeopleSoft (Statewide Financial System) | **programs with labelled status**: public per the state ("a username and password are not necessary"); the search grid and every abstract are server-rendered, reached by the page's own form posts (not a JS shell, corrected 2026-11-03); the old Grants Gateway host no longer resolves | `esupplier` robots 404 (none); `grantsmanagement` standard | 200 | **built** (`ny_sfs`, 2026-11-03) | 32 open and 227 closed rows on 2026-11-03; eligibility is five labels, `Governmental Entity` the broad one |
 | **NC** | `https://www.nc.gov/your-government/all-nc-state-services/grant-opportunities` | Drupal, static hosting | **seed list**: 86 rows (Category, Grant Program, Agency, Description); no status, no dates; `ncgrants.gov` does not resolve | robots allows, sitemap | 200 | seed list | the Maryland Grants Office pattern, done as a table |
 | **ND** | `https://www.commerce.nd.gov/community-services/community-development-rural-prosperity/cdrp-resources/cdrp-grant-programs` | Drupal | programs, prose (CDRP grants) | standard Drupal robots | 200 | agency connectors | |
 | **OH** | `https://grants.ohio.gov/` | static hosting | not found: 404 on the home page, `robots.txt`, and the old portal paths; `obm.ohio.gov` 404 too | | 404 | not found | OBM policy says agencies must post there; the site answered nothing on the day |
@@ -82,7 +82,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | built | MD, PA (2) |
 | one connector away | CA, IL, IA (3); WV in progress |
 | WebGrants vendor | IA, MT (2) |
-| small build or deeper look | NJ, TX, NY (3) |
+| small build or deeper look | NJ, TX (2); NY built 2026-11-03 (`ny_sfs`) |
 | seed list | NC, WA (2) |
 | agency connectors | AL, AR, AZ, CT, DE, FL, KY, MA, MO, ND, NE, NH, NV, OR, SD, TN, VT, VA (18) |
 | JS shell, not read | UT, WY (2) |
@@ -138,8 +138,10 @@ After `wv_grants`, in order of records unlocked per session:
 3. **`webgrants`** (Iowa, Montana agencies): the storefront connector above, two states as configuration.
 4. **`tx_egrants`** (Texas, Governor's Office): 8 active rounds with dates and eligible organizations; small and public
    safety-heavy; the state's criminal-justice pass-throughs for counties and cities.
-5. **New York SFS**: a deeper look to find the Grant Opportunity Portal's data endpoint behind the PeopleSoft shell. The
-   state says it is public; the census could not read it without a browser.
+5. **New York SFS** (built 2026-11-03 as `ny_sfs`): the deeper look found no hidden endpoint and needed none. The
+   PeopleSoft page renders its grid and abstracts server-side; the connector posts the page's own form (`ICAction`,
+   `ICSID`, `ICStateNum`) to open each abstract, return, and run the closed search. 257 records; see
+   `docs/connectors/ny_sfs.md`.
 
 Seed lists (NC, WA) and the Governor's table (VA) tell a future agency-connector session which agencies to read first.
 The 18 "agency connectors" states and the 7 "not found" states wait for outreach to name a town. The 10 blocked states
@@ -151,7 +153,8 @@ bots in general or for this proxy's address range.
 - A state-run index in GA, HI, LA, MS, OH, SC or WI at the URLs search and guesswork produced. Ohio's portal host
   answers 404 on every path, which may be a migration rather than an absence.
 - Any public AmpliFund, eCivis / Euna or SmartSimple listing; Submittable and Fluxx did not appear at all at this depth.
-- The data endpoints behind New York's SFS portal, Utah's Looker Studio portal, Wyoming's Grants Connect Hub, Kentucky's
-  DLG Portal and Nevada's Grant Discovery tool. Light depth records the shell and stops.
+- The data endpoints behind Utah's Looker Studio portal, Wyoming's Grants Connect Hub, Kentucky's DLG Portal and
+  Nevada's Grant Discovery tool. Light depth records the shell and stops. (New York's was recorded here too, wrongly:
+  the deeper look of 2026-11-03 found the SFS portal server-rendered behind form posts, and it is built.)
 - Whether the WebGrants storefront exists in any state other than Iowa and Montana; it was looked for only where
   WebGrants turned up.

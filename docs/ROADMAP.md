@@ -24,30 +24,33 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 9.6 | Texas: `tx_egrants` | 2026-10-28 | the Office of the Governor's eGrants announcements: the Active page plus the archive (six pages by offset, 147 rounds back to 2023), one server-rendered card markup, plain GETs. Status from each card's dates, never from the page that lists it (the Active page lists a round eight months past due). Applicants from the Eligible Organizations text, sentence by sentence; Total Funds kept as the source's words, never read as an award; a round's own page is empty to a plain GET, so only the cards are read. First run 147 added in 7 seconds (3 open, 144 closed), second run 0 changed; the Texas page shows 1 open municipal row and 29 between rounds | `connectors/tx_egrants.md` |
 | 10.1 | One tagger, one vocabulary, DHCD cleanup | 2026-10-28 | the applicant tagger and funding-type rule moved to `connectors/text.py` (pa, wv, ca, il no longer import a Maryland module); `city`, `village`, `township`, `borough` and `local jurisdiction` tag a municipality, a named city (`Baltimore City`, `City of Philadelphia`) and `the local jurisdiction` do not; pa.gov, California and Illinois portal labels read from one table (economic development is infrastructure in every state, California's compound housing, community and economic development carries both housing and infrastructure). Measured on all 3,700 stored records: 389 hashes move, 378 of them California, none in Maryland. DHCD: Housing Leadership Awards takes its applicants from "Award categories", State Revitalization Programs takes them from its six sub-program pages (local governments, nonprofit community development organizations, institutions of higher education). **Found on the way:** the Maryland site now serves some pages on a different body markup, which `_prose()` read as empty; Maritime Heritage Grant was showing closed while open (deadline Nov 13) and Community Schools Rental Assistance had lost its renter eligibility. Both fixed. On the live data: Maryland open municipal rows 12 → 14, California 28 → 39 | `connectors/text.py`, `connectors/md_dhcd.md`, `connectors/maryland_drupal.md` |
 | 9.7 | New Jersey: `nj_dca_sage` | 2026-10-28 | DCA's public SAGE (IntelliGrants) RFP list: one classic-ASP page, 10 RFPs from two divisions, every value in a `<span id="<field>_<n>_text">` read by id and document order (the page's HTML is not well formed, so a tree parser mis-nests it). No ID on the page, so the slug of the title is the key; a listed RFP is open until its own deadline passes; award minimum and maximum fill the amounts, the estimate of total funds stays in the structured field; the program contact is dropped before the payload is stored. The run aborts if the RFP count and the deadline-label count disagree. The second SAGE instance (`njsage`) was checked and is login-only. First run 10 added in 2.5 seconds, second run 0 changed; the New Jersey page shows 3 open municipal rows | `connectors/nj_dca_sage.md` |
+| 9.8 | New York: `ny_sfs` | 2026-11-03 | the SFS Grant Opportunity Portal (PeopleSoft on `esupplier.sfs.ny.gov`, public, no login), which the census had recorded as a JS shell: a GET answers the search grid server-rendered (32 open rows), and each abstract, the return to the grid and the closed search (227 rows) are the page's own form posted back with `ICAction`, `ICSID` and `ICStateNum` filled in; nothing is executed. Status is the grid's label (`Advertised Only - Not in SFS` is open; dates not consulted); the key is agency code plus Event ID (the ID repeats across agencies); the announcement link is the record's URL; `Governmental Entity` tags nothing (the pa/ca/il rule), so the New York page shows 0 open municipal rows until Saj decides otherwise; contact name and email dropped; any failure aborts the run. First run 257 added in 54 seconds (32 open, 225 closed), second run 0 changed | `connectors/ny_sfs.md` |
 
 ## Next
 
-### Start here (updated 2026-10-29)
+### Start here (updated 2026-11-03)
 
-**Before anything else.** PR #12 (`webgrants`, `tx_egrants`, `nj_dca_sage`, 197 records) is open. Once it merges, start from the
-latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`), not on top of the old branch. The first
-daily run after the merge adds those 197 records to the published database; they appear as `added` in the change log.
+**Before anything else.** The New York connector (`ny_sfs`, 257 records) is on this branch; once its PR merges, start
+from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the
+merge adds the 257 records to the published database; they appear as `added` in the change log.
 
-**The next session: New York.** One read-only look, then either a connector or a recorded stop.
-- Where: `https://grantsmanagement.ny.gov/search-funding-sfs`, which leads to the SFS Vendor Portal's Grant Opportunity
-  Portal (PeopleSoft). What the census knows (`docs/surveys/state_portals.md`): the state says a username and password are
-  not necessary, the portal is a JavaScript shell, the old Grants Gateway host no longer resolves, `robots.txt` is standard.
-- What to look for: an endpoint or export visible without running a browser (a JSON or XML call named in the static page,
-  a documented feed, an open-data export the state publishes, as California's CSV is). Check `robots.txt` first.
-- **Stop rule (CLAUDE.md):** if the only way in is to run the page's JavaScript, record that in the census and the decisions
-  log and stop. A headless-browser workaround needs Saj's yes first.
-- If an endpoint exists: doc first (`docs/connectors/ny_*.md`: URL, a raw sample, field mapping), then fixtures, parser,
-  tests, wiring, two live runs, the same shape as `docs/connectors/tx_egrants.md`.
-
-**After New York.** Agency-by-agency connectors only when outreach names a town. The census says which agencies first: NC's
-and WA's seed lists, Virginia's Governor's table. Outreach itself is gated on the site being reachable (below).
+**The next session: not a connector.** The census is spent: every public state index with structured rows is built (MD,
+PA, WV, CA, IL, IA, MT, TX, NJ, NY). Agency-by-agency connectors wait for outreach to name a town, and outreach waits on
+the site (below). What is worth a session now, in this order:
+1. **The `Governmental Entity` decision** (waiting on Saj, below) and, with it, the three shared-tagger follow-ups under
+   "Small follow-ups": one session on `connectors/text.py` with every stored record re-normalized and the hash moves
+   counted, as 10.1 did.
+2. The Illinois AmpliFund and NOFO reads (`il_csfa.md`), a decision session, not a parser.
+3. If a town is named: the agency the census seeds say first (NC's and WA's lists, Virginia's Governor's table).
 
 **Waiting on Saj (not code).**
+- **New York's `Governmental Entity` label** (`ny_sfs.md` decision 2): 25 of the 32 open rows carry it and none reaches
+  the municipal page, including Municipal Waste Reduction and Recycling, Community Forest Conservation and ERPO
+  Infrastructure. Three readings: keep tagging nothing (today; consistent with pa.gov, California, Illinois), read it as
+  municipality plus county (every state-agency program then lands on every town's page), or tag from the Solicitation
+  Profile sentence by sentence (a description, not an eligibility section). Recommendation: the third, scoped to rows
+  labelled `Governmental Entity`, with the matched phrase as source_code so it is auditable; it is the Texas rule on the
+  only prose the portal has.
 - The live site answers 404 because the repository is private (decision 2026-10-18): make it public, or move Pages to a
   paid plan. Outreach waits on this.
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
@@ -136,9 +139,9 @@ WebGrants (Iowa, Montana), built as item 5. One connector per session, in this o
    opportunity, a labelled `Status`; states and agency hosts as configuration. Decide in the doc what a round that leaves
    the storefront becomes.
 6. **`tx_egrants`** (Texas Governor's Office) and **`nj_dca_sage`** (New Jersey DCA), both shipped 2026-10-28, see Done.
-7. New York SFS: a deeper look for the Grant Opportunity Portal's endpoint, with a stop rule if the only way in is running
-   its JavaScript (the steps are under "Start here"). Agency connectors (VA, MA, OR, and the rest) only when a town asks;
-   NC's and WA's seed lists and VA's Governor's table say which agencies first.
+7. **`ny_sfs`** (New York SFS Grant Opportunity Portal, shipped 2026-11-03, see Done): not a JS shell after all; the
+   grid and abstracts are server-rendered behind PeopleSoft form posts. Agency connectors (VA, MA, OR, and the rest)
+   only when a town asks; NC's and WA's seed lists and VA's Governor's table say which agencies first.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -252,6 +255,11 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-10-28 | The New Jersey run aborts when the RFP count and the deadline-label count disagree, or an empty page lacks the instruction text | an error page or a changed layout must fail loudly rather than mark every RFP missing; the empty-list shape is a guess, and a wrong guess aborts, the safe direction | `connectors/nj_dca_sage.md` decision 3 |
 | 2026-10-28 | A `tax_credit` title is not a funding type on the New Jersey page | "Neighborhood Revitalization Tax Credit Planning" is a planning grant (the page gives it a grant period) named for the program it supports; the connector keeps `loan` and `grant` from the title and leaves the rest null | `connectors/nj_dca_sage.md` decision 4 |
 | 2026-10-28 | The second New Jersey SAGE instance (`njsage.intelligrants.com`) is login-only and out of scope | its opportunities URL redirects to a login and the RFP list path answers 404; DCA's page is the only public New Jersey listing | `connectors/nj_dca_sage.md` |
+| 2026-11-03 | New York's SFS portal is read through its own form posts; this is not a browser workaround | the page's JavaScript only fills `ICAction`, `ICSID` and `ICStateNum` into a form and submits it; the grid, every abstract and the closed search come back server-rendered (the return step as XML with the HTML in CDATA); nothing is executed and the state says the portal is public. The census entry "JS shell" was wrong and is corrected | `connectors/ny_sfs.md` decision 1 |
+| 2026-11-03 | `Governmental Entity` tags no applicant type on the New York portal | the pa.gov, California and Illinois rule for a label that covers state departments and towns alike, and the portal has no eligibility prose to settle it; the cost (25 of 32 open rows, 0 municipal rows on the New York page) is on the roadmap for Saj with a recommendation | `connectors/ny_sfs.md` decision 2 |
+| 2026-11-03 | A New York record is keyed by agency code plus Event ID, and a repeated key keeps the first grid row | the Event ID alone repeats across agencies (`EVT0000010` in DCJS and OASAS); DOL reuses one ID for three closed rounds of one program and two of them are not recorded; a due-date suffix would make keys depend on grid order | `connectors/ny_sfs.md` decision 9 |
+| 2026-11-03 | The announcement link is a New York record's URL, the portal page when there is none | the portal has no per-record address (one PeopleSoft URL plus session state); the agency's announcement page is what a reader opens next; 20 of 32 open rows have one | `connectors/ny_sfs.md` decision 3 |
+| 2026-11-03 | Every New York row is a grant unless its title says loan, tax credit or voucher; status is the grid's label; closed rows are read from the grid alone; any failure aborts the run | the state calls the portal's rows grant opportunities; the grid labels every row (`Advertised Only - Not in SFS` is an open round applied for outside SFS); 218 of 227 closed rows have no abstract; a partial read would mark unread rounds unknown or blank summaries | `connectors/ny_sfs.md` decisions 5 to 8 |
 
 ## Open questions (do not resolve in code yet)
 
