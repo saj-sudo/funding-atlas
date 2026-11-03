@@ -59,6 +59,8 @@ CONNECTOR_LABEL = {
     "ny_sfs": "New York SFS Grant Opportunity Portal",
     "va_dcjs": "Virginia Department of Criminal Justice Services",
     "va_dhcd": "Virginia Department of Housing and Community Development",
+    "va_dcr": "Virginia Department of Conservation and Recreation",
+    "va_vdot": "Virginia Department of Transportation (Local Assistance)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

@@ -22,7 +22,9 @@ from connectors import (
     sam_assistance_listings,
     tx_egrants,
     va_dcjs,
+    va_dcr,
     va_dhcd,
+    va_vdot,
     webgrants,
     wv_grants,
 )
@@ -46,6 +48,8 @@ CONNECTORS: dict[str, ModuleType] = {
     "ny_sfs": ny_sfs,
     "va_dcjs": va_dcjs,
     "va_dhcd": va_dhcd,
+    "va_dcr": va_dcr,
+    "va_vdot": va_vdot,
 }
 
 
