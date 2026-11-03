@@ -40,19 +40,32 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 
 ## Next
 
-### Start here (updated 2026-11-03)
+### Start here (updated 2026-11-03, evening)
 
 **Before anything else.** The New York connector (`ny_sfs`, 257 records) is on this branch; once its PR merges, start
 from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the
 merge adds the 257 records to the published database; they appear as `added` in the change log.
 
-**The next session: outreach, not a connector.** Milestone 11 is done (2026-11-03): Virginia has DCJS, DHCD, DCR and
-VDOT (101 records; VDEM unreachable by this client), Delaware has DNREC, DEMA, DelDOT and DSHA (41 records). With
-Maryland's five agencies and the ten indexed states, the site answers for twelve states by a state source and for
-every state by Grants.gov. What is worth a session now, in this order:
-1. **Outreach**, Maryland first, then Virginia and Delaware: the Outreach section below has the routes and the four
+**The next sessions: Maryland's own municipal five, then outreach.** Milestone 11 is done (2026-11-03): Virginia has
+DCJS, DHCD, DCR and VDOT (101 records; VDEM unreachable by this client), Delaware has DNREC, DEMA, DelDOT and DSHA (41
+records). That leaves Maryland, the pitch state, with less agency coverage than its neighbours: no emergency management,
+transportation or environment agency. Decision 2026-11-03 (Saj): fix that before the pitch. In this order, one per
+session:
+1. **`md_mdem`**: MDEM's grants page (two programs with structured `Applications Open?` and deadline fields; survey in
+   milestone 7 below), on the SharePoint base. Doc first, as always.
+2. **`md_mdot`** and 3. **`md_mde`**: three to five hand-listed pages each (Bikeways, Urban Tree, the water and sewer
+   financing rows; survey in `connectors/md_dhcd.md`), the DCR/DelDOT pattern.
+4. **A change-log feed per state** (RSS or JSON from the navigator views, milestone 6 note): outreach's ask becomes
+   "subscribe", not "look".
+5. **Outreach**, Maryland first, then Virginia and Delaware: the Outreach section below has the routes and the four
    questions. The first conversation names the first town, and the town names the next agency.
-2. If a town elsewhere is named: the agency the census seeds say first (NC's and WA's lists).
+
+Also codeable, lower priority: Virginia DHCD pages without an Eligibility box (VATI among them) as a hand list on the
+existing crawl (`connectors/va_dhcd.md`); read-only probes of the JavaScript shells the census recorded but never
+checked (Utah's Looker Studio index, Wyoming's hub, Kentucky's DLG portal, Nevada's discovery page, Delaware's University
+of Delaware dashboard) and a search for a third WebGrants state, each with the stop rule New York's probe had; a Baltimore
+City view (municipality or county) in SQL if a Baltimore reader ever appears. If a town elsewhere is named: the agency
+the census seeds say first (NC's and WA's lists).
 
 **Waiting on Saj (not code).**
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
