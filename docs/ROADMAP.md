@@ -42,7 +42,12 @@ PA, WV, CA, IL, IA, MT, TX, NJ, NY). Agency-by-agency connectors wait for outrea
 the site (below). What is worth a session now, in this order:
 1. **Outreach.** The site is public and answers (2026-11-03); the Outreach section below has the plan. The first
    conversation names the first town, and the town names the next connector.
-2. If a town is named: the agency the census seeds say first (NC's and WA's lists, Virginia's Governor's table).
+2. **Milestone 11, the municipal five in Virginia, then Delaware** (decision 2026-11-03): the four or five agencies per
+   state that hold the money a town can apply for, one agency connector per session, each with its doc first. Virginia
+   starts from the Governor's grant table and the Mid-Atlantic survey (`docs/surveys/mid_atlantic.md`): DHCD (Drupal
+   10, CDBG), DCJS (a Drupal view with due dates), DCR (parks and recreation), VDOT, VDEM (not readable by this client;
+   say so). Delaware: DNREC Environmental Finance, Delaware State Housing Authority, DelDOT, DEMA.
+3. If a town elsewhere is named: the agency the census seeds say first (NC's and WA's lists).
 
 The tagger follow-ups were done 2026-11-03 (10.2, see Done); what is left of them is listed under "Small follow-ups"
 with the reason each stays.
@@ -272,6 +277,7 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-11-03 | Illinois free text is read sentence by sentence, negated sentences dropped | the Texas and WebGrants rule, for both row kinds, because DNR's Wildlife Restoration page names local units of government only to exclude them | `connectors/il_csfa.md` decision 7 |
 | 2026-11-03 | `not-for-profit` is not a negation | the shared `NEGATION_RE` matched `\bnot\b` inside the hyphenated word and had dropped every sentence naming not-for-profits as applicants since 10.1; measured on every stored record the fix moves one Maryland Commerce record (MIDFA gains business and nonprofit) and restores six Illinois rounds | `connectors/maryland_drupal.py` |
 | 2026-11-03 | A Texas round is tied to a funding source by name alone, only when the source's name begins the round's | the cards do not name their source and the page does not name its rounds; a looser match would write our knowledge (VOCA for General Victim Assistance) into the data; 97 of 147 match, the 50 others stay `direct`, the same claim as before | `connectors/tx_egrants.md` decision 9 |
+| 2026-11-03 | Coverage strategy: indexed states are the backbone, the pitch is the no-index story, and the next builds are the "municipal five" agencies in Virginia and Delaware | Saj's call after the census tallies were corrected (10 states built): where a state has a central index our value is the municipal filter, the change log and the between-rounds view, not discovery, so those states stay cheap and kept; where it has none the aggregation itself is the value, which is what Maryland's five agency connectors already prove. Agency-by-agency across all 18 no-index states is still the DSIRE trap, so each state gets the four or five agencies that hold the money a town can apply for (community development, transportation, natural resources or parks, emergency management, energy where it exists), nothing more, Virginia then Delaware, one agency per session, before outreach widens past Maryland. Supersedes "agency connectors only when outreach names a town" for these two states | milestone 11 |
 
 ## Open questions (do not resolve in code yet)
 
