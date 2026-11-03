@@ -26,6 +26,8 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 9.7 | New Jersey: `nj_dca_sage` | 2026-10-28 | DCA's public SAGE (IntelliGrants) RFP list: one classic-ASP page, 10 RFPs from two divisions, every value in a `<span id="<field>_<n>_text">` read by id and document order (the page's HTML is not well formed, so a tree parser mis-nests it). No ID on the page, so the slug of the title is the key; a listed RFP is open until its own deadline passes; award minimum and maximum fill the amounts, the estimate of total funds stays in the structured field; the program contact is dropped before the payload is stored. The run aborts if the RFP count and the deadline-label count disagree. The second SAGE instance (`njsage`) was checked and is login-only. First run 10 added in 2.5 seconds, second run 0 changed; the New Jersey page shows 3 open municipal rows | `connectors/nj_dca_sage.md` |
 | 9.8 | New York: `ny_sfs` | 2026-11-03 | the SFS Grant Opportunity Portal (PeopleSoft on `esupplier.sfs.ny.gov`, public, no login), which the census had recorded as a JS shell: a GET answers the search grid server-rendered (32 open rows), and each abstract, the return to the grid and the closed search (227 rows) are the page's own form posted back with `ICAction`, `ICSID` and `ICStateNum` filled in; nothing is executed. Status is the grid's label (`Advertised Only - Not in SFS` is open; dates not consulted); the key is agency code plus Event ID (the ID repeats across agencies); the announcement link is the record's URL; `Governmental Entity` tags nothing by itself and, by Saj's call the same day, a row labelled with it has its Solicitation Profile read sentence by sentence for the governmental applicants it names (the Texas rule on the only prose the portal has, scoped to the label's kinds); contact name and email dropped; any failure aborts the run. First run 257 added in 54 seconds (32 open, 225 closed), second run 0 changed, third run (the profile reading) 7 changed; the New York page shows 4 open municipal rows, all likely | `connectors/ny_sfs.md` |
 | 10.2 | Two tagger rules, measured | 2026-11-03 | `local units of government` in Iowa's word order tags municipality and county; `residents of <place>` ("employ residents of Iowa", "candidates must be residents of the U.S.", "a legal resident of West Virginia") is a population served or a condition, not an applicant, and no longer tags a household. Re-normalized every stored record: 11 of 6,833 published records move, all on `applicant_types` (five Texas evidence-testing rounds, two PCCD rounds and New York's ERPO gain local units of government; four lose a wrong household), none in Maryland. Left alone with reasons: `Baltimore City` in "county governments, including Baltimore City" (one named city is not "cities"), and a place word after "to" ("Transportation for Youth to County and Local Fairs") | `connectors/text.py`, decisions log |
+| 9.4.1 | Illinois depth: AmpliFund pages and NOFO quotes | 2026-11-03 | the 88 GMS rows read their public AmpliFund page (CSFA number, description, funding source, labelled eligibility, fund activity categories, match), a page that cannot be read falls back to the stored copy; six native rounds whose program text said `N/A` or `SEE NOFO` carry eligibility sentences quoted by hand from their NOFO PDFs (`NOFO_QUOTES`, dated); free text is read sentence by sentence with negated sentences dropped. Found on the way: the shared `NEGATION_RE` had read `not-for-profit` as a negation since 10.1; fixed, one Maryland record and six Illinois rounds move. The Illinois page: 11 → 38 open municipal rows | `connectors/il_csfa.md` |
+| 9.6.1 | Texas funding sources | 2026-11-03 | the Funding Sources page (35 sources, `State Funds` or `Federal Funds`) is read once a run and a round is tied to a source only when the source's name begins the round's, word for word with plurals and grant/program/fund words folded; 97 of 147 rounds match (53 federal → `pass_through`), the 50 that name their source differently stay `direct` with no claim; the Texas page is unchanged | `connectors/tx_egrants.md` decision 9 |
 
 ## Next
 
@@ -40,8 +42,7 @@ PA, WV, CA, IL, IA, MT, TX, NJ, NY). Agency-by-agency connectors wait for outrea
 the site (below). What is worth a session now, in this order:
 1. **Outreach.** The site is public and answers (2026-11-03); the Outreach section below has the plan. The first
    conversation names the first town, and the town names the next connector.
-2. The Illinois AmpliFund and NOFO reads (`il_csfa.md`), a decision session, not a parser.
-3. If a town is named: the agency the census seeds say first (NC's and WA's lists, Virginia's Governor's table).
+2. If a town is named: the agency the census seeds say first (NC's and WA's lists, Virginia's Governor's table).
 
 The tagger follow-ups were done 2026-11-03 (10.2, see Done); what is left of them is listed under "Small follow-ups"
 with the reason each stays.
@@ -62,13 +63,13 @@ with the reason each stays.
   rule tells the two apart without a list of place nouns. And one found by 10.2: "any artist who is a legal resident of
   West Virginia" names an individual applicant with no word the tagger knows, so the two WVCA artist rounds now carry no
   tag (they carried a wrong household before).
-- Illinois (`il_csfa.md`): read the AmpliFund pages for the 60 DNR rows, and each NOFO for the 13 `Government Organizations`
-  rounds with no municipal tag. Both are decisions to make, not bugs.
 - `webgrants.md`: the "round left the storefront is `unknown`" rule is unverified until a round actually leaves; other
   Montana agency hosts and other states' storefronts were not searched for; 27 of 40 pages state no eligibility.
 - `nj_dca_sage.md`: the empty-list check is a guess at what a page with no RFPs looks like (a wrong guess aborts the run,
   which is the safe direction).
-- `tx_egrants.md`: the Funding Sources page (federal or state money) is not read, so `funding_source` is `direct` throughout.
+- `tx_egrants.md`: 50 of 147 rounds name their funding source differently from the Funding Sources page and stay
+  `direct` (decision 9); `il_csfa.md`: 8 native `Government Organizations` rounds and 15 GMS rows name no applicant
+  anywhere the connector reads, and a new native round's NOFO is unread until someone runs `pdftotext` on it.
 - Maryland depth (milestone 7): MDEM (two programs), MDOT and MDE (hand-listed pages) when outreach asks for them.
 - Census gaps: 18 agency-by-agency states, 7 with no state index found, 10 blocked (`docs/surveys/state_portals.md`).
 
@@ -167,8 +168,8 @@ Still open, none of them fixable without inventing a fact:
 - Main Street Improvement Grant lists "Main Street Maryland communities" and "community development organizations" as
   eligible and never says municipality, so it stays untagged. The 2026-10-16 note that it is a municipal round was an
   assumption; ask DHCD, or Saj decides to read "Main Street Maryland communities" as municipal.
-- 13 of the 23 Illinois rounds that list only `Government Organizations` carry no municipal tag (their free text is `N/A`
-  or `SEE NOFO`); several are plausibly town programs. Reading each round's NOFO attachment is the fix.
+- 8 Illinois native rounds that list `Government Organizations` carry no municipal tag after their NOFOs were read on
+  2026-11-03 (was 13 before the NOFO quotes, 9.4.1); the source does not say.
 - Homelessness Solutions, Housing Choice Voucher, Lead Hazard Reduction and Tier Structure name no applicant type.
 - The tagger reads `Baltimore City` as a named place, so a program for "county governments, including Baltimore City"
   tags county only.
@@ -266,6 +267,11 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-11-03 | `local units of government` tags municipality and county | Iowa's and Texas's word order for the phrase the tagger already knew as "units of local government"; re-normalizing every stored record moves eight (five Texas evidence-testing rounds, two PCCD rounds, New York's ERPO), all gains, none wrong | `connectors/text.py` |
 | 2026-11-03 | `residents of <place>` tags no household | "employ residents of Iowa", "candidates must be residents of the U.S." and "a legal resident of West Virginia" are a population served or a condition on the applicant, not the applicant; a bare "residents" or "Maryland residents" still tags. The accepted cost is "Residents of Iowa may apply", which reads the same; on every stored record the rule removes four wrong tags and no right one (the Maryland household programs are untouched) | `connectors/text.py` |
 | 2026-11-03 | `Baltimore City` and a place word after "to" stay as they are | one named city is not "cities" (10.1's guard protects every town's page from Philadelphia's own rounds), and "to" opens applicant statements as often as place phrases; both would need a rule that invents, so both are recorded as known tagger gaps instead | milestone 10 |
+| 2026-11-03 | Illinois GMS rows read their AmpliFund page | Saj's call, superseding 2026-10-28 "read from the list alone": the host serves no robots rules, the page is public and server-rendered with labelled fields, and a GMS row then has the same shape as a native one; 24 GMS rows reach the municipal page, 8 of them DNR | `connectors/il_csfa.md` decision 1 |
+| 2026-11-03 | A native Illinois round's NOFO is quoted by hand, not read by the run | the PDFs were read once with `pdftotext`; the sentences that say who may apply are kept verbatim in `NOFO_QUOTES` by nofo number with the date read, so the tagger and the eligibility text carry the source's words; PDF reading in the daily run waits for the third state that needs it | `connectors/il_csfa.md` decision 6 |
+| 2026-11-03 | Illinois free text is read sentence by sentence, negated sentences dropped | the Texas and WebGrants rule, for both row kinds, because DNR's Wildlife Restoration page names local units of government only to exclude them | `connectors/il_csfa.md` decision 7 |
+| 2026-11-03 | `not-for-profit` is not a negation | the shared `NEGATION_RE` matched `\bnot\b` inside the hyphenated word and had dropped every sentence naming not-for-profits as applicants since 10.1; measured on every stored record the fix moves one Maryland Commerce record (MIDFA gains business and nonprofit) and restores six Illinois rounds | `connectors/maryland_drupal.py` |
+| 2026-11-03 | A Texas round is tied to a funding source by name alone, only when the source's name begins the round's | the cards do not name their source and the page does not name its rounds; a looser match would write our knowledge (VOCA for General Victim Assistance) into the data; 97 of 147 match, the 50 others stay `direct`, the same claim as before | `connectors/tx_egrants.md` decision 9 |
 
 ## Open questions (do not resolve in code yet)
 
