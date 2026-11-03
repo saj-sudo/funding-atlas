@@ -153,7 +153,7 @@ def test_a_governmental_entity_row_reads_its_profile_for_governmental_applicants
     not a governmental type and is the portal's label to give)."""
     p = normalize(4)
     assert {t.value for t in p.applicant_types} == {"municipality", "county"}
-    assert {t.source_code for t in p.applicant_types if t.value == "municipality"} == {"municipal", "city", "town"}
+    assert {t.source_code for t in p.applicant_types if t.value == "municipality"} == {"municipal", "city", "town", "local units of government"}
     assert "tribal" not in {t.source_code for t in p.applicant_types}
 
 

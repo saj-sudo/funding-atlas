@@ -175,7 +175,7 @@ date is mapped (`opens_at`), the program officer is not.
   carry no applicant tag. Reading the description sentences is a separate, noisier feature.
 - Montana's potato research page lists applicants as plain paragraphs under "Proposals for funding will be accepted
   from:"; the paragraph-list items are not picked up, so "Local Governments" there is missed.
-- The shared tagger does not know "local units of government" (the word order on Iowa's forensic laboratory round), and
+- (Both fixed 2026-11-03, roadmap 10.2.) The shared tagger did not know "local units of government" (the word order on Iowa's forensic laboratory round), and
   `residents` tags a household on a business grant ("employ residents of Iowa"). Both are tagger items, not this
   connector's.
 - The only evidence for the removed-round rule is the HTTP 500 on an unknown id.

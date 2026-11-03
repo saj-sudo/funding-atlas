@@ -17,6 +17,7 @@ from pipeline.models import ApplicantTag
 # agencies; a phrase that is wrong for one of them is wrong for all and gets fixed here.
 APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
+    (r"local units? of (?:general )?government", ("municipality", "county")),   # Iowa's word order
     (r"local governments?", ("municipality", "county")),
     # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
     # apply for the credit"), not the applicant.
@@ -35,7 +36,9 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bdevelopers?\b", ("business",)),
     (r"\bhomeowners?\b", ("household",)),
     (r"\bhouseholds?\b", ("household",)),
-    (r"\bresidents?\b", ("household",)),
+    # "residents of Iowa", "residents of a Priority Funding Area" is a population served, not the applicant; a bare
+    # "residents" or "Maryland residents" still is.
+    (r"\bresidents?\b(?!\s+of\b)", ("household",)),
     (r"\brenters?\b", ("household",)),
     # The noun only: plural always, singular when a function word or punctuation follows ("any individual who",
     # "an individual may apply"). The adjective ("individual school facilities") never tags.

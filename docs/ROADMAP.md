@@ -25,6 +25,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 10.1 | One tagger, one vocabulary, DHCD cleanup | 2026-10-28 | the applicant tagger and funding-type rule moved to `connectors/text.py` (pa, wv, ca, il no longer import a Maryland module); `city`, `village`, `township`, `borough` and `local jurisdiction` tag a municipality, a named city (`Baltimore City`, `City of Philadelphia`) and `the local jurisdiction` do not; pa.gov, California and Illinois portal labels read from one table (economic development is infrastructure in every state, California's compound housing, community and economic development carries both housing and infrastructure). Measured on all 3,700 stored records: 389 hashes move, 378 of them California, none in Maryland. DHCD: Housing Leadership Awards takes its applicants from "Award categories", State Revitalization Programs takes them from its six sub-program pages (local governments, nonprofit community development organizations, institutions of higher education). **Found on the way:** the Maryland site now serves some pages on a different body markup, which `_prose()` read as empty; Maritime Heritage Grant was showing closed while open (deadline Nov 13) and Community Schools Rental Assistance had lost its renter eligibility. Both fixed. On the live data: Maryland open municipal rows 12 → 14, California 28 → 39 | `connectors/text.py`, `connectors/md_dhcd.md`, `connectors/maryland_drupal.md` |
 | 9.7 | New Jersey: `nj_dca_sage` | 2026-10-28 | DCA's public SAGE (IntelliGrants) RFP list: one classic-ASP page, 10 RFPs from two divisions, every value in a `<span id="<field>_<n>_text">` read by id and document order (the page's HTML is not well formed, so a tree parser mis-nests it). No ID on the page, so the slug of the title is the key; a listed RFP is open until its own deadline passes; award minimum and maximum fill the amounts, the estimate of total funds stays in the structured field; the program contact is dropped before the payload is stored. The run aborts if the RFP count and the deadline-label count disagree. The second SAGE instance (`njsage`) was checked and is login-only. First run 10 added in 2.5 seconds, second run 0 changed; the New Jersey page shows 3 open municipal rows | `connectors/nj_dca_sage.md` |
 | 9.8 | New York: `ny_sfs` | 2026-11-03 | the SFS Grant Opportunity Portal (PeopleSoft on `esupplier.sfs.ny.gov`, public, no login), which the census had recorded as a JS shell: a GET answers the search grid server-rendered (32 open rows), and each abstract, the return to the grid and the closed search (227 rows) are the page's own form posted back with `ICAction`, `ICSID` and `ICStateNum` filled in; nothing is executed. Status is the grid's label (`Advertised Only - Not in SFS` is open; dates not consulted); the key is agency code plus Event ID (the ID repeats across agencies); the announcement link is the record's URL; `Governmental Entity` tags nothing by itself and, by Saj's call the same day, a row labelled with it has its Solicitation Profile read sentence by sentence for the governmental applicants it names (the Texas rule on the only prose the portal has, scoped to the label's kinds); contact name and email dropped; any failure aborts the run. First run 257 added in 54 seconds (32 open, 225 closed), second run 0 changed, third run (the profile reading) 7 changed; the New York page shows 4 open municipal rows, all likely | `connectors/ny_sfs.md` |
+| 10.2 | Two tagger rules, measured | 2026-11-03 | `local units of government` in Iowa's word order tags municipality and county; `residents of <place>` ("employ residents of Iowa", "candidates must be residents of the U.S.", "a legal resident of West Virginia") is a population served or a condition, not an applicant, and no longer tags a household. Re-normalized every stored record: 11 of 6,833 published records move, all on `applicant_types` (five Texas evidence-testing rounds, two PCCD rounds and New York's ERPO gain local units of government; four lose a wrong household), none in Maryland. Left alone with reasons: `Baltimore City` in "county governments, including Baltimore City" (one named city is not "cities"), and a place word after "to" ("Transportation for Youth to County and Local Fairs") | `connectors/text.py`, decisions log |
 
 ## Next
 
@@ -37,15 +38,15 @@ merge adds the 257 records to the published database; they appear as `added` in 
 **The next session: not a connector.** The census is spent: every public state index with structured rows is built (MD,
 PA, WV, CA, IL, IA, MT, TX, NJ, NY). Agency-by-agency connectors wait for outreach to name a town, and outreach waits on
 the site (below). What is worth a session now, in this order:
-1. The three shared-tagger follow-ups under "Small follow-ups", plus the one New York added (a place word after "to",
-   as in "Transportation for Youth to County and Local Fairs", tags county): one session on `connectors/text.py` with
-   every stored record re-normalized and the hash moves counted, as 10.1 did.
+1. **Outreach.** The site is public and answers (2026-11-03); the Outreach section below has the plan. The first
+   conversation names the first town, and the town names the next connector.
 2. The Illinois AmpliFund and NOFO reads (`il_csfa.md`), a decision session, not a parser.
 3. If a town is named: the agency the census seeds say first (NC's and WA's lists, Virginia's Governor's table).
 
+The tagger follow-ups were done 2026-11-03 (10.2, see Done); what is left of them is listed under "Small follow-ups"
+with the reason each stays.
+
 **Waiting on Saj (not code).**
-- The live site answers 404 because the repository is private (decision 2026-10-18): make it public, or move Pages to a
-  paid plan. Outreach waits on this.
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
   them that way (milestone 10).
 - GOCPP: ask the office for crawl permission or a feed (milestone 7). ADECA's `ClaudeBot` disallow: decide whether to read
@@ -54,9 +55,13 @@ the site (below). What is worth a session now, in this order:
   tell a bot wall from a proxy block (milestone 8.1/8.2).
 
 **Small follow-ups, any session** (each is detailed in the doc named):
-- Shared tagger (`connectors/text.py`): "local units of government" in that word order is not matched; `residents` tags a
-  household on a business grant; `Baltimore City` is read as a named place (milestone 10); a place word after "to"
-  ("Transportation for Youth to County and Local Fairs") tags county (`ny_sfs.md` decision 2).
+- Shared tagger (`connectors/text.py`), left on purpose (10.2): `Baltimore City` in "county governments, including
+  Baltimore City" tags county only, because one named city is not "cities" and a rule that read it as municipality would
+  put Philadelphia's and Santa Clara's own rounds on every town's page; a place word after "to" ("Transportation for
+  Youth to County and Local Fairs") tags county, because "to" also opens applicant statements ("open to counties") and no
+  rule tells the two apart without a list of place nouns. And one found by 10.2: "any artist who is a legal resident of
+  West Virginia" names an individual applicant with no word the tagger knows, so the two WVCA artist rounds now carry no
+  tag (they carried a wrong household before).
 - Illinois (`il_csfa.md`): read the AmpliFund pages for the 60 DNR rows, and each NOFO for the 13 `Government Organizations`
   rounds with no municipal tag. Both are decisions to make, not bugs.
 - `webgrants.md`: the "round left the storefront is `unknown`" rule is unverified until a round actually leaves; other
@@ -71,8 +76,8 @@ Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open not
 
 ### 6. Navigator UI and hosting (shipped, see Done)
 
-Built and published to `gh-pages`; https://saj-sudo.github.io/funding-atlas/ answers 404 until the repository is public (see
-"Waiting on Saj"). Left for a later session, none blocking: shareable filter links
+Built and published to `gh-pages`; https://saj-sudo.github.io/funding-atlas/ is live (the repository went public on
+2026-11-03). Left for a later session, none blocking: shareable filter links
 are in the URL hash already; a per-state RSS or JSON feed of the change log; the Grants.gov data-cleanup items under
 milestone 10 show on the page as they are in the database (`&quot;` in deadline text, contact names as agencies).
 
@@ -155,7 +160,10 @@ Done 2026-10-28 (10.1): the shared tagger matches `city`, `village`, `township`,
 labels share one table; the DHCD records the source names an applicant for (Housing Leadership Awards, State Revitalization
 Programs) are tagged.
 
-Still open, none of them fixable without inventing a fact (and, from 10.1 on, two tagger items found by `webgrants`: "local units of government" in that word order is not matched, and `residents` tags a household on a business grant):
+Done 2026-11-03 (10.2): "local units of government" tags municipality and county; "residents of <place>" no longer tags a
+household (the two items `webgrants` found). Measured on every stored record: 11 move, all applicant types, listed in Done.
+
+Still open, none of them fixable without inventing a fact:
 - Main Street Improvement Grant lists "Main Street Maryland communities" and "community development organizations" as
   eligible and never says municipality, so it stays untagged. The 2026-10-16 note that it is a municipal round was an
   assumption; ask DHCD, or Saj decides to read "Main Street Maryland communities" as municipal.
@@ -167,7 +175,7 @@ Still open, none of them fixable without inventing a fact (and, from 10.1 on, tw
 
 ### Outreach (tracked, not a milestone)
 
-Gated on milestone 6 going live. Routes, in order: five small-town administrators whose towns recently received
+Milestone 6 went live on 2026-11-03 (the repository is public); nothing gates this now. Routes, in order: five small-town administrators whose towns recently received
 DHCD or MHT awards; Maryland Municipal League staff; rural COGs (Tri-County Councils, Mid-Shore and Upper Shore
 Regional Councils); Grant Professionals Association Maryland chapter and ELGL; Governor's Grants Office. Ask the
 four questions in the page footer. Answers decide what milestone 11 is.
@@ -254,6 +262,10 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-11-03 | A New York record is keyed by agency code plus Event ID, and a repeated key keeps the first grid row | the Event ID alone repeats across agencies (`EVT0000010` in DCJS and OASAS); DOL reuses one ID for three closed rounds of one program and two of them are not recorded; a due-date suffix would make keys depend on grid order | `connectors/ny_sfs.md` decision 9 |
 | 2026-11-03 | The announcement link is a New York record's URL, the portal page when there is none | the portal has no per-record address (one PeopleSoft URL plus session state); the agency's announcement page is what a reader opens next; 20 of 32 open rows have one | `connectors/ny_sfs.md` decision 3 |
 | 2026-11-03 | Every New York row is a grant unless its title says loan, tax credit or voucher; status is the grid's label; closed rows are read from the grid alone; any failure aborts the run | the state calls the portal's rows grant opportunities; the grid labels every row (`Advertised Only - Not in SFS` is an open round applied for outside SFS); 218 of 227 closed rows have no abstract; a partial read would mark unread rounds unknown or blank summaries | `connectors/ny_sfs.md` decisions 5 to 8 |
+| 2026-11-03 | The repository is public and the site is live | supersedes 2026-10-18 "the live site is down": Saj made the repository public; `saj-sudo.github.io/funding-atlas` and its state pages answer 200; outreach is unblocked | milestone 6 |
+| 2026-11-03 | `local units of government` tags municipality and county | Iowa's and Texas's word order for the phrase the tagger already knew as "units of local government"; re-normalizing every stored record moves eight (five Texas evidence-testing rounds, two PCCD rounds, New York's ERPO), all gains, none wrong | `connectors/text.py` |
+| 2026-11-03 | `residents of <place>` tags no household | "employ residents of Iowa", "candidates must be residents of the U.S." and "a legal resident of West Virginia" are a population served or a condition on the applicant, not the applicant; a bare "residents" or "Maryland residents" still tags. The accepted cost is "Residents of Iowa may apply", which reads the same; on every stored record the rule removes four wrong tags and no right one (the Maryland household programs are untouched) | `connectors/text.py` |
+| 2026-11-03 | `Baltimore City` and a place word after "to" stay as they are | one named city is not "cities" (10.1's guard protects every town's page from Philadelphia's own rounds), and "to" opens applicant statements as often as place phrases; both would need a rule that invents, so both are recorded as known tagger gaps instead | milestone 10 |
 
 ## Open questions (do not resolve in code yet)
 

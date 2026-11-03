@@ -26,6 +26,8 @@ def values(text: str | list[str]) -> set[str]:
     ("Awards will be made to local jurisdictions in four categories", {"municipality", "county"}),
     ("Eligibility is limited to local governments", {"municipality", "county"}),
     ("Applicants must be a California city or county prosecuting office", {"municipality", "county"}),
+    ("Local units of government and state agencies", {"municipality", "county", "state"}),
+    ("Eligible applicants are local units of general government", {"municipality", "county"}),
 ])
 def test_places_that_apply(text, expected):
     assert values(text) == expected
@@ -53,6 +55,17 @@ def test_places_that_do_not_apply(text):
 ])
 def test_a_named_city_is_not_cities(text):
     assert "municipality" not in values(text)
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("Businesses that employ residents of Iowa", {"business"}),
+    ("Projects that serve residents of a Priority Funding Area", set()),
+    ("Maryland residents may apply", {"household"}),
+    ("Residents and homeowners", {"household"}),
+    ("Residents of Iowa may apply", set()),       # the accepted cost: the phrase reads the same both ways
+])
+def test_residents_of_a_place_are_served_not_applying(text, expected):
+    assert values(text) == expected
 
 
 def test_a_lower_case_city_after_a_proper_noun_is_still_a_type():
