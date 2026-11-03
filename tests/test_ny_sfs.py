@@ -157,10 +157,13 @@ def test_a_governmental_entity_row_reads_its_profile_for_governmental_applicants
     assert "tribal" not in {t.source_code for t in p.applicant_types}
 
 
-def test_profile_tags_are_added_to_the_label_tags():
-    """AFTYP3: three labels, and a profile naming county fairs."""
+def test_a_profile_that_is_only_a_title_tags_nothing():
+    """AFTYP3: three labels, and a profile that is the round's name ("... to County and Local Fairs"): a name is
+    not an applicant statement, so the county fair does not tag a county."""
     assert {(t.value, t.source_code) for t in normalize(0).applicant_types} == {
-        ("nonprofit", "Not-For-Profit"), ("tribe", "Tribal Organization"), ("county", "county")}
+        ("nonprofit", "Not-For-Profit"), ("tribe", "Tribal Organization")}
+    assert ny.profile_tags("Municipal Waste Reduction and Recycling Program 2024") == []
+    assert ny.profile_tags("Municipalities may apply.") == [ny.ApplicantTag(value="municipality", source_code="municipalities")]
 
 
 def test_a_row_without_governmental_entity_never_reads_its_profile():

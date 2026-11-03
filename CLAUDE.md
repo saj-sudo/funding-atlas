@@ -52,7 +52,7 @@ Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 record
 Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
 pages), `de_dema` (ten FEMA pass-throughs), `de_deldot` (TAP and Safe Routes) and `de_dsha` (Housing Delaware's Build & Develop
 pages, 17 programs): Delaware's four.
-Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.8 shipped;
+Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1 to 10.3 and 11.1 to 11.8 shipped;
 milestone 11 (the municipal five in Virginia and Delaware) is done and the roadmap's next action is outreach. The repository is public and the site is live at
 https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
 every public state index with structured rows is built; Virginia and Delaware have their municipal five

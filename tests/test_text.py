@@ -83,6 +83,13 @@ def test_not_for_profit_is_an_applicant_not_a_negation():
 
 def test_condition_and_negation_behaviour_is_unchanged():
     assert "individual" not in values("Individual school facilities")
+
+
+def test_an_artist_named_as_the_applicant_is_an_individual():
+    assert "individual" in values("Any artist who is 18 years of age or older, a legal resident of West Virginia")
+    assert "individual" in values("● County school systems ● Individual artists ● Non-profit arts organizations")
+    assert "individual" not in values("Fiscally sponsored organizations representing disabled artists")
+    assert "individual" not in values("Organizations that further the interests of artists, creators, and tradition bearers")
     assert values(["Nonprofits and for-profit businesses"]) == {"nonprofit", "business"}
 
 
