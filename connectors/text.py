@@ -151,6 +151,11 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "health": ("health",), "child health": ("health",), "prevention/treatment": ("health",),
     # New York SFS service areas; the other six (agricultural, education, environmental, family, government supports)
     # name none of our categories and fall to `other`
+    # Delaware DNREC's page tags and DEMA's accordion headings
+    "clean water": ("water",), "drinking water": ("water",), "wastewater": ("water",), "stormwater": ("water",),
+    "septic systems": ("water",), "non-point source": ("water",), "water quality financing": ("water",),
+    "infrastructure": ("infrastructure",), "green infrastructure loans": ("infrastructure",),
+    "preparedness grants": ("public_safety",), "recovery assistance": ("public_safety",),
     "health services": ("health",), "housing and shelter services": ("housing",),
     "workforce development": ("workforce",), "public safety supports": ("public_safety",),
     "justice services": ("public_safety",), "public transportation services": ("transportation",),
