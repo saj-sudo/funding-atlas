@@ -64,6 +64,7 @@ CONNECTOR_LABEL = {
     "de_dnrec": "Delaware DNREC Environmental Finance",
     "de_dema": "Delaware Emergency Management Agency",
     "de_deldot": "Delaware DelDOT (TAP and Safe Routes to School)",
+    "de_dsha": "Delaware State Housing Authority (Housing Delaware)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

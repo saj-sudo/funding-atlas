@@ -35,6 +35,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 11.5 | Delaware DNREC: `de_dnrec` | 2026-11-03 | the first of Delaware's municipal five: twelve hand-listed Environmental Finance pages (five grants and four loans for local governments, the septic, estuary and non-point source pages), each prose with block headings; the kind from the index section, applicants from the labelled passages and applicant sentences, status from the cycle sentence ("Now Accepting", "at any time" open; the Project Priority List cycles unknown), categories from the agency's own Related Topics tags through the shared table. 12 added, 2 open, 7 municipal; the Delaware page gets its first open municipal row | `connectors/de_dnrec.md` |
 | 11.6 | Delaware DEMA: `de_dema` | 2026-11-03 | the grants page's two accordions (ten FEMA pass-throughs) and the preparedness tab's "Eligible Subrecipient" and "Apply" paragraphs; every record `unknown` (FEMA's NOFO "annually in the spring"), `pass_through` on the page's own sentence, invitation-only recorded for HSGP and EMPG. 10 added, 3 municipal | `connectors/de_dema.md` |
 | 11.7 | Delaware DelDOT: `de_deldot` | 2026-11-03 | the two programs with a call for outside applications, TAP (overview and apply pages: the sponsor list, the 2026 call-out) and Safe Routes to School; the rest of DelDOT's fifty-entry program listing is how the department runs roads. 2 added, TAP unknown on a past call-out | `connectors/de_deldot.md` |
+| 11.8 | Delaware State Housing Authority: `de_dsha` | 2026-11-03 | the last of Delaware's four: six hand-listed "Build & Develop" pages in two shapes, a one-program page with a header status card or a sections page with one program per `h2` (Home4Good, CDBG, ESG, HOPWA, NAA, the ARPA funds, the supportive housing funds); the status card is the record of the current round, a badge or the text's own sentence otherwise, dates from the card or, without one, the program's dated list lines; "Who applies" and the eligibility panels are applicant text. 17 added (4 open, 4 closed, 9 unknown), second run 0 changed; CDBG and ESG name Kent and Sussex localities and the Delaware page shows 2 open municipal rows. **Milestone 11 is done**: Virginia 101 records over four agencies, Delaware 41 over four | `connectors/de_dsha.md` |
 
 ## Next
 
@@ -44,29 +45,15 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the
 merge adds the 257 records to the published database; they appear as `added` in the change log.
 
-**The next session: not a connector.** The census is spent: every public state index with structured rows is built (MD,
-PA, WV, CA, IL, IA, MT, TX, NJ, NY). Agency-by-agency connectors wait for outreach to name a town, and outreach waits on
-the site (below). What is worth a session now, in this order:
-1. **Outreach.** The site is public and answers (2026-11-03); the Outreach section below has the plan. The first
-   conversation names the first town, and the town names the next connector.
-2. **Milestone 11, the municipal five in Virginia, then Delaware** (decision 2026-11-03): the four or five agencies per
-   state that hold the money a town can apply for, one agency connector per session, each with its doc first. Virginia,
-   from the Governor's grant table and the Mid-Atlantic survey (`docs/surveys/mid_atlantic.md`): **Virginia is done**:
-   DCJS (11.1), DHCD (11.2), DCR (11.3), VDOT (11.4); VDEM, the fifth, is unreachable by this client (TLS through the
-   proxy, rechecked 2026-11-03) and waits for a look from an ordinary browser. 101 Virginia state records, 14 between
-   rounds, 0 open municipal rows on the day (DCJS listed none open; DHCD and VDOT state cycles, not dates).
-   **Delaware** is three of four: DNREC (11.5), DEMA (11.6), DelDOT (11.7), 24 records, the Delaware page's first
-   open municipal row. Next: **Delaware State Housing Authority** (`destatehousing.com`, the "Build & Develop"
-   pages: Community Benefit Programs with CDBG for Kent and Sussex localities, NAA, ESG and Home4Good as `h2`
-   sections; Downtown Development Districts, Homeownership Production, Supportive Housing, ARPA funds, LIHTC; each
-   page or section carries a status card ("Rolling from July 15, 2026 through May 30, 2027", "Not currently
-   accepting applications", "Who applies") and "Important dates" lists: the one Delaware source that states dates).
-   Then milestone 11 is done and outreach widens past Maryland with Virginia and Delaware in hand. Delaware: DNREC Environmental Finance, Delaware State Housing
-   Authority, DelDOT, DEMA.
+**The next session: outreach, not a connector.** Milestone 11 is done (2026-11-03): Virginia has DCJS, DHCD, DCR and
+VDOT (101 records; VDEM unreachable by this client), Delaware has DNREC, DEMA, DelDOT and DSHA (41 records). With
+Maryland's five agencies and the ten indexed states, the site answers for twelve states by a state source and for
+every state by Grants.gov. What is worth a session now, in this order:
+1. **Outreach**, Maryland first, then Virginia and Delaware: the Outreach section below has the routes and the four
+   questions. The first conversation names the first town, and the town names the next agency.
+2. The small follow-ups below, as one `connectors/text.py` session when three or more have gathered, measured on
+   every stored record as 10.2 was.
 3. If a town elsewhere is named: the agency the census seeds say first (NC's and WA's lists).
-
-The tagger follow-ups were done 2026-11-03 (10.2, see Done); what is left of them is listed under "Small follow-ups"
-with the reason each stays.
 
 **Waiting on Saj (not code).**
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
@@ -303,6 +290,8 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-11-03 | A DNREC program's kind is the index section it is listed under | "Asset Management Incentive Program" pays grants and "Project Planning Advances" are grants the office files under Grants; the title keyword would say neither | `connectors/de_dnrec.md` decision 2 |
 | 2026-11-03 | DEMA's ten entries are `pass_through` on the page's own sentence; eligibility only from the "Eligible Subrecipient" paragraphs | "These grant funds often come from FEMA and DHS" and DEMA is the State Administrative Agency; a recovery entry's blurb says what the money does, not who applies | `connectors/de_dema.md` decisions 2 and 3 |
 | 2026-11-03 | DelDOT is two programs by hand list, TAP read from two pages | the department's program listing is operational; TAP's overview names the sponsors and its apply page the call-out, so both are read; a past call-out on a page that does not say closed is `unknown` (the MEA rule) | `connectors/de_deldot.md` |
+| 2026-11-03 | DSHA's header status card is the record of the current round; a program's dated list lines count only when it has no card | the agency maintains the card by hand each round ("Rolling from July 15, 2026 through May 30, 2027", "Not currently accepting applications"); the Important dates lists keep past rounds (LIHTC's 2023 deadline) that would otherwise pin an open program to a stale date | `connectors/de_dsha.md` decision 3 |
+| 2026-11-03 | A DSHA section is a program when it has an `h2.hd-sec-h2` with an id, and "Who applies" on a sections page belongs to the program the status card names | the site is typed by its own markup; the card at the top of a sections page describes one featured program (Home4Good), not all of them | `connectors/de_dsha.md` decisions 2 and 4 |
 
 ## Open questions (do not resolve in code yet)
 

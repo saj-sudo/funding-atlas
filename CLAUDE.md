@@ -50,11 +50,12 @@ Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `
 Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 records), `va_dcjs` (Virginia DCJS, 59 records),
 `va_dhcd` (Virginia DHCD, a crawl of its menus, 30 records), `va_dcr` (six DCR grant pages) and `va_vdot` (six VDOT Local
 Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
-pages), `de_dema` (ten FEMA pass-throughs) and `de_deldot` (TAP and Safe Routes): three of Delaware's four, DSHA next.
-Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.7 shipped;
-milestone 11 (the municipal five) is done for Virginia and one agency (DSHA) from done for Delaware. The repository is public and the site is live at
+pages), `de_dema` (ten FEMA pass-throughs), `de_deldot` (TAP and Safe Routes) and `de_dsha` (Housing Delaware's Build & Develop
+pages, 17 programs): Delaware's four.
+Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.8 shipped;
+milestone 11 (the municipal five in Virginia and Delaware) is done and the roadmap's next action is outreach. The repository is public and the site is live at
 https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
-every public state index with structured rows is built; next are the municipal five agencies in the no-index states
-nearest outreach (Virginia, then Delaware; decision 2026-11-03), elsewhere agency connectors only when outreach names a town. New York's
+every public state index with structured rows is built; Virginia and Delaware have their municipal five
+(decision 2026-11-03, milestone 11); elsewhere agency connectors only when outreach names a town. New York's
 `Governmental Entity` rows read their Solicitation Profile for governmental applicants (decision 2026-11-03). **Start with the "Start here" block at the top of the roadmap's Next section**: the next
 action, what waits on Saj, and the open follow-ups in one place.

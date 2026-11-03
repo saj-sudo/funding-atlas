@@ -30,6 +30,7 @@ uv run python cli.py run va_vdot                              # Virginia VDOT Lo
 uv run python cli.py run de_dnrec                             # Delaware DNREC Environmental Finance: 12 program pages, seconds
 uv run python cli.py run de_dema                              # Delaware DEMA: one grants page and its preparedness tab, seconds
 uv run python cli.py run de_deldot                            # Delaware DelDOT: TAP and Safe Routes to School, seconds
+uv run python cli.py run de_dsha                              # Delaware State Housing Authority: six Build & Develop pages, seconds
 uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
