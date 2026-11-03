@@ -45,6 +45,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # "an individual may apply"). The adjective ("individual school facilities") never tags.
     (r"\bindividuals\b|\bindividual\b(?=\s*(?:$|[,.;:)]|(?:and|or|who|that|which|may|can|must|is|are|applying|seeking)\b))",
      ("individual",)),
+    # An artist named as the applicant ("Any artist who is 18 years of age or older", "Individual artists" in a
+    # list of who may apply) is an individual. A bare "artists" is not: "representing disabled artists", "grant
+    # payments to artists" and "the interests of artists" name the people served.
+    (r"\b(?:any|individual) artists?\b", ("individual",)),
     (r"housing authorit\w*", ("housing_authority",)),
     (r"\bschools?\b", ("school",)),
     (r"local education agenc\w*", ("school",)),

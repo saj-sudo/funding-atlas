@@ -309,9 +309,16 @@ def applicant_tags(eligibility: str) -> list[ApplicantTag]:
     return tags
 
 
+PROSE_RE = re.compile(r"[.!?](?:\s|$)")
+
+
 def profile_tags(profile: str) -> list[ApplicantTag]:
     """The governmental applicants the Solicitation Profile names, sentence by sentence, negated sentences dropped
-    (the Texas rule on the only prose the portal has). The matched phrase is the tag's source_code."""
+    (the Texas rule on the only prose the portal has). The matched phrase is the tag's source_code. A profile with
+    no sentence in it is a title ("2027 Transportation for Youth to County and Local Fairs", "Municipal Waste
+    Reduction and Recycling Program 2024"): a name says what the money is for, not who applies, and tags nothing."""
+    if not PROSE_RE.search(profile):
+        return []
     lines = [line for line in sentences(profile) if not NEGATION_RE.search(line)]
     return [tag for tag in applicant_types_for(lines or None) if tag.value in GOVERNMENTAL_TYPES]
 
