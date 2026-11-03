@@ -35,7 +35,8 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bbusiness(?:es)?\b", ("business",)),
     (r"\bretailers?\b", ("business",)),
     (r"\bdevelopers?\b", ("business",)),
-    (r"\bhomeowners?\b", ("household",)),
+    # "homeowner associations" (MDOT's Urban Tree eligibility list) is an organization, not a household.
+    (r"\bhomeowners?\b(?!['’]?\s+associations?\b)", ("household",)),
     (r"\bhouseholds?\b", ("household",)),
     # "residents of Iowa", "residents of a Priority Funding Area" is a population served, not the applicant; a bare
     # "residents" or "Maryland residents" still is.
