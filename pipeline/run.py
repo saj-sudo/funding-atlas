@@ -9,6 +9,9 @@ from types import ModuleType
 
 from connectors import (
     ca_grants,
+    de_deldot,
+    de_dema,
+    de_dnrec,
     grants_gov,
     il_csfa,
     md_commerce,
@@ -50,6 +53,9 @@ CONNECTORS: dict[str, ModuleType] = {
     "va_dhcd": va_dhcd,
     "va_dcr": va_dcr,
     "va_vdot": va_vdot,
+    "de_dnrec": de_dnrec,
+    "de_dema": de_dema,
+    "de_deldot": de_deldot,
 }
 
 

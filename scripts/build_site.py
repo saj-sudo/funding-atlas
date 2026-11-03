@@ -61,6 +61,9 @@ CONNECTOR_LABEL = {
     "va_dhcd": "Virginia Department of Housing and Community Development",
     "va_dcr": "Virginia Department of Conservation and Recreation",
     "va_vdot": "Virginia Department of Transportation (Local Assistance)",
+    "de_dnrec": "Delaware DNREC Environmental Finance",
+    "de_dema": "Delaware Emergency Management Agency",
+    "de_deldot": "Delaware DelDOT (TAP and Safe Routes to School)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

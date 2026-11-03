@@ -49,9 +49,10 @@ Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `
 (grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list plus its AmpliFund pages, 125 records), `webgrants` (Iowa and Montana storefronts, 40 records), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records), `ny_sfs` (New York SFS
 Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 records), `va_dcjs` (Virginia DCJS, 59 records),
 `va_dhcd` (Virginia DHCD, a crawl of its menus, 30 records), `va_dcr` (six DCR grant pages) and `va_vdot` (six VDOT Local
-Assistance programs): Virginia's municipal five, VDEM excepted (unreachable).
-Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.4 shipped;
-milestone 11 (the municipal five) is done for Virginia and next for Delaware. The repository is public and the site is live at
+Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
+pages), `de_dema` (ten FEMA pass-throughs) and `de_deldot` (TAP and Safe Routes): three of Delaware's four, DSHA next.
+Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.7 shipped;
+milestone 11 (the municipal five) is done for Virginia and one agency (DSHA) from done for Delaware. The repository is public and the site is live at
 https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
 every public state index with structured rows is built; next are the municipal five agencies in the no-index states
 nearest outreach (Virginia, then Delaware; decision 2026-11-03), elsewhere agency connectors only when outreach names a town. New York's
