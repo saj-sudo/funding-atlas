@@ -51,6 +51,7 @@ CONNECTOR_LABEL = {
     "md_dnr": "Maryland DNR",
     "md_mdem": "Maryland Department of Emergency Management",
     "md_mdot": "Maryland Department of Transportation",
+    "md_mde": "Maryland Department of the Environment (MWIFA)",
     "pa_grants": "Pennsylvania grants portal (pa.gov)",
     "wv_grants": "West Virginia grants portal (grants.wv.gov)",
     "ca_grants": "California Grants Portal (grants.ca.gov)",

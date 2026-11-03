@@ -18,6 +18,7 @@ uv run python cli.py run md_mea                               # Maryland Energy 
 uv run python cli.py run md_dnr                               # Maryland DNR: 1 index + ~22 pages, under a minute
 uv run python cli.py run md_mdem                              # Maryland Department of Emergency Management: the grant roster + 4 pages, seconds
 uv run python cli.py run md_mdot                              # Maryland MDOT: three hand-listed pages (Bikeways, Urban Tree, TOD Fund), seconds
+uv run python cli.py run md_mde                               # Maryland MDE: MWIFA's index + 6 program pages, seconds
 uv run python cli.py run pa_grants                            # Pennsylvania pa.gov grants index: 4 search pages + ~377 detail pages, about 10 minutes
 uv run python cli.py run wv_grants                            # West Virginia grants.wv.gov: one JSON request, ~124 items, seconds
 uv run python cli.py run ca_grants                            # California Grants Portal: one CSV from data.ca.gov, ~2,025 rows, seconds

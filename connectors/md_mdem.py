@@ -157,6 +157,9 @@ def scrub_contacts(main_html: str) -> str:
     return str(soup)
 
 
+SCRUB = scrub_contacts        # the probe applies it to the index fixture as well
+
+
 def roster_clauses(lines: list[str]) -> list[str]:
     """Each eligibility line as clauses: the text outside parentheses, then each parenthetical; negated clauses dropped."""
     out: list[str] = []
