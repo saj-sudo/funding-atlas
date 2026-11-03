@@ -58,6 +58,7 @@ CONNECTOR_LABEL = {
     "nj_dca_sage": "New Jersey DCA SAGE (public RFP list)",
     "ny_sfs": "New York SFS Grant Opportunity Portal",
     "va_dcjs": "Virginia Department of Criminal Justice Services",
+    "va_dhcd": "Virginia Department of Housing and Community Development",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
