@@ -49,6 +49,7 @@ CONNECTOR_LABEL = {
     "md_mht": "Maryland Historical Trust",
     "md_mea": "Maryland Energy Administration",
     "md_dnr": "Maryland DNR",
+    "md_mdem": "Maryland Department of Emergency Management",
     "pa_grants": "Pennsylvania grants portal (pa.gov)",
     "wv_grants": "West Virginia grants portal (grants.wv.gov)",
     "ca_grants": "California Grants Portal (grants.ca.gov)",

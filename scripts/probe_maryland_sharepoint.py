@@ -34,6 +34,12 @@ DEFAULT_PAGES = {
         "pages/megawattsformaryland.aspx",                                 # closed line + future FOA date: forecasted
         "business/pages/commercial-solar.aspx",                            # closed because funding ran out: exhausted
     ),
+    "md_mdem": (
+        "pages/nonprofit-security-grant-program.aspx",                     # roster Yes with a 2023 deadline; the page's dated window
+        "community/pages/mitigation.aspx",                                 # FMA: roster No, local governments; 302 to the hazard page
+        "pages/rlf-fund.aspx",                                             # hand-added loan fund, no window
+        "community/pages/public-assistance-program.aspx",                  # hand-added FEMA pass-through, contact block scrubbed
+    ),
     "md_dnr": (
         "land/pages/programopenspace/cpp.aspx",                            # "is now closed", unit H1 -> program H2, "municipal corporations"
         "land/pages/lwcf-grants.aspx",                                     # closed + "Check back in April 2027": forecasted; government-entity list
@@ -61,9 +67,11 @@ def main(connector: str, paths: list[str]) -> None:
         for path in getattr(mod, "INDEX_PATHS", None) or (mod.INDEX_PATH,):
             url = f"{site.BASE}/{path}"
             resp = client.get(url)
-            section = main_section(resp.text)
+            # A connector whose index is not in the first mdgov section says what to save (MDEM's roster table).
+            index_html = getattr(mod, "index_fixture_html", None)
+            section = index_html(resp.text) if index_html else str(main_section(resp.text))
             (fixtures / f"index__{fixture_name(path)}.json").write_text(
-                json.dumps({"url": url, "main_html": str(section)}, indent=1, ensure_ascii=False))
+                json.dumps({"url": url, "main_html": section}, indent=1, ensure_ascii=False))
             time.sleep(0.3)
 
         for path in paths:

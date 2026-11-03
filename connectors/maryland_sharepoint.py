@@ -1,5 +1,5 @@
-"""Shared base for Maryland agencies on SharePoint with the state's `mdgov` theme (MEA, DNR; MDEM, MDOT and MDE
-run on it too and are not connected yet).
+"""Shared base for Maryland agencies on SharePoint with the state's `mdgov` theme (MEA, DNR, MDEM, MDE; MDOT's
+pages are the theme's newer Bootstrap layout with no rich-text body and are read by a hand-listed connector instead).
 
 Every one of these sites has the same skeleton, verified page by page on 2026-10-16 (see
 docs/connectors/maryland_sharepoint.md): no sitemap; a hand-curated index page (or several) linking the programs;
@@ -53,6 +53,9 @@ from pipeline.models import CategoryTag, Program, RawRecord
 # mdgov theme: the page body is one rich-text div inside the first <section class="mdgov-section">; the <h1> sits
 # in an edit-mode panel next to it.
 BODY_SELECTOR = "#ctl00_PlaceHolderMain_RichHtmlField1__ControlWrapper_RichHtmlField"
+# MDEM names the same control `ctl00` or `ctl01` instead of `RichHtmlField1` from page to page; the suffix is the
+# stable part. The exact form is tried first so nothing that parsed before parses differently (2026-11-03).
+BODY_FALLBACK_SELECTOR = 'section.mdgov-section div[id$="__ControlWrapper_RichHtmlField"]'
 H1_SELECTOR = "#ctl00_PlaceHolderMain_editmodepanel2 h1"
 LEAF_BLOCKS = ("p", "div", "li", "td", "th", "h2", "h3", "h4", "h5", "h6")
 # Every mdgov page carries the same site-wide <meta name="description">; it is the theme's, not the program's.
@@ -84,10 +87,15 @@ def fixture_name(source_id: str) -> str:
     return re.sub(r"[^a-z0-9_.-]+", "-", source_id.replace("/", "__").removesuffix(".aspx"))
 
 
+def rich_text_body(soup: BeautifulSoup | Tag) -> Tag | None:
+    """The page's rich-text body div: the exact mdgov control first, else the first control with the same suffix."""
+    return soup.select_one(BODY_SELECTOR) or soup.select_one(BODY_FALLBACK_SELECTOR)
+
+
 def main_section(html_text: str) -> Tag | None:
     """The first mdgov section (H1 panel + rich-text body), or the body div alone, or None for a non-page."""
     soup = BeautifulSoup(html_text, "html.parser")
-    body = soup.select_one(BODY_SELECTOR)
+    body = rich_text_body(soup)
     if body is None:
         return None
     return body.find_parent("section") or body
@@ -95,7 +103,7 @@ def main_section(html_text: str) -> Tag | None:
 
 def body_div(main_html: str) -> Tag | None:
     soup = BeautifulSoup(main_html, "html.parser")
-    return soup.select_one(BODY_SELECTOR) or soup
+    return rich_text_body(soup) or soup
 
 
 def text_hash(main_html: str) -> str:
@@ -173,6 +181,25 @@ def parse_text_date(value: str | None) -> date | None:
     if not m:
         return None
     return parse_date(f"{m.group(1).rstrip('.')} {int(m.group(2))}, {m.group(3)}")
+
+
+_MONTHS = ("january", "february", "march", "april", "may", "june", "july", "august", "september", "october",
+           "november", "december")
+
+
+def future_marker(text: str, today: date) -> tuple[bool, date | None]:
+    """(is in the future, full date or None) for 'April 2027' or 'July 15, 2026'. A bare month-year is compared by
+    month, never turned into a date (DHCD's rule, used by DNR and MDE)."""
+    m = DATE_RE.search(text)
+    if m:
+        d = parse_text_date(m.group(0))
+        return (d is not None and d > today), d
+    m = re.search(rf"({MONTH}) (\d{{4}})", text, re.I)
+    if m:
+        month = next((i + 1 for i, name in enumerate(_MONTHS) if name.startswith(m.group(1).lower()[:3])), None)
+        year = int(m.group(2))
+        return (month is not None and (year, month) > (today.year, today.month)), None
+    return False, None
 
 
 # ---------- the base ----------

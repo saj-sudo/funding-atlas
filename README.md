@@ -16,6 +16,7 @@ uv run python cli.py run md_commerce                          # Maryland Commerc
 uv run python cli.py run md_mht                               # Maryland Historical Trust: ~35 pages, under a minute
 uv run python cli.py run md_mea                               # Maryland Energy Administration: 5 indexes + ~35 pages, under a minute
 uv run python cli.py run md_dnr                               # Maryland DNR: 1 index + ~22 pages, under a minute
+uv run python cli.py run md_mdem                              # Maryland Department of Emergency Management: the grant roster + 4 pages, seconds
 uv run python cli.py run pa_grants                            # Pennsylvania pa.gov grants index: 4 search pages + ~377 detail pages, about 10 minutes
 uv run python cli.py run wv_grants                            # West Virginia grants.wv.gov: one JSON request, ~124 items, seconds
 uv run python cli.py run ca_grants                            # California Grants Portal: one CSV from data.ca.gov, ~2,025 rows, seconds
