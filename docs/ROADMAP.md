@@ -53,8 +53,9 @@ records to the published database and writes the first `feed.xml` beside every p
 
 **The next action is outreach, not code.** Maryland now has eight agencies (DHCD, Commerce, MHT, MEA, DNR, MDEM, MDOT,
 MDE) and a subscribe link (`https://saj-sudo.github.io/funding-atlas/md/feed.xml`); Virginia and Delaware have their
-municipal five. The Outreach section below has the routes and the four questions; the first note was drafted on
-2026-11-03 (chat, not sent). The first conversation names the first town, and the town names the next agency.
+municipal five. `docs/outreach.md` has the routes, the four questions, the links to send, the paste-ready note (drafted
+2026-11-03, not sent) and the log of who was written to. The first conversation names the first town, and the town
+names the next agency.
 
 Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
 funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
@@ -188,10 +189,12 @@ Still open, none of them fixable without inventing a fact:
 
 ### Outreach (tracked, not a milestone)
 
-Milestone 6 went live on 2026-11-03 (the repository is public); nothing gates this now. Routes, in order: five small-town administrators whose towns recently received
+Milestone 6 went live on 2026-11-03 (the repository is public); Maryland's eight agencies and the subscribe feed shipped
+the same day; nothing gates this now. Routes, in order: five small-town administrators whose towns recently received
 DHCD or MHT awards; Maryland Municipal League staff; rural COGs (Tri-County Councils, Mid-Shore and Upper Shore
 Regional Councils); Grant Professionals Association Maryland chapter and ELGL; Governor's Grants Office. Ask the
-four questions in the page footer. Answers decide what milestone 11 is.
+four questions in the page footer. **The note, the links and the contact log live in `docs/outreach.md`.** Answers
+decide what gets built next.
 
 ## Decisions log
 
