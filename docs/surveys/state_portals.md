@@ -79,11 +79,8 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 
 | Verdict | States |
 |---|---|
-| built | MD, PA (2) |
-| one connector away | CA, IL, IA (3); WV in progress |
-| WebGrants vendor | IA, MT (2) |
-| small build or deeper look | NJ, TX (2); NY built 2026-11-03 (`ny_sfs`) |
-| seed list | NC, WA (2) |
+| built (a state connector, updated 2026-11-03) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY (10) |
+| seed list, nothing built | NC, WA (2) |
 | agency connectors | AL, AR, AZ, CT, DE, FL, KY, MA, MO, ND, NE, NH, NV, OR, SD, TN, VT, VA (18) |
 | JS shell, not read | UT, WY (2) |
 | blocked | AK, CO, ID, KS, ME, MI, MN (listing), NM, RI, OK (OGX), plus FL Commerce and VT eGrants on otherwise-readable states (10) |
