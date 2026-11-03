@@ -8,12 +8,31 @@ census for the municipal page.
 
 `connectors/tx_egrants.py` follows this doc. First live run on a fresh database: 147 records added in 7 seconds (3
 open, 144 closed; 76 grants by title keyword, 71 with no stated type), 0 errors. Second run: 0 changed, 0 missing.
+2026-11-03, the Funding Sources page: run on the published database, 93 records changed on `eligibility_structured`
+(and `funding_source` for the 53 federal ones), 54 unchanged; the Texas page is the same (1 open municipal row, 30
+between rounds), since the match adds a fact and moves nothing.
 On the Texas page: 1 open municipal row (ALERRT Travel Assistance FY2027, likely) and 29 between rounds, the county and
 city rounds that recur every fiscal year (Border Zone Fire Departments, State Homeland Security Program, Texas
 Anti-Gang, Operation Lone Star, ...). The other two open rounds are county-only (invitation only) and nonprofit-only,
 and are not municipal. Found while writing it: 22 cards hold their eligible text outside any `<p>`, which a first
 count that looked only for paragraphs read as "no text"; the parser reads the bare block, and the corrected count is 127
 of 147 rounds with an applicant tag.
+
+## Funding Sources (added 2026-11-03)
+
+The site's Funding Sources page, `https://egrants.gov.texas.gov/funding`, lists the 35 fund sources the office
+administers, each an `entry-listitem` with an `entry-title` (the source's name) and an `entry-subheading` that is
+either `State Funds` (21) or `Federal Funds` (14), plus a paragraph of purpose. It is read once a run (one more GET; a
+page with no entries aborts the run, decision 6). A round is tied to a source only by name: the source's name, as
+words, must begin the round's name, after both drop parentheticals, the words grant / program / fund / funding / the,
+and plural endings. `Specialty Courts Grant Program, FY2024` is `specialty court fy2024` and `Specialty Court Program`
+is `specialty court`; `Body-Worn Camera Grant Program` meets `Body-Worn Cameras`; `Urban Area Security Initiative 2023`
+meets the page's own misspelling `Urban Area Securities Initiative (UASI)`. A name two sources begin, or none, is
+unmatched. On 2026-11-03: 97 of 147 rounds match a source (53 federal, 44 state), 50 do not, every one of them named
+differently from its source on the page (`General Victim Assistance` is VOCA money and `Rifle-Resistant Body Armor` is
+`Bullet-Resistant Vests`, which only a person knows; `Criminal Justice Grant Program` is not `Criminal Justice Planning
+Fund`). A matched round carries `funding_source_name` and `fund_type` in `eligibility_structured` and `funding_source`
+is `pass_through` when the fund type is federal; an unmatched round stays `direct` with no keys, as before.
 
 ## The source
 
@@ -86,7 +105,7 @@ municipality 93, tribe 62, nonprofit 57, higher_ed 54, state 43, school 41.
 | administering_agency | constant | `Office of the Governor`: the host office, which the page names as the solicitor ("OOG may solicit applications") |
 | agency_code | none | null |
 | funding_type | name | the shared `funding_type_for` keyword rule; else null |
-| funding_source | none | `direct`: the card makes no claim about whose money it is |
+| funding_source | Funding Sources page | `pass_through` when the round's matched source is `Federal Funds`; else `direct` (a state source, or no match). Decision 9 |
 | amount_min / amount_max | none | null: Total Funds is a program total, not an award |
 | match_required / match_pct | none | null: no labelled field |
 | status | Available, Due Date | see status rules |
@@ -95,7 +114,7 @@ municipality 93, tribe 62, nonprofit 57, higher_ed 54, state 43, school 41.
 | rolling | none | null: every card has a due date |
 | summary | Purpose | the first paragraph, whitespace collapsed |
 | eligibility_text | Eligible Organizations | the paragraphs, one per line (the bare block as one line); null when empty |
-| eligibility_structured | card | `{"total_funds": "$15 Million", "invitation_only": true}`, keys only when present; Total Funds verbatim, `invitation_only` when the eligible text begins "Invitation Only" |
+| eligibility_structured | card, Funding Sources page | `{"total_funds": "$15 Million", "invitation_only": true, "funding_source_name": "State Homeland Security Program (SHSP)", "fund_type": "Federal Funds"}`, keys only when present; Total Funds verbatim, `invitation_only` when the eligible text begins "Invitation Only", the source keys when a source matches |
 | applicant_types | Eligible Organizations | see decision 2 |
 | categories | none | none: the card states no topic |
 | alns | none | always empty |
@@ -144,23 +163,30 @@ The hash is over the Program. The cards carry no modified stamp, so everything i
    ever needs more than 20 pages the cap is a one-line change.
 8. **No category.** The card names no topic, and the rounds are mostly public safety and criminal justice, which is
    knowledge about the office, not a field on the page.
+9. **A round is tied to a funding source by name alone, and only when the source's name begins the round's.** The
+   cards do not name their source; the Funding Sources page does not name its rounds; a looser match (VOCA for
+   General Victim Assistance) would be our knowledge written into the data. 97 of 147 rounds match on 2026-11-03; the
+   50 that do not stay `direct`, which is the same claim as before (none). The page's own typo (`Securities`) is
+   matched as written, not corrected.
 
 ## Known gaps (the source's wording, not the parser's)
 
 - 20 of 147 rounds carry no applicant tag: their text names none of the applicants the shared tagger knows.
 - The shared negation rule reads "but is not limited to" as a negation (decision 2).
-- The Funding Sources page (`/funding`) says whether a program is federal or state money; it is not read, so
-  `funding_source` is `direct` for every round.
+- 50 of 147 rounds name their funding source differently from the Funding Sources page (or have none there) and stay
+  `direct` with no source keys (decision 9); the federal ones among them (VAWA, VOCA, UASI's border supplement) are
+  federal money the data does not say is federal.
 
 ## Out of scope
 
-Each round's own page (empty to a plain GET, see above) and its Request for Applications (RFA) document; the Funding Sources page; the other Texas
+Each round's own page (empty to a plain GET, see above) and its Request for Applications (RFA) document; the other Texas
 agencies (the census found no other public Texas listing).
 
 ## Verification
 
-- `tests/test_tx_egrants.py` against `tests/fixtures/tx_egrants/` (the Active page, two trimmed archive pages and an
-  empty page, written by `scripts/probe_tx_egrants.py`): card parsing, dates and statuses including the past-due Active
-  round, deduplication, paging, the applicant text cases, Total Funds shapes, `fetch` with a stub client (retry, a
-  failing page aborts), `resolve_missing`.
+- `tests/test_tx_egrants.py` against `tests/fixtures/tx_egrants/` (the Active page, two trimmed archive pages, an
+  empty page and the Funding Sources page, written by `scripts/probe_tx_egrants.py`): card parsing, dates and statuses
+  including the past-due Active round, deduplication, paging, the applicant text cases, Total Funds shapes, the source
+  name match and its refusals, `fetch` with a stub client (retry, a failing page aborts, an empty sources page aborts),
+  `resolve_missing`.
 - Two live runs: all added, then 0 changed.
