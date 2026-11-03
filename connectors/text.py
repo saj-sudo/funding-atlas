@@ -22,6 +22,7 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
     # apply for the credit"), not the applicant.
     (r"(?<!the )local jurisdictions?", ("municipality", "county")),
+    (r"\blocalit(?:y|ies)\b", ("municipality", "county")),   # Virginia's word for a city, county or town
     (r"municipalit\w*", ("municipality",)),
     (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
     (r"\bcit(?:y|ies)\b", ("municipality",)),

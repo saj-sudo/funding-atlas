@@ -23,6 +23,7 @@ uv run python cli.py run il_csfa                              # Illinois CSFA op
 uv run python cli.py run webgrants                            # WebGrants storefronts (Iowa, Montana Agriculture, Montana FWP): 3 lists + ~40 detail pages, under a minute
 uv run python cli.py run nj_dca_sage                          # New Jersey DCA SAGE: one page, ~10 RFPs, seconds
 uv run python cli.py run tx_egrants                           # Texas Governor eGrants: Funding Sources + Active page + 6 archive pages, ~147 rounds, seconds
+uv run python cli.py run va_dcjs                              # Virginia DCJS: 1 view + ~58 program pages, under a minute
 uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it

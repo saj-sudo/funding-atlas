@@ -27,6 +27,8 @@ def values(text: str | list[str]) -> set[str]:
     ("Eligibility is limited to local governments", {"municipality", "county"}),
     ("Applicants must be a California city or county prosecuting office", {"municipality", "county"}),
     ("Local units of government and state agencies", {"municipality", "county", "state"}),
+    ("A locality must certify its police department", {"municipality", "county"}),
+    ("State Aid to Localities with Police Departments", {"municipality", "county"}),
     ("Eligible applicants are local units of general government", {"municipality", "county"}),
 ])
 def test_places_that_apply(text, expected):

@@ -57,6 +57,7 @@ CONNECTOR_LABEL = {
     "tx_egrants": "Texas Office of the Governor eGrants",
     "nj_dca_sage": "New Jersey DCA SAGE (public RFP list)",
     "ny_sfs": "New York SFS Grant Opportunity Portal",
+    "va_dcjs": "Virginia Department of Criminal Justice Services",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
