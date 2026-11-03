@@ -142,11 +142,41 @@ def test_a_date_cell_that_is_not_a_date_goes_to_the_cycle_text():
 
 # ---------- applicants and categories ----------
 
-def test_governmental_entity_tags_nothing_and_the_other_labels_tag_by_table():
-    assert {(t.value, t.source_code) for t in normalize(0).applicant_types} == {("nonprofit", "Not-For-Profit"), ("tribe", "Tribal Organization")}
-    assert normalize(4).applicant_types == []
+def test_the_labels_tag_by_table_and_governmental_entity_alone_tags_nothing():
     assert {(t.value, t.source_code) for t in ny.applicant_tags("For Profit, Governmental Entity, Individual, Not-For-Profit")} == {
         ("business", "For Profit"), ("individual", "Individual"), ("nonprofit", "Not-For-Profit")}
+    assert ny.applicant_tags("Governmental Entity") == []
+
+
+def test_a_governmental_entity_row_reads_its_profile_for_governmental_applicants():
+    """ERPO: 'Governmental Entity' alone; the profile names municipal, city, town and county (and 'tribal', which is
+    not a governmental type and is the portal's label to give)."""
+    p = normalize(4)
+    assert {t.value for t in p.applicant_types} == {"municipality", "county"}
+    assert {t.source_code for t in p.applicant_types if t.value == "municipality"} == {"municipal", "city", "town"}
+    assert "tribal" not in {t.source_code for t in p.applicant_types}
+
+
+def test_profile_tags_are_added_to_the_label_tags():
+    """AFTYP3: three labels, and a profile naming county fairs."""
+    assert {(t.value, t.source_code) for t in normalize(0).applicant_types} == {
+        ("nonprofit", "Not-For-Profit"), ("tribe", "Tribal Organization"), ("county", "county")}
+
+
+def test_a_row_without_governmental_entity_never_reads_its_profile():
+    p = normalize(3)      # Not-For-Profit alone; the profile talks of communities and families
+    assert [(t.value, t.source_code) for t in p.applicant_types] == [("nonprofit", "Not-For-Profit")]
+    row = {**rows()[3], "eligibility": "Governmental Entity, Not-For-Profit"}
+    abstract = {"profile": "Counties and cities may apply."}
+    assert {t.value for t in ny.applicant_tags_for(row, abstract)} == {"nonprofit", "county", "municipality"}
+    assert {t.value for t in ny.applicant_tags_for(row, None)} == {"nonprofit"}
+
+
+def test_profile_tags_drop_negated_sentences_and_beneficiaries():
+    assert ny.profile_tags("Counties are not eligible. Towns and villages may apply to serve residents.") == [
+        ny.ApplicantTag(value="municipality", source_code="towns")]
+    assert ny.profile_tags("Services for low-income individuals and households.") == []
+    assert ny.profile_tags("") == []
 
 
 def test_service_areas_map_by_table_and_keep_the_label():
@@ -196,7 +226,7 @@ def test_a_closed_row_normalizes_from_the_grid_alone():
     p = ny.normalize(RawRecord(source_connector=ny.CONNECTOR, source_id=ny.row_key(row), payload={"grid": "closed", "row": row, "abstract": None}))
     assert (p.source_id, p.status, p.closes_at) == ("AGM01-AGM-AFTYP1", "closed", date(2025, 2, 25))
     assert p.administering_agency == "AGRICULTURE & MARKETS"       # the table
-    assert p.summary is None and p.categories == [] and p.source_url == ny.PORTAL_URL
+    assert p.summary is None and p.categories == [] and p.source_url == ny.PORTAL_URL      # no abstract: no profile tags
     assert p.eligibility_structured == {"portal_status": "Closed", "posted_at": "2024-11-20"}
     assert {t.value for t in p.applicant_types} == {"nonprofit", "tribe"}
 

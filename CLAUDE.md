@@ -51,6 +51,6 @@ Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 record
 Milestones 1 to 8.2, 9.1 to 9.8 and 10.1 shipped. **The live site answers 404: the
 repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
 the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
-every public state index with structured rows is built; agency connectors only when outreach names a town. The open
-decision is New York's `Governmental Entity` label (0 municipal rows on that page until Saj rules). **Start with the "Start here" block at the top of the roadmap's Next section**: the next
+every public state index with structured rows is built; agency connectors only when outreach names a town. New York's
+`Governmental Entity` rows read their Solicitation Profile for governmental applicants (decision 2026-11-03). **Start with the "Start here" block at the top of the roadmap's Next section**: the next
 action, what waits on Saj, and the open follow-ups in one place.

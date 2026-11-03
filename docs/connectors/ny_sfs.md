@@ -8,12 +8,13 @@ in CLAUDE.md does not apply and the census entry is corrected below.
 ## Implemented (2026-11-03, same day)
 
 `connectors/ny_sfs.py` follows this doc. First live run on a fresh database: 257 records added in 54 seconds (32 open,
-225 closed; 256 grants, 1 loan by title keyword), 0 errors; 66 requests. Second run: 0 changed, 0 missing. Of the 32 open
-rows, 30 carry an applicant tag (nonprofit, tribe, business, individual from the portal's labels) and none a municipal
-one, so **the New York page shows 0 open municipal rows and 0 between rounds** (decision 2; the relevance view grades
-12 open rows `likely` and 20 `possible`, 8 of them on local-government wording in the title alone: Municipal Waste
-Reduction and Recycling, Community Forest Conservation, ERPO Infrastructure and Implementation, Farmland Protection,
-Drinking Water Fluoridation, three OMH crisis programs). 20 of 32 open rows link to an agency announcement page, 12 to the
+225 closed; 256 grants, 1 loan by title keyword), 0 errors; 66 requests. Second run: 0 changed, 0 missing. Third run,
+after Saj chose the profile reading of `Governmental Entity` (decision 2): 7 changed (`applicant_types` only), and **the
+New York page shows 4 open municipal rows, all `likely`** (Farmland Protection Implementation Grants round 20, ERPO
+Infrastructure and Implementation, Municipal Waste Reduction and Recycling 2024, Drinking Water Fluoridation) and 0
+between rounds. 31 of the 32 open rows carry an applicant tag; the profile reading added municipality to 4 rows, county to
+3 (one of them `2027 TYCLF`, from "County and Local Fairs", a place word the shared tagger cannot tell from an
+applicant; the source_code says so) and school to 1. 20 of 32 open rows link to an agency announcement page, 12 to the
 portal. 43 of the 225 closed rows have no agency name (12 codes never seen on an open abstract). Found while writing it:
 the closed grid lists the Department of Labor's `OSH TE` three times (the 2025-2026, 2026-2027 and a second 2026-2027
 round) under one Event ID, so the key keeps the first in grid order and two closed rounds are not recorded (decision 9).
@@ -145,7 +146,7 @@ the portal names an agency; the grid shows the code.
 | summary | abstract Solicitation Profile | whole text, whitespace collapsed; null for a closed row |
 | eligibility_text | grid Eligibility | the labels as written |
 | eligibility_structured | grid and abstract | `portal_status` (the grid's word, always), `posted_at` (Availability Date), `total_funding`, `contract_length`, `anticipated_award_date`, `questions_due` (dates ISO when they parse, else verbatim); keys only when the source has a value |
-| applicant_types | grid Eligibility | each label through the shared `portal_applicant` table: Not-For-Profit → nonprofit, For Profit → business, Tribal Organization → tribe, Individual → individual, **Governmental Entity → nothing**. Decision 2 |
+| applicant_types | grid Eligibility, then the abstract Solicitation Profile | each label through the shared `portal_applicant` table: Not-For-Profit → nonprofit, For Profit → business, Tribal Organization → tribe, Individual → individual, Governmental Entity → nothing by itself; **a row labelled Governmental Entity also has its Solicitation Profile read sentence by sentence** (negated sentences dropped) through the shared tagger, keeping only the governmental kinds (municipality, county, state, school, special_district, housing_authority, higher_ed), the matched phrase as source_code. Decision 2 |
 | categories | abstract Service Areas | each label through the shared `portal_categories` table (Health Services → health, Housing and Shelter Services → housing, Workforce Development → workforce, Public Safety Supports and Justice Services → public_safety, Public Transportation Services → transportation; the other six → other), the label kept as source_code; none for a closed row |
 | alns | none | always empty |
 
@@ -179,15 +180,19 @@ The hash is over the Program. The grid carries no modified stamp; the abstract o
 1. **This is not a browser workaround.** The page's JavaScript only fills `ICAction`, `ICSID` and `ICStateNum` into a form
    and submits it; the connector sends the same form. Nothing is executed, no headless browser is involved, and the
    state says the portal is public. The census is corrected from "JS shell" to "server-rendered behind form posts".
-2. **`Governmental Entity` tags no applicant type.** It is the same breadth as pa.gov's `Public Agency`, California's
-   `Other Legal Entity` and Illinois's `Government Organizations` (decision 2026-10-28): state departments, authorities,
-   school districts, counties and towns alike, and the portal has no free-text eligibility line to settle it. The cost is
-   plain: on 2026-11-03, 25 of the 32 open rows carry the label and none of them reaches the municipal page, including
-   rows whose titles say `Municipal Waste Reduction and Recycling`, `Community Forest Conservation` and `ERPO
-   Infrastructure` (a county and city program). The relevance view still reads those titles as local-government wording.
-   Two alternatives are on the roadmap for Saj: read `Governmental Entity` as municipality plus county (every state
-   agency program then lands on every town's page), or tag from the Solicitation Profile sentence by sentence (a
-   description, not an eligibility section, which the WebGrants decision ruled out).
+2. **`Governmental Entity` tags nothing by itself; a row that carries it has its Solicitation Profile read for the
+   governmental applicants it names** (Saj's decision, 2026-11-03, after the first build tagged nothing). The label is
+   the same breadth as pa.gov's `Public Agency`, California's `Other Legal Entity` and Illinois's `Government
+   Organizations` (decision 2026-10-28): state departments, authorities, school districts, counties and towns alike, and
+   the portal has no eligibility prose to settle it; the profile is the only prose it has. So the Texas rule runs on the
+   profile, sentence by sentence with negated sentences dropped, but only for rows the portal itself says are open to a
+   governmental entity, and only for the governmental kinds the label can mean: a `residents` or `individuals` found in
+   a description is a beneficiary, and nonprofit, business and tribe are the portal's own labels to give. The reading
+   was rejected for WebGrants (descriptions tag incidental text); it is accepted here because the scope is narrow and
+   every tag names its phrase. What it does on 2026-11-03: 7 of the 25 labelled rows gain a governmental tag, 4 of them
+   municipality; the other 18 (the DEC forest and river rounds, the CDD rounds, the OMH crisis programs) have profiles
+   that name no applicant and stay off the municipal page. One false positive is known: `2027 TYCLF` tags county from
+   "County and Local Fairs". Read the `Governmental Entity` rows that gained nothing before trusting a town's page.
 3. **The announcement link is the record's URL.** The portal has no per-record address (every page is one PeopleSoft
    URL plus session state), and the Announcement Link is the agency's own page for the round, the thing a reader opens
    next. 20 of 32 abstracts carry a usable one; the rest, and every closed row, link to the portal search page. A link
@@ -213,8 +218,8 @@ The hash is over the Program. The grid carries no modified stamp; the abstract o
 
 ## Known gaps (the source's wording, not the parser's)
 
-- 25 of the 32 open rows are open to `Governmental Entity` and carry no municipal tag (decision 2): the New York page
-  shows no open municipal row until that decision is revisited.
+- 18 of the 25 open rows labelled `Governmental Entity` have a Solicitation Profile that names no applicant, so they
+  carry no governmental tag and stay off the municipal page (decision 2); `2027 TYCLF` tags county from a place word.
 - Titles are cut at 50 characters by the source (`Municipal Waste Reduction and Rcycling. Prgrm. 24`); the Solicitation
   Profile often carries the full name, but it is a description on other rows, so the name stays the grid's.
 - Closed rows have no agency name unless the code was seen on an open abstract (10 of 22 codes on 2026-11-03), no

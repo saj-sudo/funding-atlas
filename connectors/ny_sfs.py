@@ -7,8 +7,10 @@ the control: a row's title link opens its Grant Abstract, "Return to Search" com
 answer whose CDATA holds the same HTML), and the Search button with Status = Closed lists the closed rounds (227). The
 browser's JavaScript only fills three hidden fields; the connector fills them itself. Nothing is executed.
 
-The grid labels every row's status; dates are not consulted. `Governmental Entity` tags nothing (decision 2 in the doc).
-The contact name and email are dropped before the payload is stored. See docs/connectors/ny_sfs.md.
+The grid labels every row's status; dates are not consulted. `Governmental Entity` is the portal's one broad label; a
+row that carries it also has its Solicitation Profile read sentence by sentence for the governmental applicants it
+names (decision 2 in the doc). The contact name and email are dropped before the payload is stored. See
+docs/connectors/ny_sfs.md.
 """
 
 from __future__ import annotations
@@ -22,8 +24,9 @@ from urllib.parse import urlparse
 import httpx
 from bs4 import BeautifulSoup, Tag
 
+from connectors.maryland_drupal import NEGATION_RE, sentences
 from connectors.sam_assistance_listings import clean
-from connectors.text import funding_type_for, portal_applicant, portal_categories
+from connectors.text import applicant_types_for, funding_type_for, portal_applicant, portal_categories
 from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "ny_sfs"
@@ -84,6 +87,10 @@ ABSTRACT_SPANS: dict[str, str] = {
     "NY_GG_SRCH_WRK_DESCRLONG": "service_areas",
 }
 ANNOUNCEMENT_LABEL = "Announcement Link"
+# The portal's broad label, and the kinds of body it can mean. A row with it has its Solicitation Profile read for
+# these; a tag of any other kind found there (a beneficiary: "residents", "individuals") is the portal's labels' call.
+GOVERNMENTAL_ENTITY = "governmental entity"
+GOVERNMENTAL_TYPES = frozenset({"municipality", "county", "state", "school", "special_district", "housing_authority", "higher_ed"})
 
 STATUS_MAP: dict[str, str] = {
     "available": "open",
@@ -302,6 +309,22 @@ def applicant_tags(eligibility: str) -> list[ApplicantTag]:
     return tags
 
 
+def profile_tags(profile: str) -> list[ApplicantTag]:
+    """The governmental applicants the Solicitation Profile names, sentence by sentence, negated sentences dropped
+    (the Texas rule on the only prose the portal has). The matched phrase is the tag's source_code."""
+    lines = [line for line in sentences(profile) if not NEGATION_RE.search(line)]
+    return [tag for tag in applicant_types_for(lines or None) if tag.value in GOVERNMENTAL_TYPES]
+
+
+def applicant_tags_for(row: dict[str, Any], abstract: dict[str, str] | None) -> list[ApplicantTag]:
+    """The grid's labels through the table, plus the profile's governmental applicants when the row is open to a
+    Governmental Entity and has an abstract."""
+    tags = applicant_tags(row["eligibility"])
+    if abstract and any(label.lower() == GOVERNMENTAL_ENTITY for label in labels(row["eligibility"])):
+        tags += profile_tags(abstract.get("profile", ""))
+    return tags
+
+
 def category_tags(service_areas: str) -> list[CategoryTag]:
     return [CategoryTag(value=value, source_code=label)
             for label in labels(service_areas) for value in portal_categories(label)]
@@ -375,7 +398,7 @@ def normalize(raw: RawRecord, today: date | None = None) -> Program:
         summary=(clean(abstract.get("profile", "")) or None) if abstract else None,
         eligibility_text=clean(row["eligibility"]) or None,
         eligibility_structured=structured_for(row, abstract),
-        applicant_types=applicant_tags(row["eligibility"]),
+        applicant_types=applicant_tags_for(row, abstract),
         categories=category_tags(abstract.get("service_areas", "")) if abstract else [],
         alns=[],
     )
