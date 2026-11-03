@@ -13,8 +13,10 @@ after Saj chose the profile reading of `Governmental Entity` (decision 2): 7 cha
 New York page shows 4 open municipal rows, all `likely`** (Farmland Protection Implementation Grants round 20, ERPO
 Infrastructure and Implementation, Municipal Waste Reduction and Recycling 2024, Drinking Water Fluoridation) and 0
 between rounds. 31 of the 32 open rows carry an applicant tag; the profile reading added municipality to 4 rows, county to
-3 (one of them `2027 TYCLF`, from "County and Local Fairs", a place word the shared tagger cannot tell from an
-applicant; the source_code says so) and school to 1. 20 of 32 open rows link to an agency announcement page, 12 to the
+3 (one of them `2027 TYCLF`, from "County and Local Fairs") and school to 1. Fourth reading (10.3, the same day): a
+profile with no sentence in it is a title and tags nothing, so `2027 TYCLF` loses its wrong county, Regional School
+Food Infrastructure its school and Municipal Waste Reduction and Recycling 2024 its municipal: **3 open municipal rows**
+(Farmland Protection, ERPO, Drinking Water Fluoridation). 20 of 32 open rows link to an agency announcement page, 12 to the
 portal. 43 of the 225 closed rows have no agency name (12 codes never seen on an open abstract). Found while writing it:
 the closed grid lists the Department of Labor's `OSH TE` three times (the 2025-2026, 2026-2027 and a second 2026-2027
 round) under one Event ID, so the key keeps the first in grid order and two closed rounds are not recorded (decision 9).
@@ -191,8 +193,12 @@ The hash is over the Program. The grid carries no modified stamp; the abstract o
    was rejected for WebGrants (descriptions tag incidental text); it is accepted here because the scope is narrow and
    every tag names its phrase. What it does on 2026-11-03: 7 of the 25 labelled rows gain a governmental tag, 4 of them
    municipality; the other 18 (the DEC forest and river rounds, the CDD rounds, the OMH crisis programs) have profiles
-   that name no applicant and stay off the municipal page. One false positive is known: `2027 TYCLF` tags county from
-   "County and Local Fairs". Read the `Governmental Entity` rows that gained nothing before trusting a town's page.
+   that name no applicant and stay off the municipal page. A profile with no sentence in it is the round's title
+   ("2027 Transportation for Youth to County and Local Fairs", "Municipal Waste Reduction and Recycling Program 2024")
+   and tags nothing (10.3): a name says what the money is for, not who applies, and the county fair is not a county.
+   The cost is Municipal Waste Reduction and Recycling 2024, a municipal program by its name that the labels and the
+   profile never state, off the municipal page. Read the `Governmental Entity` rows that gained nothing before trusting
+   a town's page.
 3. **The announcement link is the record's URL.** The portal has no per-record address (every page is one PeopleSoft
    URL plus session state), and the Announcement Link is the agency's own page for the round, the thing a reader opens
    next. 20 of 32 abstracts carry a usable one; the rest, and every closed row, link to the portal search page. A link
@@ -219,7 +225,8 @@ The hash is over the Program. The grid carries no modified stamp; the abstract o
 ## Known gaps (the source's wording, not the parser's)
 
 - 18 of the 25 open rows labelled `Governmental Entity` have a Solicitation Profile that names no applicant, so they
-  carry no governmental tag and stay off the municipal page (decision 2); `2027 TYCLF` tags county from a place word.
+  carry no governmental tag and stay off the municipal page (decision 2); a title-only profile tags nothing, which keeps
+  Municipal Waste Reduction and Recycling 2024 off it too.
 - Titles are cut at 50 characters by the source (`Municipal Waste Reduction and Rcycling. Prgrm. 24`); the Solicitation
   Profile often carries the full name, but it is a description on other rows, so the name stays the grid's.
 - Closed rows have no agency name unless the code was seen on an open abstract (10 of 22 codes on 2026-11-03), no
