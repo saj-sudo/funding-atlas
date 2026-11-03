@@ -37,35 +37,34 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 11.6 | Delaware DEMA: `de_dema` | 2026-11-03 | the grants page's two accordions (ten FEMA pass-throughs) and the preparedness tab's "Eligible Subrecipient" and "Apply" paragraphs; every record `unknown` (FEMA's NOFO "annually in the spring"), `pass_through` on the page's own sentence, invitation-only recorded for HSGP and EMPG. 10 added, 3 municipal | `connectors/de_dema.md` |
 | 11.7 | Delaware DelDOT: `de_deldot` | 2026-11-03 | the two programs with a call for outside applications, TAP (overview and apply pages: the sponsor list, the 2026 call-out) and Safe Routes to School; the rest of DelDOT's fifty-entry program listing is how the department runs roads. 2 added, TAP unknown on a past call-out | `connectors/de_deldot.md` |
 | 11.8 | Delaware State Housing Authority: `de_dsha` | 2026-11-03 | the last of Delaware's four: six hand-listed "Build & Develop" pages in two shapes, a one-program page with a header status card or a sections page with one program per `h2` (Home4Good, CDBG, ESG, HOPWA, NAA, the ARPA funds, the supportive housing funds); the status card is the record of the current round, a badge or the text's own sentence otherwise, dates from the card or, without one, the program's dated list lines; "Who applies" and the eligibility panels are applicant text. 17 added (4 open, 4 closed, 9 unknown), second run 0 changed; CDBG and ESG name Kent and Sussex localities and the Delaware page shows 2 open municipal rows. **Milestone 11 is done**: Virginia 101 records over four agencies, Delaware 41 over four | `connectors/de_dsha.md` |
+| 7.2 | Maryland MDEM: `md_mdem` | 2026-11-03 | the first of Maryland's three missing agencies (emergency management): the grant roster on `/Pages/grants.aspx` (a SharePoint list rendered as one table, still "in development", two rows: NSGP, FMA) plus two hand-added pages (the Resilient Maryland Revolving Loan Fund, FEMA Public Assistance), on the SharePoint base. A roster row is the record and lives at its Learn More page; the roster's `Applications Open?` field is the status (`No` is closed), a `Yes` with a past deadline is stale and the page's dated window decides (NSGP: June 30 to July 15, 2026, passed, `unknown`); eligibility lines are split into clauses so FMA keeps "Local Governments and State Agencies" and loses its negated parenthetical; contact names and e-mails scrubbed. Base: the body selector falls back to the control-id suffix (MDEM names the control `ctl00`/`ctl01`), `future_marker` moves in from DNR. 4 added (1 closed, 3 unknown), second run 0 changed; FMA joins the Maryland between-rounds group (17 → 18) | `connectors/md_mdem.md` |
+| 7.3 | Maryland MDOT: `md_mdot` | 2026-11-03 | the second (transportation): three hand-listed pages of The Secretary's Office (Kim Lamphier Bikeways, Urban Tree, the TOD Capital Grant and Revolving Loan Fund), the DCR/DelDOT pattern, **not** the SharePoint base (the pages are the theme's Bootstrap layout with no rich-text body). Every stale banner ("Applications are OPEN for FY27", "currently closed for applications", TOD's eligibility and 10% match cards) sits inside HTML comments and is never read. Status: an accepting sentence with a date, then year-round, then "awards have now been announced" (closed, Saj's call), then closed wording. The Urban Tree page names no applicant; its how-to-apply PDF's sentence is quoted by hand, dated (the Illinois precedent), which exposed a tagger gap: "homeowner associations" tagged a household; guarded, 0 of 6,834 stored records move. 3 added (TOD open to 2026-11-20, Urban Tree open year-round, Bikeways closed), second run 0 changed; Maryland open municipal rows 13 → 15, between rounds 18 → 19 | `connectors/md_mdot.md` |
+| 7.4 | Maryland MDE: `md_mde` | 2026-11-03 | the third (environment): the Water Infrastructure Financing Administration's index, which the survey had called "no listing" and is one: an `h2` status banner ("MWIFA's funding solicitation is currently closed. Applications will reopen in December 2026.") over a seven-row `Financial Program | Purpose` table, six rows linked to a page and one (Supplemental Assistance) keyed to the index itself, on the SharePoint base. The banner sets every row's status (closed with a month still ahead is `forecasted`, no date invented); the Purpose cell and the page's applicant sentences name who may apply; the row's title is the name; the two EPA-funded revolving funds are `pass_through` with no ALN stated. 7 added (all forecasted), second run 0 changed; five municipal rows join the Maryland page (open-or-forecasted municipal 15 → 20). **Maryland's missing agencies are done**: eight agencies, 141 state records | `connectors/md_mde.md` |
+| 6.1 | Change feed per state (Atom + JSON) | 2026-11-03 | beside every state page, `feed.xml` and `changes.json` carry the same rows as its Changes tab (the newest 200 federal plus the newest 200 of that state), and the site root the newest 200 across every source. Entry ids are tag URIs over the change-log row id (permanent); summaries use the page's own wording (one `FIELD_LABEL` in Python and JavaScript, held equal by a test); a listed program links to its state page, anything else to the source; the standard library builds it, control characters stripped; both templates declare the feed, the footer links it. 52 feeds, every one parsed; outreach's ask is now "subscribe" | `scripts/build_site.py`, README |
 
 ## Next
 
-### Start here (updated 2026-11-03, evening)
+### Start here (updated 2026-11-03, night)
 
-**Before anything else.** The New York connector (`ny_sfs`, 257 records) is on this branch; once its PR merges, start
-from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the
-merge adds the 257 records to the published database; they appear as `added` in the change log.
+**Before anything else.** This branch carries Maryland's three missing agencies (`md_mdem`, `md_mdot`, `md_mde`, 14
+records) and the per-state change feed, four commits; once its PR merges, start from the latest `main`
+(`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the merge adds the 14
+records to the published database and writes the first `feed.xml` beside every page.
 
-**The next sessions: Maryland's own municipal five, then outreach.** Milestone 11 is done (2026-11-03): Virginia has
-DCJS, DHCD, DCR and VDOT (101 records; VDEM unreachable by this client), Delaware has DNREC, DEMA, DelDOT and DSHA (41
-records). That leaves Maryland, the pitch state, with less agency coverage than its neighbours: no emergency management,
-transportation or environment agency. Decision 2026-11-03 (Saj): fix that before the pitch. In this order, one per
-session:
-1. **`md_mdem`**: MDEM's grants page (two programs with structured `Applications Open?` and deadline fields; survey in
-   milestone 7 below), on the SharePoint base. Doc first, as always.
-2. **`md_mdot`** and 3. **`md_mde`**: three to five hand-listed pages each (Bikeways, Urban Tree, the water and sewer
-   financing rows; survey in `connectors/md_dhcd.md`), the DCR/DelDOT pattern.
-4. **A change-log feed per state** (RSS or JSON from the navigator views, milestone 6 note): outreach's ask becomes
-   "subscribe", not "look".
-5. **Outreach**, Maryland first, then Virginia and Delaware: the Outreach section below has the routes and the four
-   questions. The first conversation names the first town, and the town names the next agency.
+**The next action is outreach, not code.** Maryland now has eight agencies (DHCD, Commerce, MHT, MEA, DNR, MDEM, MDOT,
+MDE) and a subscribe link (`https://saj-sudo.github.io/funding-atlas/md/feed.xml`); Virginia and Delaware have their
+municipal five. The Outreach section below has the routes and the four questions; the first note was drafted on
+2026-11-03 (chat, not sent). The first conversation names the first town, and the town names the next agency.
 
-Also codeable, lower priority: Virginia DHCD pages without an Eligibility box (VATI among them) as a hand list on the
-existing crawl (`connectors/va_dhcd.md`); read-only probes of the JavaScript shells the census recorded but never
-checked (Utah's Looker Studio index, Wyoming's hub, Kentucky's DLG portal, Nevada's discovery page, Delaware's University
-of Delaware dashboard) and a search for a third WebGrants state, each with the stop rule New York's probe had; a Baltimore
-City view (municipality or county) in SQL if a Baltimore reader ever appears. If a town elsewhere is named: the agency
-the census seeds say first (NC's and WA's lists).
+Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
+funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
+roster the agency calls "in development" lists them (no code change: the roster is read every run); a
+`roads.maryland.gov` TAP connector; Virginia DHCD pages without an Eligibility box (VATI among them) as a hand list on
+the existing crawl (`connectors/va_dhcd.md`); read-only probes of the JavaScript shells the census recorded but never
+checked (Utah's Looker Studio index, Wyoming's hub, Kentucky's DLG portal, Nevada's discovery page, Delaware's
+University of Delaware dashboard) and a search for a third WebGrants state, each with the stop rule New York's probe
+had; a Baltimore City view (municipality or county) in SQL if a Baltimore reader ever appears. If a town elsewhere is
+named: the agency the census seeds say first (NC's and WA's lists).
 
 **Waiting on Saj (not code).**
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
@@ -76,9 +75,10 @@ the census seeds say first (NC's and WA's lists).
   tell a bot wall from a proxy block (milestone 8.1/8.2).
 
 **Small follow-ups, any session** (each is detailed in the doc named):
-- Shared tagger (`connectors/text.py`): nothing recorded. 10.3 closed the three gaps 10.2 left (artists tag an
-  individual; a New York title-only profile tags nothing; Baltimore City is a county-equivalent and `county` stands).
-  The next gap found goes here, and three gaps make a session, measured on every stored record as 10.2 and 10.3 were.
+- Shared tagger (`connectors/text.py`): two gaps recorded on 2026-11-03 (MDEM): `not within <place>` ("Nonprofit
+  entities not within designated urban areas") reads as a negation and drops the line; a bare "State" as an applicant
+  ("assistance to State, local governments and ...") tags nothing, only "state agencies" does. Neither costs a row today.
+  The third gap makes a session, measured on every stored record as 10.2, 10.3 and 7.3 were.
 - `webgrants.md`: the "round left the storefront is `unknown`" rule is unverified until a round actually leaves; other
   Montana agency hosts and other states' storefronts were not searched for; 27 of 40 pages state no eligibility.
 - `nj_dca_sage.md`: the empty-list check is a guess at what a page with no RFPs looks like (a wrong guess aborts the run,
@@ -86,7 +86,6 @@ the census seeds say first (NC's and WA's lists).
 - `tx_egrants.md`: 50 of 147 rounds name their funding source differently from the Funding Sources page and stay
   `direct` (decision 9); `il_csfa.md`: 8 native `Government Organizations` rounds and 15 GMS rows name no applicant
   anywhere the connector reads, and a new native round's NOFO is unread until someone runs `pdftotext` on it.
-- Maryland depth (milestone 7): MDEM (two programs), MDOT and MDE (hand-listed pages) when outreach asks for them.
 - Census gaps: 18 agency-by-agency states, 7 with no state index found, 10 blocked (`docs/surveys/state_portals.md`).
 
 Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open notes they carry.
@@ -94,26 +93,23 @@ Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open not
 ### 6. Navigator UI and hosting (shipped, see Done)
 
 Built and published to `gh-pages`; https://saj-sudo.github.io/funding-atlas/ is live (the repository went public on
-2026-11-03). Left for a later session, none blocking: shareable filter links
-are in the URL hash already; a per-state RSS or JSON feed of the change log; the Grants.gov data-cleanup items under
-milestone 10 show on the page as they are in the database (`&quot;` in deadline text, contact names as agencies).
+2026-11-03). The per-state change feed shipped on 2026-11-03 (6.1: `feed.xml` and `changes.json` beside every page).
+Left for a later session, none blocking: shareable filter links are in the URL hash already; the Grants.gov
+data-cleanup items under milestone 10 show on the page as they are in the database (`&quot;` in deadline text,
+contact names as agencies).
 
-### 7. Maryland depth (shipped 2026-10-16, see Done; two items remain)
+### 7. Maryland depth (shipped 2026-10-16 and 2026-11-03, see Done; GOCPP remains)
 
-Shipped: MEA and DNR, and the SharePoint base they share. Still open, none blocking:
+Shipped: MEA and DNR (2026-10-16) and the SharePoint base they share; MDEM, MDOT and MDE (2026-11-03, rows 7.2 to
+7.4). Still open, not blocking:
 
 - **GOCPP** (gocpp.maryland.gov): 43 grant programs on WordPress with a clean taxonomy (`eligible_apply-*` classes)
   and an open list, but `robots.txt` ends with `User-agent: * / Disallow: /`. Stopped per CLAUDE.md. Next step is a
   request to the office for crawl permission or a feed; the survey and the connector design are in
   `connectors/md_gocpp.md`. The municipal law-enforcement rounds (BARM, SAPP, PRAR, GVRG, ...) are the known gap.
-- **MDEM** (mdem.maryland.gov, SharePoint): `/Pages/grants.aspx` says it is "still in development" and lists two
-  programs with structured `Applications Open?` and deadline fields (NSGP, "open" with a 2023 deadline; FMA, closed,
-  local governments eligible). `/community/Pages/Mitigation.aspx` redirects to `/Pages/hazard-mitigation.aspx`, which
-  names no programs (a request-info form, the Resilient MD Revolving Loan Fund, FAQs). Two records is not a connector;
-  revisit when the index grows. The base class fits it when that day comes.
-- **MDOT** and **MDE**: no listing to enumerate from (survey in `connectors/md_dhcd.md`); three to five hand-written
-  pages each. Candidates for a hand-listed `HAND_ADDED`-style connector on the SharePoint base if outreach asks for
-  Bikeways, Urban Tree, or the water and sewer financing rows by name.
+- **MDEM, MDOT, MDE**: connected 2026-11-03. The 2026-10-16 notes stand as history: MDEM's roster is still "in
+  development" (two rows; the connector reads whatever rows it gains), MDOT has no listing (three pages by hand), and
+  MDE's "no listing" was wrong: MWIFA's index is a seven-row table under one banner (`connectors/md_mde.md`).
 
 ### 8. Mid-Atlantic portal survey (shipped 2026-10-17, see Done)
 
@@ -303,6 +299,12 @@ four questions in the page footer. Answers decide what milestone 11 is.
 | 2026-11-03 | "Any artist" and "Individual artists" tag an individual; a bare "artists" does not | the two WVCA rounds that name an artist as the applicant carried no tag at all (10.2 took away a wrong household); "representing disabled artists" and "grant payments to artists" are the people served, and the bare word would have tagged five California organization rounds | `connectors/text.py` (10.3) |
 | 2026-11-03 | A New York Solicitation Profile with no sentence in it tags nothing | it is the round's title ("2027 Transportation for Youth to County and Local Fairs", "Regional School Food Infrastructure Grant Program"), and a name says what the money is for, not who applies; the cost, accepted, is Municipal Waste Reduction and Recycling 2024, a municipal program by its name whose labels and profile never say so, off the New York page until the agency's row says who applies | `connectors/ny_sfs.py`, `connectors/ny_sfs.md` decision 2 (10.3) |
 | 2026-11-03 | Baltimore City stays `county`; a reader who is both is a navigator question | Baltimore City is a county-equivalent under Maryland law, so "county governments, including Baltimore City" is a county program, and the DNR line "municipal corporations of the state and Baltimore City" tags municipality from its own words; if a Baltimore City office ever uses the page, a view that reads municipality or county answers it without a rule that would put every county formula on every town's page | milestone 10.3 |
+| 2026-11-03 | An MDEM roster row is the record and lives at its Learn More page; a roster `Yes` with a past deadline is stale and the page's dated window decides; the list's XML export is not read | the roster has no page per item and the link is where the agency sends a reader (FMA's is the hazard page, which adds a URL and nothing else); reading `Yes` as open would list a 2023 round; `/_vti_bin/` is robots-disallowed and the rendered table carries every field. Two rows pointing at one page would collide on the key (first wins), unsolved until it happens | `connectors/md_mdem.md` decisions 1 to 3 |
+| 2026-11-03 | The SharePoint base falls back to the rich-text control's id suffix, exact id first; `future_marker` lives in the base | MDEM names the control `ctl00`/`ctl01` where MEA, DNR and MDE say `RichHtmlField1`; the exact form is tried first so nothing that parsed before parses differently (the Drupal body-selector rule, 2026-10-28); MDE is the third month-only forecast case | `connectors/maryland_sharepoint.py` |
+| 2026-11-03 | MDOT is a hand list off the SharePoint base; HTML comments are never read; "awards have now been announced" is `closed` | the pages are the theme's Bootstrap layout with no rich-text body, and three pages do not earn a second base; every stale banner on them is a comment and the record is what the page shows; the agency says the cycle is decided (Saj's call over `unknown`, which would drop Bikeways from every list until spring) | `connectors/md_mdot.md` decisions 1 to 3 |
+| 2026-11-03 | The Urban Tree eligibility sentence is quoted by hand from the agency's PDF, dated; `homeowner associations` is not a household | the page names no applicant and the PDF does (the Illinois NOFO precedent, never fetched by the run); the quote exposed `homeowners?` tagging an association, guarded in the shared table and measured on all 6,834 stored records: none move | `connectors/md_mdot.md` decision 4, `connectors/text.py` |
+| 2026-11-03 | The MWIFA index banner sets every row's status; a Purpose cell is applicant text; the row's title is the name; the unlinked row is keyed to the index page | the seven programs share one solicitation and the agency states its status once, above the table (closed with a month still ahead is `forecasted`); the Purpose column is the agency's own "loans to local governments" (the VDOT card-blurb rule), and for the unlinked row it is the only text read, because the index's sentences would tag every row's local governments; two page H1s differ from the fund they describe | `connectors/md_mde.md` decisions 1 to 3 |
+| 2026-11-03 | Atom and JSON per state and site-wide, entry ids as tag URIs over the change-log row id, summaries in the page's own words | outreach's ask becomes "subscribe"; a feed reader, Outlook or Slack's RSS app takes Atom and a script takes JSON; a permanent id means a reader never re-announces a change; one `FIELD_LABEL` in Python and JavaScript, held equal by a test, keeps the feed and the page saying the same thing | `scripts/build_site.py`, milestone 6.1 |
 
 ## Open questions (do not resolve in code yet)
 

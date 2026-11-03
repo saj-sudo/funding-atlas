@@ -46,8 +46,9 @@ sqlite3 atlas.db "SELECT * FROM v_navigator_program;"         # every state page
 Connectors: `grants_gov` (federal notices), `sam_assistance_listings` (the program catalog underneath them,
 joined by ALN through `v_opportunity_listing`), three Maryland agencies on the state's Drupal platform (`md_dhcd`,
 `md_commerce`, `md_mht`, sharing `connectors/maryland_drupal.py`: sitemap enumeration, lastmod refetch gate, page
-parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`, sharing
-`connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading), and
+parsing, applicant tagging) and four on its SharePoint theme (`md_mea`, `md_dnr`, `md_mdem`, `md_mde`, sharing
+`connectors/maryland_sharepoint.py`: index-page enumeration, text-hash change signal, block-level page reading), `md_mdot`
+(three hand-listed MDOT pages), and
 `pa_grants`, the first state outside Maryland: Pennsylvania's pa.gov grants index (a Coveo search index plus one JSON
 record per grant page, 377 grants from 17 agencies with a labelled status), and `wv_grants`, West Virginia's grants portal
 read through its JSON API (one request, 124 items, status from the page's own date rule), and `ca_grants`, the California Grants Portal's

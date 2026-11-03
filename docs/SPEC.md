@@ -52,8 +52,9 @@ The navigator UI should lead with 1 and 3. A plain table shows only 4.
   stated per state), a landing strip of new / closing soon / status changes, faceted filters with counts, a detail
   panel, a change feed. GitHub Pages, rebuilt daily. Between rounds (2026-10-16): a collapsed group of closed or
   past-deadline state programs with their last deadline and cycle wording, so a town can prepare for the next round.
-- Maryland depth (shipped 2026-10-16): MEA and DNR connected on a shared SharePoint base. GOCPP blocks crawlers in
-  robots.txt (surveyed, stopped); MDEM lists two programs; MDOT and MDE have no listing. Seven connectors.
+- Maryland depth (shipped 2026-10-16 and 2026-11-03): MEA, DNR, MDEM and MDE on a shared SharePoint base, MDOT as a
+  hand list; eight agencies. GOCPP blocks crawlers in robots.txt (surveyed, stopped). A change feed (Atom + JSON)
+  beside every state page (2026-11-03).
 - Expansion beyond Maryland, platform-first: survey each state's central grants portal, build one connector per
   platform, treat a state as configuration. Mid-Atlantic first.
 
