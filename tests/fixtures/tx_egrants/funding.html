@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Funding Sources | eGrants</title>
+<!-- Bootstrap 5.3 CDN -->
+<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" integrity="sha512-t4GWSVZO1eC8BM339Xd7Uphw5s17a86tIZIj8qRxhnKub6WoyhnrxeCIMeAqBPgdZGlCcG2PrZjMc+Wr78+5Xg==" referrerpolicy="no-referrer" rel="stylesheet"/>
+<!-- Bootstrp 5.3 JS Bundle CDN  -->
+
+<!-- FontAwesome CDN  -->
+<link crossorigin="anonymous" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" referrerpolicy="no-referrer" rel="stylesheet"/>
+<!-- Google Fonts  -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<!-- Fonts  -->
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&amp;family=Fredericka+the+Great&amp;family=Great+Vibes&amp;family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;family=Libre+Franklin:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,1000;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900;1,1000&amp;family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&amp;family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;family=Pridi:wght@200;300;400;500;600;700&amp;family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&amp;family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap" rel="stylesheet"/>
+<!-- Font Types  -->
+<!--
+    font-family: 'EB Garamond', serif;
+    font-family: 'Fredericka the Great', cursive;
+    font-family: 'Great Vibes', cursive;
+    font-family: 'Libre Baskerville', serif;
+    font-family: 'Libre Franklin', sans-serif;
+    font-family: 'Montserrat', sans-serif;
+    font-family: 'Mulish', sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Poppins', sans-serif;
+    font-family: 'Pridi', serif;
+    font-family: 'Raleway', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
+    -->
+<!-- EGrants Style Sheets  -->
+<link href="/addon-stylecss/egrants-main" rel="stylesheet" type="text/css"/>
+</head>
+<body class="bodycolor">
+<!-- #Top menu bar -->
+<!-- ********************************** -->
+<div class="container-fluid top-menubar-bg">
+<div class="container top-menubar-menu">
+<ul>
+<li>
+<a href="https://egrants.gov.texas.gov/#" title="eGrants Home">Home 
+                
+              </a>
+</li>
+<li>
+<a href="https://egrants.gov.texas.gov/apps/egrants/contactpage.aspx" title="Contact Us">Contact Us 
+                
+              </a>
+</li>
+<li>
+<a href="https://egrants.gov.texas.gov/apps/evo/identity/account/login" title="Login to eGrants">Login 
+                
+                  <i class="subarrow fa-solid fa-caret-down"></i>
+</a>
+<ul>
+<li><a href="https://egrants.gov.texas.gov/apps/evo/identity/account/login" title="Login">Login</a></li>
+<li><a href="https://egrants.gov.texas.gov/apps/evo/Identity/Account/Register" title="Register for eGrants">Register</a></li>
+<li><a href="https://egrants.gov.texas.gov/apps/evo/EgrantsLogin/RetrieveUserName" title="">Forgot Username</a></li>
+<li><a href="https://egrants.gov.texas.gov/apps/evo/EgrantsLogin/RetrievePassword" title="">Reset Password</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ********************************** -->
+<!-- Main-Menu  -->
+<!-- ********************************** -->
+<!-- Main-Menu  -->
+<!-- ********************************** -->
+<div class="container-fluid main-menu-bg" data-mainmenu="">
+<!-- Logo+Menu & Search Area (in container)  -->
+<div class="container">
+<!--Logo & Main Menu Section-----------------  -->
+<div class="main-menu-section">
+<!-- OOG Logo -->
+<img alt="Office of the Governor Logo" class="oog-logo" src="https://egrants.gov.texas.gov//src/dist/img/egrants-img/oog-logo-sml-1.svg"/>
+<!-- App Title  -->
+<div class="logo-text"><a href="https://egrants.gov.texas.gov/" style="color: inherit; text-decoration: none;">eGrants </a></div>
+<!-- Main Menu Toggle button  -->
+<div class="menu-main-toggle navbar navbar-expand-md">
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+</div>
+<!-- # Main Menu-----------------  -->
+<nav class="menu-main navbar navbar-expand-md">
+<!-- Main Menu Items -->
+<div class="collapse navbar-collapse" id="navbarNav">
+<ul class="navbar-nav">
+<!-- Menu Item  -->
+<!-- ---------- -->
+<li class="nav-item dropdown">
+<a aria-current="page" aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="https://egrants.gov.texas.gov/guides" role="button">Guides</a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/guides">
+                        All Guides
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/guides/guide-to-grants">
+                        Guide to Grants
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/guides/non-profit-security-grant-pre-application-guide">
+                        NPSG Pre-Application
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+</ul>
+</li>
+<!-- ---------- -->
+<!-- Menu Item  -->
+<!-- ---------- -->
+<li class="nav-item dropdown">
+<a aria-current="page" aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="https://egrants.gov.texas.gov/fundingopp" role="button">Funding Opportunities</a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/fundingopp">
+                        Active Opportunities
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/fundingopp/archive">
+                        Archived Opportunities
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/funding">
+                        Funding Sources
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+</ul>
+</li>
+<!-- ---------- -->
+<!-- Menu Item  -->
+<!-- ---------- -->
+<li class="nav-item dropdown">
+<a aria-current="page" aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="https://egrants.gov.texas.gov/resources" role="button">Resources</a>
+<ul class="dropdown-menu">
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources">
+                        Resources
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/forms">
+                        Forms
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/egrantstraining">
+                        eGrants Training
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/guidance">
+                        Guidance
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/publications">
+                        Publications
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/civilrights">
+                        Civil Rights
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+<li>
+<a class="dropdown-item" href="https://egrants.gov.texas.gov/resources/single-audit-and-exemption-reporting">
+                        Single Audit
+
+                        
+                        
+                        
+                        
+                    </a>
+</li>
+</ul>
+</li>
+<!-- ---------- -->
+</ul>
+</div>
+</nav>
+<!-- ## Main Menu-----------------  -->
+</div>
+<!-- -----------------------------------  -->
+<!-- Search Area Section-----------------  -->
+<!-- <div class="search-area-section">
+        <div class="alert-text">Notify Section</div>
+        <div class="search-box">
+          <icon class="fa-search fa search-icon"></icon>
+          <input type="text" class="search-input">
+          <button class="search-button">Search</button>
+        </div>
+      </div> -->
+<!-- ------------------------------------  -->
+</div>
+<!--End Menu & Logo Area (top)-->
+<!-- ------------------------------------  -->
+<!-- ------------------------------------  -->
+<!-- ------------------------------------  -->
+<!-- ------------------------------------  -->
+</div>
+<!-- ********************************** -->
+<!-- ********************************** -->
+<!-- -------------------------------------------  -->
+<!-- -------------------------------------------  -->
+<!-- Hero Section  -->
+<!-- ********************************** -->
+<div class="container-fluid hero hero-pages">
+<!-- background image  -->
+<img alt="" class="background" src="/src/dist/img/egrants-img/hero/herohome.png"/>
+<div class="container">
+<!-- Title Box  -->
+<div class="title-box">
+<div class="title">Funding Sources </div>
+<div class="subtitle">Below are specific details related to the federal and state fund sources administered by PSO.</div>
+</div>
+</div>
+</div>
+<!-- ********************************** -->
+<!-- -------------------------------------------  -->
+<!-- -------------------------------------------  -->
+<!-- -------------------------------------------  -->
+<!-- Preload  -->
+<!-- Set Layout Fields  -->
+<!-- Main Content Section  -->
+<!-- ********************************** -->
+<div class="container-fluid">
+<div class="container section-border with-sidebar">
+<!-- this is the _content.html  -->
+<img alt="" class="background-swoop" src="/src/dist/img/egrants-img/backgrounds/light-blue-swoop.png"/>
+<!-- Main Content Area  -------------------->
+<!-- Entry Item Channel List  -->
+<div class="entry-list">
+<!-- Entry List Items -----------------  -->
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">ALERRT Travel Assistance</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="ALERRT" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/ALERRT.png"/>
+<p>Assists law enforcement agencies by offsetting agency-incurred travel costs for sending peace officers to Advanced Law Enforcement Rapid Response<br/>Training (ALERRT) training.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Body-Worn Cameras</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BodyCamera" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BodyCamera.png"/>
+<p>Supports municipal police departments and county sheriffs’ offices in establishing or enhancing body-worn camera programs.<br/></p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Border Prosecution Unit</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BPU2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BPU2.png"/>
+<p>Provides funding to support prosecution resources and training as part of a collaborative initiative of district and county attorney offices within the Texas border region handling an increased number of cases resulting from border-related offenses.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Border Zone Fire Departments</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BFZ.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BFZ.png"/>
+<p>Provides funding to professional fire departments in the border region to assist in the acquisition of specialized equipment, maintenance, and medical supplies to support emergency services associated with the execution of security activities that deter crime in the border region.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Bullet-Resistant Shields</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BallShield1.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BallShield1.png"/>
+<p>Provides funding to law enforcement agencies to equip peace officers with bullet-resistant shields.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Bullet-Resistant Vests</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BallVest.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BallVest.png"/>
+<p>Provides funding for law enforcement agencies to equip peace officers with rifle-resistant body armor.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Child Sex Trafficking Programs</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="CSTT4.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/CSTT4.png"/>
+<p>Fills services gaps for sexually exploited children by promoting regional and statewide programs that exemplify standards for trauma-informed care.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">County Essential Services</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="CE1.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/CE1.png"/>
+<p>Provides financial assistance to counties for essential public services including law enforcement services, jail services, court services, or reimbursement of extraordinary costs incurred for the investigation or prosecution of a capital murder or crimes committed because of bias or prejudice as defined in Article 104.004 of the Code of Criminal Procedure.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Crime Stoppers Assistance Fund</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="CrimeSToppers.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/CrimeSToppers.png"/>
+<p>Provides funding to support, expand, and fund local certified Texas Crime Stoppers organizations that help protect our communities.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Criminal Justice Planning Fund</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="SF.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SF.png"/>
+<p>Fills gaps throughout all areas of the criminal justice system and supports innovative concepts and best practices to achieve a safer Texas for all citizens. </p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Edward Byrne Memorial Justice Assistance Grant (JAG)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="JAG2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/JAG2.png"/>
+<p>Promotes public safety efforts, crime reduction, and system improvements.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Emergency Operations Centers (EOC)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="EOC1.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/EOC1.png"/>
+<p>Provides funding to improve emergency management and preparedness capabilities by supporting flexible, sustainable, secure, strategically located, and fully interoperable EOCs with a focus on addressing identified deficiencies and needs. Fully capable emergency operations facilities at the state and local levels are an essential element of a comprehensive national emergency management system and are necessary to ensure continuity of operations and continuity of government in major disasters or emergencies caused by any hazard. Among the five basic homeland security missions noted in the DHS Strategic Plan, the EOC Grant Program supports the goal to Strengthen National Preparedness and Resilience.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">First Responder Mental Health</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="FRMH2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/FRMH2.png"/>
+<p>Provides funding for services and assistance directly to peace officers and first responders to address direct and indirect trauma that occurs in the course of their normal duties either as the result of the commission of crimes by other persons or in response to an emergency.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Forensic Evidence Testing for District Attorneys</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="ForensicEvidenceTest3.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/ForensicEvidenceTest3.png"/>
+<p>Provides funding to reimburse district attorneys for costs associated with the testing of forensic evidence.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Internet Crimes Against Children</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="ICAC.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/ICAC.png"/>
+<p>Supports investigation of internet crimes against children through task forces made up of multi-agency law enforcement personnel throughout urban Texas cities.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Local Border Security Funding</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="BorderStar.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/BorderStar.png"/>
+<p>Provides funding for overtime and operating costs to sustain interagency law enforcement operations and support an increased law enforcement presence to detect, deter, and disrupt drug, human, and other contraband trafficking created by the close proximity to the Texas/Mexico border.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Nonprofit Security Grant Program (NSGP)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="NSGP2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/NSGP2.png"/>
+<p>Provides funding for target hardening and other physical security enhancements/activities to nonprofit organizations that are at high risk of a terrorist attack.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Operation Lone Star</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="OLS1.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/OLS1.png"/>
+<p>Provides funding to enhance interagency border security operations supporting Operation Lone Star including funding to help deter and interdict criminal activity related to the border crisis.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Operation Stonegarden (OPSG)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="OPSG3.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/OPSG3.png"/>
+<p>Supports enhanced cooperation and coordination among federal, state, local, and tribal law enforcement agencies to secure the Texas/Mexico and international water borders.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Paul Coverdell Forensic Science Improvement Program (Coverdell)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="Coverdell1.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/Coverdell1.png"/>
+<p>Provides funding for projects that improve the quality and timeliness of forensic science or medical examiners services as well as projects seeking to address emerging forensic science. Specific funding has been reserved for projects that support responses to the opioid epidemic.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Project Safe Neighborhoods (PSN)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="PSN4.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/PSN4.png"/>
+<p>Supports programs that foster safer neighborhoods through a sustained reduction in violent crime, including, but not limited to, addressing criminal gangs and the felonious possession and use of firearms.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Residential Substance Abuse Treatment (RSAT)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="RSAT.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/RSAT.png"/>
+<p>Provides substance abuse treatment for incarcerated offenders.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">SAFE-Ready Facilities</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="SAFE2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SAFE2.png"/>
+<p>Provides funding to hospital facilities seeking to achieve or maintain a Sexual Assault Forensic Exam (SAFE)-Ready designation, as well as non-profit corporations seeking to operate or maintain a SAFE Program as defined in Chapter 323 of the Texas Health and Safety Code.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Sexual Assault Evidence Testing Grant Program</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="SAEvidence.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SAEvidence.png"/>
+<p>Supports temporary or long-term expansions of testing capacity in crime laboratories to reduce the backlog of sexual assault kits in Texas.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Sexual Assault Services Formula Grant Program (SASP)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="SASP.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SASP.png"/>
+<p>Supports rape crisis centers that provide core services to victims of sexual assault. </p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Specialty Court Program</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="drugcourt.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/drugcourt.png"/>
+<p>Supports specialty court programs as defined in Chapters 121 through 129 of the Texas Government Code that focus on treatment for those with substance abuse or mental health issues or the specific needs of Veterans or sexually exploited persons. </p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">State and Local Cybersecurity Grant Program (SLCGP)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="Cyber.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/Cyber.png"/>
+<p>Assists local governments with managing and reducing systemic cyber risk. Program objectives include:</p>
+<ul><li>Develop and establish appropriate governance structures, including developing, implementing, or revising cybersecurity plans, to improve capabilities to respond to cybersecurity incidents and ensure continuity of operations.</li><li>Understand their current cybersecurity posture and areas for improvement based on continuous testing, evaluation, and structured assessments.</li><li>Implement security protections commensurate with risk.</li><li>Ensure organization personnel are appropriately trained in cybersecurity, commensurate with responsibility.</li></ul>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">State Crisis Intervention Program (SCIP)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="SCIP.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SCIP.png"/>
+<p>Provides funding for strategies aimed at the prevention, intervention, and reduction of crime and violence in Texas and to provide essential services to at-risk populations within our communities.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">State Homeland Security Program (SHSP)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="SHSP.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SHSP.png"/>
+<p>Supports state and local efforts to prevent terrorism and targeted violence and prepare for the threats and hazards that pose the greatest risk to the security of Texas citizens. Provides funding to implement investments that build, sustain, and deliver the 32 core capabilities<br/>essential to achieving a secure and resilient state.<br/><br/></p>
+<p><br/></p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Statewide Emergency Radio Infrastructure Program</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="SERI2.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/SERI2.png"/>
+<p>Supports state and regional efforts to improve or sustain interoperable emergency radio infrastructure.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">STOP Violence Against Women Formula Grant Program (VAWA)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="VAWA.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/VAWA.png"/>
+<p>Provides funding for projects that promote a coordinated, multi-disciplinary approach to improve the justice system’s response to violent crimes against women, including domestic violence, sexual assault, dating violence, and stalking.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Texas Anti-Gang Program</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="TAG.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/TAG.png"/>
+<p>Supports targeted, regional approaches to combat gang violence by coordinating prevention, intervention, and suppression activities.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Truancy Prevention and Intervention</div>
+<div class="entry-subheading">State Funds</div>
+<div class="entry-content">
+<img alt="Truancy.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/Truancy.png"/>
+<p>Supports school districts and local governments by providing case management and support to truant school children.</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Urban Area Securities Initiative (UASI)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="UASI4.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/UASI4.png"/>
+<p>Supports state and local efforts to prevent terrorism and other catastrophic events and prepare for the threats and hazards that pose the greatest risk to the security of Texas citizens. PSO provides funding to implement investments that build, sustain, and deliver the 32 core capabilities essential to achieving a secure and resilient state.</p>
+<p><br/></p>
+<p>Assists high-threat, high-density Urban Areas in efforts to build and sustain the capabilities necessary to prevent, protect against, mitigate, respond to, and recover from acts of terrorism. All investments must be consistent with capability targets set during the Threat and Hazard Identification and Risk Assessment (THIRA) process, and gaps identified in the Stakeholder Preparedness Review (SPR).</p>
+</div>
+</div>
+<div class="entry-listitem">
+<div class="entry-topheading">Funding Source</div>
+<div class="entry-title">Victims of Crime Act (VOCA)</div>
+<div class="entry-subheading">Federal Funds</div>
+<div class="entry-content">
+<img alt="VOCA.png" class="entry-img" src="https://egrants.gov.texas.gov/uploads/egrants_images/VOCA.png"/>
+<p>Devotes resources to provide services and assistance directly to victims of crime to speed their recovery and aid them through the criminal justice process.</p>
+<p><br/></p>
+<p>Services may include the following:</p>
+<ul><li>Responding to the emotional and physical needs of crime victims;</li><li>Assisting victims in stabilizing their lives after a victimization;</li><li>Assisting victims to understand and participate in the criminal justice system; and</li><li>Providing victims with safety and security.</li></ul>
+</div>
+</div>
+</div>
+<!-- ------------------------------------  -->
+<!-- Sidebar Section  -------------------- -->
+<!-- Sidebar Menu  -------------------- -->
+<!-- ************************************* -->
+<!-- Sidebar Section  -------------------- -->
+<!-- ************************************* -->
+<nav class="sidebar">
+<a class="sidebar-toggle" tabindex="-1"><span>Menu</span><i class="fa-solid fa-bars"></i></a>
+<!-- SideBar Menu  ------------------------>
+<div class="sidebar-menu sidebar-item">
+<div class="menutitle">Quick Links</div>
+<ul>
+<li class="menuitem">
+<a href="/funding">Funding Sources</a>
+</li>
+<li class="menuitem">
+<a href="/fundingopp">Funding Opportunities</a>
+</li>
+<li class="spacer"></li>
+<li class="menuitem">
+<a href="/guides">Guides</a>
+</li>
+<li class="spacer"></li>
+<li class="menuitem">
+<a href="/resources">Resources</a>
+</li>
+</ul>
+<!-- --------------  -->
+</div>
+<!-- Alert Modules  ------------------------>
+<div class="section-news-alert">
+<div class="alert-box">
+<div class="alert-title">Audit Confirmation Letters </div>
+<div class="alert-news">
+<p>Requests for confirmation of grant payments from the OOG (audit confirmation letters) should be sent to the OOG Financial Services Division (FSD). </p>
+<p> Requests via email are preferred and should be submitted to: <a data-linkindex="0" data-ogsc="" href="mailto:accounting@gov.texas.gov" title="mailto:accounting@gov.texas.gov">accounting@gov.texas.gov</a>. If email is not feasible, requests may be made in writing to the following address:</p>
+<p>Office of the Governor<br/>
+Attn: FSD<br/>
+P.O. Box 12878
+Austin, TX 78711-2878</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- ************************************* -->
+<!-- ************************************* -->
+<!-- ------------------------------------  -->
+</div>
+</div>
+<!-- ********************************** -->
+<!-- Main-Footer  -->
+<!-- ********************************** -->
+<!-- Footer Fluid Area Box-->
+<div class="container-fluid mainbody-bg-color p-0">
+<!-- Begin Container  -->
+<div class="container footer-container">
+<!-- Footer Img Section  -->
+<div class="bluedivider1">
+</div>
+<!--New Footer Logo Section -->
+<div class="footer-logo-links-section">
+<!-- Footer Item Box -->
+<div class="footer-logo-box">
+<img alt="" class="footer-logo" src="/src/dist/img/egrants-img/section-footer/Governor_Seal_Fancy_White 1.svg"/>
+</div>
+<!-- Footer Item Box -->
+<div class="footer-links-box2">
+<div class="links-header">Contact the Office of the Governor (OOG)</div>
+<!-- Address  -->
+<div class="address-container">
+<!-- title  -->
+<!-- <div class="address-title">Contact the Office of the Governor (OOG)</div> -->
+<!-- address box  -->
+<div class="address-box">
+<div class="a-title">Physical Address :</div>
+              Office of the Governor
+
+              <div class="a-address">400 W 15th St, Austin, Texas 78701</div>
+</div>
+<!-- address box  -->
+<div class="address-box">
+<div class="a-title">Mailing Address :</div>
+<div class="a-address">P.O. Box 12428, Austin, Texas 78711-2428</div>
+</div>
+</div>
+<!-- Contact  -->
+<div class="contact-container">
+<!-- Contact Box  -->
+<div class="contact-box">
+<div class="c-title">
+<a href="http://">Public Safety Office (PSO)</a>
+</div>
+<div class="c-contact">
+                (512) 463-1919
+              </div>
+</div>
+<!-- Contact Box  -->
+<div class="contact-box">
+<div class="c-title">
+<a href="http://">Texas Music Office (TMO)</a>
+</div>
+<div class="c-contact">
+                (512) 463-6666
+              </div>
+</div>
+</div>
+</div>
+<!-- Footer Item Box -->
+<div class="footer-links-helpdesk">
+<img alt="" class="helpdesk" src="/uploads/homepage/helpdeskicon.png"/>
+<a class="footer-button" href="/apps/egrants/contactpage.aspx">Send Email</a>
+</div>
+</div>
+</div>
+<!-- ********************************** -->
+<!-- ********************************** -->
+</div>
+<!-- ********************************** -->
+<!-- Bottom menubar Section----------- -->
+<div class="container-fluid bottom-menubar-bg fixed-bottom">
+<div class="container bottom-menubar-menu">
+<ul>
+<li><a href="#"><img alt="" src="https://egrants.gov.texas.gov//src/dist/img/egrants-img/icons/backtotop.svg"/> Back to Top</a></li>
+</ul>
+</div>
+</div>
+<!-- ---------------------------  -->
+</body>
+</html>

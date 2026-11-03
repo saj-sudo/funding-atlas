@@ -1,0 +1,635 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width" name="viewport"/>
+<title>Euna Grants - Criminal Justice Information Authority - NOFO# 3342 - 0726 SCIP: Local FRO Implementation Support</title>
+<link href="https://il.amplifund.com/Image/FavIcon" rel="icon" type="image/png"/>
+<link href="/Content/eunagrants-theme-variables.css?v=639291864460000000" rel="stylesheet"/>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" type="text/javascript">
+		window.__cspNonce = 'GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=';
+		// Override document.head.appendChild to add CSP nonce to dynamically created scripts.
+		// jQuery's DOMEval creates new script elements from AJAX-loaded HTML, but modern browsers
+		// strip the nonce attribute during DOM parsing (nonce hiding), causing CSP violations.
+		(function() {
+			var _origAppendChild = Node.prototype.appendChild;
+			document.head.appendChild = function(node) {
+				if (node.nodeName === 'SCRIPT' && window.__cspNonce) {
+					node.setAttribute('nonce', window.__cspNonce);
+				}
+				return _origAppendChild.call(this, node);
+			};
+		})();
+		window.AppConfig = window.AppConfig || {};
+		AppConfig.applicationName = "Euna Grants";
+	</script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/runtime.d9935b09898e15478b47.js"></script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/vendor.43777522692670dd9e57.js"></script>
+<link href="/Content/dist/vendor.ec7adb68e50a24c34364.css" rel="stylesheet"/>
+<link href="/Content/dist/legacyPublic.99d48dc86cae02cb0151.css" rel="stylesheet"/>
+<noscript><meta content="0;url=/error/noscript.aspx" http-equiv="refresh"/></noscript>
+<script src="/js/jquery?v=lffGfRzXgQ4ZaJOjwISI7XGO23LKh3Z9o_g1vvCTER01" type="text/javascript"></script>
+</head>
+<body>
+<input id="afRazor" type="hidden"/>
+<div id="AntiForgeryToken">
+<input name="__RequestVerificationToken" type="hidden" value="KH5PmhFfTZa8DZsrL2uISgKprEnqTs7zLxOq6wq3W1nSOQ4b3mvUUARbjlUpG10sKHdt2NYcAu_m-7SwWtLHFhLz0Dk1"/>
+</div>
+<a class="sr-only sr-only-focusable" href="#af-layout-page-content" id="skip-to-main-content">Skip to main content</a>
+<header>
+<a href="/public">
+<img alt="Organization Logo" class="logo" src="/Public/OpportunityLogo/abba654d-8098-44ea-bc9f-f998bc64abcd"/>
+</a>
+<a class="floatright login" href="/account/Login.aspx?returnUrl=%2FPublic%2FOpportunities%2FDetailsAuthorized%2Fabba654d-8098-44ea-bc9f-f998bc64abcd" title="Log In">Log In</a>
+</header>
+<div>
+<div class="push10" id="top">
+<div class="main af-body">
+<!--In order for the skiplink to function properly, the navigation view needed to be split out from Applications.cshtml.
+					This check prevents the partial navigation view from being rendered where it shouldn't be. We want partial nav
+					rendered at the Public/Applications and Public/faq views, but not when viewing a specific opportunity.-->
+<br/>
+<main id="af-layout-page-content">
+<div class="button-header">
+<h1>NOFO# 3342 - 0726 SCIP: Local FRO Implementation Support</h1>
+<div class="button-container">
+<a class="button" data-role="print" href="#" title="Print">Print</a>
+<a class="button" href="/Public/Opportunities/Help/abba654d-8098-44ea-bc9f-f998bc64abcd" title="Help">Help</a>
+<a class="button" data-role="download" href="/RequestForProposals/OpportunityApplications/ApplicationPrint?isPublic=True&amp;applicationPrintType=Empty&amp;opportunityGuid=abba654d-8098-44ea-bc9f-f998bc64abcd" target="_blank" title="Download Application"><i class="af-icon af-download"></i> Download</a>
+<span class="save-apply" hidden="">
+<a class="button" data-role="" href="/Public/Opportunities/Save/abba654d-8098-44ea-bc9f-f998bc64abcd" id="save-link-top" title="Save">Save</a>
+<a class="button" data-role="" href="/Public/Opportunities/Apply/abba654d-8098-44ea-bc9f-f998bc64abcd" id="apply-link-top" title="Apply">Apply</a>
+</span>
+</div>
+</div>
+<div class="tab-strip-collection-wrapper">
+<div class="tab-strip-collection">
+<div class="tab-strip-tab tab-strip-active" id="tabstrip_Opportunity_Details" style="width:45em;">
+<a class="tab-strip-link" data-role="tab-strip-element" href="#opportunityDetails">Opportunity Details</a>
+</div>
+<div class="tab-strip-tab" id="tabstrip_Evaluation_&amp;_Scoring" style="width:45em;">
+<a class="tab-strip-link" data-role="tab-strip-element" href="#evalScoring">Evaluation &amp; Scoring</a>
+</div>
+</div>
+</div>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" type="text/javascript">
+	window.setTimeout(function () {
+		//--where html will go if using the ajax option
+		var $targetContainer = $('');
+		var $tabContainer = $('div.tab-strip-collection');
+
+		var activateLink = function (activeElement) {
+			$tabContainer.find('.tab-strip-active').removeClass('tab-strip-active');
+			activeElement.parent('div').addClass('tab-strip-active');
+		}
+
+		$tabContainer.on('click', '[data-role="tab-strip-ajax"]', function () {
+			activateLink($(this));
+			$('body').addClass('wait');
+			$targetContainer.load($(this).attr('href'), function () {
+				$('body').removeClass('wait');
+			});
+		});
+
+		$tabContainer.on('click', '[data-role="tab-strip-element"]', function () {
+			activateLink($(this));
+			$('div.tab-content-container').addClass('tab-content-container-hidden')
+			$($(this).attr('href')).removeClass('tab-content-container-hidden')
+			return false;
+		});
+
+
+		//--center tab strip
+		//var containerWidth = 0;
+		//$.each($('.tab-strip-tab'), function (ix, val) {
+		//	containerWidth += $(val).width();
+		//});
+
+		//$('div.tab-strip-collection').width(containerWidth);
+	}, 0);
+
+</script><style type="text/css">
+	div.display-label {
+		vertical-align: top;
+	}
+
+	.display-group h2 {
+		background-color: #ffffff;
+		border: none;
+		padding: 0;
+	}
+
+	.tab-content-container {
+		margin-left: 0 !important;
+	}
+</style>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/dateLogic.e3f335d10d803ff18a2b.js"></script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/dateTimeLogic.778c6eb1ee2075177f51.js"></script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/timeZoneLogic.907e595d916d888d4a2d.js"></script>
+<div class="tab-content-parent">
+<div class="tab-content-container" id="opportunityDetails">
+<div class="display-field-group">
+<h2>Opportunity Information</h2>
+<div class="display-group">
+<div class="display-label">CSFA Number</div>
+<div class="display-field">546-00-3342</div>
+</div>
+<div class="display-group">
+<div class="display-label">CSFA Popular Name</div>
+<div class="display-field">SCIP</div>
+</div>
+<div class="display-group">
+<div class="display-label">Title</div>
+<div class="display-field">NOFO# 3342 - 0726 SCIP: Local FRO Implementation Support</div>
+</div>
+<div class="display-group">
+<div class="display-label">Description</div>
+<div class="display-field">
+<div class="multi-line-text">Byrne State Crisis Intervention Program (SCIP) provides funding for the creation and/or implementation of firearms restraining order programs, state crisis intervention court proceedings, and related gun violence reduction programs/initiatives.
+
+The purpose of this NOFO is to award grants to local governments to support firearms restraining orders (FROs) programs.
+
+PLEASE REFERENCE THE ICJIA FUNDING OPPORTUNTIES PAGE FOR ADDITIONAL INFO ON THIS NOFO: https://icjia.illinois.gov/grants/funding/</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Awarding Agency Name</div>
+<div class="display-field">Criminal Justice Info Authority</div>
+</div>
+<div class="display-group">
+<div class="display-label">Agency Contact Name</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Agency Contact Phone</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Agency Contact Email</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Program</div>
+<div class="display-field"></div>
+</div>
+<div class="display-group">
+<div class="display-label">Fund Activity Categories</div>
+<div class="display-field">Law, Justice, and Legal Services</div>
+</div>
+<div class="display-group">
+<div class="display-label">Departments</div>
+<div class="display-field">FSGU - SCIP</div>
+</div>
+<div class="display-group">
+<div class="display-label">Opportunity Manager</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Posted Date</div>
+<div class="display-field">
+<span id="postedDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#postedDate').html(window.afUtility.dateLogic.getDateString('9/22/2026 12:00:00 AM'))
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Announcement Type</div>
+<div class="display-field">
+							Initial Announcement
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Funding Opportunity Number</div>
+<div class="display-field">3342 – 0726</div>
+</div>
+<div class="display-group">
+<div class="display-label">Assistance Listings Number</div>
+<div class="display-field">16.738</div>
+</div>
+<div class="display-group">
+<div class="display-label">Public Link</div>
+<div class="display-field">
+<a href="/Public/Opportunities/Details/abba654d-8098-44ea-bc9f-f998bc64abcd">https://il.amplifund.com/Public/Opportunities/Details/abba654d-8098-44ea-bc9f-f998bc64abcd</a>
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Funding Information</h2>
+<div class="display-group">
+<div class="display-label">Opportunity Funding</div>
+<div class="display-field">
+							$5,000,000.00
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Funding Sources</div>
+<div class="display-field">
+							Federal Or Federal Pass Through
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Funding Source Description</div>
+<div class="display-field">
+<div class="multi-line-text">Byrne State Crisis Intervention Program (SCIP) was created through the 2022 Bipartisan Safer Communities Supplemental Appropriations Act (Pub. L. No. 117-159, 136 Stat. 1313, 1339); 28 U.S.C. 530C. SCIP provides funding to “implement state crisis intervention court proceedings and related programs or initiatives, including, but not limited to, extreme risk protection order programs that work to keep guns out of the hands of those who pose a threat to themselves or others, mental health courts, drug courts, and veterans treatment courts.”  The U.S. Department of Justice Office of Justice Programs Bureau of Justice Assistance administers formula-based grants to each state. The Illinois Criminal Justice Information Authority (ICJIA) administers Illinois SCIP funds.
+
+In Illinois, extreme risk protection orders are FROs. FROs are civil orders that allow for temporary removal of firearms, ammunition, firearm parts that can be assembled into a firearm, and surrender of firearm owner’s identification (FOID) card when an individual is deemed a potential danger to themselves or others. People who are subject to FROs are referred to as respondents. Those who request FROs are referred to as petitioners. Additional information on FROs can be found here.
+
+In accordance with SCIP guidance, ICJIA convened a SCIP Advisory Committee to establish funding priorities and to approve a SCIP plan, viewable at https://icjia.illinois.gov/grants/programs/state-crisis-intervention-program/. Applicants are strongly encouraged to review the plan. The Committee established three priorities for the use of federal SCIP funding, centering community voice and incorporating research and evaluation throughout. They include:
+
+1.	FRO training for system partners.
+2.	FRO compliance and enforcement.
+3.	Grant opportunities to support local government FRO implementation, treatment linkages, develop community infrastructure, and follow-up.</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Funding Restrictions</div>
+<div class="display-field">Please see NOFO Instructions document for additional information.</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Award Information</h2>
+<div class="display-group">
+<div class="display-label">Award Ceiling</div>
+<div class="display-field">
+$1,000,000.00						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Award Floor</div>
+<div class="display-field">
+$150,000.00						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Award Start Date</div>
+<div class="display-field">
+<span id="awardStartDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#awardStartDate').html(window.afUtility.dateLogic.getDateString('2/1/2027 12:00:00 AM'))
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Award End Date</div>
+<div class="display-field">
+<span id="awardEndDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#awardEndDate').html(window.afUtility.dateLogic.getDateString('1/31/2028 12:00:00 AM'))
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Award Type</div>
+<div class="display-field">
+							Competitive
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Indirect Costs Allowed</div>
+<div class="display-field">Yes</div>
+</div>
+<div class="display-group">
+<div class="display-label">Indirect Cost Description</div>
+<div class="display-field">
+<div class="multi-line-text">To charge indirect costs to a grant, the applicant organization must either have an annually negotiated indirect cost rate agreement (NICRA) or elect to use a standard de minimis rate. There are three types of allowable indirect cost rates: 
+
+a)	Federally Negotiated Rate. Organizations that receive direct federal funding, may have an indirect cost rate that was negotiated with the Federal Cognizant Agency. Illinois will accept the federally negotiated rate. 
+
+b)	State Negotiated Rate. The organization may negotiate an indirect cost rate with the State of Illinois if they do not have a Federally Negotiated Rate. If an organization has not previously established an indirect cost rate, an indirect cost rate proposal must be submitted through the State of Illinois centralized indirect cost rate system in the GATA Grantee Portal. If an organization previously established an indirect cost rate, the organization must annually submit a new indirect cost proposal through the GATA Grantee Portal system within the earlier of six (6) months after the close of the grantee’s fiscal year; and three (3) months of the notice of award. 
+
+c)	De Minimis Rate. An organization that has never negotiated an indirect cost rate with the Federal Government or the State of Illinois is eligible to elect a de minimis rate of 15% of modified total direct cost (MTDC). Once established, the de minimis Rate may be used indefinitely. The State of Illinois must verify the calculation of the MTDC annually in order to accept the de minimis rate.
+
+Grant fund recipients are required to complete the indirect cost rate proposal process every fiscal year. If you plan to include indirect costs in your budget, please select your indirect cost rate through the GATA Grantee portal prior to submitting your grant documents to ICJIA.  
+
+Grantees have discretion and can elect to waive payment for indirect costs. Grantees that elect to waive payments for indirect costs cannot be reimbursed for indirect costs. The organization must record an election to “Waive Indirect Costs” into the GATA Grantee Portal. Indirect Cost election must be completed annually, for every entity’s fiscal year.</div>
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Submission Information</h2>
+<div class="display-group">
+<div class="display-label">Submission Timeline Type</div>
+<div class="display-field">
+							One Time
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Submission Open Date</div>
+<div class="display-field">
+<span id="submissionOpenDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#submissionOpenDate')
+									.html(window.afUtility.timeZoneLogic.getShortZonedDateTimeDisplay('9/22/2026 12:00:00 PM', 'Central Standard Time', undefined, true));
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Submission Close Date</div>
+<div class="display-field">
+<span id="submissionCloseDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#submissionCloseDate')
+									.html(window.afUtility.timeZoneLogic.getShortZonedDateTimeDisplay('11/4/2026 5:00:00 PM', 'Central Standard Time', undefined, true));
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Submission Timeline Additional Information</div>
+<div class="display-field">
+<div class="multi-line-text">Applications must be submitted via Euna. Upon receipt, an automated confirmation will be emailed. Proposals will not be accepted by email, mail, fax, or in person. Euna will not permit late submissions. Agencies are encouraged to submit their applications 24-72 hours in advance of the deadline to avoid unforeseen technical difficulties. Technical difficulties with the grant management system should be reported immediately to ICJIA at CJA.SCIP@illinois.gov.</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Other Submission Requirements</div>
+<div class="display-field">
+<div class="multi-line-text">Please see NOFO Instructions document for additional information.</div>
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Question Submission Information</h2>
+<div class="display-group">
+<div class="display-label">Question Submission Close Date</div>
+<div class="display-field">
+<span id="questionSubmissionCloseDate"></span>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=">
+								$('#questionSubmissionCloseDate')
+								.html(window.afUtility.timeZoneLogic.getShortZonedDateTimeDisplay('10/20/2026 5:00:00 PM', 'Central Standard Time', undefined, true));
+							</script>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Question Submission Email Address</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Question Submission Additional Information</div>
+<div class="display-field">
+<div class="multi-line-text">Questions may be submitted via email at CJA.SCIP@illinois.gov. All substantive questions and responses will be posted on the ICJIA website at https://icjia.illinois.gov/grants/funding/. Due to the competitive nature of this solicitation, applicants may not discuss the opportunity directly with any ICJIA employee other than via this email address CJA.SCIP@illinois.gov.
+
+For questions specific to the AmpliFund program contact:
+support@il-amplifund.zendesk.com
+
+AmpliFund Support Site:
+https://il-amplifund.zendesk.com</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Attachments</div>
+<div class="display-field">
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Technical Assistance Session</h2>
+<div class="display-group">
+<div class="display-label">Technical Assistance Session</div>
+<div class="display-field">
+							Yes
+						</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Eligibility Information</h2>
+<div class="display-group">
+<div class="display-label">Eligibility Type</div>
+<div class="display-field">
+							Public
+						</div>
+</div>
+<div class="display-group">
+<div class="display-label">Eligible Applicants</div>
+<div class="display-field">State Governments, County Governments, City or township governments, Special District Governments, Government Organizations</div>
+</div>
+<div class="display-group">
+<div class="display-label">Applicant Eligibility Information</div>
+<div class="display-field">
+<div class="multi-line-text">Local government entities are eligible for this funding. 
+
+Illinois counties and municipalities may apply as an implementing agency on behalf of a justice system agency that will serve as the program agency. An implementing agency (e.g., a county) is the legal entity that accepts and accounts for grant funds and accepts responsibility for all ICJIA reporting and compliance requirements. The program agency (e.g., county sheriff department) is a subdivision of the implementing agency that will carry out program operations.
+
+Illinois state agencies may apply as a coordinating agency if the proposed program is focused on supporting local municipalities. State agencies must include Memorandum of Understanding (MOU) with the proposed specific local partners in their application.
+
+Grant recipients may subaward SCIP funds to non-profits and other government agencies to implement funded programs, but they must comply with ICJIA subaward standards requiring fiscal and programmatic monitoring of subaward agencies. For-profit entities may be considered for subaward funding in select instances on a case-by-case basis.
+
+All recipients and subrecipients must forgo any profit or management fee. 
+
+Organizations that are current ICJIA grantees funded through SCIP are potentially eligible for this funding. However, applicants need to demonstrate the proposed program is substantially different than their currently funded program and that no supplanting would exist.</div>
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Additional Information</h2>
+<div class="display-group">
+<div class="display-label">Additional Information URL</div>
+<div class="display-field">
+<a href="https://icjia.illinois.gov/grants/funding/" target="_blank">https://icjia.illinois.gov/grants/funding/</a>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Additional Information URL Description</div>
+<div class="display-field">
+<div class="multi-line-text">Please reference the NOFO page on ICJIA's website for additional information.</div>
+</div>
+</div>
+</div>
+<div class="display-field-group">
+<h2>Award Administration Information</h2>
+<div class="display-group">
+<div class="display-label">State Award Notices</div>
+<div class="display-field">
+<div class="multi-line-text">ICJIA will submit all selected applications to BJA and ICJIA’s Budget Committee for approval. The ICJIA Budget Committee is scheduled to review and approve designations in December 2026.
+
+ICJIA will transmit a Notice of State Award (NOSA) and the grant agreement to successful applicants after BJA and ICJIA’s Budget Committee reviews and approves designations. The NOSA will detail specific conditions resulting from pre-award risk assessments that will be included in the grant agreement. The NOSA will be provided and must be accepted through the Grantee Portal unless another distribution is established. The NOSA is not an authorization to begin performance or incur costs.
+
+The following documents must be submitted prior to the execution of an agreement: 
+
+•	Civil Rights Compliance Questionnaire</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Administrative and National Policy Requirements</div>
+<div class="display-field">
+<div class="multi-line-text">In addition to implementing the funded project consistent with the approved project proposal and budget, agencies selected for funding must comply with applicable grant terms and conditions and other legal requirements, including the Bipartisan Safer Communities Supplemental Appropriations Act, 2022 (Pub. L. No. 117-159, 136 Stat. 1313, 1339); 28 U.S.C. § 530C, GATA (30 ILCS 708/1 et al), and the U.S. Department of Justice Grants Financial Guide. 
+
+Additional programmatic and administrative special conditions may be required.</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">Reporting</div>
+<div class="display-field">
+<div class="multi-line-text">Recipients must submit periodic financial reports, periodic performance reports, final financial and performance reports, and, if applicable, an annual audit report in accordance with the 2 CFR Part 200 Uniform Requirements. Reporting may include additional required Department of Justice performance measures. Future awards and fund drawdowns may be withheld if reports are delinquent.</div>
+</div>
+</div>
+<div class="display-group">
+<div class="display-label">State Awarding Agency Contacts</div>
+<div class="display-field">Contact Placeholder</div>
+</div>
+<div class="display-group">
+<div class="display-label">Other Information</div>
+<div class="display-field">
+<div class="multi-line-text">The Illinois Criminal Justice Information Authority (ICJIA) is a state agency dedicated to improving the administration of criminal justice. ICJIA brings together key leaders from the justice system and the public to identify critical issues facing the criminal justice system in Illinois, and to propose and evaluate policies, programs, and legislation that address those issues. The statutory responsibilities of ICJIA fit into four areas: grants administration; research and analysis; policy and planning; and information systems and technology.
+
+Neither the State of Illinois nor ICJIA are obligated to make any award as a result of this announcement. The ICJIA Executive Director or designee has sole authority to bind ICJIA to the expenditure of funds by executing grant agreements.
+ 
+Applications submitted in response to this Notice of Funding Opportunity are subject to the Illinois Freedom of Information Act (FOIA). Any information that the applicant believes should be exempt under FOIA should clearly highlight the exemption and the basis for the exemption. 
+
+This notice of funding opportunity (NOFO) is one of multiple ICJIA funding opportunities related to SCIP funding. All current ICJIA NOFOs are posted on the ICJIA website. Furthermore, the CJ Dispatch email newsletter provides information on upcoming ICJIA NOFOs and funding opportunities.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-content-container tab-content-container-hidden" id="evalScoring">
+<div class="display-field-group">
+<h2>Criteria</h2>
+<div class="display-group"><span style="font-size: 12px">Application materials must address all components of this NOFO and demonstrate both a need for the program and an ability to successfully implement the program.</span><br/><br/><span style="font-size: 12px">Reviewers will score applications based on completeness, clear and detailed responses to program narrative questions, and inclusion of all mandatory program elements as well as past performance history and/or financial standing with ICJIA. The applicant must demonstrate that costs are reasonable, necessary, and allowable.</span><br/><br/><span style="font-size: 12px">Application selection will be made using the criteria listed in the NOFO Instructions Doc, which provides the point breakdown for each major section of the proposal narrative and budget documents. The total number of points available is 100.</span><br/></div>
+</div>
+<div class="display-field-group">
+<h2>Review and Selection Process</h2>
+<div class="display-group"><span style="font-size: 12px">All applications are screened for completeness including GATA pre-qualification and ICQ submission for the current state fiscal year. Applications that are not complete will not be reviewed and will be denied funding. Proposals that pass the screening process will receive an automated AmpliFund notification stating that the application has been designated for scoring and review.</span><br/><br/><span style="font-size: 12px">Proposals that pass the screening process will be reviewed by a panel of ICJIA staff and stakeholders. Reviewers will score applications based on completeness, clear and detailed responses to program narrative questions, and inclusion of all mandatory program elements as well as past performance history and/or financial standing with ICJIA. The applicant must demonstrate that costs are reasonable, necessary, and allowable. </span><br/><br/><span style="font-size: 12px">Selection of proposals will be based on the scoring criteria outlined in the previous section. An applicant will be selected from each of the six defined regions to ensure statewide access to funding. The regions are Cook County, Collar counties, Northern Illinois, Central Illinois, Southern Illinois, and the state via a state agency/es. Please see the appendix for a map and list of counties for each region. After one applicant is selected from each region, applicants will be selected based on the total application score from highest to lowest and available funding. Selected applicants will receive a notification announcing their selection for a grant award. In the event of a tie, the following will be used as tiebreaker until an application breaks the tie and is selected: highest score for Program Design; if still tied then, highest score for Summary of the Program; if still tied then, highest score for Statement of Problem. </span><br/><br/><span style="font-size: 12px">ICJIA may invite applicants to answer clarifying questions and modify budgets that include unallowable or unreasonable costs. NOFO application budgets will be reviewed for allowability, completeness, and cost-effectiveness. ICJIA will perform an in-depth budget review of all grants awarded and may require budget modifications that do not materially change the nature of the program. </span><br/><br/><span style="font-size: 12px">Successful applicants whose applications contained unallowable or unreasonable costs may have their awards reduced by the total amount of those costs. Upon applicant acceptance of the grant award, the announcement of the grant award shall be published by ICJIA to the GATA portal. ICJIA will submit all selected applications to BJA and ICJIA’s Budget Committee for approval. BJA and/or ICJIA’s Budget Committee may require additional changes to budgets or proposed programs. Applicants will be notified of BJA’s and ICJIA’s Budget Committee's decisions. </span><br/></div>
+</div>
+<div class="display-field-group">
+<h2>Anticipated Announcement Dates</h2>
+<div class="display-group">ICJIA will submit all selected applications to BJA and ICJIA’s Budget Committee for approval. The ICJIA Budget Committee is scheduled to review and approve designations in December 2026.</div>
+</div>
+</div>
+</div>
+<span class="save-apply" hidden="">
+<div class="button-footer">
+<div class="button-container">
+<a class="button" data-role="" href="/Public/Opportunities/Save/abba654d-8098-44ea-bc9f-f998bc64abcd" id="save-link-bottom" title="Save">Save</a>
+<a class="button" data-role="" href="/Public/Opportunities/Apply/abba654d-8098-44ea-bc9f-f998bc64abcd" id="apply-link-bottom" title="Apply">Apply</a>
+<button class="button" id="nextTabButton" title="Next">Next</button>
+</div>
+</div>
+</span>
+<div class="hidden">
+<form action="/Public/Opportunities/Apply/abba654d-8098-44ea-bc9f-f998bc64abcd" id="apply-form" method="POST"></form>
+<form action="/Public/Opportunities/Save/abba654d-8098-44ea-bc9f-f998bc64abcd" id="save-form" method="POST"></form>
+</div>
+</main>
+<script id="TimeoutNotifierTemplate" type="text/html">
+		<div class="ui modal tiny">
+			<div class="header">
+				Your Session is About to Expire!
+			</div>
+			<div class="content">
+				<div class="w25 float-left">
+					<i class="af-icon fw red af-notification-error fa-5x"></i>
+				</div>
+				<div class="w75 float-right">
+					<p>
+						Your session will expire in <span class="bold" data-bind="text: remainingSecondsDisplay"></span> second(s). If you do nothing, you will be logged out.
+					</p>
+					<p>
+						Do you wish to continue your session? If you quit, you will lose any unsaved work.
+					</p>
+				</div>
+			</div>
+			<div class="actions">
+				<button class="ui button approve exclude" data-role="submit" type="button">Continue</button>
+				<a class="ui button cancel exclude" data-role="logout" href="/account/Logout.aspx">Quit</a>
+			</div>
+		</div>
+	</script>
+</div>
+</div>
+<div class="hidden" id="ModelStateNotifications">
+</div>
+<script src="/js/semantic?v=rHn0-RDARuSlfp3zixpVeylkF9Xz0COn_TIDxx2gwDE1" type="text/javascript"></script>
+<script src="/js/jqueryui?v=2EKpHZSQgDC3Cm135uNIAdQcNFnNGe0z-gl_zBsnqo01" type="text/javascript"></script>
+<script src="/js/jqueryvalidation?v=MJv39ILfIJF5cCQG047vDwPeplmA8u8tX9R3otCZUxI1" type="text/javascript"></script>
+<script src="/js/moment?v=yY0BWuMRcr0vbk6d_g-yVamhYrqpofEarFIXmIN2z4w1" type="text/javascript"></script>
+<script src="/js/numeral?v=UmT2BB0S4lzMrCSktUGVITYJQDqLw3czb5RJs0IhMBg1" type="text/javascript"></script>
+<script src="/js/kendoui?v=vpLfKB3X6_8S37nUGr-tsX1kFliA7u8uO9jCDKLT6qs1" type="text/javascript"></script>
+<script src="/js/knockout?v=QOqQCno0dHIbrQYVHSfm5Vid5omdStwYIxcsPMbmkbI1" type="text/javascript"></script>
+<script src="/js/base-public?v=pU62hareSCbxNTP5ZzoqTZkRuVvVmbPBRwdmRwzjnd81" type="text/javascript"></script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" src="/Content/dist/legacyPublic.f372a716b61dd26d9c5b.js"></script>
+<script src="/areas/publicmodule/scripts/litebox/images-loaded.min.js?v=5e647c0f70c8e64d0cb82e9569029aaf9e0a90570af056bedbcbf486719a5fd7" type="text/javascript"></script>
+<script src="/areas/publicmodule/scripts/litebox/litebox.js?v=ba5545df630620742d63f39d748de0d9323fa28a23a30b9d436335d62295ae59" type="text/javascript"></script>
+<script src="/areas/publicmodule/scripts/ui/public.details.js?v=639291975403069329" type="text/javascript"></script>
+<script src="/areas/publicmodule/scripts/opportunities/opportunities.details.js?v=30530308505d139fe27a851a9ee63370fd26f9ea183c5fb3745f3c86e4ce5bd9" type="text/javascript"></script>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" type="text/javascript">
+		$(document).ready(function () {
+            if (window.afPagerAccessibility && typeof window.afPagerAccessibility.enhancePagerDropdownAccessibility === 'function') {
+                window.afPagerAccessibility.enhancePagerDropdownAccessibility();
+            }
+            $('.save-apply').show();
+
+            //--QT: Focus the popup modal on opening.
+            $('a[href="#modal-multipleapplications"]').click(function () {
+                const focusTrapHandler = window.trap_focus('modal-multipleapplications', 'a');
+                const modal = $('div#modal-multipleapplications');
+
+                modal.on('keydown', focusTrapHandler);
+                modal.focus();
+            });
+
+            //--QT: Forgive me for using JQuery but without reworking the TabStrip using knockout this is the only way.
+            // Rework TabStrip in tabstripcollection.cshtml first if more tabs need to be added to this page.
+			var $tabContainer = $('div.tab-strip-collection');
+			var $evalAndScoringTab = $("a[href='#evalScoring']");
+			var $nextTabButton = $('#nextTabButton');
+
+			$nextTabButton.click(function () {
+				$tabContainer.find('.tab-strip-active').removeClass('tab-strip-active');
+				$evalAndScoringTab.parent('div').addClass('tab-strip-active');
+				$('div.tab-content-container').addClass('tab-content-container-hidden');
+				$($evalAndScoringTab.attr('href')).removeClass('tab-content-container-hidden');
+
+				$nextTabButton.hide();
+			});
+
+			$tabContainer.on('click', '[data-role="tab-strip-element"]', function () {
+				if ($(this).attr('href') == '#evalScoring') {
+					$nextTabButton.hide();
+				} else {
+					$nextTabButton.show();
+				}
+			});
+		});
+    </script>
+</div>
+<script nonce="GHGhVEvkT6k7jou9mTKFkWAizmyjrKjT+4s5HfpoJT0=" type="text/javascript">
+        //--EB: do *not* keep these (print/download/help) here - we're about to redo the entire app layout and should wire the desired
+        //functionality up the right way at that time.
+        $("[data-role='print']").off();
+        $("[data-role='print']").click(function () {
+            window.print();
+            return false;
+        });
+
+        $("body").on("click", "[data-role='download']", function () {
+            var download = $(this);
+            pulse(download);
+            window.setTimeout(function () {
+                endPulse(download)
+            }, 5000);
+		});
+
+		$('body').on('click', 'a[data-semantic-modal-v2-url], button[data-semantic-modal-v2-url]', function(e) {
+			var skipValidation = false;
+			if (!e.which || e.which === 1) {
+				var href = $(this).is('a') ? $(this).attr('href') : null;
+				var isNavigationLink = !!href && href !== '#';
+				if (isNavigationLink && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) {
+					return;
+				}
+				if (!isNavigationLink) {
+					e.preventDefault();
+				}
+				if (typeof $(this).attr('data-semantic-modal-validate') !== 'undefined') {
+					skipValidation = $(this).attr('data-semantic-modal-validate') === 'false';
+				}
+
+				$.ampliFund.modals.renderGlobalModal($(this).attr('data-semantic-modal-v2-url'), $(this).attr('data-semantic-modal-title'), skipValidation);
+			}
+		});
+
+        $("[title='Help']").click(function () {
+            pulse($(this));
+        });
+    </script>
+</body>
+</html>

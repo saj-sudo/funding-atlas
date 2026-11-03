@@ -1,5 +1,5 @@
 """Texas eGrants connector tests. Everything runs against the saved pages (never the network): the Active page, two
-trimmed archive pages and a page past the end."""
+trimmed archive pages, a page past the end and the Funding Sources page."""
 
 from __future__ import annotations
 
@@ -36,8 +36,14 @@ def cards() -> dict[str, dict]:
     return out
 
 
+def sources() -> list[dict]:
+    return tx.parse_funding_sources(read("funding.html"))
+
+
 def normalize(slug: str):
-    return tx.normalize(RawRecord(source_connector=tx.CONNECTOR, source_id=slug, payload={"listed": "x", "card": cards()[slug]}), TODAY)
+    card = cards()[slug]
+    payload = {"listed": "x", "card": card, "funding_source": tx.match_source(card["name"], sources())}
+    return tx.normalize(RawRecord(source_connector=tx.CONNECTOR, source_id=slug, payload=payload), TODAY)
 
 
 def tags(slug: str) -> set[str]:
@@ -66,7 +72,7 @@ def test_eligible_text_in_a_bare_block_is_still_read():
 
 
 def test_fixtures_carry_no_scripts_or_hidden_inputs():
-    for name in ("active.html", "archive_0.html", "archive_1.html", "archive_end.html"):
+    for name in ("active.html", "archive_0.html", "archive_1.html", "archive_end.html", "funding.html"):
         html = read(name)
         assert "<script" not in html and 'type="hidden"' not in html and "csrf_token" not in html
 
@@ -115,7 +121,8 @@ def test_units_of_local_government_and_school_districts():
 def test_counties_only_and_invitation_only():
     p = normalize(COUNTY27)
     assert {t.value for t in p.applicant_types} == {"county"}
-    assert p.eligibility_structured == {"total_funds": "$TBD", "invitation_only": True}
+    assert p.eligibility_structured == {"total_funds": "$TBD", "invitation_only": True,
+                                        "funding_source_name": "County Essential Services", "fund_type": "State Funds"}
     assert normalize(COUNTY25).eligibility_structured["invitation_only"] is True
 
 
@@ -142,6 +149,72 @@ def test_border_zone_fire_departments_tag_counties_and_cities_not_volunteer_depa
     assert tags(BORDER_ZONE) == {"county", "municipality"}
 
 
+# ---------- funding sources ----------
+
+def test_funding_sources_parse_with_their_kind():
+    got = sources()
+    assert len(got) == 35 and {s["kind"] for s in got} == {"State Funds", "Federal Funds"}
+    assert {"name": "ALERRT Travel Assistance", "kind": "State Funds"} in got
+    assert {"name": "Edward Byrne Memorial Justice Assistance Grant (JAG)", "kind": "Federal Funds"} in got
+
+
+@pytest.mark.parametrize("name, tokens", [
+    ("Specialty Courts Grant Program, FY2024", ("specialty", "court", "fy2024")),
+    ("Specialty Court Program", ("specialty", "court")),
+    ("Body-Worn Cameras", ("body", "worn", "camera")),
+    ("Urban Area Securities Initiative (UASI)", ("urban", "area", "security", "initiative")),
+    ("County Essential Services Grant Grant Program, FY2027", ("county", "essential", "service", "fy2027")),
+    ("Internet Crimes Against Children", ("internet", "crime", "against", "children")),
+])
+def test_name_tokens(name, tokens):
+    assert tx.name_tokens(name) == tokens
+
+
+@pytest.mark.parametrize("name, source, kind", [
+    ("ALERRT Travel Assistance, FY2027", "ALERRT Travel Assistance", "State Funds"),
+    ("Border Zone Fire Departments (BZFD), FY 2025", "Border Zone Fire Departments", "State Funds"),
+    ("Operation Lone Star Grant Program (OLS) - FY2026", "Operation Lone Star", "State Funds"),
+    ("Nonprofit Security Grant Program (NSGP), Federal Fiscal Year 2024", "Nonprofit Security Grant Program (NSGP)", "Federal Funds"),
+    ("State Homeland Security Program – LETPA Projects (SHSP-L), Federal Fiscal Year 2025", "State Homeland Security Program (SHSP)", "Federal Funds"),
+    ("Specialty Courts Grant Program, FY2024", "Specialty Court Program", "State Funds"),
+    ("Body-Worn Camera Grant Program, FY2027", "Body-Worn Cameras", "State Funds"),
+    ("Urban Area Security Initiative 2023 – LETPA Projects (UASI-L)", "Urban Area Securities Initiative (UASI)", "Federal Funds"),
+    ("Paul Coverdell Forensic Sciences Improvement Grant Program, FY2027", "Paul Coverdell Forensic Science Improvement Program (Coverdell)", "Federal Funds"),
+    ("Local Border Security Program (LBSP), FY2024", "Local Border Security Funding", "State Funds"),
+])
+def test_a_round_matches_the_source_whose_name_begins_its_own(name, source, kind):
+    assert tx.match_source(name, sources()) == {"name": source, "kind": kind}
+
+
+@pytest.mark.parametrize("name", [
+    "General Victim Assistance Grant Program, FY2027",            # VOCA money, but the page does not say so by name
+    "Rifle-Resistant Body Armor Grant Program, FY2027",           # the source is "Bullet-Resistant Vests"
+    "Violence Against Women Justice and Training Program, FY2027",
+    "Criminal Justice Grant Program, FY2027",                     # not "Criminal Justice Planning Fund"
+    "Music Educational and Community Programs, FY2027",
+    "SHSP and UASI – Supporting Border Crisis Response and Enforcement Projects (HSGP-BC), FFY 2025",
+])
+def test_a_round_that_names_its_source_differently_stays_unmatched(name):
+    assert tx.match_source(name, sources()) is None
+
+
+def test_two_sources_that_both_begin_a_name_match_nothing():
+    two = [{"name": "Crime", "kind": "State Funds"}, {"name": "Crime Stoppers", "kind": "State Funds"}]
+    assert tx.match_source("Crime Stoppers Assistance Fund, FY2026", two) is None
+
+
+def test_funding_source_and_structured_keys_follow_the_match():
+    alerrt = normalize(ALERRT27)
+    assert alerrt.funding_source == "direct"
+    assert alerrt.eligibility_structured["funding_source_name"] == "ALERRT Travel Assistance"
+    assert alerrt.eligibility_structured["fund_type"] == "State Funds"
+    music = normalize(MUSIC27)
+    assert music.funding_source == "direct" and "funding_source_name" not in (music.eligibility_structured or {})
+    card = {**cards()[ALERRT27], "name": "Nonprofit Security Grant Program (NSGP), FY 2023"}
+    p = tx.normalize(RawRecord(source_connector=tx.CONNECTOR, source_id="x", payload={"listed": "x", "card": card, "funding_source": tx.match_source(card["name"], sources())}), TODAY)
+    assert p.funding_source == "pass_through" and p.eligibility_structured["fund_type"] == "Federal Funds"
+
+
 # ---------- mapping ----------
 
 def test_fields():
@@ -149,13 +222,14 @@ def test_fields():
     assert p.source_url == "https://egrants.gov.texas.gov/fundingopp/page/alerrt-travel-assistance-fy2027"
     assert (p.level, p.jurisdiction, p.administering_agency, p.agency_code) == ("state", "TX", "Office of the Governor", None)
     assert (p.funding_source, p.amount_min, p.amount_max, p.match_required, p.rolling) == ("direct", None, None, None, None)
+    assert p.eligibility_structured["funding_source_name"] == "ALERRT Travel Assistance"
     assert p.categories == [] and p.alns == [] and p.external_number is None
     assert p.summary.startswith("The purpose of this announcement") and p.eligibility_text.count("\n") >= 1
 
 
 def test_total_funds_is_kept_verbatim_and_a_bare_dollar_is_not():
-    assert normalize(ALERRT25).eligibility_structured == {"total_funds": "$2.9 Million"}
-    assert normalize(BORDER_ZONE).eligibility_structured is None
+    assert normalize(ALERRT25).eligibility_structured == {"total_funds": "$2.9 Million", "funding_source_name": "ALERRT Travel Assistance", "fund_type": "State Funds"}
+    assert normalize(BORDER_ZONE).eligibility_structured == {"funding_source_name": "Border Zone Fire Departments", "fund_type": "State Funds"}
     assert normalize(ALERRT25).amount_max is None
 
 
@@ -182,6 +256,8 @@ class _Pages:
         self.calls.append(url)
         if url in self.broken:
             raise httpx.ConnectError("down")
+        if url == tx.FUNDING_URL:
+            return read("funding.html") if not self.endless == "nosources" else "<html></html>"
         if url == tx.ACTIVE_URL:
             return read("active.html")
         if url == tx.archive_url(0):
@@ -203,9 +279,16 @@ def test_fetch_reads_active_then_the_archive_until_an_empty_page(pages):
     records = tx.fetch()
     assert [r.source_id for r in records][:4] == [ALERRT27, COUNTY27, MUSIC27, VAWA27]
     assert len(records) == 10 and len({r.source_id for r in records}) == 10
-    assert pages.calls == [tx.ACTIVE_URL, tx.archive_url(0), tx.archive_url(1), tx.archive_url(2)]
+    assert pages.calls == [tx.FUNDING_URL, tx.ACTIVE_URL, tx.archive_url(0), tx.archive_url(1), tx.archive_url(2)]
     assert records[0].payload["listed"] == "active" and records[-1].payload["listed"] == "archive"
+    assert records[0].payload["funding_source"] == {"name": "ALERRT Travel Assistance", "kind": "State Funds"}
     assert len(tx.fetch(limit=3)) == 3
+
+
+def test_a_funding_sources_page_with_no_entries_aborts(monkeypatch, pages):
+    monkeypatch.setattr(tx, "_get", _Pages(endless="nosources"))
+    with pytest.raises(RuntimeError, match="no sources"):
+        tx.fetch()
 
 
 def test_a_round_on_both_lists_is_one_record_and_the_active_copy_wins(monkeypatch, pages):
@@ -222,7 +305,7 @@ def test_a_round_on_both_lists_is_one_record_and_the_active_copy_wins(monkeypatc
 
 
 def test_a_page_that_cannot_be_read_aborts_the_run(monkeypatch, pages):
-    for broken in (tx.ACTIVE_URL, tx.archive_url(1)):
+    for broken in (tx.FUNDING_URL, tx.ACTIVE_URL, tx.archive_url(1)):
         monkeypatch.setattr(tx, "_get", _Pages(broken={broken}))
         with pytest.raises(httpx.ConnectError):
             tx.fetch()

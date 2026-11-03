@@ -56,6 +56,15 @@ CONNECTOR_LABEL = {
     "webgrants": "WebGrants storefronts (Iowa, Montana)",
     "tx_egrants": "Texas Office of the Governor eGrants",
     "nj_dca_sage": "New Jersey DCA SAGE (public RFP list)",
+    "ny_sfs": "New York SFS Grant Opportunity Portal",
+    "va_dcjs": "Virginia Department of Criminal Justice Services",
+    "va_dhcd": "Virginia Department of Housing and Community Development",
+    "va_dcr": "Virginia Department of Conservation and Recreation",
+    "va_vdot": "Virginia Department of Transportation (Local Assistance)",
+    "de_dnrec": "Delaware DNREC Environmental Finance",
+    "de_dema": "Delaware Emergency Management Agency",
+    "de_deldot": "Delaware DelDOT (TAP and Safe Routes to School)",
+    "de_dsha": "Delaware State Housing Authority (Housing Delaware)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

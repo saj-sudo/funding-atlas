@@ -42,14 +42,20 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-10-29)
+## Current state (2026-11-03)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr` (SharePoint base, `connectors/maryland_sharepoint.py`), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
-(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list, 119 records), `webgrants` (Iowa and Montana storefronts, 40 records), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records).
-Milestones 1 to 8.2, 9.1 to 9.7 and 10.1 shipped. **The live site answers 404: the
-repository is private and GitHub Pages on a free account needs it public** (roadmap decision 2026-10-15); `gh-pages` holds
-the build. GOCPP is blocked by its robots.txt (ask the office). Next per the census (`docs/surveys/state_portals.md`):
-a look at New York's SFS Grant Opportunity Portal (a JavaScript shell; likely say-so-and-stop), then agency connectors
-only when outreach names a town. **Start with the "Start here" block at the top of the roadmap's Next section**: the next
+(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list plus its AmpliFund pages, 125 records), `webgrants` (Iowa and Montana storefronts, 40 records), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records), `ny_sfs` (New York SFS
+Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 records), `va_dcjs` (Virginia DCJS, 59 records),
+`va_dhcd` (Virginia DHCD, a crawl of its menus, 30 records), `va_dcr` (six DCR grant pages) and `va_vdot` (six VDOT Local
+Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
+pages), `de_dema` (ten FEMA pass-throughs), `de_deldot` (TAP and Safe Routes) and `de_dsha` (Housing Delaware's Build & Develop
+pages, 17 programs): Delaware's four.
+Milestones 1 to 8.2, 9.1 to 9.8 (with 9.4.1 Illinois depth and 9.6.1 Texas funding sources), 10.1, 10.2 and 11.1 to 11.8 shipped;
+milestone 11 (the municipal five in Virginia and Delaware) is done and the roadmap's next action is outreach. The repository is public and the site is live at
+https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
+every public state index with structured rows is built; Virginia and Delaware have their municipal five
+(decision 2026-11-03, milestone 11); elsewhere agency connectors only when outreach names a town. New York's
+`Governmental Entity` rows read their Solicitation Profile for governmental applicants (decision 2026-11-03). **Start with the "Start here" block at the top of the roadmap's Next section**: the next
 action, what waits on Saj, and the open follow-ups in one place.

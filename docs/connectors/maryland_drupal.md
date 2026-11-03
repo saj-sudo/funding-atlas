@@ -79,7 +79,8 @@ conditions, then definitions. So the scan now reads lines, not whole sections (`
 - a later paragraph counts only if it talks about applying or qualifying (`APPLICANT_MARKER_RE`), and a paragraph
   ending in a colon introduces applicant list items ("an applicant must be either:") unless it ends with a
   condition word ("businesses that:", "your company:"), where the scan stops for that section;
-- a negated line never counts ("For-profit businesses are not eligible to apply."), and neither does a negated
+- a negated line never counts ("For-profit businesses are not eligible to apply."; since 2026-11-03 "not-for-profit"
+  is not a negation, which it had been read as since 10.1), and neither does a negated
   heading ("Who is not eligible to apply?");
 - a place word right after a spatial preposition is a place ("located in a designated rural county");
 - the section heading is itself the first line ("Household eligibility requirements" names the applicant).

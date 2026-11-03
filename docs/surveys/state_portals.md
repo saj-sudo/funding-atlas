@@ -31,7 +31,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **CA** | `https://www.grants.ca.gov/` with the open-data export `california-grants-portal-data.csv` on `data.ca.gov` (CKAN) | WordPress site; CKAN dataset, daily CSV | **programs with labelled status**: 2,023 rows; `Status` active 167, closed 1,853, forecasted 3; `OpenDate`, `ApplicationDeadline`, `ApplicantType`, `FundingSource`, `MatchingFunds`, `EstAmounts`, `LastUpdated`, `GrantURL`, 37 columns | robots allows all, Yoast sitemap; CSV via CKAN redirect to object storage | 200 | **one connector away** | the largest and cheapest source in the census: one file |
 | **CO** | `https://dlg.colorado.gov/local-community-funding-guide` | CloudFront | blocked | 403 "request could not be satisfied" on every `colorado.gov` path, robots included | 403 | blocked | the Local Community Funding Guide (DOLA) is the index, per search |
 | **CT** | `https://portal.ct.gov/opm/igpp/grants` | Sitecore | programs, prose: three IGPP grants (LoCIP, Mashantucket Pequot/Mohegan Fund, Municipal Grants in Aid); `/grants` 404 | robots restricts Sitecore paths | 200 | agency connectors | no statewide index |
-| **DE** | none; UD IPA "Master Grant Portal" is Looker Studio | WordPress agencies | agency prose | allows | 200 | agency connectors | carried over |
+| **DE** | none; UD IPA "Master Grant Portal" is Looker Studio | WordPress agencies | agency prose | allows | 200 | **built, the municipal five** (2026-11-03): `de_dnrec`, `de_dema`, `de_deldot`, `de_dsha` | carried over |
 | **DC** | `https://communityaffairs.dc.gov/topic/grants-and-funding` | Drupal 7 | notices only | `Crawl-delay: 10` | 200 | out of scope | carried over; no municipalities |
 | **FL** | `https://dosgrants.com/` (Department of State only); FloridaCommerce `floridajobs.org` | ASP.NET (DOS Grants); Azure WAF on FloridaCommerce | an application system for one department's culture, history, library and elections grants; FloridaCommerce 403 | dosgrants robots served as an HTML page | 200 / 403 | agency connectors; FloridaCommerce blocked | no statewide index |
 | **GA** | none found; `https://dca.georgia.gov/` | Drupal 10 | not found: `/funding-opportunities` 404, home carries no grants link, `grants.georgia.gov` does not resolve | standard Drupal robots | 200 | not found | DCA CDBG awards are announced as news |
@@ -55,7 +55,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **NH** | none; `https://nhcdfa.org/` (CDFA) | WordPress | prose (CDBG); `nh.gov` 403 | | 200 / 403 | agency connectors | |
 | **NJ** | DCA SAGE public RFP list | IntelliGrants | RFPs with deadlines | | 200 | small build | carried over |
 | **NM** | `https://www.nmdfa.state.nm.us/` | | unreachable: 502 and connection reset through the proxy (`robots.txt` alone answered 200) | | 000 | blocked (proxy) | `grants.nm.gov` does not resolve |
-| **NY** | `https://grantsmanagement.ny.gov/search-funding-sfs` → the SFS Vendor Portal's Grant Opportunity Portal | PeopleSoft (Statewide Financial System) | public per the state ("a username and password are not necessary"), but the portal is a JS shell; the old Grants Gateway host no longer resolves | robots standard | 200 | deeper look | the one public index whose endpoint needs a session to find |
+| **NY** | `https://grantsmanagement.ny.gov/search-funding-sfs` → the SFS Vendor Portal's Grant Opportunity Portal (`esupplier.sfs.ny.gov`) | PeopleSoft (Statewide Financial System) | **programs with labelled status**: public per the state ("a username and password are not necessary"); the search grid and every abstract are server-rendered, reached by the page's own form posts (not a JS shell, corrected 2026-11-03); the old Grants Gateway host no longer resolves | `esupplier` robots 404 (none); `grantsmanagement` standard | 200 | **built** (`ny_sfs`, 2026-11-03) | 32 open and 227 closed rows on 2026-11-03; eligibility is five labels, `Governmental Entity` the broad one |
 | **NC** | `https://www.nc.gov/your-government/all-nc-state-services/grant-opportunities` | Drupal, static hosting | **seed list**: 86 rows (Category, Grant Program, Agency, Description); no status, no dates; `ncgrants.gov` does not resolve | robots allows, sitemap | 200 | seed list | the Maryland Grants Office pattern, done as a table |
 | **ND** | `https://www.commerce.nd.gov/community-services/community-development-rural-prosperity/cdrp-resources/cdrp-grant-programs` | Drupal | programs, prose (CDRP grants) | standard Drupal robots | 200 | agency connectors | |
 | **OH** | `https://grants.ohio.gov/` | static hosting | not found: 404 on the home page, `robots.txt`, and the old portal paths; `obm.ohio.gov` 404 too | | 404 | not found | OBM policy says agencies must post there; the site answered nothing on the day |
@@ -69,7 +69,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **TX** | `https://egrants.gov.texas.gov/fundingopp` (Office of the Governor only) | custom eGrants | **opportunities with dates**: 8 active on the day (Name, Available, Due Date, Purpose, Eligible Organizations, Total Funds) plus an archive; one office; the statewide `txapps.texas.gov` eGrants search is 404 | robots 404 | 200 | small build | public safety and criminal justice rounds for counties and cities |
 | **UT** | Utah Funding Opportunities Portal, `https://lookerstudio.google.com/.../ef90555b-7a4d-4b8e-898e-c427c996bf65` linked from `gopb.utah.gov` | Looker Studio | JS shell | gopb robots `Crawl-delay: 10` | 200 | JS shell | the Delaware pattern, state-run this time |
 | **VT** | `https://accd.vermont.gov/community-development/funding-incentives`; `https://egrants.vermont.gov/` | Drupal; eGrants (connection reset, same host address as Oklahoma's OGX) | programs, prose | standard Drupal robots | 200 / 000 | agency connectors; eGrants blocked | |
-| **VA** | Governor's grant table | hand-kept HTML | free-text periods | | 200 | defer | carried over |
+| **VA** | Governor's grant table; agency sites | hand-kept HTML; Drupal 10 agencies | free-text periods on the table; DCJS has a structured view with due dates | | 200 | **built, the municipal five** (2026-11-03): `va_dcjs`, `va_dhcd`, `va_dcr`, `va_vdot`; VDEM unreachable by this client | carried over |
 | **WA** | `https://tre.wa.gov/financing-and-debt/other-programs/washington-fund-directory` (Treasurer); `https://www.commerce.wa.gov/` | Drupal 10; WordPress | **seed list** by topic (Treasurer's Fund Directory); Commerce's "Funding" menu leads to the contracting page | allows; Commerce `Crawl-delay: 10` | 200 | seed list | |
 | **WV** | `https://grants.wv.gov/grants/Pages/default.aspx` | SharePoint + state JSON API | dates | none published | 200 | build second | carried over |
 | **WI** | `https://wigrants.wi.gov/` | | not found: the host does not resolve (WiGrants is cited in 2006 to 2010 state reports) | DOA robots restricts SharePoint paths | 000 | not found | |
@@ -79,11 +79,8 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 
 | Verdict | States |
 |---|---|
-| built | MD, PA (2) |
-| one connector away | CA, IL, IA (3); WV in progress |
-| WebGrants vendor | IA, MT (2) |
-| small build or deeper look | NJ, TX, NY (3) |
-| seed list | NC, WA (2) |
+| built (a state connector, updated 2026-11-03) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY, VA, DE (12; Virginia and Delaware by their municipal five agencies) |
+| seed list, nothing built | NC, WA (2) |
 | agency connectors | AL, AR, AZ, CT, DE, FL, KY, MA, MO, ND, NE, NH, NV, OR, SD, TN, VT, VA (18) |
 | JS shell, not read | UT, WY (2) |
 | blocked | AK, CO, ID, KS, ME, MI, MN (listing), NM, RI, OK (OGX), plus FL Commerce and VT eGrants on otherwise-readable states (10) |
@@ -138,8 +135,10 @@ After `wv_grants`, in order of records unlocked per session:
 3. **`webgrants`** (Iowa, Montana agencies): the storefront connector above, two states as configuration.
 4. **`tx_egrants`** (Texas, Governor's Office): 8 active rounds with dates and eligible organizations; small and public
    safety-heavy; the state's criminal-justice pass-throughs for counties and cities.
-5. **New York SFS**: a deeper look to find the Grant Opportunity Portal's data endpoint behind the PeopleSoft shell. The
-   state says it is public; the census could not read it without a browser.
+5. **New York SFS** (built 2026-11-03 as `ny_sfs`): the deeper look found no hidden endpoint and needed none. The
+   PeopleSoft page renders its grid and abstracts server-side; the connector posts the page's own form (`ICAction`,
+   `ICSID`, `ICStateNum`) to open each abstract, return, and run the closed search. 257 records; see
+   `docs/connectors/ny_sfs.md`.
 
 Seed lists (NC, WA) and the Governor's table (VA) tell a future agency-connector session which agencies to read first.
 The 18 "agency connectors" states and the 7 "not found" states wait for outreach to name a town. The 10 blocked states
@@ -151,7 +150,8 @@ bots in general or for this proxy's address range.
 - A state-run index in GA, HI, LA, MS, OH, SC or WI at the URLs search and guesswork produced. Ohio's portal host
   answers 404 on every path, which may be a migration rather than an absence.
 - Any public AmpliFund, eCivis / Euna or SmartSimple listing; Submittable and Fluxx did not appear at all at this depth.
-- The data endpoints behind New York's SFS portal, Utah's Looker Studio portal, Wyoming's Grants Connect Hub, Kentucky's
-  DLG Portal and Nevada's Grant Discovery tool. Light depth records the shell and stops.
+- The data endpoints behind Utah's Looker Studio portal, Wyoming's Grants Connect Hub, Kentucky's DLG Portal and
+  Nevada's Grant Discovery tool. Light depth records the shell and stops. (New York's was recorded here too, wrongly:
+  the deeper look of 2026-11-03 found the SFS portal server-rendered behind form posts, and it is built.)
 - Whether the WebGrants storefront exists in any state other than Iowa and Montana; it was looked for only where
   WebGrants turned up.

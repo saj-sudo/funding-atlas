@@ -17,10 +17,12 @@ from pipeline.models import ApplicantTag
 # agencies; a phrase that is wrong for one of them is wrong for all and gets fixed here.
 APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
+    (r"local units? of (?:general )?government", ("municipality", "county")),   # Iowa's word order
     (r"local governments?", ("municipality", "county")),
     # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
     # apply for the credit"), not the applicant.
     (r"(?<!the )local jurisdictions?", ("municipality", "county")),
+    (r"\blocalit(?:y|ies)\b", ("municipality", "county")),   # Virginia's word for a city, county or town
     (r"municipalit\w*", ("municipality",)),
     (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
     (r"\bcit(?:y|ies)\b", ("municipality",)),
@@ -35,7 +37,9 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bdevelopers?\b", ("business",)),
     (r"\bhomeowners?\b", ("household",)),
     (r"\bhouseholds?\b", ("household",)),
-    (r"\bresidents?\b", ("household",)),
+    # "residents of Iowa", "residents of a Priority Funding Area" is a population served, not the applicant; a bare
+    # "residents" or "Maryland residents" still is.
+    (r"\bresidents?\b(?!\s+of\b)", ("household",)),
     (r"\brenters?\b", ("household",)),
     # The noun only: plural always, singular when a function word or punctuation follows ("any individual who",
     # "an individual may apply"). The adjective ("individual school facilities") never tags.
@@ -118,6 +122,16 @@ PORTAL_APPLICANTS: dict[str, str] = {
     "individual": "individual", "individuals": "individual",
     "tribal government": "tribe", "native american tribal organization or government": "tribe",
     "public housing organizations": "housing_authority",
+    # New York SFS (the portal's five eligibility labels; `Governmental Entity` is the broad one and tags nothing)
+    "not-for-profit": "nonprofit", "for profit": "business", "tribal organization": "tribe",
+    # Illinois AmpliFund pages, which also use the Grants.gov applicant vocabulary beside the CSFA labels
+    "state governments": "state", "county governments": "county", "city or township governments": "municipality",
+    "special district governments": "special_district",
+    "native american tribal governments (federally recognized)": "tribe",
+    "nonprofits with 501(c)(3) status (excludes institutions of higher education)": "nonprofit",
+    "nonprofits without 501(c)(3) status (excludes institutions of higher education)": "nonprofit",
+    "public and state controlled institutions of higher education": "higher_ed",
+    "private institutions of higher education": "higher_ed",
 }
 
 # Topic label -> categories. A label that names two topics carries both (as DHCD's energy-home-repair section
@@ -135,6 +149,16 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "community development": ("infrastructure",),
     "disaster assistance": ("public_safety",), "disaster preparedness": ("public_safety",),
     "health": ("health",), "child health": ("health",), "prevention/treatment": ("health",),
+    # New York SFS service areas; the other six (agricultural, education, environmental, family, government supports)
+    # name none of our categories and fall to `other`
+    # Delaware DNREC's page tags and DEMA's accordion headings
+    "clean water": ("water",), "drinking water": ("water",), "wastewater": ("water",), "stormwater": ("water",),
+    "septic systems": ("water",), "non-point source": ("water",), "water quality financing": ("water",),
+    "infrastructure": ("infrastructure",), "green infrastructure loans": ("infrastructure",),
+    "preparedness grants": ("public_safety",), "recovery assistance": ("public_safety",),
+    "health services": ("health",), "housing and shelter services": ("housing",),
+    "workforce development": ("workforce",), "public safety supports": ("public_safety",),
+    "justice services": ("public_safety",), "public transportation services": ("transportation",),
 }
 
 

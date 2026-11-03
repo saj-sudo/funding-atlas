@@ -6,12 +6,14 @@ markup: name, Available and Due dates, Purpose, Eligible Organizations (free tex
 holds none of that to a plain GET, so only the cards are read. About 7 requests a run.
 
 The Active page lists a round eight months past its due date, so status comes from the card's dates, never from which
-page lists it. Applicants come from the Eligible Organizations text, sentence by sentence. See
-docs/connectors/tx_egrants.md.
+page lists it. Applicants come from the Eligible Organizations text, sentence by sentence. The Funding Sources page
+(`/funding`, 35 named sources, each `State Funds` or `Federal Funds`) is read once a run and a round is tied to a source
+only when the names are the same (decision 9 in the doc). See docs/connectors/tx_egrants.md.
 """
 
 from __future__ import annotations
 
+import re
 import time
 from datetime import date
 from typing import Any
@@ -29,6 +31,10 @@ CONNECTOR = "tx_egrants"
 BASE = "https://egrants.gov.texas.gov"
 ACTIVE_URL = BASE + "/fundingopp"
 ARCHIVE_URL = BASE + "/fundingopp/archive"
+FUNDING_URL = BASE + "/funding"
+FEDERAL = "Federal Funds"
+# Words that say nothing about which source a round belongs to: "Body-Worn Camera Grant Program" is "Body-Worn Cameras".
+NAME_NOISE = frozenset({"grant", "grants", "program", "programs", "fund", "funds", "funding", "the"})
 PAGE_SIZE = 25
 MAX_ARCHIVE_PAGES = 20
 AGENCY = "Office of the Governor"
@@ -104,6 +110,42 @@ def parse_cards(page_html: str) -> list[dict[str, Any]]:
     return cards
 
 
+def parse_funding_sources(page_html: str) -> list[dict[str, str]]:
+    """The Funding Sources page: one dict per entry, `name` (the entry title) and `kind` (`State Funds` or `Federal
+    Funds`, the entry subheading)."""
+    soup = BeautifulSoup(page_html, "html.parser")
+    out = []
+    for item in soup.select("div.entry-listitem"):
+        title, kind = item.select_one(".entry-title"), item.select_one(".entry-subheading")
+        if title is not None and kind is not None and clean(title.get_text(" ")):
+            out.append({"name": clean(title.get_text(" ")), "kind": clean(kind.get_text(" "))})
+    return out
+
+
+def name_tokens(name: str) -> tuple[str, ...]:
+    """A name as comparable words: parentheticals dropped, lower-cased, noise words out, plurals folded
+    (`Specialty Courts Grant Program` and `Specialty Court Program` are both `specialty court`)."""
+    words = re.sub(r"[^a-z0-9]+", " ", re.sub(r"\(.*?\)", " ", name.lower())).split()
+    out = []
+    for w in words:
+        if w in NAME_NOISE:
+            continue
+        if w.endswith("ies") and len(w) > 4:
+            w = w[:-3] + "y"
+        elif w.endswith("s") and not w.endswith("ss") and len(w) > 3:
+            w = w[:-1]
+        out.append(w)
+    return tuple(out)
+
+
+def match_source(name: str, sources: list[dict[str, str]]) -> dict[str, str] | None:
+    """The one funding source whose name begins the round's name, word for word; none when no source does or more
+    than one does. Never a looser match: a round that names its source differently stays unmatched."""
+    words = name_tokens(name)
+    hits = [s for s in sources if name_tokens(s["name"]) and words[:len(name_tokens(s["name"]))] == name_tokens(s["name"])]
+    return hits[0] if len(hits) == 1 else None
+
+
 # ---------- fetch ----------
 
 def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = None) -> list[RawRecord]:
@@ -111,6 +153,10 @@ def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = No
     archived round would otherwise look missing); an archive longer than the cap aborts it too, loudly."""
     found: list[tuple[str, dict[str, Any]]] = []
     with _client() as client:
+        sources = parse_funding_sources(_get(client, FUNDING_URL))
+        if not sources:
+            raise RuntimeError("the Funding Sources page listed no sources (35 on 2026-11-03): not read")
+        time.sleep(DELAY_S)
         found += [("active", c) for c in parse_cards(_get(client, ACTIVE_URL))]
         for page in range(MAX_ARCHIVE_PAGES):
             time.sleep(DELAY_S)
@@ -123,7 +169,8 @@ def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = No
     records: dict[str, RawRecord] = {}
     for listed, card in found:
         records.setdefault(card["slug"], RawRecord(source_connector=CONNECTOR, source_id=card["slug"],
-                                                   payload={"listed": listed, "card": card}))
+                                                   payload={"listed": listed, "card": card,
+                                                            "funding_source": match_source(card["name"], sources)}))
     out = list(records.values())
     return out[:limit] if limit else out
 
@@ -160,17 +207,20 @@ def closes_text_for(card: dict[str, Any]) -> str | None:
     return "; ".join(parts) or None
 
 
-def structured_for(card: dict[str, Any]) -> dict[str, Any] | None:
+def structured_for(card: dict[str, Any], source: dict[str, str] | None = None) -> dict[str, Any] | None:
     out: dict[str, Any] = {}
     if card["total_funds"].strip("$ "):
         out["total_funds"] = card["total_funds"]
     if card["eligible"] and card["eligible"][0].lower().startswith(INVITATION_ONLY):
         out["invitation_only"] = True
+    if source:
+        out["funding_source_name"] = source["name"]
+        out["fund_type"] = source["kind"]
     return out or None
 
 
 def normalize(raw: RawRecord, today: date | None = None) -> Program:
-    card = raw.payload["card"]
+    card, source = raw.payload["card"], raw.payload.get("funding_source")
     today = today or date.today()
     available, due = parse_date(card["available"]), parse_date(card["due"])
     return Program(
@@ -184,7 +234,7 @@ def normalize(raw: RawRecord, today: date | None = None) -> Program:
         administering_agency=AGENCY,
         agency_code=None,
         funding_type=funding_type_for(card["name"]),
-        funding_source="direct",
+        funding_source="pass_through" if source and source["kind"] == FEDERAL else "direct",
         amount_min=None,
         amount_max=None,
         match_required=None,
@@ -196,7 +246,7 @@ def normalize(raw: RawRecord, today: date | None = None) -> Program:
         rolling=None,
         summary=card["purpose"][0] if card["purpose"] else None,
         eligibility_text="\n".join(card["eligible"]) or None,
-        eligibility_structured=structured_for(card),
+        eligibility_structured=structured_for(card, source),
         applicant_types=applicant_tags(card["eligible"]),
         categories=[],
         alns=[],

@@ -19,10 +19,19 @@ uv run python cli.py run md_dnr                               # Maryland DNR: 1 
 uv run python cli.py run pa_grants                            # Pennsylvania pa.gov grants index: 4 search pages + ~377 detail pages, about 10 minutes
 uv run python cli.py run wv_grants                            # West Virginia grants.wv.gov: one JSON request, ~124 items, seconds
 uv run python cli.py run ca_grants                            # California Grants Portal: one CSV from data.ca.gov, ~2,025 rows, seconds
-uv run python cli.py run il_csfa                              # Illinois CSFA opportunity list: 1 list + ~70 detail pages, under a minute
+uv run python cli.py run il_csfa                              # Illinois CSFA opportunity list: 1 list + ~70 native pages + ~88 AmpliFund pages, about 90 seconds
 uv run python cli.py run webgrants                            # WebGrants storefronts (Iowa, Montana Agriculture, Montana FWP): 3 lists + ~40 detail pages, under a minute
 uv run python cli.py run nj_dca_sage                          # New Jersey DCA SAGE: one page, ~10 RFPs, seconds
-uv run python cli.py run tx_egrants                           # Texas Governor eGrants: Active page + 6 archive pages, ~147 rounds, seconds
+uv run python cli.py run tx_egrants                           # Texas Governor eGrants: Funding Sources + Active page + 6 archive pages, ~147 rounds, seconds
+uv run python cli.py run va_dcjs                              # Virginia DCJS: 1 view + ~58 program pages, under a minute
+uv run python cli.py run va_dhcd                              # Virginia DHCD: a crawl of 3 sections, ~90 pages, under a minute
+uv run python cli.py run va_dcr                               # Virginia DCR: six recreation and land conservation grant pages, seconds
+uv run python cli.py run va_vdot                              # Virginia VDOT Local Assistance: 1 index + 6 program pages, seconds
+uv run python cli.py run de_dnrec                             # Delaware DNREC Environmental Finance: 12 program pages, seconds
+uv run python cli.py run de_dema                              # Delaware DEMA: one grants page and its preparedness tab, seconds
+uv run python cli.py run de_deldot                            # Delaware DelDOT: TAP and Safe Routes to School, seconds
+uv run python cli.py run de_dsha                              # Delaware State Housing Authority: six Build & Develop pages, seconds
+uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
 uv run python cli.py export                                   # site/: the navigator (index + 51 state pages)
@@ -40,10 +49,11 @@ parsing, applicant tagging) and two on its SharePoint theme (`md_mea`, `md_dnr`,
 record per grant page, 377 grants from 17 agencies with a labelled status), and `wv_grants`, West Virginia's grants portal
 read through its JSON API (one request, 124 items, status from the page's own date rule), and `ca_grants`, the California Grants Portal's
 daily open-data CSV (one file, about 2,025 grants with a labelled status), and `il_csfa`, Illinois's Catalog of State Financial Assistance (the list of
-rounds posted now, 119 rows; the native ones read with their program's eligibility), and `webgrants`, the one vendor platform with a public
+rounds posted now, about 125 rows; the native ones read with their program's eligibility, the GMS ones with their AmpliFund page), and `webgrants`, the one vendor platform with a public
 listing in two states: the WebGrants storefronts of Iowa and Montana's agency hosts (the state is configuration; about 40 rounds), and
 `tx_egrants`, the Texas Governor's eGrants announcements (the Active page plus the archive, about 147 rounds, each stating who may apply), and
-`nj_dca_sage`, New Jersey DCA's public SAGE list (one page, about 10 RFPs). Each
+`nj_dca_sage`, New Jersey DCA's public SAGE list (one page, about 10 RFPs), and `ny_sfs`, New York's SFS Grant Opportunity Portal
+(PeopleSoft, read through its own form posts: about 30 open rows with an abstract each, plus the closed grid). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 

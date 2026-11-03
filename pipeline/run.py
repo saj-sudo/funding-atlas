@@ -9,6 +9,10 @@ from types import ModuleType
 
 from connectors import (
     ca_grants,
+    de_deldot,
+    de_dema,
+    de_dnrec,
+    de_dsha,
     grants_gov,
     il_csfa,
     md_commerce,
@@ -17,9 +21,14 @@ from connectors import (
     md_mea,
     md_mht,
     nj_dca_sage,
+    ny_sfs,
     pa_grants,
     sam_assistance_listings,
     tx_egrants,
+    va_dcjs,
+    va_dcr,
+    va_dhcd,
+    va_vdot,
     webgrants,
     wv_grants,
 )
@@ -40,6 +49,15 @@ CONNECTORS: dict[str, ModuleType] = {
     "webgrants": webgrants,
     "tx_egrants": tx_egrants,
     "nj_dca_sage": nj_dca_sage,
+    "ny_sfs": ny_sfs,
+    "va_dcjs": va_dcjs,
+    "va_dhcd": va_dhcd,
+    "va_dcr": va_dcr,
+    "va_vdot": va_vdot,
+    "de_dnrec": de_dnrec,
+    "de_dema": de_dema,
+    "de_deldot": de_deldot,
+    "de_dsha": de_dsha,
 }
 
 

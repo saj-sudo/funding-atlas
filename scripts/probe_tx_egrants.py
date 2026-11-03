@@ -2,7 +2,8 @@
 cards the tests need, save the trimmed pages as fixtures, and print what the connector sees on each.
   uv run python scripts/probe_tx_egrants.py
 Writes tests/fixtures/tx_egrants/: active.html, archive_0.html, archive_1.html (archive page 25), archive_end.html
-(a page past the end, no cards). Scripts and hidden form inputs (the CSRF token) are removed from every page."""
+(a page past the end, no cards) and funding.html (the Funding Sources page). Scripts and hidden form inputs (the CSRF
+token) are removed from every page. `--funding-only` refreshes funding.html alone."""
 
 from __future__ import annotations
 
@@ -60,10 +61,22 @@ def trim(page_html: str, keep: set[str]) -> str:
     return str(soup)
 
 
+def save_funding(client) -> None:
+    soup = BeautifulSoup(tx._get(client, tx.FUNDING_URL), "html.parser")
+    scrub(soup)
+    (FIXTURES / "funding.html").write_text(str(soup), encoding="utf-8")
+    print(f"funding: {len(tx.parse_funding_sources(str(soup)))} sources")
+
+
 def main() -> None:
     FIXTURES.mkdir(parents=True, exist_ok=True)
+    if "--funding-only" in sys.argv:
+        with tx._client() as client:
+            save_funding(client)
+        return
     pages: dict[str, str] = {}
     with tx._client() as client:
+        save_funding(client)
         active = tx._get(client, tx.ACTIVE_URL)
         pages["active.html"] = trim(active, {c["slug"] for c in tx.parse_cards(active)})
         print(f"active: {len(tx.parse_cards(active))} cards")
