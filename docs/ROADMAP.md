@@ -51,11 +51,12 @@ records) and the per-state change feed, four commits; once its PR merges, start 
 (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the merge adds the 14
 records to the published database and writes the first `feed.xml` beside every page.
 
-**The next action is outreach, not code.** Maryland now has eight agencies (DHCD, Commerce, MHT, MEA, DNR, MDEM, MDOT,
-MDE) and a subscribe link (`https://saj-sudo.github.io/funding-atlas/md/feed.xml`); Virginia and Delaware have their
-municipal five. `docs/outreach.md` has the routes, the four questions, the links to send, the paste-ready note (drafted
-2026-11-03, not sent) and the log of who was written to. The first conversation names the first town, and the town
-names the next agency.
+**Next session: milestone 12, the rest of the states (Saj's call, 2026-11-03, late).** Start with 12.0 and 12.1 below:
+a one-file Actions workflow that fetches the ten blocked hosts from the daily runner's own network, and the hand-list
+base extracted from the seven hand-listed connectors with their fixture hashes as the gate. Then one state or one
+platform per session in the order milestone 12 gives. Outreach runs alongside, not after: Maryland now has eight
+agencies and a subscribe link (`https://saj-sudo.github.io/funding-atlas/md/feed.xml`); `docs/outreach.md` has the
+routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent) and the contact log.
 
 Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
 funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
@@ -155,6 +156,65 @@ WebGrants (Iowa, Montana), built as item 5. One connector per session, in this o
 7. **`ny_sfs`** (New York SFS Grant Opportunity Portal, shipped 2026-11-03, see Done): not a JS shell after all; the
    grid and abstracts are server-rendered behind PeopleSoft form posts. Agency connectors (VA, MA, OR, and the rest)
    only when a town asks; NC's and WA's seed lists and VA's Governor's table say which agencies first.
+
+### 12. The rest of the states (decision 2026-11-03, Saj; one state or one base per session)
+
+**The tension, stated once.** The 2026-10-15 decision called agency-by-agency across 50 states the DSIRE trap, and the
+census (8.2) confirmed the shape: 12 states have a public index and are built; the other 38 are 16 agency-by-agency
+states, 2 seed lists, 2 JavaScript shells, 10 blocked hosts, 7 with no index found, and DC. Saj's call on 2026-11-03 is
+to build them out anyway. What makes that survivable for one person is sequencing: the multipliers first (a base that
+turns a new agency into a dict and fixtures, platform connectors where a vendor repeats), then the states cheapest
+first, and the honest `unknown` for pages that state no round. Record counts per session will be small (3 to 15);
+the coverage line on each state page is the product. Outreach is not paused for this.
+
+In order, one per session unless marked:
+
+- **12.0 Probe the blocked hosts from the runner's network** (code, under a session). A `workflow_dispatch` workflow
+  (`.github/workflows/probe_hosts.yml`) that fetches the ten blocked index URLs (AK DCCED, CO DOLA guide, ID Commerce,
+  KS hub, ME MOCA finder, MI eGrams, MN `mn.gov/grants/find`, NM DFA, RI GMS page, OK OGX; plus FL Commerce and VT
+  eGrants) with the connectors' own `USER_AGENT`, and prints status, server header and the first 300 bytes. The daily
+  runner is GitHub Actions, so its address range is the one that matters, not this proxy's. Each host that answers 200
+  moves to 12.8; each that walls Actions too is recorded as blocked for good (the GOCPP rule) and left. Still on Saj:
+  the ADECA `ClaudeBot` decision (AL), and one look from an ordinary browser at any host that walls Actions.
+- **12.1 The hand-list base** (one session). Seven connectors now share one shape (`va_dcr`, `va_vdot`, `de_dnrec`,
+  `de_dema`, `de_deldot`, `de_dsha`, `md_mdot`): a dict of pages, a content selector, blocks `(kind, text)`, a label
+  regex for the applicant list, a round-sentence table (accepting with a date → open; year-round → rolling; closed
+  wording → closed; awards announced → closed; a past date on a page that says nothing else → unknown), `prior`
+  fallback, `resolve_missing` → unknown. The third-case rule is long past; extract `connectors/hand_list.py` with a
+  `HandListConnector` (constants, `PAGES`, `content(soup)`, `LABEL_RE`, `APPLICANT_RE`, status table, categories hook,
+  hand quotes) and move the seven onto it. **Gate:** every one of the seven's fixtures produces the same `record_hash`
+  before and after (the rule that produced `maryland_drupal.py` and `maryland_sharepoint.py`). After this a new
+  agency is a 40-line module, its fixtures and its doc; a state session holds two to four agencies.
+- **12.2 AmpliFund as a platform** (one to two sessions). `il_csfa` already reads AmpliFund's public opportunity pages
+  (9.4.1). Indiana ("Opportunities listed with Euna Grants Powered by AmpliFund") and Nebraska point at the same
+  vendor. Probe, read-only with the New York stop rule: does each client host serve a public opportunities list
+  (the WebGrants storefront shape)? If yes, `amplifund` with hosts as configuration, the Illinois page reader as the
+  parser; Illinois's GMS rows stay where they are. If no, record it and move on.
+- **12.3 Massachusetts, then Oregon** (two sessions). mass.gov's Community One Stop for Growth: 12 programs under one
+  NOFA with round dates in text, Drupal 11 (the Virginia DHCD shape). Business Oregon: about 90 programs by category
+  on one SharePoint page, prose; an index connector whose rows are mostly `unknown` with applicants from prose.
+- **12.4 The two seed lists** (one session). `nc_grants` (nc.gov's 86-row table: category, program, agency,
+  description) and `wa_fund_directory` (the Treasurer's directory by topic) as directory connectors: one record per
+  row, status `unknown`, the link kept, the agency named. Low value per row, honest coverage, and they name the
+  agencies for 12.6.
+- **12.5 The JavaScript shells** (one session, read-only probes with the New York stop rule): Kentucky's DLG Portal
+  (Dynamics "EYGA"), Utah's Looker Studio, Wyoming's Grants Connect Hub, Nevada's discovery tool, Delaware's
+  University of Delaware dashboard. Build only what turns out server-rendered or to have a plain data endpoint the
+  page itself calls; record the rest.
+- **12.6 The agency states, cheapest first**, two to four agencies per session on the hand-list base, each state's
+  municipal four or five (community development, transportation, natural resources or parks, emergency management,
+  energy where it exists): CT (three IGPP grants, Sitecore), MO (DED), ND (Commerce CDRP), SD (GOED), NE (DED), TN
+  (ECD rural), AR (AEDC, DFA), NH (CDFA), VT (ACCD), NV, KY (DLG pages), FL (DOS grants system is an application
+  portal; probe first), AZ (nothing public; agency pages), AL (after the ClaudeBot decision). Roughly nine sessions.
+- **12.7 The seven not found** (about four sessions): a second, deeper look per state for the agency pages, then hand
+  lists: GA (DCA), OH (OBM's portal answered 404 on the census day, likely a migration; recheck first), SC (Commerce,
+  RIA), WI (DOA), LA (OCD), MS (MDA), HI.
+- **12.8 The blocked ten, after 12.0**: whatever answers Actions is real coverage (Colorado's Local Community Funding
+  Guide, Maine's Community Funding Finder, Michigan's eGrams, Minnesota's find page, Rhode Island's GMS page, the
+  Kansas hub, Idaho Commerce, Alaska DCCED, New Mexico DFA, Oklahoma's OGX are indexes if reachable); up to five
+  sessions. What walls Actions is left, with the reason in the census.
+
+About 20 to 25 sessions in all. Each follows the connector rule: doc first, fixtures, tests, two live runs, one commit.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -308,6 +368,7 @@ decide what gets built next.
 | 2026-11-03 | The Urban Tree eligibility sentence is quoted by hand from the agency's PDF, dated; `homeowner associations` is not a household | the page names no applicant and the PDF does (the Illinois NOFO precedent, never fetched by the run); the quote exposed `homeowners?` tagging an association, guarded in the shared table and measured on all 6,834 stored records: none move | `connectors/md_mdot.md` decision 4, `connectors/text.py` |
 | 2026-11-03 | The MWIFA index banner sets every row's status; a Purpose cell is applicant text; the row's title is the name; the unlinked row is keyed to the index page | the seven programs share one solicitation and the agency states its status once, above the table (closed with a month still ahead is `forecasted`); the Purpose column is the agency's own "loans to local governments" (the VDOT card-blurb rule), and for the unlinked row it is the only text read, because the index's sentences would tag every row's local governments; two page H1s differ from the fund they describe | `connectors/md_mde.md` decisions 1 to 3 |
 | 2026-11-03 | Atom and JSON per state and site-wide, entry ids as tag URIs over the change-log row id, summaries in the page's own words | outreach's ask becomes "subscribe"; a feed reader, Outlook or Slack's RSS app takes Atom and a script takes JSON; a permanent id means a reader never re-announces a change; one `FIELD_LABEL` in Python and JavaScript, held equal by a test, keeps the feed and the page saying the same thing | `scripts/build_site.py`, milestone 6.1 |
+| 2026-11-03 | Build out the rest of the states (milestone 12), multipliers first | Saj's call, superseding "agency connectors only when outreach names a town" (2026-11-03) and narrowing "agency-by-agency across 50 states rejected" (2026-10-15) to a sequencing rule: the hand-list base (seven connectors already share the shape) and platform connectors (AmpliFund next to WebGrants) go before any new agency, the blocked hosts are probed from the runner's own network before being called blocked, states go cheapest first, and `unknown` stays the status for a page that states no round. Outreach runs alongside | milestone 12 |
 
 ## Open questions (do not resolve in code yet)
 
