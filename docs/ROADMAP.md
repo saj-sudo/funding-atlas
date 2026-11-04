@@ -44,22 +44,25 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 12.0 | Probe the blocked hosts from the runner's network | 2026-11-04 | `.github/workflows/probe_hosts.yml` (`workflow_dispatch`, a `states` input) runs `scripts/probe_hosts.py`: the twelve index URLs the census recorded as blocked (AK, CO, ID, KS, ME, MI, MN's find page, NM, RI, OK's OGX, FloridaCommerce, VT eGrants) and each host's `robots.txt`, fetched once with the connectors' User-Agent; prints status, server header, final URL and the first 300 bytes; writes nothing, never fails. Smoke-tested from the proxy (Colorado: CloudFront 403 on page and robots, as in the census). **The Actions run is Saj's click**; its output goes in the census and decides 12.8 | this file, `docs/surveys/state_portals.md` |
 | 12.1 | The hand-list base | 2026-11-04 | `connectors/hand_list.py`: the parts seven hand-built connectors shared byte for byte (client, GET, comment-stripped soup, list-item text, the block builder, the label-and-sentence applicant walk, first sentence, last date, hand quotes, the tagger call, `resolve_missing`) and `HandListConnector` (a page dict walked with a pause, `prior` fallback by slug or `slug#`, `urls_for` / `parse_page` / `records_for` / `fields` hooks, the shared constants in `normalize`, MDOT's round sentence and status table as the default for the next agency). Five moved onto the class (`va_dcr`, `de_dnrec`, `de_deldot`, `de_dsha`, `md_mdot`), two onto the helpers (`va_vdot` is an index crawl, `de_dema` two fixed pages). Each agency keeps its own regexes, status table and field mapping: those are what differ. **Gate met**: 56 fixture records, identical `record_hash`, canonical record, payload keys and `limit` order against `main` (ddf6801); 912 tests, ruff clean; two stub lines changed per moved test | `connectors/hand_list.md` |
 | 12.2 | AmpliFund as a platform: probed, no public list | 2026-11-04 | read-only probes with the New York stop rule, from the proxy: `il.amplifund.com/Public/Opportunities` redirects to the state's ADFS sign-in, `ne.amplifund.com/Public/Opportunities` to `account/login.aspx`, `in.amplifund.com` does not resolve and in.gov's page carries no AmpliFund href in its static HTML. Only `Public/Opportunities/Details/<guid>` pages are public, and only a state's own list leads to them (`il_csfa` already reads them that way). No `amplifund` connector; Illinois's GMS rows stay where they are; Indiana and Nebraska move to 12.6 as agency states (Nebraska DED's `/programs/` answered 200) | `docs/surveys/state_portals.md` |
+| 12.3 | Massachusetts: `ma_onestop` | 2026-11-04 | the Community One Stop for Growth page is the index and the round at once: under "One Stop Programs" three agency `h3`s (EOED, EOHLC, MassDevelopment) list fourteen programs, nine mass.gov pages in three templates and five sections of one massdevelopment.com page; under "FY27 Round of the One Stop: Key Dates" the FY26 round's dates (the heading and the dates disagree; the dates are read, the heading is stored). One round for every record: `open` while the Full Application deadline is ahead, `forecasted` before the open date, `closed` after (the between-rounds group carries it); applicants from each program page's own prose (outermost `.ma__rich-text` blocks; contacts, menus and the feedback form sit outside them), the agency as a field and the category (housing; infrastructure). First run 14 added in 7 seconds, second run 0 changed; the Massachusetts page: 3 agencies, 14 programs, 0 open, 6 between rounds. On the hand-list helpers, not the class (the list comes from the index each run) | `connectors/ma_onestop.md` |
 
 ## Next
 
-### Start here (updated 2026-11-03, night)
+### Start here (updated 2026-11-04)
 
-**Before anything else.** This branch carries Maryland's three missing agencies (`md_mdem`, `md_mdot`, `md_mde`, 14
-records) and the per-state change feed, four commits; once its PR merges, start from the latest `main`
-(`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the merge adds the 14
-records to the published database and writes the first `feed.xml` beside every page.
+**Before anything else.** This branch carries milestone 12's first four items (12.0 the `probe-hosts` workflow, 12.1 the
+hand-list base, 12.2 the AmpliFund verdict, 12.3 Massachusetts), one commit each; once its PR merges, start from the
+latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run after the merge
+adds Massachusetts's 14 records to the published database.
 
-**Next session: milestone 12, the rest of the states (Saj's call, 2026-11-03, late).** Start with 12.0 and 12.1 below:
-a one-file Actions workflow that fetches the ten blocked hosts from the daily runner's own network, and the hand-list
-base extracted from the seven hand-listed connectors with their fixture hashes as the gate. Then one state or one
-platform per session in the order milestone 12 gives. Outreach runs alongside, not after: Maryland now has eight
-agencies and a subscribe link (`https://saj-sudo.github.io/funding-atlas/md/feed.xml`); `docs/outreach.md` has the
-routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent) and the contact log.
+**Next session: 12.3b Oregon**, then 12.4 (the NC and WA seed lists), then 12.5 and 12.6 in the order milestone 12
+gives below. Oregon is probed and buildable: Business Oregon's programs page (`https://www.oregon.gov/biz/programs/`,
+200 on 2026-11-04, robots restrict only `_layouts` and search paths) lists about 90 programs as links under eight topic
+`h2`s, one SharePoint page per program; an index connector on the hand-list helpers whose rows are mostly `unknown`
+with the cycle sentence kept, applicants from prose, the topic `h2` through the shared category table. The NC table
+(86 rows, a link per program) and the WA directory (six topic `h3`s with link lists) both answered 200 the same day.
+Outreach runs alongside, not after: `docs/outreach.md` has the routes, the four questions, the links, the paste-ready
+note (drafted 2026-11-03, not sent) and the contact log.
 
 Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
 funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
@@ -72,13 +75,13 @@ had; a Baltimore City view (municipality or county) in SQL if a Baltimore reader
 named: the agency the census seeds say first (NC's and WA's lists).
 
 **Waiting on Saj (not code).**
+- Run the `probe-hosts` workflow from the Actions tab (12.0) and paste its output into the census; it decides 12.8.
 - Main Street Improvement Grant: ask DHCD whether "Main Street Maryland communities" are municipalities, or decide to read
   them that way (milestone 10).
 - GOCPP: ask the office for crawl permission or a feed (milestone 7). ADECA's `ClaudeBot` disallow: decide whether to read
   Alabama at all (decision 2026-10-18).
-- **Run `probe-hosts` from the Actions tab** (12.0, shipped 2026-11-04) and paste its output into the census: a 200 moves that
-  state to 12.8, a wall is blocked for good. The ten blocked hosts (AK, CO, ID, KS, ME, MI, MN's listing, NM, RI, OK's OGX) then
-  need one check from an ordinary browser only where Actions is walled too (milestone 8.1/8.2).
+- The ten blocked hosts (AK, CO, ID, KS, ME, MI, MN's listing, NM, RI, OK's OGX): after the `probe-hosts` run, one check from an
+  ordinary browser only where Actions is walled too (milestone 8.1/8.2).
 
 **Small follow-ups, any session** (each is detailed in the doc named):
 - Shared tagger (`connectors/text.py`): two gaps recorded on 2026-11-03 (MDEM): `not within <place>` ("Nonprofit
@@ -92,7 +95,9 @@ named: the agency the census seeds say first (NC's and WA's lists).
 - `tx_egrants.md`: 50 of 147 rounds name their funding source differently from the Funding Sources page and stay
   `direct` (decision 9); `il_csfa.md`: 8 native `Government Organizations` rounds and 15 GMS rows name no applicant
   anywhere the connector reads, and a new native round's NOFO is unread until someone runs `pdftotext` on it.
-- Census gaps: 18 agency-by-agency states, 7 with no state index found, 10 blocked (`docs/surveys/state_portals.md`).
+- Census gaps: 17 agency-by-agency states (Massachusetts built 2026-11-04), 7 with no state index found, 10 blocked (`docs/surveys/state_portals.md`).
+- `ma_onestop.md`: Seaport's "coastal communities are eligible to apply" tags nothing (`communities` is not a tagger word); a
+  measured tagger session if it recurs.
 
 Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open notes they carry.
 
@@ -280,6 +285,7 @@ decide what gets built next.
 | 2026-10-15 | Likely tier checked by default, possible one click away | same choice as milestone 5; counts on the facet make the second tier visible | `web/app.js` |
 | 2026-11-04 | Hand-list base extracted at the fifth page-dict connector; five modules on the class, two on the helpers; hash identity on fixtures is the gate | the shape had repeated seven times since 2026-11-03; a base that held only the byte-identical parts could meet the `maryland_sharepoint.py` gate, one that unified the status tables could not (four tables differ in order and regexes); an index crawl and a two-page accordion are not page dicts | `connectors/hand_list.md` |
 | 2026-11-04 | No AmpliFund platform connector | the vendor's public surface is one opportunity page at a time behind a state's own list; the list page itself is login-only on every client host reached; a platform connector needs the list | `docs/surveys/state_portals.md` |
+| 2026-11-04 | Massachusetts is one connector for the One Stop, status from the index's round dates | fourteen programs share one application, one deadline and one index; the page's heading (FY27) contradicts its dates (FY26) and a date is a fact where a heading is a label; MassDevelopment's five are One Stop records because the One Stop lists and awards them | `connectors/ma_onestop.md` |
 | 2026-10-16 | Shared applicant table gains `municipal` | "county and municipal governments" (MEA) and "governing bodies of municipal corporations" (DNR) matched nothing; one DHCD record changed, correctly | `connectors/maryland_drupal.md` |
 | 2026-10-16 | SharePoint base extracted at the second mdgov site, with MEA's fixture hashes as the gate | same rule that produced `maryland_drupal.py`; MDEM, MDOT and MDE are on the same theme | `connectors/maryland_sharepoint.md` |
 | 2026-10-16 | Text hash, not markup hash, and every page every run on SharePoint | the CDN stamps one `Last-Modified` on every page and Cloudflare rewrites the e-mail markup per response; the sites are small | `connectors/maryland_sharepoint.md` |

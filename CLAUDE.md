@@ -44,7 +44,7 @@ connector or one feature per session, no abstractions before the third real case
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
 
-## Current state (2026-11-03)
+## Current state (2026-11-04)
 
 Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `md_mht` (Drupal base), `md_mea`,
 `md_dnr`, `md_mdem` (the MDEM grant roster plus two hand-added pages, 4 records) and `md_mde` (MWIFA's seven financing
@@ -55,10 +55,11 @@ Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 record
 `va_dhcd` (Virginia DHCD, a crawl of its menus, 30 records), `va_dcr` (six DCR grant pages) and `va_vdot` (six VDOT Local
 Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
 pages), `de_dema` (ten FEMA pass-throughs), `de_deldot` (TAP and Safe Routes) and `de_dsha` (Housing Delaware's Build & Develop
-pages, 17 programs): Delaware's four.
+pages, 17 programs): Delaware's four; `ma_onestop` (Massachusetts's Community One Stop for Growth, 14 programs under one round, 2026-11-04).
 Milestones 1 to 8.2 (with 6.1, the Atom + JSON change feed beside every page, 2026-11-03), 9.1 to 9.8 (with 9.4.1 Illinois
 depth and 9.6.1 Texas funding sources), 10.1 to 10.3, 7.2 to 7.4 (Maryland's MDEM, MDOT and MDE, 2026-11-03) and 11.1 to 11.8
-shipped; Maryland has eight agencies, Virginia and Delaware their municipal five, and the roadmap's next action is outreach. The repository is public and the site is live at
+shipped; milestone 12 began on 2026-11-04 (12.0 the `probe-hosts` workflow, 12.1 the hand-list base, 12.2 AmpliFund has no public list, 12.3
+Massachusetts); Maryland has eight agencies, Virginia and Delaware their municipal five, and the roadmap's next session is Oregon (12.3b), outreach alongside. The repository is public and the site is live at
 https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
 every public state index with structured rows is built; Virginia and Delaware have their municipal five
 (decision 2026-11-03, milestone 11); elsewhere agency connectors only when outreach names a town. New York's

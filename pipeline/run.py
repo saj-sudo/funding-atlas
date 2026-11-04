@@ -15,6 +15,7 @@ from connectors import (
     de_dsha,
     grants_gov,
     il_csfa,
+    ma_onestop,
     md_commerce,
     md_dhcd,
     md_dnr,
@@ -64,6 +65,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "de_dema": de_dema,
     "de_deldot": de_deldot,
     "de_dsha": de_dsha,
+    "ma_onestop": ma_onestop,
 }
 
 

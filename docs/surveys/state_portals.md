@@ -44,7 +44,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **KY** | `https://dlg.ky.gov/grants/state/Pages/default.aspx`; `https://www.dlgportal.ky.gov/en-US` (DLG Portal, state grants moved there 2026-09-28) | SharePoint; the portal is a Dynamics-style "EYGA Grants Management Portal" | programs, prose on DLG; the portal has an Opportunities tab (JS shell) | robots restricts SharePoint paths; sitemap | 200 | agency connectors; portal to revisit | `grantreadyky.org` is a curated resource, not a listing |
 | **LA** | `https://www.doa.la.gov/doa/ocd/` | custom | prose; LGAP page 404; `larc.la.gov` does not resolve | robots 404 | 200 | not found | OCD is disaster recovery and LGAP |
 | **ME** | `https://www.maine.gov/moca/funding` | CloudFront | blocked (403 on every `maine.gov` path) | | 403 | blocked | MOCA's Maine Community Funding Finder is the index, per search |
-| **MA** | `https://www.mass.gov/info-details/community-one-stop-for-growth` | Drupal 11; One Stop applications in IntelliGrants (Agate) | programs, prose: 12 programs under one NOFA with round dates in text; the Municipal Grant Finder URLs 404 | standard Drupal robots; SemrushBot blocked | 200 | agency connectors | |
+| **MA** | `https://www.mass.gov/info-details/community-one-stop-for-growth` | Drupal 11; One Stop applications in IntelliGrants (Agate) | programs, prose: 14 programs under one NOFA with the round's dates in text (the page says "12"; it lists 14); the Municipal Grant Finder URLs 404 | standard Drupal robots; SemrushBot blocked | 200 | **built** (`ma_onestop`, 2026-11-04) | one round for fourteen records; status from the Key Dates lines |
 | **MI** | `https://www.michigan.gov/egrams` | Akamai | blocked (403 on every `michigan.gov` path); `egrams-mi.com` is an IIS default page | | 403 | blocked | |
 | **MN** | `https://mn.gov/grants/` (landing 200); `https://mn.gov/grants/find/` | state-run (Vivisimo search) | blocked at the listing: the find page answers a Radware Bot Manager captcha | robots allows most | 200 / captcha | blocked (listing) | the one portal that blocks the listing but not the landing page |
 | **MS** | `https://mississippi.org/` (MDA) | WordPress | not found: no grants listing at the tried paths | robots allows, sitemap | 200 | not found | the Municipal League publishes a PDF booklet |
@@ -79,9 +79,9 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 
 | Verdict | States |
 |---|---|
-| built (a state connector, updated 2026-11-03) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY, VA, DE (12; Virginia and Delaware by their municipal five agencies) |
+| built (a state connector, updated 2026-11-04) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY, VA, DE, MA (13; Virginia and Delaware by their municipal five agencies, Massachusetts by its One Stop) |
 | seed list, nothing built | NC, WA (2) |
-| agency connectors | AL, AR, AZ, CT, DE, FL, KY, MA, MO, ND, NE, NH, NV, OR, SD, TN, VT, VA (18) |
+| agency connectors | AL, AR, AZ, CT, FL, IN, KY, MO, ND, NE, NH, NV, OR, SD, TN, VT (16; DE, VA and MA built) |
 | JS shell, not read | UT, WY (2) |
 | blocked | AK, CO, ID, KS, ME, MI, MN (listing), NM, RI, OK (OGX), plus FL Commerce and VT eGrants on otherwise-readable states (10) |
 | not found | GA, HI, LA, MS, OH, SC, WI (7) |
