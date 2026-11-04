@@ -6,6 +6,13 @@ and the first fed by a search index rather than by agency pages.
 
 ## Implemented (2026-10-17, same day)
 
+**2026-11-04, the proxy.** The daily run of 2026-11-04 failed with `401 Invalid token` from
+`platform.cloud.coveo.com`: pa.gov now routes every Coveo request through its own host
+(`https://www.pa.gov/cv-pxy/rest/search/v2`, a fetch rewrite in `clientlib-coveo-proxy.js`), and the page's
+`data-api-key` is no longer accepted by the platform host. The connector posts to the proxy, which answers the same
+search with or without the key (379 grants on the day); the key is sent when the page carries one and its absence no
+longer aborts the run. One URL and one `| None`; the record shape is unchanged.
+
 `connectors/pa_grants.py` follows this doc. First live run on a fresh database: 377 records added in 9 m 33 s (84 open,
 2 forecasted, 291 closed; 314 grants, 20 loans, 16 tax credits, 13 other, 14 with no stated type; 82 pass-through), 0
 errors, every detail page readable. The second run, ten minutes later: 0 changed, 0 missing. On the Pennsylvania page
@@ -39,8 +46,8 @@ robots: `https://www.pa.gov/robots.txt` disallows three unrelated paths and stat
 ### Enumeration
 
 ```
-POST https://platform.cloud.coveo.com/rest/search/v2
-Authorization: Bearer <search key>
+POST https://www.pa.gov/cv-pxy/rest/search/v2        (pa.gov's proxy of platform.cloud.coveo.com since 2026-11)
+Authorization: Bearer <search key>                 (optional since 2026-11)
 {"q": "", "searchHub": "All Grants", "numberOfResults": 100, "firstResult": 0, "sortCriteria": "copapwpclosedate ascending"}
 ```
 

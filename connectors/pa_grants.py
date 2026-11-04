@@ -2,8 +2,8 @@
 
 Source: https://www.pa.gov/grants, an Adobe Experience Manager site whose grant list is a Coveo search index
 (search hub "All Grants", 377 grants from 17 agencies on 2026-10-17). Enumeration is one POST per 100 results to
-the Coveo search API with the public search key read from https://www.pa.gov/grants/search at run time (it sits in
-the page as data-api-key and rotates on site rebuilds). Each grant has a page at
+the Coveo search API through pa.gov's own proxy (`/cv-pxy`, since 2026-11; the platform host rejects the page's key)
+with the public search key read from https://www.pa.gov/grants/search when the page carries one. Each grant has a page at
 https://www.pa.gov/grants/search/grant-details/<agency>/<n> that embeds the whole record as HTML-escaped JSON in
 `<div id="pageApiData" data-page-api-data="...">`; the connector reads that attribute, never the rendered text.
 
@@ -33,7 +33,9 @@ from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
 
 CONNECTOR = "pa_grants"
 SEARCH_PAGE = "https://www.pa.gov/grants/search"
-COVEO_URL = "https://platform.cloud.coveo.com/rest/search/v2"
+# pa.gov proxies every Coveo call through its own host since 2026-11 (`/content/dam/components/coveo/clientlib-coveo-proxy.js`
+# rewrites the browser's requests); the platform host answers 401 to the page's key, the proxy answers with or without it.
+COVEO_URL = "https://www.pa.gov/cv-pxy/rest/search/v2"
 SEARCH_HUB = "All Grants"
 DETAIL_BASE = "https://www.pa.gov/grants/search/grant-details/"
 ROWS = 100
@@ -78,15 +80,14 @@ def _client() -> httpx.Client:
     return httpx.Client(timeout=TIMEOUT_S, headers={"User-Agent": USER_AGENT}, follow_redirects=True)
 
 
-def read_search_key(page_html: str) -> str:
-    """The public Coveo search key from the search page's markup. Missing means the site changed: fail loudly."""
+def read_search_key(page_html: str) -> str | None:
+    """The public Coveo search key from the search page's markup, or None: since pa.gov's proxy took over the
+    search calls (2026-11) the key is sent when the page carries one and the search works without it."""
     m = KEY_RE.search(page_html or "")
-    if not m:
-        raise RuntimeError(f"{SEARCH_PAGE} carries no data-api-key; the Coveo search key cannot be read")
-    return m.group(1)
+    return m.group(1) if m else None
 
 
-def fetch_search_key(client: httpx.Client) -> str:
+def fetch_search_key(client: httpx.Client) -> str | None:
     r = client.get(SEARCH_PAGE)
     r.raise_for_status()
     return read_search_key(r.text)
@@ -126,7 +127,7 @@ def iter_hits(client: httpx.Client, key: str, limit: int | None = None) -> Itera
     first = 0
     rows = min(ROWS, limit) if limit else ROWS
     while True:
-        r = client.post(COVEO_URL, json=search_body(first, rows), headers={"Authorization": f"Bearer {key}"})
+        r = client.post(COVEO_URL, json=search_body(first, rows), headers={"Authorization": f"Bearer {key}"} if key else {})
         r.raise_for_status()
         data = r.json()
         results = data.get("results") or []
