@@ -46,23 +46,23 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 12.2 | AmpliFund as a platform: probed, no public list | 2026-11-04 | read-only probes with the New York stop rule, from the proxy: `il.amplifund.com/Public/Opportunities` redirects to the state's ADFS sign-in, `ne.amplifund.com/Public/Opportunities` to `account/login.aspx`, `in.amplifund.com` does not resolve and in.gov's page carries no AmpliFund href in its static HTML. Only `Public/Opportunities/Details/<guid>` pages are public, and only a state's own list leads to them (`il_csfa` already reads them that way). No `amplifund` connector; Illinois's GMS rows stay where they are; Indiana and Nebraska move to 12.6 as agency states (Nebraska DED's `/programs/` answered 200) | `docs/surveys/state_portals.md` |
 | 12.3 | Massachusetts: `ma_onestop` | 2026-11-04 | the Community One Stop for Growth page is the index and the round at once: under "One Stop Programs" three agency `h3`s (EOED, EOHLC, MassDevelopment) list fourteen programs, nine mass.gov pages in three templates and five sections of one massdevelopment.com page; under "FY27 Round of the One Stop: Key Dates" the FY26 round's dates (the heading and the dates disagree; the dates are read, the heading is stored). One round for every record: `open` while the Full Application deadline is ahead, `forecasted` before the open date, `closed` after (the between-rounds group carries it); applicants from each program page's own prose (outermost `.ma__rich-text` blocks; contacts, menus and the feedback form sit outside them), the agency as a field and the category (housing; infrastructure). First run 14 added in 7 seconds, second run 0 changed; the Massachusetts page: 3 agencies, 14 programs, 0 open, 6 between rounds. On the hand-list helpers, not the class (the list comes from the index each run) | `connectors/ma_onestop.md` |
 | 12.3b | Oregon: `or_biz` | 2026-11-04 | Business Oregon's Programs page, two views of one list (alphabetical 95 links, by topic 80 under eight `h2`s), the union on the agency's host 99 programs, one SharePoint page each (an intro field, a sidebar never read, a body with "Who is Eligible?" / "How Does Funding Work?" / "What is the Application Process?"), read block by block with each block's own text (SharePoint nests headings in paragraphs and repeats them bold). Status by the hand-list default table with the connector's own open and closed wording ("not accepting", "no longer accepting" closed; "accepted for further review" and "open to public comments" not open), the cycle sentence kept when the table says nothing; applicants from the eligibility passage and applicant sentences; the topic `h2` through the shared table (`infrastructure and land programs` added). First run 99 added in 86 seconds, fourth run 0 changed: 85 unknown, 6 open, 8 closed, 13 municipal or county; the Oregon page: 99 programs, 1 open municipal row (Levee), 0 between rounds. **The honest state page the roadmap asked for**: most of Oregon states no round | `connectors/or_biz.md` |
+| 12.4 | The two seed lists: `nc_grants`, `wa_fund_directory` | 2026-11-04 | directory connectors, one record per program, `unknown`, the link kept, the agency named, no applicant tags (a description says what the money is for, not who applies). **North Carolina**: nc.gov's one table (86 rows, 75 programs once a program listed under two categories is one record), agency codes as the table writes them (`NC-DEQ`), categories through the shared table (Disaster Recovery added); 75 added in a second, second run 0 changed; the NC page: 17 agencies, 75 programs. **Washington**: the Treasurer's Fund Directory, a landing page of six topic cards and six Drupal tables (149 rows, 128 programs, every one linked), Fund Source as the funding type (118 grant, 10 loan), the row's Type of Program through the shared table (fifteen labels added: water, transportation, parks, public safety, health), agency codes by the state's own acronyms (`WA-COM`, `WA-ECY`, `WA-RCO`, `WA-WSDOT`); 128 added in three seconds, second run 0 changed; the WA page: 16 agencies, 128 programs, 108 with a category. Both name the agencies a 12.6 session reads first | `connectors/nc_grants.md`, `connectors/wa_fund_directory.md` |
 
 ## Next
 
-### Start here (updated 2026-11-04, evening)
+### Start here (updated 2026-11-04, night)
 
-**Before anything else.** This branch carries milestone 12's first five items (12.0 the `probe-hosts` workflow, 12.1 the
-hand-list base, 12.2 the AmpliFund verdict, 12.3 Massachusetts, 12.3b Oregon), one commit each; once its PR merges,
-start from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily run
-after the merge adds Massachusetts's 14 and Oregon's 99 records to the published database (Oregon adds about 90
-seconds to the run).
+**Before anything else.** Milestone 12's first five items are on `main` (PR #16, merged 2026-11-04) with the
+probe-hosts results (PR #17). This branch carries 12.4, the two seed lists (`nc_grants`, `wa_fund_directory`), two
+commits; once its PR merges, start from the latest `main` (`git fetch origin main && git checkout -B <branch>
+origin/main`). A manual `site` run on 2026-11-04 published Massachusetts and Oregon; the first daily run after this
+merge adds North Carolina's 75 and Washington's 128 directory rows.
 
-**Next session: 12.4, the two seed lists** (`nc_grants`, `wa_fund_directory`), then 12.5 and 12.6 in the order
-milestone 12 gives below. Both answered 200 on 2026-11-04: nc.gov's grant table is one `table` of 86 rows (Category,
-Grant Program with a link, Agency, Description), the Treasurer's Washington Fund Directory is six topic `h3`s with link
-lists under "What type of project are you funding?". Directory connectors: one record per row, status `unknown`, the
-link kept, the agency named; they name the agencies for 12.6. Outreach runs alongside, not after: `docs/outreach.md`
-has the routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent) and the contact log.
+**Next session: 12.5, the JavaScript shells** (read-only probes with the New York stop rule: Kentucky's DLG Portal,
+Utah's Looker Studio, Wyoming's Grants Connect Hub, Nevada's discovery tool, Delaware's UD dashboard; build only what
+turns out server-rendered or to have a plain data endpoint), then 12.6 agency states cheapest first, with 12.8 (MN
+and NM, probed read-only from Actions first) alongside. Outreach runs alongside, not after: `docs/outreach.md` has
+the routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent) and the contact log.
 
 Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
 funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
@@ -93,7 +93,8 @@ named: the agency the census seeds say first (NC's and WA's lists).
   `direct` (decision 9); `il_csfa.md`: 8 native `Government Organizations` rounds and 15 GMS rows name no applicant
   anywhere the connector reads, and a new native round's NOFO is unread until someone runs `pdftotext` on it.
 - Census gaps: 16 agency-by-agency states (Massachusetts and Oregon built 2026-11-04), 7 with no state index found, 8 blocked
-  for good and 2 login portals after the Actions probe, MN and NM moved to 12.8 (`docs/surveys/state_portals.md`).
+  for good and 2 login portals after the Actions probe, MN and NM moved to 12.8; the two seed lists are built as directories
+  (`docs/surveys/state_portals.md`).
 - `or_biz.md`: "Be an Oregon resident" (Aggie Bond) tags a household and "in the county" (BEP) a county: shared-tagger readings
   to measure with the Seaport "coastal communities" gap in one 10.x session.
 - `ma_onestop.md`: Seaport's "coastal communities are eligible to apply" tags nothing (`communities` is not a tagger word); a
@@ -289,6 +290,7 @@ decide what gets built next.
 | 2026-11-04 | Massachusetts is one connector for the One Stop, status from the index's round dates | fourteen programs share one application, one deadline and one index; the page's heading (FY27) contradicts its dates (FY26) and a date is a fact where a heading is a label; MassDevelopment's five are One Stop records because the One Stop lists and awards them | `connectors/ma_onestop.md` |
 | 2026-11-04 | Oregon is the whole Business Oregon index, one agency, `unknown` as the common status | the agency's own listing is the index and the navigator's tiers decide what a town sees; the Arts Commission sits inside the department; a page that states two windows a year with no year, or a 2024 deadline alone, says no status and the cycle sentence is the product | `connectors/or_biz.md` |
 | 2026-11-04 | The daily runner's view settles a blocked host; eight are blocked for good | an Actions runner met the same walls as the proxy on AK, CO, ID, KS, ME, MI, RI and FloridaCommerce, so no browser check is owed; the resets and the captcha were the proxy's, and of the four hosts that answer the runner only MN and NM have a public side | `docs/surveys/state_portals.md` |
+| 2026-11-04 | Seed lists are records, not tags: a directory row is `unknown` with its link, agency and category, and tags no applicant | the roadmap asked for honest coverage; a directory's description names a population served, which the 10.2 rule says is not an applicant; the agency list is the enumeration aid for 12.6 | `connectors/nc_grants.md`, `connectors/wa_fund_directory.md` |
 | 2026-10-16 | Shared applicant table gains `municipal` | "county and municipal governments" (MEA) and "governing bodies of municipal corporations" (DNR) matched nothing; one DHCD record changed, correctly | `connectors/maryland_drupal.md` |
 | 2026-10-16 | SharePoint base extracted at the second mdgov site, with MEA's fixture hashes as the gate | same rule that produced `maryland_drupal.py`; MDEM, MDOT and MDE are on the same theme | `connectors/maryland_sharepoint.md` |
 | 2026-10-16 | Text hash, not markup hash, and every page every run on SharePoint | the CDN stamps one `Last-Modified` on every page and Cloudflare rewrites the e-mail markup per response; the sites are small | `connectors/maryland_sharepoint.md` |
