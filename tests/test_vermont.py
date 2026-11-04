@@ -85,7 +85,11 @@ def test_applicants():
     assert {"municipality", "tribe", "state"} <= tags("vt_fpr", "lwcf")
     assert tags("vt_vtrans", "better-roads") == {"municipality"}          # the bold intro sentence
     assert tags("vt_accd", "municipal-planning-grant") == {"municipality"}
-    assert tags("vt_vtrans", "transport-alt") == set()                    # the page names no applicant
+    # the pages name no applicant; the joint guidebook's "Eligible Applicants:" list is quoted by hand, dated
+    assert {"municipality", "county", "school", "tribe", "nonprofit"} <= tags("vt_vtrans", "transport-alt")
+    assert tags("vt_vtrans", "mhsmp") == tags("vt_vtrans", "transport-alt")
+    assert program("vt_vtrans", "mhsmp").eligibility_text.startswith(
+        "VTrans TAP and MHSMP Grant Guidebook, October 2026 (PDF), Eligible Applicants, read 2026-11-04: A local government.")
     assert tags("vt_vem", "empg") == set()                                # subgrants go to the RPCs
 
 
@@ -134,3 +138,12 @@ def test_module_contract(name):
     m = mod(name)
     assert m.CONNECTOR == name and callable(m.fetch) and callable(m.normalize) and callable(m.resolve_missing)
     assert m.AGENCY_CODE.startswith("VT-") and m.CATEGORY_LABEL
+
+
+def test_parenthetical_exclusion_is_not_a_negation():
+    from connectors.maryland_drupal import NEGATION_RE
+    assert not NEGATION_RE.search("Any Vermont town, city (except Burlington), incorporated village ... is eligible")
+    assert not NEGATION_RE.search("Municipalities (excluding schools) may apply")
+    assert NEGATION_RE.search("All towns except Burlington may apply")
+    assert NEGATION_RE.search("Nonprofits (except those that are not 501c3) may apply")      # "not" still negates
+    assert NEGATION_RE.search("Applicants are not eligible") and not NEGATION_RE.search("not-for-profit groups")

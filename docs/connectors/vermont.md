@@ -12,18 +12,26 @@ is an IntelliGrants login (12.0) and is not needed: every round below is announc
 added in about ten seconds (6 ACCD, 5 VTrans, 3 FPR, 3 VEM), 0 errors; second run 0 changed. Open: VCDP (no date),
 Municipal Planning Grant (to 2026-12-02), TAP and MHSMP (to 2026-12-04), Better Roads (to 2026-11-20), RTP and LWCF
 (pre-applications to 2026-11-20), VOREC (to 2026-12-13); closed: Downtown Transportation Fund, Grants in Aid; the rest
-`unknown`. The Vermont page: 4 agencies, 17 programs, 6 open municipal rows, 3 between rounds. Found while writing
+`unknown`. The Vermont page: 4 agencies, 17 programs, 8 open municipal rows, 3 between rounds. Found while writing
 the parser:
 
 - the first `.field--name-body` on a page is often an empty sidebar block; the body is the main block's;
 - VTrans writes its intro sentences bold, so "grant funding to municipalities" sat in label blocks the shared
   `label_lines` never reads for sentences; Vermont reads applicant sentences from every block;
 - VCDP's eligibility sentence carries "(except Burlington)", and the shared negation guard dropped the whole
-  sentence; the parenthetical is removed before tagging (the text is stored as written);
+  sentence. Fixed in the shared guard (`maryland_drupal.NEGATION_RE`): "except" and "excluding" inside a parenthetical
+  no longer negate; a bare "except" still does. Re-normalized every stored record in the published database: 0 of
+  7,574 move (142 such parentheticals across 10 connectors, none in a sentence the tagger reads);
 - VOREC's example projects mention a "FEMA buyout property"; FPR's own "Funding source:" line now decides;
 - Hazard Mitigation's first sentence with "deadline" and a date was a 2024 notice about changed deadlines; a deadline's
   date must sit within 40 characters of its word;
-- TAP and MHSMP name no applicant on the page (open rows the municipal page does not show).
+- TAP and MHSMP name no applicant on the page. Their joint guidebook does ("Transportation Alternatives Program and
+  Municipal Mitigation Grant Guidebook Oct 2026", linked from both pages, page 6, "Eligible Applicants:"): a local
+  government ("any unit of local government below a State government agency"), a regional transportation authority, a
+  transit agency, a natural resource or public land agency, a school district or school, a Tribal government, a
+  nonprofit entity, a State at an eligible entity's request. Each bullet's opening sentence is quoted by hand, dated
+  2026-11-04, in `vt_vtrans.HAND_QUOTES` (the MDOT precedent); the guidebook does not split the list by program, so
+  both records carry it. TAP and MHSMP are now open municipal rows.
 
 ## The platform
 

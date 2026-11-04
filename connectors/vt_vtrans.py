@@ -22,6 +22,25 @@ PAGES: dict[str, str] = {
 }
 
 
+# The TAP and MHSMP pages name no applicant; their joint guidebook does, under "Eligible Applicants:" (page 6). One list
+# for both programs: the guidebook does not split it. Each bullet's opening sentence, verbatim.
+GUIDEBOOK = "VTrans TAP and MHSMP Grant Guidebook, October 2026 (PDF), Eligible Applicants"
+GUIDEBOOK_LINES = [
+    "A local government. Local government entities include any unit of local government below a State government agency.",
+    "A regional transportation authority.",
+    "A transit agency.",
+    "A natural resource or public land agency.",
+    "A school district, local education agency, or school.",
+    "A Tribal government.",
+    "A nonprofit entity.",
+    "A State, at the request of an eligible entity listed above.",
+]
+HAND_QUOTES: dict[str, tuple[str, str, list[str]]] = {
+    "transport-alt": ("2026-11-04", GUIDEBOOK, GUIDEBOOK_LINES),
+    "mhsmp": ("2026-11-04", GUIDEBOOK, GUIDEBOOK_LINES),
+}
+
+
 class Vtrans(VermontAgency):
     CONNECTOR = CONNECTOR
     BASE = BASE
@@ -29,6 +48,7 @@ class Vtrans(VermontAgency):
     AGENCY_CODE = AGENCY_CODE
     CATEGORY_LABEL = CATEGORY_LABEL
     PAGES = PAGES
+    HAND_QUOTES = HAND_QUOTES
 
 
 SITE = Vtrans()

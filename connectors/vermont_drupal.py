@@ -18,6 +18,7 @@ from connectors.hand_list import (
     HandListConnector,
     applicant_tags,
     blocks_from,
+    quote_lines,
     soup,
 )
 from connectors.maryland_drupal import NEGATION_RE, sentences
@@ -52,9 +53,6 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to apply\b"
     r"|\b(?:is|are) eligible for funding\b|\bfor local municipalities\b", re.I)
 SHORT_ITEM = 160
-# "Any Vermont town, city (except Burlington), ... is eligible for funding": the shared negation guard drops a sentence
-# with "except" in it, so a parenthetical exclusion is removed before tagging (the sentence itself is kept as written).
-EXCLUSION_RE = re.compile(r"\s*\([^)]*\bexcept\b[^)]*\)", re.I)
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
     r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b", re.I)
@@ -178,6 +176,9 @@ class VermontAgency(HandListConnector):
 
     JURISDICTION = JURISDICTION
     CATEGORY_LABEL: str = ""
+    # slug -> (date read, source, lines): who may apply, quoted by hand from a document the page links when the page
+    # itself names no applicant (the MDOT and Illinois precedent).
+    HAND_QUOTES: dict[str, tuple[str, str, list[str]]] = {}
 
     def parse_page(self, page_html: str) -> dict[str, Any]:
         return parse_page(page_html)
@@ -191,7 +192,7 @@ class VermontAgency(HandListConnector):
         blocks = [tuple(b) for b in page.get("blocks", [])]
         text = " ".join(t for _, t in blocks)
         name = clean(page.get("title", "")) or raw.source_id
-        lines = applicant_lines(blocks)
+        lines = applicant_lines(blocks) + quote_lines(self.HAND_QUOTES, raw.source_id)
         match = None if MATCH_NOT_RE.search(text) else (True if MATCH_RE.search(text) else None)
         return dict(
             source_url=self.BASE + path,
@@ -203,7 +204,7 @@ class VermontAgency(HandListConnector):
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,
             eligibility_structured=None,
-            applicant_types=applicant_tags([EXCLUSION_RE.sub("", line) for line in lines]),
+            applicant_types=applicant_tags(lines),
             categories=[CategoryTag(value=v, source_code=self.CATEGORY_LABEL) for v in portal_categories(self.CATEGORY_LABEL)],
             **round_for(blocks, today),
         )
