@@ -83,6 +83,7 @@ CONNECTOR_LABEL = {
     "or_biz": "Business Oregon",
     "nc_grants": "nc.gov Grant Opportunities (directory)",
     "wa_fund_directory": "Washington Fund Directory (State Treasurer, directory)",
+    "ky_dlg": "Kentucky DLG Portal (Office of State Grants)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

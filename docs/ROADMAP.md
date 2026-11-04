@@ -47,30 +47,28 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 12.3 | Massachusetts: `ma_onestop` | 2026-11-04 | the Community One Stop for Growth page is the index and the round at once: under "One Stop Programs" three agency `h3`s (EOED, EOHLC, MassDevelopment) list fourteen programs, nine mass.gov pages in three templates and five sections of one massdevelopment.com page; under "FY27 Round of the One Stop: Key Dates" the FY26 round's dates (the heading and the dates disagree; the dates are read, the heading is stored). One round for every record: `open` while the Full Application deadline is ahead, `forecasted` before the open date, `closed` after (the between-rounds group carries it); applicants from each program page's own prose (outermost `.ma__rich-text` blocks; contacts, menus and the feedback form sit outside them), the agency as a field and the category (housing; infrastructure). First run 14 added in 7 seconds, second run 0 changed; the Massachusetts page: 3 agencies, 14 programs, 0 open, 6 between rounds. On the hand-list helpers, not the class (the list comes from the index each run) | `connectors/ma_onestop.md` |
 | 12.3b | Oregon: `or_biz` | 2026-11-04 | Business Oregon's Programs page, two views of one list (alphabetical 95 links, by topic 80 under eight `h2`s), the union on the agency's host 99 programs, one SharePoint page each (an intro field, a sidebar never read, a body with "Who is Eligible?" / "How Does Funding Work?" / "What is the Application Process?"), read block by block with each block's own text (SharePoint nests headings in paragraphs and repeats them bold). Status by the hand-list default table with the connector's own open and closed wording ("not accepting", "no longer accepting" closed; "accepted for further review" and "open to public comments" not open), the cycle sentence kept when the table says nothing; applicants from the eligibility passage and applicant sentences; the topic `h2` through the shared table (`infrastructure and land programs` added). First run 99 added in 86 seconds, fourth run 0 changed: 85 unknown, 6 open, 8 closed, 13 municipal or county; the Oregon page: 99 programs, 1 open municipal row (Levee), 0 between rounds. **The honest state page the roadmap asked for**: most of Oregon states no round | `connectors/or_biz.md` |
 | 12.4 | The two seed lists: `nc_grants`, `wa_fund_directory` | 2026-11-04 | directory connectors, one record per program, `unknown`, the link kept, the agency named, no applicant tags (a description says what the money is for, not who applies). **North Carolina**: nc.gov's one table (86 rows, 75 programs once a program listed under two categories is one record), agency codes as the table writes them (`NC-DEQ`), categories through the shared table (Disaster Recovery added); 75 added in a second, second run 0 changed; the NC page: 17 agencies, 75 programs. **Washington**: the Treasurer's Fund Directory, a landing page of six topic cards and six Drupal tables (149 rows, 128 programs, every one linked), Fund Source as the funding type (118 grant, 10 loan), the row's Type of Program through the shared table (fifteen labels added: water, transportation, parks, public safety, health), agency codes by the state's own acronyms (`WA-COM`, `WA-ECY`, `WA-RCO`, `WA-WSDOT`); 128 added in three seconds, second run 0 changed; the WA page: 16 agencies, 128 programs, 108 with a category. Both name the agencies a 12.6 session reads first | `connectors/nc_grants.md`, `connectors/wa_fund_directory.md` |
+| 12.5 | The JavaScript shells: probed five, built Kentucky (`ky_dlg`) | 2026-11-04 | read-only probes with the New York stop rule, from the proxy. **Kentucky** is a shell over a plain GET: the DLG Portal's grid is filled by `/en-US/Services/GetGrantOpportunities/?page=N&applicationStatus=Open|Expired`, a Power Pages Liquid template answering JSON, no login, no token; each opportunity page is server-rendered (banner summary, then Eligibility Criteria, Required Documentation, Award Details, Application Process; the template leaves its last `h2` unclosed, so sections are read by their label element). Status is the list a row came from; no dates stated, none stored. 4 added (all open: Line-Items, LGEDF Coal Severance, LMPP, RDAAP) in 4 seconds, second run 0 changed; the Kentucky page: 2 open municipal rows (Line-Items, LMPP), LGEDF county-only, RDAAP tags nothing ("Special Purpose Governmental Entities" is not a tagger word, and "in partnership with county governments" reads as a location: a shared-tagger gap). **Utah** and **Delaware** (Looker Studio) and **Wyoming** (Power BI embeds) have no plain endpoint: stopped. **Nevada**: state NOFOs now live in NEVADA ePro, a public server-rendered procurement search with a grant-subaward type; 0 grant rows among 23 open on the day, so no connector yet | `connectors/ky_dlg.md`, `docs/surveys/state_portals.md` |
 
 ## Next
 
-### Start here (updated 2026-11-04, night)
+### Start here (updated 2026-11-04, 12.5)
 
-**Before anything else.** Milestone 12's first five items are on `main` (PR #16, merged 2026-11-04) with the
-probe-hosts results (PR #17). This branch carries 12.4, the two seed lists (`nc_grants`, `wa_fund_directory`), two
-commits; once its PR merges, start from the latest `main` (`git fetch origin main && git checkout -B <branch>
-origin/main`). A manual `site` run on 2026-11-04 published Massachusetts and Oregon; the first daily run after this
-merge adds North Carolina's 75 and Washington's 128 directory rows.
+**Before anything else.** 12.4 is on `main` (PR #18, merged 2026-11-04). This branch carries 12.5 (the JavaScript
+shells: five probes, `ky_dlg` built), one commit; once its PR merges, start from the latest `main` (`git fetch origin
+main && git checkout -B <branch> origin/main`). The first daily run after the merge adds Kentucky's four DLG rounds.
 
-**Next session: 12.5, the JavaScript shells** (read-only probes with the New York stop rule: Kentucky's DLG Portal,
-Utah's Looker Studio, Wyoming's Grants Connect Hub, Nevada's discovery tool, Delaware's UD dashboard; build only what
-turns out server-rendered or to have a plain data endpoint), then 12.6 agency states cheapest first, with 12.8 (MN
-and NM, probed read-only from Actions first) alongside. Outreach runs alongside, not after: `docs/outreach.md` has
-the routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent) and the contact log.
+**Next session: 12.6, the agency states cheapest first** (two to four agencies per session on the hand-list base),
+with 12.8 (MN and NM, probed read-only from Actions first) alongside. Nevada's 12.6 entry now starts with NEVADA ePro's
+grant-subaward filter: build it the day the open-bid search shows a grant row. Outreach runs alongside, not after:
+`docs/outreach.md` has the routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent)
+and the contact log.
 
 Codeable, lower priority, when a reader asks: a TOD loan record when MDOT's loan round opens (one program, two
 funding types, `connectors/md_mdot.md` decision 5); MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) when the
 roster the agency calls "in development" lists them (no code change: the roster is read every run); a
 `roads.maryland.gov` TAP connector; Virginia DHCD pages without an Eligibility box (VATI among them) as a hand list on
 the existing crawl (`connectors/va_dhcd.md`); read-only probes of the JavaScript shells the census recorded but never
-checked (Utah's Looker Studio index, Wyoming's hub, Kentucky's DLG portal, Nevada's discovery page, Delaware's
-University of Delaware dashboard) and a search for a third WebGrants state, each with the stop rule New York's probe
+checked (done 2026-11-04, 12.5: Kentucky built, the rest recorded) and a search for a third WebGrants state, each with the stop rule New York's probe
 had; a Baltimore City view (municipality or county) in SQL if a Baltimore reader ever appears. If a town elsewhere is
 named: the agency the census seeds say first (NC's and WA's lists).
 
@@ -97,6 +95,9 @@ named: the agency the census seeds say first (NC's and WA's lists).
   (`docs/surveys/state_portals.md`).
 - `or_biz.md`: "Be an Oregon resident" (Aggie Bond) tags a household and "in the county" (BEP) a county: shared-tagger readings
   to measure with the Seaport "coastal communities" gap in one 10.x session.
+- `ky_dlg.md`: RDAAP's "grants to Special Purpose Governmental Entities ... in partnership with county governments" tags
+  nothing (`special purpose governmental entit*` is Kentucky's special district; "in partnership with" trips the location
+  guard). One more for the measured tagger session.
 - `ma_onestop.md`: Seaport's "coastal communities are eligible to apply" tags nothing (`communities` is not a tagger word); a
   measured tagger session if it recurs.
 
@@ -207,14 +208,14 @@ In order, one per session unless marked:
   description) and `wa_fund_directory` (the Treasurer's directory by topic) as directory connectors: one record per
   row, status `unknown`, the link kept, the agency named. Low value per row, honest coverage, and they name the
   agencies for 12.6.
-- **12.5 The JavaScript shells** (one session, read-only probes with the New York stop rule): Kentucky's DLG Portal
+- **12.5 The JavaScript shells** (shipped 2026-11-04, see Done: Kentucky built, UT, WY, DE stopped, NV to ePro). Kentucky's DLG Portal
   (Dynamics "EYGA"), Utah's Looker Studio, Wyoming's Grants Connect Hub, Nevada's discovery tool, Delaware's
   University of Delaware dashboard. Build only what turns out server-rendered or to have a plain data endpoint the
   page itself calls; record the rest.
 - **12.6 The agency states, cheapest first**, two to four agencies per session on the hand-list base, each state's
   municipal four or five (community development, transportation, natural resources or parks, emergency management,
   energy where it exists): CT (three IGPP grants, Sitecore), MO (DED), ND (Commerce CDRP), SD (GOED), NE (DED), TN
-  (ECD rural), AR (AEDC, DFA), NH (CDFA), VT (ACCD), NV, KY (DLG pages), FL (DOS grants system is an application
+  (ECD rural), AR (AEDC, DFA), NH (CDFA), VT (ACCD), NV (NEVADA ePro's grant-subaward type first, when it lists a row), KY (DLG pages the portal does not list), FL (DOS grants system is an application
   portal; probe first), AZ (nothing public; agency pages), AL (after the ClaudeBot decision). Roughly nine sessions.
 - **12.7 The seven not found** (about four sessions): a second, deeper look per state for the agency pages, then hand
   lists: GA (DCA), OH (OBM's portal answered 404 on the census day, likely a migration; recheck first), SC (Commerce,
@@ -292,6 +293,7 @@ decide what gets built next.
 | 2026-11-04 | The daily runner's view settles a blocked host; eight are blocked for good | an Actions runner met the same walls as the proxy on AK, CO, ID, KS, ME, MI, RI and FloridaCommerce, so no browser check is owed; the resets and the captcha were the proxy's, and of the four hosts that answer the runner only MN and NM have a public side | `docs/surveys/state_portals.md` |
 | 2026-11-04 | Seed lists are records, not tags: a directory row is `unknown` with its link, agency and category, and tags no applicant | the roadmap asked for honest coverage; a directory's description names a population served, which the 10.2 rule says is not an applicant; the agency list is the enumeration aid for 12.6 | `connectors/nc_grants.md`, `connectors/wa_fund_directory.md` |
 | 2026-11-04 | `pa_grants` reads Coveo through pa.gov's own proxy (`/cv-pxy`), the page key optional | the 2026-11-04 daily run failed with 401 at the platform host: pa.gov now rewrites every Coveo request to its proxy and the page's key is no longer accepted there; the proxy answers the same search with or without the key | `connectors/pa_grants.md` |
+| 2026-11-04 | A JSON answer the page itself requests with a plain GET is a data endpoint; a BI tool's internal API is not | Kentucky's Power Pages grid calls a Liquid template that answers JSON with no token, the New York precedent; Looker Studio (UT, DE) and Power BI (WY) serve rows only through undocumented batched APIs built for their own viewers, which is reverse engineering and close to the headless browser CLAUDE.md says to ask about | `connectors/ky_dlg.md`, `docs/surveys/state_portals.md` |
 | 2026-10-16 | Shared applicant table gains `municipal` | "county and municipal governments" (MEA) and "governing bodies of municipal corporations" (DNR) matched nothing; one DHCD record changed, correctly | `connectors/maryland_drupal.md` |
 | 2026-10-16 | SharePoint base extracted at the second mdgov site, with MEA's fixture hashes as the gate | same rule that produced `maryland_drupal.py`; MDEM, MDOT and MDE are on the same theme | `connectors/maryland_sharepoint.md` |
 | 2026-10-16 | Text hash, not markup hash, and every page every run on SharePoint | the CDN stamps one `Last-Modified` on every page and Cloudflare rewrites the e-mail markup per response; the sites are small | `connectors/maryland_sharepoint.md` |
