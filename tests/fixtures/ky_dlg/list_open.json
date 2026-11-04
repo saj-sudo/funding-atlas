@@ -1,0 +1,48 @@
+{
+    "moreRecords": false,
+    "totalRecordCount": 4,
+    "itemsPerPageCount": 10,
+    "results": [
+        
+        {
+            "name": "Legislative Line-Items and Special Programs",
+            "program": "Legislative Line-Items and Special Programs",
+            "startdate": "",
+            "enddate": "",
+            "shortname": "LLISP",
+            "applandingpage": "/LLISP/LLISP",
+            "programlandingpage" : "/LLISP"
+        },
+        
+        {
+            "name": "LGEDF Coal Severance",
+            "program": "LGEDF Coal Severance",
+            "startdate": "",
+            "enddate": "",
+            "shortname": "LGEDFSCCS",
+            "applandingpage": "/LGEDFSCCS/LGEDFSCCS",
+            "programlandingpage" : "/LGEDFSCCS"
+        },
+        
+        {
+            "name": "Local Match Participation Program",
+            "program": "Local Match Participation Program",
+            "startdate": "",
+            "enddate": "",
+            "shortname": "LMPP",
+            "applandingpage": "/FCLMPP/LMPP",
+            "programlandingpage" : "/FCLMPP"
+        },
+        
+        {
+            "name": "Regional Development Agency Assistance Program",
+            "program": "Regional Development Agency Assistance Program",
+            "startdate": "",
+            "enddate": "",
+            "shortname": "RDAAP",
+            "applandingpage": "/RDAAP/RDAAP",
+            "programlandingpage" : "/RDAAP"
+        }
+        
+    ]
+}
