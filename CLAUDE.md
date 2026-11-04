@@ -43,6 +43,8 @@ connector or one feature per session, no abstractions before the third real case
 - Prefer SQL for anything analytical. Python fetches and shapes.
 - Record decisions in `docs/ROADMAP.md` (decisions log) rather than in code comments or chat.
 - Commit messages: `connector(md-dhcd): ...`, `pipeline: ...`, `schema: ...`, `export: ...`, `docs: ...`.
+- Commit author: `Saj Chandoo <263086808+saj-sudo@users.noreply.github.com>` (the GitHub noreply identity), never the
+  account e-mail; the repository is public and its history is the record.
 
 ## Current state (2026-11-04)
 
