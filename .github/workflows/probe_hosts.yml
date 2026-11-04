@@ -1,0 +1,36 @@
+# Probe the index hosts the census recorded as blocked, from the daily runner's own network (milestone 12.0).
+#
+# The census (docs/surveys/state_portals.md) was taken through the development proxy; ten state index hosts walled
+# it. The connectors run on GitHub Actions, so an Actions runner is the client whose view counts. This workflow is
+# run by hand from the Actions tab, fetches each host once with the connectors' User-Agent (scripts/probe_hosts.py),
+# and prints what came back. It writes nothing and never fails: the output is read by a person and recorded in the
+# census. A host that answers 200 here is a connector candidate (roadmap 12.8); one that walls Actions too is
+# recorded as blocked for good.
+
+name: probe-hosts
+
+on:
+  workflow_dispatch:
+    inputs:
+      states:
+        description: "Space-separated state codes to probe (empty: all twelve)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --frozen
+
+      - name: Fetch each host once
+        run: uv run python scripts/probe_hosts.py ${{ inputs.states }}
