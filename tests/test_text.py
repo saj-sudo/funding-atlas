@@ -20,7 +20,7 @@ def values(text: str | list[str]) -> set[str]:
 # ---------- applicant tagger ----------
 
 @pytest.mark.parametrize("text, expected", [
-    ("Public agencies (any city, county, special district, joint powers authority)", {"municipality", "county"}),
+    ("Public agencies (any city, county, special district, joint powers authority)", {"municipality", "county", "special_district"}),
     ("Cities, villages, townships and counties", {"municipality", "county"}),
     ("Boroughs and townships may apply", {"municipality"}),
     ("Awards will be made to local jurisdictions in four categories", {"municipality", "county"}),
@@ -161,3 +161,14 @@ def test_economic_development_means_the_same_thing_in_every_state():
 ])
 def test_webgrants_storefront_categories(label, expected):
     assert portal_categories(label) == expected
+
+
+def test_special_districts_and_kentucky_spges():
+    def v(text):
+        return {t.value for t in applicant_types_for([text])}
+    assert v("Applicants must be a California-incorporated city, county, special district, or tribe") >= {"special_district"}
+    assert v("special purpose districts (e.g. resource conservation districts)") == {"special_district"}
+    assert v("a system of grants to Special Purpose Governmental Entities, as defined by KRS 65A.010(9)") == {"special_district"}
+    assert v("distribution to local governments, public agencies, SPGEs, and other authorized recipients") >= {"special_district"}
+    assert v("projects located in a special district") == set()            # a place, not an applicant
+    assert v("in partnership with county governments") == set()            # partners, not grantees (RDAAP)

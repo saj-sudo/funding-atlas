@@ -12,7 +12,7 @@ JSON plus one server-rendered page per opportunity.
 `connectors/ky_dlg.py` follows this doc. First live run on a fresh database: 4 added in 4 seconds (two JSON lists, four
 pages), 0 errors; second run 0 changed. All four `open`, no dates. Applicants: LMPP municipality and county ("City
 governments, County governments"), Legislative Line-Items municipality and county ("distribution to local
-governments"), LGEDF county ("eligible coal-producing counties"), RDAAP nothing. The Kentucky page: 2 open municipal
+governments"), LGEDF county ("eligible coal-producing counties"), RDAAP nothing (special district since 10.4). The Kentucky page: 2 open municipal
 rows (Line-Items, LMPP). Found while writing the parser:
 
 - the template leaves its last `h2` unclosed (`<h2>Application Process<h2>`), so the last section nests inside the
@@ -21,10 +21,12 @@ rows (Line-Items, LMPP). Found while writing the parser:
   more than 50%", which dropped the whole line as a negation; bullets and starred headings now end a line;
 - "The Local Government Economic Development Fund (LGEDF)" tagged a municipality from the program's own name; a
   Title Case name followed by its acronym is removed before tagging;
-- **a shared-tagger gap**, not fixed here: RDAAP's "grants to Special Purpose Governmental Entities ... and in
-  partnership with county governments" tags nothing (`special purpose governmental entit*` is Kentucky's special
-  district, and "in partnership with" trips the location guard). Recorded in the roadmap's small follow-ups for the
-  measured tagger session.
+- **a shared-tagger gap, closed the same day (roadmap 10.4)**: RDAAP's "grants to Special Purpose Governmental
+  Entities ... and in partnership with county governments" tagged nothing, because the tagger had no rule for special
+  districts at all. `connectors/text.py` now reads "special (purpose) district(s)" and Kentucky's statutory "Special
+  Purpose Governmental Entity" / "SPGE(s)" as `special_district`: RDAAP tags `special_district`, Line-Items ("local
+  governments, public agencies, SPGEs") gains it. "In partnership with county governments" stays untagged on purpose:
+  the counties authorize the grant by Fiscal Court resolution, the grantee is the SPGE.
 
 ## The source
 

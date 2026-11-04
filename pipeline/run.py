@@ -36,6 +36,10 @@ from connectors import (
     va_dcr,
     va_dhcd,
     va_vdot,
+    vt_accd,
+    vt_fpr,
+    vt_vem,
+    vt_vtrans,
     wa_fund_directory,
     webgrants,
     wv_grants,
@@ -74,6 +78,10 @@ CONNECTORS: dict[str, ModuleType] = {
     "nc_grants": nc_grants,
     "wa_fund_directory": wa_fund_directory,
     "ky_dlg": ky_dlg,
+    "vt_accd": vt_accd,
+    "vt_vtrans": vt_vtrans,
+    "vt_fpr": vt_fpr,
+    "vt_vem": vt_vem,
 }
 
 

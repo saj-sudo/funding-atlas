@@ -55,6 +55,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"local education agenc\w*", ("school",)),
     (r"\btrib(?:al|es?)\b", ("tribe",)),
     (r"\bstate (?:government )?agenc\w*", ("state",)),
+    # Special districts: the plain word, and Kentucky's statutory name for them (KRS 65A.010, "Special Purpose
+    # Governmental Entities", written "SPGEs" on the DLG Portal).
+    (r"\bspecial (?:purpose )?districts?\b", ("special_district",)),
+    (r"\bspecial purpose governmental entit(?:y|ies)\b|\bSPGEs?\b", ("special_district",)),
     (r"\bcolleges?\b|\buniversit\w*|institutions? of higher education", ("higher_ed",)),
 )
 

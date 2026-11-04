@@ -68,8 +68,8 @@ def test_fields():
 def test_applicants_from_eligibility_and_the_recipient_sentence():
     assert tags("LMPP") == {"municipality", "county"}              # the list survives the "will not fund" bullet
     assert tags("LGEDFSCCS") == {"county"}                         # "Local Government ... Fund (LGEDF)" is a name
-    assert tags("LLISP") == {"municipality", "county"}             # "distribution to local governments"
-    assert tags("RDAAP") == set()                                  # SPGEs: a shared-tagger gap, recorded in the doc
+    assert tags("LLISP") == {"municipality", "county", "special_district"}   # "local governments, public agencies, SPGEs"
+    assert tags("RDAAP") == {"special_district"}                   # "grants to Special Purpose Governmental Entities"
 
 
 def test_dates_when_the_portal_gives_them():

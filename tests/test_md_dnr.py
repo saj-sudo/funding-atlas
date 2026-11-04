@@ -152,7 +152,8 @@ def test_normalize_lwcf_forecasted_federal_government_entities():
     assert p.status == "forecasted" and p.opens_at is None and p.closes_at is None
     assert p.closes_at_text.startswith("UPDATE: The application period for LWCF grant funding is now closed. Check back in April 2027")
     assert p.funding_source == "pass_through" and p.alns == ["15.916"] and p.funding_type == "grant"
-    assert p.applicant_pairs() == [("county", "county"), ("municipality", "municipality"), ("state", "state agency"), ("tribe", "tribe")]
+    assert p.applicant_pairs() == [("county", "county"), ("municipality", "municipality"), ("special_district", "special district"), ("state", "state agency"),
+                                  ("tribe", "tribe")]
 
 
 def test_normalize_wif_hand_added_past_deadline_is_unknown():

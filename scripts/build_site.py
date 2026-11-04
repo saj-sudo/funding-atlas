@@ -84,6 +84,10 @@ CONNECTOR_LABEL = {
     "nc_grants": "nc.gov Grant Opportunities (directory)",
     "wa_fund_directory": "Washington Fund Directory (State Treasurer, directory)",
     "ky_dlg": "Kentucky DLG Portal (Office of State Grants)",
+    "vt_accd": "Vermont ACCD (Housing and Community Development)",
+    "vt_vtrans": "Vermont Agency of Transportation (Municipal Assistance)",
+    "vt_fpr": "Vermont Forests, Parks and Recreation",
+    "vt_vem": "Vermont Emergency Management",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
