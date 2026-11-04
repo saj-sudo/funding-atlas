@@ -81,6 +81,8 @@ CONNECTOR_LABEL = {
     "de_dsha": "Delaware State Housing Authority (Housing Delaware)",
     "ma_onestop": "Community One Stop for Growth (EOED, EOHLC, MassDevelopment)",
     "or_biz": "Business Oregon",
+    "nc_grants": "nc.gov Grant Opportunities (directory)",
+    "wa_fund_directory": "Washington Fund Directory (State Treasurer, directory)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

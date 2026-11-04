@@ -24,6 +24,7 @@ from connectors import (
     md_mdot,
     md_mea,
     md_mht,
+    nc_grants,
     nj_dca_sage,
     ny_sfs,
     or_biz,
@@ -34,6 +35,7 @@ from connectors import (
     va_dcr,
     va_dhcd,
     va_vdot,
+    wa_fund_directory,
     webgrants,
     wv_grants,
 )
@@ -68,6 +70,8 @@ CONNECTORS: dict[str, ModuleType] = {
     "de_dsha": de_dsha,
     "ma_onestop": ma_onestop,
     "or_biz": or_biz,
+    "nc_grants": nc_grants,
+    "wa_fund_directory": wa_fund_directory,
 }
 
 

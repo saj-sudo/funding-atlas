@@ -29,8 +29,7 @@ def normalize(source_id: str):
 
 def test_search_key_is_read_from_the_page_or_fails_loudly():
     assert pa.read_search_key('<div data-search-hub="All Grants" data-api-key="xx3f-abc"></div>') == "xx3f-abc"
-    with pytest.raises(RuntimeError):
-        pa.read_search_key("<html>no key here</html>")
+    assert pa.read_search_key("<html>no key here</html>") is None   # the proxy works without a key
 
 
 def test_search_body_and_source_id_rules():

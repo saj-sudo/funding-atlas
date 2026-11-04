@@ -36,6 +36,8 @@ uv run python cli.py run de_deldot                            # Delaware DelDOT:
 uv run python cli.py run de_dsha                              # Delaware State Housing Authority: six Build & Develop pages, seconds
 uv run python cli.py run ma_onestop                           # Massachusetts Community One Stop for Growth: 1 index + 9 program pages + MassDevelopment's, seconds
 uv run python cli.py run or_biz                               # Business Oregon: 1 index + about 100 program pages, under a minute
+uv run python cli.py run nc_grants                            # North Carolina seed list: nc.gov's grant table, one page, ~75 programs, seconds
+uv run python cli.py run wa_fund_directory                    # Washington seed list: the Treasurer's Fund Directory, 1 landing + 6 topic pages, ~128 programs, seconds
 uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it

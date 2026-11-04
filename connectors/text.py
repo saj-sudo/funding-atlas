@@ -167,6 +167,16 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     # Business Oregon's topic tabs; its other seven (arts and culture, business finance, business incentives, COVID-19
     # response, global trade, innovation, other business services) name none of our categories and fall to `other`
     "infrastructure and land programs": ("infrastructure",),
+    # nc.gov's grant table categories (the other six, agriculture, art and culture, community service, education,
+    # environment, technology broadband and digital equity, name none of ours) and the Washington Fund Directory's
+    # "Type of Program" labels (the rest, air quality, salmon recovery, conservation, broadband, education, agriculture,
+    # fall to `other`)
+    "disaster recovery": ("public_safety",),
+    "water quality": ("water",), "pollution cleanup": ("water",), "wetlands watershed and shoreline restoration": ("water",),
+    "transit and other alternative transportation": ("transportation",), "bridges roads and safety improvements": ("transportation",),
+    "rail and freight": ("transportation",), "recreation": ("parks",), "outdoor recreation": ("parks",),
+    "recreation and conservation": ("parks",), "recreation and culture": ("parks",),
+    "emergency management": ("public_safety",), "emergency mitigation": ("public_safety",), "social services": ("health",),
 }
 
 
