@@ -17,13 +17,21 @@ from typing import Any
 from urllib.parse import urljoin
 
 import httpx
-from bs4 import BeautifulSoup, Comment
 
 from connectors.grants_gov import parse_date
-from connectors.maryland_drupal import NEGATION_RE, sentences
+from connectors.hand_list import (
+    DATE_RE,
+    DELAY_S,
+    applicant_tags,
+    resolve_missing,  # noqa: F401  (the pipeline reads it from this module)
+)
+from connectors.hand_list import client as _client
+from connectors.hand_list import get as _get
+from connectors.hand_list import soup as _soup
+from connectors.maryland_drupal import sentences
 from connectors.sam_assistance_listings import clean
-from connectors.text import applicant_types_for, funding_type_for
-from pipeline.models import ApplicantTag, Program, RawRecord
+from connectors.text import funding_type_for
+from pipeline.models import Program, RawRecord
 
 CONNECTOR = "va_vdot"
 BASE = "https://www.vdot.virginia.gov"
@@ -33,38 +41,20 @@ EXCLUDED = frozenset({"locally-administered-projects", "training-and-outreach"})
 AGENCY = "Department of Transportation"
 AGENCY_CODE = "VA-VDOT"
 JURISDICTION = "VA"
-DELAY_S = 0.3
-TIMEOUT_S = 30.0
-USER_AGENT = "funding-atlas/0.1 (+https://github.com/saj-sudo/funding-atlas)"
 
 CYCLE_RE = re.compile(
     r"\b(?:application period|applications? (?:are|will be|must be) (?:accepted|due|submitted)|deadline|are due|is due"
     r"|must be submitted|are biennial|accepting applications|now closed|is closed|application cycle|pre-application cycle)\b", re.I)
 CLOSED_RE = re.compile(r"\b(?:now closed|is closed)\b", re.I)
-FULL_DATE_RE = re.compile(r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b")
+FULL_DATE_RE = DATE_RE
 APPLICANT_RE = re.compile(r"\b(?:eligible|qualif(?:y|ies)|may apply|localit(?:y|ies)|count(?:y|ies)|cit(?:y|ies)|towns?|municipalit\w*)\b", re.I)
 CONTACT_RE = re.compile(r"^contact(?: us)?$", re.I)
 
 
 # ---------- HTTP ----------
 
-def _client() -> httpx.Client:
-    return httpx.Client(timeout=TIMEOUT_S, headers={"User-Agent": USER_AGENT}, follow_redirects=True)
-
-
-def _get(client: httpx.Client, url: str) -> str:
-    r = client.get(url)
-    r.raise_for_status()
-    return r.text
-
 
 # ---------- parsing (no I/O) ----------
-
-def _soup(page_html: str) -> BeautifulSoup:
-    soup = BeautifulSoup(page_html, "html.parser")
-    for c in soup.find_all(string=lambda s: isinstance(s, Comment)):
-        c.extract()
-    return soup
 
 
 def parse_cards(index_html: str) -> list[dict[str, str]]:
@@ -126,11 +116,6 @@ def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = No
     return records
 
 
-def resolve_missing(source_id: str) -> dict[str, Any] | None:
-    """A card VDOT dropped: not a closure it stated; unknown, no request."""
-    return {"status": "unknown"}
-
-
 # ---------- normalize ----------
 
 def cycle_sentence(paragraphs: list[str]) -> str | None:
@@ -162,11 +147,6 @@ def closes_at_for(sentence: str | None) -> date | None:
     dates = [parse_date(m) for m in FULL_DATE_RE.findall(sentence or "")]
     dates = [d for d in dates if d]
     return dates[-1] if dates else None
-
-
-def applicant_tags(lines: list[str]) -> list[ApplicantTag]:
-    kept = [s for line in lines for s in sentences(line) if not NEGATION_RE.search(s)]
-    return applicant_types_for(kept or None)
 
 
 def normalize(raw: RawRecord, today: date | None = None) -> Program:

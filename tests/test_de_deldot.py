@@ -8,6 +8,7 @@ from pathlib import Path
 import httpx
 
 from connectors import de_deldot as de
+from connectors import hand_list as hl
 from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures" / "de_deldot"
@@ -83,14 +84,14 @@ class _Pages:
 
 
 def test_fetch_reads_both_programs_and_falls_back(monkeypatch):
-    monkeypatch.setattr(de.time, "sleep", lambda s: None)
-    monkeypatch.setattr(de, "_get", _Pages())
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    monkeypatch.setattr(hl, "get", _Pages())
     records = de.fetch()
     assert [r.source_id for r in records] == ["tap", "srts"] and len(records[0].payload["pages"]) == 2
     prior = {r.source_id: r.payload for r in records}
-    monkeypatch.setattr(de, "_get", _Pages(broken={de.BASE + de.PAGES["tap"][1]}))
+    monkeypatch.setattr(hl, "get", _Pages(broken={de.BASE + de.PAGES["tap"][1]}))
     assert {r.source_id: r.payload for r in de.fetch(prior=prior)}["tap"] == prior["tap"]
     assert [r.source_id for r in de.fetch()] == ["srts"]
-    monkeypatch.setattr(de, "_get", _Pages())
+    monkeypatch.setattr(hl, "get", _Pages())
     assert len(de.fetch(limit=1)) == 1
     assert de.resolve_missing("tap") == {"status": "unknown"}

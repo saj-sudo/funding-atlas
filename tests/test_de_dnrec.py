@@ -9,6 +9,7 @@ import httpx
 import pytest
 
 from connectors import de_dnrec as de
+from connectors import hand_list as hl
 from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures" / "de_dnrec"
@@ -120,14 +121,14 @@ class _Pages:
 
 
 def test_fetch_reads_every_page_and_falls_back(monkeypatch):
-    monkeypatch.setattr(de.time, "sleep", lambda s: None)
-    monkeypatch.setattr(de, "_get", _Pages())
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    monkeypatch.setattr(hl, "get", _Pages())
     records = de.fetch()
     assert [r.source_id for r in records] == list(de.PAGES)
     prior = {r.source_id: r.payload for r in records}
-    monkeypatch.setattr(de, "_get", _Pages(broken={f"{de.BASE}asset-management/"}))
+    monkeypatch.setattr(hl, "get", _Pages(broken={f"{de.BASE}asset-management/"}))
     assert {r.source_id: r.payload for r in de.fetch(prior=prior)}["asset-management"] == prior["asset-management"]
     assert "asset-management" not in {r.source_id for r in de.fetch()}
-    monkeypatch.setattr(de, "_get", _Pages())
+    monkeypatch.setattr(hl, "get", _Pages())
     assert len(de.fetch(limit=3)) == 3
     assert de.resolve_missing("asset-management") == {"status": "unknown"}

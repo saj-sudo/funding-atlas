@@ -3,24 +3,24 @@
 Source: https://www.destatehousing.com (WordPress, no robots restrictions). Six hand-listed pages in two shapes: a
 one-program page (a header card with status lines and "Who applies") or a sections page (one program per
 `h2.hd-sec-h2`, each with its paragraphs, eligibility panel and Important dates list). The header meta is the status
-of record where its key names the program. Contact cards are never read. See docs/connectors/de_dsha.md.
+of record where its key names the program. Contact cards are never read. On the hand-list base
+(`connectors/hand_list.py`) since 12.1, with its own page reader, dates and status table. See docs/connectors/de_dsha.md.
 """
 
 from __future__ import annotations
 
 import re
-import time
 from datetime import date
 from typing import Any
 
-import httpx
-from bs4 import BeautifulSoup, Comment, Tag
+from bs4 import Tag
 
 from connectors.grants_gov import parse_date
-from connectors.maryland_drupal import NEGATION_RE, sentences
+from connectors.hand_list import Blocks, HandListConnector, applicant_tags, first_p, soup
+from connectors.maryland_drupal import sentences
 from connectors.sam_assistance_listings import clean
-from connectors.text import applicant_types_for, funding_type_for
-from pipeline.models import ApplicantTag, Program, RawRecord
+from connectors.text import funding_type_for
+from pipeline.models import RawRecord
 
 CONNECTOR = "de_dsha"
 BASE = "https://www.destatehousing.com"
@@ -35,9 +35,6 @@ WHO_APPLIES = "who applies"
 AGENCY = "Delaware State Housing Authority"
 AGENCY_CODE = "DE-DSHA"
 JURISDICTION = "DE"
-DELAY_S = 0.3
-TIMEOUT_S = 30.0
-USER_AGENT = "funding-atlas/0.1 (+https://github.com/saj-sudo/funding-atlas)"
 
 ELIGIBILITY_HEADING_RE = re.compile(r"eligibility|eligible applicants|who applies|applicant qualifications", re.I)   # not "Eligible activities"
 APPLICANT_RE = re.compile(r"\b(?:eligible to apply|may apply|who applies|apply to housing delaware|are eligible)\b", re.I)
@@ -47,21 +44,10 @@ OPEN_RE = re.compile(r"\b(?:rolling|applications? open|current round|accepting a
 RANGE_RE = re.compile(r"\b(?:from|open)\b.*\b(?:through|to|until)\b", re.I)
 DUE_RE = re.compile(r"\b(?:due|deadline|through|until|by|closed|closes)\b", re.I)
 OPENS_RE = re.compile(r"\bopens?\b", re.I)
+# This site abbreviates months ("Sept. 30, 2026"), so the base's date regexes do not fit it.
 FULL_DATE_RE = re.compile(r"\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.?\s+\d{1,2},?\s+\d{4}\b")
 FEDERAL_RE = re.compile(r"\bfederal (?:grant|funding|funds|program)\b|\bHUD\b|\bU\.S\. Department of Housing\b", re.I)
 REBATE_RE = re.compile(r"\brebate", re.I)
-
-
-# ---------- HTTP ----------
-
-def _client() -> httpx.Client:
-    return httpx.Client(timeout=TIMEOUT_S, headers={"User-Agent": USER_AGENT}, follow_redirects=True)
-
-
-def _get(client: httpx.Client, url: str) -> str:
-    r = client.get(url)
-    r.raise_for_status()
-    return r.text
 
 
 # ---------- parsing (no I/O) ----------
@@ -70,7 +56,7 @@ def _text(el: Tag) -> str:
     return clean(el.get_text(" "))
 
 
-def _block_lines(el: Tag) -> list[tuple[str, str]]:
+def _block_lines(el: Tag) -> Blocks:
     """(kind, text) for one element: a heading, a paragraph, each list item, or a panel's heading and paragraphs."""
     if el.name in ("h2", "h3", "h4"):
         return [("heading", _text(el))]
@@ -78,7 +64,7 @@ def _block_lines(el: Tag) -> list[tuple[str, str]]:
         return [("p", _text(el))] if _text(el) else []
     if el.name in ("ul", "ol"):
         return [("li", clean(li.get_text(" "))) for li in el.find_all("li") if clean(li.get_text(" "))]
-    out: list[tuple[str, str]] = []
+    out: Blocks = []
     for child in el.find_all(["h2", "h3", "h4", "p", "li"]):
         if child.name == "li" and child.find_parent("li") is not None:
             continue
@@ -92,19 +78,17 @@ def _block_lines(el: Tag) -> list[tuple[str, str]]:
 def parse_page(page_html: str) -> dict[str, Any]:
     """title, lede, meta [(key, value)], sections [{id, name, blocks}] (the whole page as one section for a
     one-program page is built by the caller)."""
-    soup = BeautifulSoup(page_html, "html.parser")
-    for c in soup.find_all(string=lambda s: isinstance(s, Comment)):
-        c.extract()
-    for card in soup.select(".hd-contact-card, script, style, nav, header, footer"):
+    doc = soup(page_html)
+    for card in doc.select(".hd-contact-card, script, style, nav, header, footer"):
         card.decompose()
-    title = soup.select_one("h1.hd-hdr-title") or soup.find("h1")
-    lede = soup.select_one("p.hd-hdr-lede")
+    title = doc.select_one("h1.hd-hdr-title") or doc.find("h1")
+    lede = doc.select_one("p.hd-hdr-lede")
     meta = []
-    for row in soup.select(".hd-hdr-meta > div"):
+    for row in doc.select(".hd-hdr-meta > div"):
         k, v = row.select_one(".hd-hdr-meta-k"), row.select_one(".hd-hdr-meta-v")
         if k and v and not SKIP_META.match(_text(k)):
             meta.append((_text(k), _text(v)))
-    content = soup.find("main") or soup
+    content = doc.find("main") or doc
     sections: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
     for el in content.find_all(["h2", "h3", "h4", "p", "ul", "ol", "div"]):
@@ -125,7 +109,7 @@ def parse_page(page_html: str) -> dict[str, Any]:
             continue
         current["blocks"] += _block_lines(el)
     # one-program pages: everything that is not a section heading
-    body_blocks: list[tuple[str, str]] = []
+    body_blocks: Blocks = []
     for el in content.find_all(["h2", "h3", "h4", "p", "ul", "ol"]):
         if el.find_parent(["ul", "ol"]) is not None and el.name not in ("ul", "ol"):
             continue
@@ -138,40 +122,7 @@ def parse_page(page_html: str) -> dict[str, Any]:
             "sections": sections, "body": body_blocks}
 
 
-# ---------- fetch ----------
-
-def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = None) -> list[RawRecord]:
-    prior = prior or {}
-    records: list[RawRecord] = []
-    with _client() as client:
-        for i, (slug, mode) in enumerate(PAGES.items()):
-            if i:
-                time.sleep(DELAY_S)
-            try:
-                page = parse_page(_get(client, f"{BASE}/{slug}/"))
-            except httpx.HTTPError:
-                records += [RawRecord(source_connector=CONNECTOR, source_id=sid, payload=p)
-                            for sid, p in prior.items() if sid == slug or sid.startswith(slug + "#")]
-                continue
-            if mode == "page":
-                records.append(RawRecord(source_connector=CONNECTOR, source_id=slug,
-                                         payload={"slug": slug, "mode": mode, "page": page, "section": None}))
-            else:
-                for section in page["sections"]:
-                    sid = f"{slug}#{section['id']}" if section["id"] else f"{slug}#{len(records)}"
-                    records.append(RawRecord(source_connector=CONNECTOR, source_id=sid,
-                                             payload={"slug": slug, "mode": mode, "page": {k: v for k, v in page.items() if k != "sections"},
-                                                      "section": section}))
-            if limit and len(records) >= limit:
-                break
-    return records[:limit] if limit else records
-
-
-def resolve_missing(source_id: str) -> dict[str, Any] | None:
-    return {"status": "unknown"}
-
-
-# ---------- normalize ----------
+# ---------- status and applicants (no I/O) ----------
 
 def status_lines(page: dict[str, Any], section: dict[str, Any] | None) -> list[tuple[str, str]]:
     """The header meta lines that belong to this program: all but Who applies on a one-program page; on a sections
@@ -262,48 +213,66 @@ def eligibility_lines(page: dict[str, Any], section: dict[str, Any] | None) -> l
     return out
 
 
-def applicant_tags(lines: list[str]) -> list[ApplicantTag]:
-    kept = [s for line in lines for s in sentences(line) if not NEGATION_RE.search(s)]
-    return applicant_types_for(kept or None)
+# ---------- the connector ----------
+
+class Dsha(HandListConnector):
+    CONNECTOR = CONNECTOR
+    BASE = BASE
+    AGENCY = AGENCY
+    AGENCY_CODE = AGENCY_CODE
+    JURISDICTION = JURISDICTION
+    PAGES = PAGES
+
+    def urls_for(self, slug: str, spec: str) -> list[str]:
+        return [f"{BASE}/{slug}/"]
+
+    def parse_page(self, page_html: str) -> dict[str, Any]:
+        return parse_page(page_html)
+
+    def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
+        """One record for a one-program page; one per section otherwise, keyed by the heading's id or, without one,
+        by the record count so far."""
+        page = pages[0]
+        if spec == "page":
+            return [(slug, {"slug": slug, "mode": spec, "page": page, "section": None})]
+        out: list[tuple[str, dict[str, Any]]] = []
+        for section in page["sections"]:
+            sid = f"{slug}#{section['id']}" if section["id"] else f"{slug}#{count + len(out)}"
+            out.append((sid, {"slug": slug, "mode": spec, "page": {k: v for k, v in page.items() if k != "sections"},
+                              "section": section}))
+        return out
+
+    def fields(self, raw: RawRecord, today: date) -> dict[str, Any]:
+        page, section, slug = raw.payload["page"], raw.payload.get("section"), raw.payload["slug"]
+        name = clean(section["name"]) if section else (clean(page.get("title", "")) or slug)
+        blocks = section["blocks"] if section else page.get("body", [])
+        text = " ".join(t for _, t in blocks)
+        sentence = status_sentence(page, section)
+        opens_at, closes_at = program_dates(page, section)
+        lines = eligibility_lines(page, section)
+        summary = first_p(blocks) if section else (page.get("lede") or first_p(blocks))
+        metas = status_lines(page, section)
+        structured = {"status_lines": dict(metas)} if len(metas) > 1 else None
+        return dict(
+            source_url=f"{BASE}/{slug}/" + (f"#{section['id']}" if section and section.get("id") else ""),
+            name=name,
+            funding_type=funding_type_for(name) or ("rebate" if REBATE_RE.search(summary or "") else None),
+            funding_source="pass_through" if FEDERAL_RE.search(text) else "direct",
+            match_required=None,
+            status=status_for(sentence, opens_at, closes_at, today),
+            opens_at=opens_at,
+            closes_at=closes_at,
+            closes_at_text=sentence,
+            rolling=True if sentence and re.search(r"\brolling\b", sentence, re.I) else None,
+            summary=summary,
+            eligibility_text="\n".join(lines) or None,
+            eligibility_structured=structured,
+            applicant_types=applicant_tags(lines),
+            categories=[],
+        )
 
 
-def normalize(raw: RawRecord, today: date | None = None) -> Program:
-    page, section, slug = raw.payload["page"], raw.payload.get("section"), raw.payload["slug"]
-    today = today or date.today()
-    name = clean(section["name"]) if section else (clean(page.get("title", "")) or slug)
-    blocks = section["blocks"] if section else page.get("body", [])
-    text = " ".join(t for _, t in blocks)
-    sentence = status_sentence(page, section)
-    opens_at, closes_at = program_dates(page, section)
-    lines = eligibility_lines(page, section)
-    summary = next((t for k, t in blocks if k == "p"), None) if section else (page.get("lede") or next((t for k, t in blocks if k == "p"), None))
-    metas = status_lines(page, section)
-    structured = {"status_lines": dict(metas)} if len(metas) > 1 else None
-    return Program(
-        source_connector=CONNECTOR,
-        source_id=raw.source_id,
-        source_url=f"{BASE}/{slug}/" + (f"#{section['id']}" if section and section.get("id") else ""),
-        external_number=None,
-        name=name,
-        level="state",
-        jurisdiction=JURISDICTION,
-        administering_agency=AGENCY,
-        agency_code=AGENCY_CODE,
-        funding_type=funding_type_for(name) or ("rebate" if REBATE_RE.search(summary or "") else None),
-        funding_source="pass_through" if FEDERAL_RE.search(text) else "direct",
-        amount_min=None,
-        amount_max=None,
-        match_required=None,
-        match_pct=None,
-        status=status_for(sentence, opens_at, closes_at, today),
-        opens_at=opens_at,
-        closes_at=closes_at,
-        closes_at_text=sentence,
-        rolling=True if sentence and re.search(r"\brolling\b", sentence, re.I) else None,
-        summary=summary,
-        eligibility_text="\n".join(lines) or None,
-        eligibility_structured=structured,
-        applicant_types=applicant_tags(lines),
-        categories=[],
-        alns=[],
-    )
+SITE = Dsha()
+fetch = SITE.fetch
+normalize = SITE.normalize
+resolve_missing = SITE.resolve_missing

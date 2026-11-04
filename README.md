@@ -34,6 +34,8 @@ uv run python cli.py run de_dnrec                             # Delaware DNREC E
 uv run python cli.py run de_dema                              # Delaware DEMA: one grants page and its preparedness tab, seconds
 uv run python cli.py run de_deldot                            # Delaware DelDOT: TAP and Safe Routes to School, seconds
 uv run python cli.py run de_dsha                              # Delaware State Housing Authority: six Build & Develop pages, seconds
+uv run python cli.py run ma_onestop                           # Massachusetts Community One Stop for Growth: 1 index + 9 program pages + MassDevelopment's, seconds
+uv run python cli.py run or_biz                               # Business Oregon: 1 index + about 100 program pages, under a minute
 uv run python cli.py run ny_sfs                               # New York SFS Grant Opportunity Portal: 1 search + 2 posts per open row + the closed search, ~260 rounds, under a minute
 uv run python cli.py diff
 uv run python cli.py aln 97.106                               # one listing + the opportunities that cite it
@@ -57,7 +59,11 @@ rounds posted now, about 125 rows; the native ones read with their program's eli
 listing in two states: the WebGrants storefronts of Iowa and Montana's agency hosts (the state is configuration; about 40 rounds), and
 `tx_egrants`, the Texas Governor's eGrants announcements (the Active page plus the archive, about 147 rounds, each stating who may apply), and
 `nj_dca_sage`, New Jersey DCA's public SAGE list (one page, about 10 RFPs), and `ny_sfs`, New York's SFS Grant Opportunity Portal
-(PeopleSoft, read through its own form posts: about 30 open rows with an abstract each, plus the closed grid). Each
+(PeopleSoft, read through its own form posts: about 30 open rows with an abstract each, plus the closed grid), and Virginia's and
+Delaware's municipal agencies (`va_dcjs`, `va_dhcd`, `va_dcr`, `va_vdot`; `de_dnrec`, `de_dema`, `de_deldot`, `de_dsha`; the hand-listed
+ones on `connectors/hand_list.py`), and `ma_onestop`, Massachusetts's Community One Stop for Growth (fourteen capital grant programs
+under one application and one round, read from the One Stop page and each program's page), and `or_biz`, Business Oregon's
+Programs page (about a hundred programs, each read from its own page; most are `unknown` with the cycle sentence kept). Each
 connector keeps only its own status rules. Docs per connector and per shared base are in `docs/connectors/`; GOCPP is
 surveyed there too, and stopped on its robots.txt.
 

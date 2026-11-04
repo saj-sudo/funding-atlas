@@ -15,12 +15,18 @@ from typing import Any
 from urllib.parse import urljoin, urlparse
 
 import httpx
-from bs4 import BeautifulSoup, Comment
 
-from connectors.maryland_drupal import NEGATION_RE, sentences
+from connectors.hand_list import (
+    DELAY_S,
+    applicant_tags,
+    resolve_missing,  # noqa: F401  (the pipeline reads it from this module)
+)
+from connectors.hand_list import client as _client
+from connectors.hand_list import get as _get
+from connectors.hand_list import soup as _soup
 from connectors.sam_assistance_listings import clean
-from connectors.text import applicant_types_for, funding_type_for, portal_categories
-from pipeline.models import ApplicantTag, CategoryTag, Program, RawRecord
+from connectors.text import funding_type_for, portal_categories
+from pipeline.models import CategoryTag, Program, RawRecord
 
 CONNECTOR = "de_dema"
 BASE = "https://dema.delaware.gov"
@@ -29,27 +35,7 @@ PREP_URL = BASE + "/about/grants/index.shtml?dc=preparednessgrants"
 AGENCY = "Delaware Emergency Management Agency"
 AGENCY_CODE = "DE-DEMA"
 JURISDICTION = "DE"
-DELAY_S = 0.3
-TIMEOUT_S = 30.0
-USER_AGENT = "funding-atlas/0.1 (+https://github.com/saj-sudo/funding-atlas)"
 SECTION_HEADINGS = ("Preparedness Grants", "Recovery Assistance")
-
-
-def _client() -> httpx.Client:
-    return httpx.Client(timeout=TIMEOUT_S, headers={"User-Agent": USER_AGENT}, follow_redirects=True)
-
-
-def _get(client: httpx.Client, url: str) -> str:
-    r = client.get(url)
-    r.raise_for_status()
-    return r.text
-
-
-def _soup(page_html: str) -> BeautifulSoup:
-    soup = BeautifulSoup(page_html, "html.parser")
-    for c in soup.find_all(string=lambda s: isinstance(s, Comment)):
-        c.extract()
-    return soup
 
 
 def entry_id(url: str) -> str:
@@ -118,15 +104,6 @@ def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = No
     records = [RawRecord(source_connector=CONNECTOR, source_id=e["id"], payload={"entry": e, "details": prep.get(e["id"])})
                for e in entries]
     return records[:limit] if limit else records
-
-
-def resolve_missing(source_id: str) -> dict[str, Any] | None:
-    return {"status": "unknown"}
-
-
-def applicant_tags(lines: list[str]) -> list[ApplicantTag]:
-    kept = [s for line in lines for s in sentences(line) if not NEGATION_RE.search(s)]
-    return applicant_types_for(kept or None)
 
 
 def normalize(raw: RawRecord, today: date | None = None) -> Program:

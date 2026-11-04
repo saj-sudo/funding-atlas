@@ -164,6 +164,9 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "health services": ("health",), "housing and shelter services": ("housing",),
     "workforce development": ("workforce",), "public safety supports": ("public_safety",),
     "justice services": ("public_safety",), "public transportation services": ("transportation",),
+    # Business Oregon's topic tabs; its other seven (arts and culture, business finance, business incentives, COVID-19
+    # response, global trade, innovation, other business services) name none of our categories and fall to `other`
+    "infrastructure and land programs": ("infrastructure",),
 }
 
 

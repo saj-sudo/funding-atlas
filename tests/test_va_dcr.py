@@ -8,6 +8,7 @@ from pathlib import Path
 import httpx
 import pytest
 
+from connectors import hand_list as hl
 from connectors import va_dcr as va
 from pipeline.models import RawRecord
 
@@ -125,16 +126,16 @@ class _Pages:
 
 
 def test_fetch_reads_the_six_pages_and_falls_back(monkeypatch):
-    monkeypatch.setattr(va.time, "sleep", lambda s: None)
-    monkeypatch.setattr(va, "_get", _Pages())
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    monkeypatch.setattr(hl, "get", _Pages())
     records = va.fetch()
     assert [r.source_id for r in records] == list(va.PAGES)
     prior = {r.source_id: r.payload for r in records}
-    monkeypatch.setattr(va, "_get", _Pages(broken={va.BASE + va.PAGES["orlp"]}))
+    monkeypatch.setattr(hl, "get", _Pages(broken={va.BASE + va.PAGES["orlp"]}))
     again = va.fetch(prior=prior)
     assert {r.source_id: r.payload for r in again}["orlp"] == prior["orlp"]
     assert "orlp" not in {r.source_id for r in va.fetch()}
-    monkeypatch.setattr(va, "_get", _Pages())
+    monkeypatch.setattr(hl, "get", _Pages())
     assert len(va.fetch(limit=2)) == 2
 
 
