@@ -74,6 +74,17 @@ def li_text(el: Tag) -> str:
     return clean(" ".join(el.find_all(string=True, recursive=False)) or el.get_text(" "))
 
 
+BLOCK_TAGS = {"p", "div", "ul", "ol", "li", "table", "section", "nav", "h1", "h2", "h3", "h4", "h5", "h6"}
+
+
+def own_text(el: Tag) -> str:
+    """A block's text minus its nested blocks: SharePoint nests <p> inside <p>, <h2> inside <p> and <div class="row">
+    inside <p>, so the outer element's full text would repeat every child and fuse a banner with the paragraphs after
+    it."""
+    parts = [str(c) if not isinstance(c, Tag) else ("" if c.name in BLOCK_TAGS else c.get_text(" ")) for c in el.children]
+    return clean(" ".join(parts))
+
+
 def is_label(el: Tag, text: str, bold_max: int | None) -> bool:
     """A heading, or (when `bold_max` is set) a short block that is entirely bold: the page's own way of labelling
     a list. `text` is the block's text as the caller read it."""

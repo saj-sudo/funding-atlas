@@ -80,6 +80,7 @@ CONNECTOR_LABEL = {
     "de_deldot": "Delaware DelDOT (TAP and Safe Routes to School)",
     "de_dsha": "Delaware State Housing Authority (Housing Delaware)",
     "ma_onestop": "Community One Stop for Growth (EOED, EOHLC, MassDevelopment)",
+    "or_biz": "Business Oregon",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

@@ -17,7 +17,7 @@ from typing import Any
 
 from bs4 import BeautifulSoup, Tag
 
-from connectors.hand_list import Blocks, HandListConnector, applicant_tags, label_lines, quote_lines, soup
+from connectors.hand_list import Blocks, HandListConnector, applicant_tags, label_lines, own_text, quote_lines, soup
 from connectors.sam_assistance_listings import clean
 from connectors.text import funding_type_for
 from pipeline.models import CategoryTag, RawRecord
@@ -73,16 +73,6 @@ def _content(doc: BeautifulSoup) -> Tag:
     return main
 
 
-BLOCK_TAGS = {"p", "div", "ul", "ol", "li", "table", "section", "nav", "h1", "h2", "h3", "h4", "h5", "h6"}
-
-
-def _own_text(el: Tag) -> str:
-    """A block's text minus its nested blocks: SharePoint nests <p> inside <p> and <div class="row"> inside <p>, so
-    the outer element's full text would repeat every child and fuse a banner with the paragraphs after it."""
-    parts = [str(c) if not isinstance(c, Tag) else ("" if c.name in BLOCK_TAGS else c.get_text(" ")) for c in el.children]
-    return clean(" ".join(parts))
-
-
 def parse_page(page_html: str) -> dict[str, Any]:
     """title (the H1), blocks [(kind, text)]: label (headings and card headers), p, li. Comments are removed first:
     the pages keep their stale banners in them. Contact lines dropped."""
@@ -98,7 +88,7 @@ def parse_page(page_html: str) -> dict[str, Any]:
             kind, text = "label", clean(el.get_text(" "))
         else:
             kind = "label" if el.name.startswith("h") else el.name
-            text = _own_text(el)
+            text = own_text(el)
         if not text or CONTACT_RE.search(text) or (kind == "label" and text == title):
             continue
         if blocks and blocks[-1] == (kind, text):

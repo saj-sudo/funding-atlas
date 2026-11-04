@@ -60,7 +60,7 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 | **ND** | `https://www.commerce.nd.gov/community-services/community-development-rural-prosperity/cdrp-resources/cdrp-grant-programs` | Drupal | programs, prose (CDRP grants) | standard Drupal robots | 200 | agency connectors | |
 | **OH** | `https://grants.ohio.gov/` | static hosting | not found: 404 on the home page, `robots.txt`, and the old portal paths; `obm.ohio.gov` 404 too | | 404 | not found | OBM policy says agencies must post there; the site answered nothing on the day |
 | **OK** | `https://ogx.ok.gov/` (Oklahoma Grant Exchange); `https://www.okcommerce.gov/` | | OGX: connection reset through the proxy on two tries; Commerce WordPress CDBG pages, prose | `oklahoma.gov` robots allows | 000 / 200 | blocked (OGX); agency connectors | |
-| **OR** | `https://www.oregon.gov/biz/programs/` (Business Oregon) | SharePoint | programs, prose: about 90 programs by category on one page | robots restricts SharePoint paths | 200 | agency connectors | |
+| **OR** | `https://www.oregon.gov/biz/programs/` (Business Oregon) | SharePoint | programs, prose: 99 programs on one page in two views (alphabetical, by eight topics), one page each with "Who is Eligible?" and "What is the Application Process?" blocks | robots restricts SharePoint paths | 200 | **built** (`or_biz`, 2026-11-04) | 85 of 99 state no round; the cycle sentence is kept |
 | **PA** | `https://www.pa.gov/grants` | Coveo index + JSON per page | labelled status | allows | 200 | built | `pa_grants`, 377 records |
 | **RI** | `https://controller.admin.ri.gov/grants-management/grant-management-system-gms/subrecipients/funding-opportunities` | Drupal 11; eCivis / Euna GMS | blocked: Cloudflare challenge on the funding-opportunities page (`robots.txt` 200) | | 403 | blocked | the state's own page says it lists state grant programs with eligibility and deadlines |
 | **SC** | `https://www.sccommerce.com/`; `https://ria.sc.gov/` | Drupal; WordPress | not found at the tried paths | standard | 200 | not found | |
@@ -79,9 +79,9 @@ vendor with a public listing); **agency connectors** (no index; the agencies wou
 
 | Verdict | States |
 |---|---|
-| built (a state connector, updated 2026-11-04) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY, VA, DE, MA (13; Virginia and Delaware by their municipal five agencies, Massachusetts by its One Stop) |
+| built (a state connector, updated 2026-11-04) | MD, PA, WV, CA, IL, IA, MT, TX, NJ, NY, VA, DE, MA, OR (14; Virginia and Delaware by their municipal five agencies, Massachusetts by its One Stop, Oregon by Business Oregon's index) |
 | seed list, nothing built | NC, WA (2) |
-| agency connectors | AL, AR, AZ, CT, FL, IN, KY, MO, ND, NE, NH, NV, OR, SD, TN, VT (16; DE, VA and MA built) |
+| agency connectors | AL, AR, AZ, CT, FL, IN, KY, MO, ND, NE, NH, NV, SD, TN, VT (15; DE, VA, MA and OR built) |
 | JS shell, not read | UT, WY (2) |
 | blocked | AK, CO, ID, KS, ME, MI, MN (listing), NM, RI, OK (OGX), plus FL Commerce and VT eGrants on otherwise-readable states (10) |
 | not found | GA, HI, LA, MS, OH, SC, WI (7) |
