@@ -14,7 +14,9 @@ connector or one feature per session, no abstractions before the third real case
 - Python 3.12, `uv`, SQLite via `sqlite3` (Postgres later), `httpx`, `pydantic` for the record model, `typer` CLI.
 - `connectors/`: one module per source exposing `fetch(limit, prior) -> list[RawRecord]`,
   `normalize(raw) -> Program`, `resolve_missing(source_id)`. Keep them dumb. Maryland's Drupal agencies share
-  `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; `pa_grants` reads a
+  `connectors/maryland_drupal.py` and its SharePoint agencies `connectors/maryland_sharepoint.py`; a few hand-listed pages of one agency (Virginia DCR, Delaware DNREC, DelDOT, DSHA,
+  Maryland MDOT) go on `connectors/hand_list.py` (`HandListConnector`: a page dict, `parse_page`, `fields`, a default status
+  table; `docs/connectors/hand_list.md` says how a new agency goes on it in forty lines); `pa_grants` reads a
   search index plus one JSON record per page; a new platform base is extracted only when the second site on that
   platform forces it.
 - `connectors/text.py`: the rules every state shares: the applicant tagger, the funding-type keyword, and the tables that

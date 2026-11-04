@@ -9,6 +9,7 @@ import httpx
 import pytest
 
 from connectors import de_dsha as de
+from connectors import hand_list as hl
 
 FIX = Path(__file__).parent / "fixtures" / "de_dsha"
 TODAY = date(2026, 11, 3)
@@ -20,8 +21,8 @@ def read(slug: str) -> str:
 
 @pytest.fixture
 def site(monkeypatch):
-    monkeypatch.setattr(de.time, "sleep", lambda s: None)
-    monkeypatch.setattr(de, "_get", lambda client, url: read(url.rstrip("/").rsplit("/", 1)[-1]))
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    monkeypatch.setattr(hl, "get", lambda client, url: read(url.rstrip("/").rsplit("/", 1)[-1]))
 
 
 def programs(site=None) -> dict:
@@ -121,7 +122,7 @@ def test_a_failed_page_falls_back_to_prior(monkeypatch, site):
         if url.endswith("/community-benefit/"):
             raise httpx.ConnectError("down")
         return read(url.rstrip("/").rsplit("/", 1)[-1])
-    monkeypatch.setattr(de, "_get", broken)
+    monkeypatch.setattr(hl, "get", broken)
     again = {r.source_id: r.payload for r in de.fetch(prior=prior)}
     assert again["community-benefit#cdbg"] == prior["community-benefit#cdbg"]
     assert "community-benefit#cdbg" not in {r.source_id for r in de.fetch()}

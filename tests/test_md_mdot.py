@@ -9,6 +9,7 @@ from pathlib import Path
 import httpx
 import pytest
 
+from connectors import hand_list as hl
 from connectors import md_mdot as md
 from pipeline.models import RawRecord
 
@@ -132,15 +133,15 @@ class _Pages:
 
 
 def test_fetch_reads_three_pages_and_falls_back_to_prior(monkeypatch):
-    monkeypatch.setattr(md.time, "sleep", lambda s: None)
-    monkeypatch.setattr(md, "_get", _Pages())
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    monkeypatch.setattr(hl, "get", _Pages())
     records = md.fetch()
     assert [r.source_id for r in records] == ["bikeways", "urban-tree", "tod"]
     assert records[2].payload["page_id"] == 217 and records[2].payload["section"] == "Transit Oriented Development"
     prior = {r.source_id: r.payload for r in records}
-    monkeypatch.setattr(md, "_get", _Pages(broken={md.URL.format(n=28)}))
+    monkeypatch.setattr(hl, "get", _Pages(broken={md.URL.format(n=28)}))
     assert {r.source_id: r.payload for r in md.fetch(prior=prior)}["bikeways"] == prior["bikeways"]
     assert [r.source_id for r in md.fetch()] == ["urban-tree", "tod"]
-    monkeypatch.setattr(md, "_get", _Pages())
+    monkeypatch.setattr(hl, "get", _Pages())
     assert len(md.fetch(limit=1)) == 1
     assert md.resolve_missing("tod") == {"status": "unknown"}
