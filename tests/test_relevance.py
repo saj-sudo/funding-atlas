@@ -38,6 +38,9 @@ CASES = [
     ("dos", prog("10", "Promoting Human Rights for Vulnerable Children in Haut-Katanga", "DOS-COD", EVERYONE, ["other"],
                  eligibility_text="Local governments and NGOs"), "unlikely"),
     ("baa", prog("11", "NRL Long Range Broad Agency Announcement (BAA)", "DOD-ONR-NRL", [ApplicantTag(value="municipality", source_code="99")]), "unlikely"),
+    # 0007: North Dakota's FIND has no category and two applicant codes; its own wording makes it likely.
+    ("political subdivisions", prog("13", "July 2026 - June 2027 Infrastructure Request", "X", LOCAL,
+                                    summary="the FIND program allows for political subdivisions to submit one application"), "likely"),
     ("stale", prog("12", "Stale But Still Posted", "HUD", LOCAL, ["housing"], eligibility_text="units of general local government"), "likely"),
 ]
 CASES[-1][1].closes_at = __import__("datetime").date(2021, 8, 4)
