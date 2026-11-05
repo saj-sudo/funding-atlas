@@ -88,6 +88,10 @@ CONNECTOR_LABEL = {
     "vt_vtrans": "Vermont Agency of Transportation (Municipal Assistance)",
     "vt_fpr": "Vermont Forests, Parks and Recreation",
     "vt_vem": "Vermont Emergency Management",
+    "ct_doh": "Connecticut Department of Housing",
+    "ct_dot": "Connecticut Department of Transportation",
+    "ct_deep": "Connecticut DEEP (Open Space)",
+    "ct_demhs": "Connecticut DEMHS (Emergency Management)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

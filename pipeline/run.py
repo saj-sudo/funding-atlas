@@ -9,6 +9,10 @@ from types import ModuleType
 
 from connectors import (
     ca_grants,
+    ct_deep,
+    ct_demhs,
+    ct_doh,
+    ct_dot,
     de_deldot,
     de_dema,
     de_dnrec,
@@ -82,6 +86,10 @@ CONNECTORS: dict[str, ModuleType] = {
     "vt_vtrans": vt_vtrans,
     "vt_fpr": vt_fpr,
     "vt_vem": vt_vem,
+    "ct_doh": ct_doh,
+    "ct_dot": ct_dot,
+    "ct_deep": ct_deep,
+    "ct_demhs": ct_demhs,
 }
 
 
