@@ -172,3 +172,11 @@ def test_special_districts_and_kentucky_spges():
     assert v("distribution to local governments, public agencies, SPGEs, and other authorized recipients") >= {"special_district"}
     assert v("projects located in a special district") == set()            # a place, not an applicant
     assert v("in partnership with county governments") == set()            # partners, not grantees (RDAAP)
+
+
+def test_political_subdivisions_are_local_governments():
+    def v(text):
+        return {t.value for t in applicant_types_for([text])}
+    assert v("the FIND program allows for political subdivisions to submit one application") == {"municipality", "county"}
+    assert v("provides loans to political subdivisions for eligible essential infrastructure projects") == {"municipality", "county"}
+    assert v("Political subdivisions") == {"municipality", "county"}

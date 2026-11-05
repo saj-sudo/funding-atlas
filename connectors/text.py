@@ -19,6 +19,9 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
     (r"local units? of (?:general )?government", ("municipality", "county")),   # Iowa's word order
     (r"local governments?", ("municipality", "county")),
+    # "political subdivisions" is the statutory word for a state's local governments (North Dakota's FIND and its
+    # revolving funds: "loans to political subdivisions"); the same two tags as "local governments".
+    (r"\bpolitical subdivisions?\b", ("municipality", "county")),
     # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
     # apply for the credit"), not the applicant.
     (r"(?<!the )local jurisdictions?", ("municipality", "county")),
