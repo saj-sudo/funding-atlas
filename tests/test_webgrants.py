@@ -1,5 +1,5 @@
 """WebGrants storefront connector tests. Everything runs against the saved pages (never the network): three lists
-(Iowa, Montana Agriculture, and Montana Fish, Wildlife and Parks with no rows) and six detail pages."""
+(Iowa, Montana Agriculture, Montana Fish, Wildlife and Parks with no rows, North Dakota) and eight detail pages."""
 
 from __future__ import annotations
 
@@ -244,8 +244,9 @@ def pages(monkeypatch):
 
 def test_fetch_reads_every_list_and_every_detail(pages):
     records = wg.fetch()
-    assert [r.source_id for r in records] == ["ia-230028", "ia-371353", "ia-666997", "ia-667406", "mtagr-27785", "mtagr-28249"]
-    assert sum(1 for u in pages.calls if wg.LIST_PATH in u) == 3
+    assert [r.source_id for r in records] == ["ia-230028", "ia-371353", "ia-666997", "ia-667406", "mtagr-27785", "mtagr-28249",
+                                              "nd-1086108", "nd-1088301"]
+    assert sum(1 for u in pages.calls if wg.LIST_PATH in u) == 4
     assert records[0].payload["host"] == "ia" and records[0].payload["detail"]["fields"]["Status"] == "Posted"
     assert len(wg.fetch(limit=2)) == 2
 
@@ -318,3 +319,31 @@ def test_a_round_that_left_the_list_is_unknown_without_a_request(monkeypatch):
     monkeypatch.setattr(wg, "_get", lambda *a: pytest.fail("no request"))
     monkeypatch.setattr(wg, "_client", lambda: pytest.fail("no client"))
     assert wg.resolve_missing(ENERGY) == {"status": "unknown"}
+
+
+# ---------- North Dakota (12.6c, 2026-11-05) ----------
+
+HONOR, FIND = "nd-1086108", "nd-1088301"
+
+
+def test_north_dakota_storefront():
+    assert [r["id"] for r in list_rows("nd")] == ["1086108", "1088301"]
+    p = normalize(FIND)
+    assert (p.jurisdiction, p.status, p.closes_at) == ("ND", "open", date(2027, 6, 30))
+    assert p.source_url.startswith("https://grants.nd.gov/")
+    honor = normalize(HONOR)
+    assert (honor.administering_agency, honor.closes_at, honor.rolling) == ("North Dakota Veterans Affairs", None, True)
+
+
+def test_a_page_without_an_eligibility_heading_reads_its_who_applies_sentence():
+    # "the FIND program allows for political subdivisions to submit one application"
+    assert tags(FIND) == {"municipality", "county"}
+    assert normalize(FIND).eligibility_text.startswith("The Funding Infrastructure in North Dakota (FIND) program allows")
+    assert tags(HONOR) == set()
+
+
+def test_the_fallback_keeps_only_sentences_that_name_an_applicant():
+    blocks = [["p", "An applicant may apply for a loan for up to 75% of the total costs of the project.", False],
+              ["p", "Districts and nonpublic schools can apply for funding to attend a workshop.", False]]
+    assert wg.fallback_sentences(blocks) == ["Districts and nonpublic schools can apply for funding to attend a workshop."]
+    assert wg.fallback_sentences([["p", "Cities may not apply.", False]]) == []

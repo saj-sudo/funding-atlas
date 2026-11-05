@@ -52,7 +52,7 @@ Connectors: `grants_gov`, `sam_assistance_listings`, `md_dhcd`, `md_commerce`, `
 `md_dnr`, `md_mdem` (the MDEM grant roster plus two hand-added pages, 4 records) and `md_mde` (MWIFA's seven financing
 rows, status from the index banner) on the SharePoint base (`connectors/maryland_sharepoint.py`), `md_mdot` (three hand-listed
 MDOT pages, comments stripped, 3 records), `pa_grants` (pa.gov Coveo index, 377 records), `wv_grants`
-(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list plus its AmpliFund pages, 125 records), `webgrants` (Iowa and Montana storefronts, 40 records), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records), `ny_sfs` (New York SFS
+(grants.wv.gov JSON API, 124 records), `ca_grants` (data.ca.gov CSV, 2,025 records), `il_csfa` (Illinois CSFA list plus its AmpliFund pages, 125 records), `webgrants` (Iowa, Montana and, since 2026-11-05, North Dakota storefronts), `tx_egrants` (Texas Governor's eGrants, 147 records), `nj_dca_sage` (New Jersey DCA SAGE list, 10 records), `ny_sfs` (New York SFS
 Grant Opportunity Portal, PeopleSoft read through its own form posts, 257 records), `va_dcjs` (Virginia DCJS, 59 records),
 `va_dhcd` (Virginia DHCD, a crawl of its menus, 30 records), `va_dcr` (six DCR grant pages) and `va_vdot` (six VDOT Local
 Assistance programs): Virginia's municipal five, VDEM excepted (unreachable); `de_dnrec` (twelve DNREC Environmental Finance
@@ -61,7 +61,7 @@ pages, 17 programs): Delaware's four; `ma_onestop` (Massachusetts's Community On
 Milestones 1 to 8.2 (with 6.1, the Atom + JSON change feed beside every page, 2026-11-03), 9.1 to 9.8 (with 9.4.1 Illinois
 depth and 9.6.1 Texas funding sources), 10.1 to 10.3, 7.2 to 7.4 (Maryland's MDEM, MDOT and MDE, 2026-11-03) and 11.1 to 11.8
 shipped; milestone 12 began on 2026-11-04 (12.0 the `probe-hosts` workflow, 12.1 the hand-list base, 12.2 AmpliFund has no public list, 12.3
-Massachusetts, 12.3b Oregon, 12.4 the NC and WA seed lists, 12.5 the JavaScript shells: Kentucky built, UT, WY and DE stopped, NV's NOFOs to NEVADA ePro, 12.6a Vermont's municipal four, 12.6b Connecticut's); the blocked ten were settled from the daily runner (eight blocked for good, MN and NM to 12.8); Maryland has eight agencies, Virginia and Delaware their municipal five, and the roadmap's next session is 12.6c, North Dakota, outreach alongside. The repository is public and the site is live at
+Massachusetts, 12.3b Oregon, 12.4 the NC and WA seed lists, 12.5 the JavaScript shells: Kentucky built, UT, WY and DE stopped, NV's NOFOs to NEVADA ePro, 12.6a Vermont's municipal four, 12.6b Connecticut's, 12.6c part 1 North Dakota's WebGrants storefront with 10.5 "political subdivisions"); the blocked ten were settled from the daily runner (eight blocked for good, MN and NM to 12.8); Maryland has eight agencies, Virginia and Delaware their municipal five, and the roadmap's next session is 12.6c part 2, North Dakota's agency pages, outreach alongside. The repository is public and the site is live at
 https://saj-sudo.github.io/funding-atlas/ (2026-11-03); `gh-pages` holds the build. GOCPP is blocked by its robots.txt (ask the office). The census (`docs/surveys/state_portals.md`) is spent:
 every public state index with structured rows is built; Virginia and Delaware have their municipal five
 (decision 2026-11-03, milestone 11); elsewhere agency connectors only when outreach names a town. New York's

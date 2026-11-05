@@ -1,4 +1,4 @@
-"""WebGrants storefront connector: the public opportunity lists of Iowa and Montana's agency hosts.
+"""WebGrants storefront connector: the public opportunity lists of Iowa's, Montana's and North Dakota's hosts.
 
 WebGrants (Dulles Technology) serves the same storefront on every host: `storefrontFOList.do` is one static table of
 the opportunities posted now, `viewStorefrontOpportunity.do?OIDString=<oid>|Opportunity` one page per opportunity.
@@ -29,6 +29,7 @@ HOSTS: dict[str, tuple[str, str]] = {
     "ia": ("https://www.iowagrants.gov", "IA"),
     "mtagr": ("https://mtagr.webgrantscloud.com", "MT"),
     "mtfwp": ("https://mtfwp.webgrantscloud.com", "MT"),
+    "nd": ("https://grants.nd.gov", "ND"),          # North Dakota's enterprise storefront (12.6c, 2026-11-05)
 }
 LIST_PATH = "/storefrontFOList.do"
 DETAIL_PATH = "/viewStorefrontOpportunity.do?OIDString={oid}"
@@ -231,13 +232,41 @@ def category_tags(area: str) -> list[CategoryTag]:
             for value in portal_categories(part)]
 
 
+# A page with no eligibility heading may still say who applies in its description: North Dakota's FIND, "the FIND
+# program allows for political subdivisions to submit one application". Only a sentence that says who may apply or
+# submit is read, never the whole description (decision 2026-11-05, 12.6c).
+WHO_APPLIES_RE = re.compile(
+    r"\beligible applicants?\b|\b(?:may|can) apply\b|\beligible to apply\b"
+    r"|\ballows?\s+(?:for\s+)?[^.]{0,80}?\bto\s+(?:apply|submit)\b", re.I)
+
+
+def fallback_sentences(blocks: list[list[Any]]) -> list[str]:
+    """The description's who-may-apply sentences that name an applicant type, used only when the page has no
+    eligibility section ("An applicant may apply for a loan for up to 75%" names nobody and is not kept)."""
+    out: list[str] = []
+    for _tag, text, heading in blocks:
+        if heading:
+            continue
+        out += [s for s in sentences(text) if WHO_APPLIES_RE.search(s) and not NEGATION_RE.search(s)
+                and applicant_types_for([s]) and s not in out]
+    return out
+
+
+def applicant_lines(blocks: list[list[Any]]) -> list[str]:
+    sections = eligibility_sections(blocks)
+    if sections:
+        return [s for _, section in sections for s in applicant_sentences(section)]
+    return fallback_sentences(blocks)
+
+
 def applicant_tags(blocks: list[list[Any]]) -> list[ApplicantTag]:
-    lines = [s for _, section in eligibility_sections(blocks) for s in applicant_sentences(section)]
-    return applicant_types_for(lines or None)
+    return applicant_types_for(applicant_lines(blocks) or None)
 
 
 def eligibility_text_for(blocks: list[list[Any]]) -> str | None:
     sections = eligibility_sections(blocks)
+    if not sections:
+        return "\n".join(fallback_sentences(blocks)) or None
     return "\n\n".join(f"{heading}\n" + "\n".join(text for _, text in lines) for heading, lines in sections) or None
 
 

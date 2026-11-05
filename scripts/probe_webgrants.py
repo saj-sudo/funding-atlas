@@ -1,6 +1,6 @@
 """One-off probe for the WebGrants connector: read each storefront list once, keep the rows the tests need, save the
 trimmed lists and those rows' detail pages as fixtures, and print what the connector sees on each.
-  uv run python scripts/probe_webgrants.py
+  uv run python scripts/probe_webgrants.py [host ...]
 Writes tests/fixtures/webgrants/: <host>_list.html and detail_<host>-<ID>.html."""
 
 from __future__ import annotations
@@ -32,6 +32,10 @@ WANTED = {
         ("Potato Research and Market Development", "all-caps APPLICANT ELIGIBILITY heading, applicants as plain paragraphs"),
     ),
     "mtfwp": (),
+    "nd": (
+        ("Honor Guard Stipends", "North Dakota, Final-Application Due Date Not Applicable"),
+        ("Infrastructure Request", "FIND: one application for six programs, 'political subdivisions' apply"),
+    ),
 }
 
 
@@ -40,6 +44,8 @@ def main() -> None:
     kept: list[tuple[str, dict[str, str], str]] = []
     with wg._client() as client:
         for key, (base, _state) in wg.HOSTS.items():
+            if sys.argv[1:] and key not in sys.argv[1:]:   # `probe_webgrants.py nd` re-reads one host only
+                continue
             list_html = wg._get(client, base + wg.LIST_PATH)
             rows = wg.parse_list(list_html)
             print(f"{key}: {len(rows)} rows")

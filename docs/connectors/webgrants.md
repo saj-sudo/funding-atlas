@@ -14,6 +14,31 @@ municipal rows, as expected from a single Department of Agriculture host. Cross-
 against the deadline heading on its own detail page: all 40 agree, and one round (687121) repeats its final date as its
 pre-application date on the list, which the record leaves out.
 
+## North Dakota (2026-11-05, roadmap 12.6c)
+
+The 12.6c probe found the third storefront state: `https://grants.nd.gov` ("WebGrants - North Dakota", the state's
+enterprise system; `robots.txt` answers 404) serves `storefrontFOList.do` and `viewStorefrontOpportunity.do` exactly as
+Iowa and Montana do, so it is one line in `HOSTS` (`nd`) and the parser is unchanged. North Dakota's agencies post their
+rounds here (Parks and Recreation's Recreational Trails Program page says to apply on "WebGrants Site"). On 2026-11-05 two
+rounds were posted: Veterans Affairs' Honor Guard Stipends 2025-2027 (no final deadline, rolling) and "July 2026 - June
+2027 Infrastructure Request" under Funding for Infrastructure in North Dakota (FIND: one application for six water and
+infrastructure programs, due 2027-06-30). The Department of Public Instruction runs its own storefront
+(`nddpi.grants.nd.gov`); it was empty on the day and is not configured.
+
+FIND's page has no eligibility heading; its description says "the FIND program allows for political subdivisions to
+submit one application". Two changes followed, both measured on every stored record:
+
+- **A page with no eligibility section** now reads the description's who-may-apply sentences ("eligible applicants",
+  "may apply", "can apply", "eligible to apply", "allows ... to submit/apply"), keeping only a sentence that names an
+  applicant type (`fallback_sentences`). A page with an eligibility section is read exactly as before.
+- **"Political subdivision(s)"** tags municipality and county in the shared tagger (`connectors/text.py`) and counts as
+  local-government wording for the tier (migration 0007).
+
+Together: 3 of 7,606 stored records move (Pennsylvania DEP's Alternative Fuel Incentive Grants gains county from its
+"Political subdivisions" line; California's Proposition 1 keeps its values with a new source code; Iowa's K-12 District
+Computer Science Planning gains school from "Districts and nonpublic schools can apply"). Live: 2 North Dakota rounds
+added, 1 Iowa round changed, second run 0 changed; FIND is an open, likely municipal row on the North Dakota page.
+
 ## The source
 
 WebGrants is Dulles Technology's grants-management system. Its public face is the **storefront**: a list of the
