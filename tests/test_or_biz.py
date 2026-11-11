@@ -71,8 +71,13 @@ def test_status_table():
     assert normalize("programs/hisf").status == "closed"
     assert normalize("programs/sbma").status == "closed"
     assert normalize("programs/rsia").status == "closed"
+    # CDBG states two windows a year with no year on them (10.6): between them it is closed at the last window's end,
+    # inside one it is open to that window's end.
     cdbg = normalize("programs/cdbg")
-    assert (cdbg.status, cdbg.closes_at_text) == ("unknown", "February 1–April 30, applications accepted.")
+    assert (cdbg.status, cdbg.closes_at) == ("closed", date(2026, 9, 30)) and cdbg.closes_at_text.startswith("July 1–September 30")
+    spring = normalize("programs/cdbg", date(2027, 3, 1))
+    assert (spring.status, spring.closes_at) == ("open", date(2027, 4, 30))
+    assert normalize("programs/cdbg", date(2027, 1, 15)).closes_at == date(2026, 9, 30)
     bdp = normalize("programs/bdp")
     assert (bdp.status, bdp.closes_at) == ("unknown", date(2024, 4, 25))
     abc = normalize("aboutus/artscommission/grants/for-organizations/arts-build-communities")

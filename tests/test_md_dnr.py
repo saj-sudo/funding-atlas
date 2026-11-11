@@ -224,3 +224,12 @@ def test_classify_page():
     assert dn.classify_page(None) == {"status": "unknown"}
     assert dn.classify_page(payload(KMB), TODAY) == {"status": "open", "closes_at": date(2026, 12, 1)}
     assert dn.classify_page(payload(CPP), TODAY) == {"status": "closed", "closes_at": None}
+
+
+def test_a_who_is_eligible_question_is_answered_by_the_next_sentence():
+    """Living Shorelines (10.6): the question and its answer share a block, split by a line break."""
+    html = section("<p><strong>Who is eligible for a 0% interest living shoreline loan?</strong><br/>Individuals or groups "
+                   "of homeowners, non-profit organizations, community organizations, counties and municipalities</p>"
+                   "<p><strong>What is the loan term?</strong><br/> Loans range from 5-20 years.</p>")
+    lines = dn.applicant_lines_for(html)
+    assert lines[1].startswith("Individuals or groups of homeowners") and not any("loan term" in ln for ln in lines)

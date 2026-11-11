@@ -54,11 +54,39 @@ APPLICANT_RE = re.compile(r"\b(?:eligible applicants?|may apply|are eligible|eli
 CYCLE_RE = re.compile(r"\b(?:applications? (?:are |will be )?accepted|application (?:period|round|window|cycle)|deadline|are due|is due)\b", re.I)
 FEDERAL_RE = re.compile(r"\bfederal(?:ly)? (?:funds|funding|grant|program|dollars)\b|\bHUD\b|\bU\.S\. Department\b|\bARPA\b|\bAmerican Rescue Plan\b", re.I)
 MATCH_RE = re.compile(r"\bmatch(?:ing)? (?:requirement|funds?|is required)\b|\b\d{1,3}% (?:local )?match\b", re.I)
+# A window the page states for every year, with no year on it: CDBG's "February 1–April 30, applications accepted" and
+# "July 1–September 30, applications accepted". Read for the run date's year (and the year before, for the last window
+# that ended): inside a window is `open` to its end; between windows is `closed` with the last window's end (10.6).
+_MONTHS = r"(January|February|March|April|May|June|July|August|September|October|November|December)"
+WINDOW_RE = re.compile(rf"^{_MONTHS}\s+(\d{{1,2}})\s*[–-]\s*{_MONTHS}\s+(\d{{1,2}}),\s*applications accepted\b", re.I)
 CONTACT_RE = re.compile(r"@|\b\d{3}[.-]\d{3}[.-]\d{4}\b")   # an address or a number; "contact your officer" is prose
 ZWSP_RE = re.compile(r"[​﻿]")
 
 
 # ---------- parsing (no I/O) ----------
+
+def yearly_windows(blocks: Blocks, today: date) -> tuple[str, date, str] | None:
+    """(status, closes_at, sentence) from the yearly windows a page states, or None when it states none."""
+    month = {m.lower(): i for i, m in enumerate(_MONTHS.strip("()").split("|"), 1)}
+    spans: list[tuple[date, date, str]] = []
+    for _, text in blocks:
+        m = WINDOW_RE.match(text)
+        if not m:
+            continue
+        for year in (today.year - 1, today.year):
+            try:
+                spans.append((date(year, month[m.group(1).lower()], int(m.group(2))),
+                              date(year, month[m.group(3).lower()], int(m.group(4))), text))
+            except ValueError:
+                continue
+    if not spans:
+        return None
+    current = next(((end, text) for start, end, text in spans if start <= today <= end), None)
+    if current:
+        return "open", current[0], current[1]
+    end, text = max((end, text) for _, end, text in spans if end < today)
+    return "closed", end, text
+
 
 def _text(el: Tag) -> str:
     return clean(ZWSP_RE.sub("", el.get_text(" ")))
@@ -173,6 +201,9 @@ class Biz(HandListConnector):
         sentence = self.round_sentence(blocks)
         closes_at = self.closes_at_for(sentence)
         status, rolling = self.status_for(sentence, closes_at, today)
+        windows = yearly_windows(blocks, today) if status == "unknown" else None
+        if windows:
+            status, closes_at, sentence = windows
         lines = applicant_lines(blocks)
         topic = program.get("topic")
         categories = [CategoryTag(value=v, source_code=topic) for v in portal_categories(topic) if v != "other"] if topic else []
