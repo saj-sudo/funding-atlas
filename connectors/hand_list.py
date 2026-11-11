@@ -307,7 +307,8 @@ AGENCY_DATE_RE = re.compile(rf"\b{_MONTHS}\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4
 DUE_RE = re.compile(r"\b(?:due|deadline|submitted by)\b|\bthrough\b(?=[^.]*\baccepting\b)", re.I)
 NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant term|implementation period|reimbursement)\b", re.I)
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
-AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b", re.I)
+AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
+                            r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b", re.I)   # Kentucky ARC: "Pre-applications ... are being accepted"
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b", re.I)
 # "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
 # certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
@@ -319,7 +320,9 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   r"|\beligible applicants\b"
                                   # North Dakota (12.6c): NDDOT's "Eligible Project Applicants"; Parks' "The following
                                   # entities are eligible to apply:" over a list.
-                                  r"|\beligible project applicants\b|\bentities are eligible\b", re.I)
+                                  r"|\beligible project applicants\b|\bentities are eligible\b"
+                                  # Kentucky (12.6d): KIA's bare "Eligibility:" label over the loan fund's conditions.
+                                  r"|^eligibility:?$", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to apply\b"
@@ -327,7 +330,7 @@ APPLICANT_SENTENCE_RE = re.compile(
     # Connecticut (12.6b): "accepting applications from municipalities", "Applicants must be a municipality",
     # "only available to Connecticut towns and cities", "State funds to urbanized area municipal governments",
     # "grants-in-aid to towns", "enables municipalities ... to apply", "sub-entities able to apply".
-    r"|\baccept(?:s|ing) applications from\b|\bapplicants must be\b|\b(?:is|are) (?:only )?available to\b"
+    r"|\baccept(?:s|ing) applications from\b|\bapplicants? must be\b|\b(?:is|are) (?:only )?available to\b"
     r"|\b(?:funds?|funding|grants?(?:-in-aid)?)\s+to\s+(?:[\w-]+\s+){0,3}"
     r"(?:municipal\w*|towns?|cities|count(?:y|ies)|local governments?)\b"
     r"|\benables?\b[^.]*\bto apply\b|\bable to apply\b|\bserves? as the sub-?applicant\b"   # FEMA: a town is the sub-applicant
@@ -338,17 +341,22 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|^eligible entities\b|\bprogram is open to\b|\bprojects identified by\b"
     r"|\bopportunity for (?:[\w-]+\s+){0,2}(?:cities|counties|towns|townships|municipal\w*)\b"
     r"|\bprovides?\s+(?:\w+\s+)?aid to\b"
-    r"|\beligible jurisdictions\b[^.]*\bmay submit\b", re.I)   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
+    r"|\beligible jurisdictions\b[^.]*\bmay submit\b"   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
+    # Kentucky (12.6d): DLG's "Who can Apply: ..." line on every CDBG, DRA and ARC page.
+    r"|^who (?:can|may) apply\b", re.I)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
     r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
     r"|\bfunded with federal aid\b", re.I)   # NDDOT's Urban Grant Program (12.6c)
 FUNDING_SOURCE_RE = re.compile(r"^funding source:", re.I)
-FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational Park Service\b", re.I)
+FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational Park Service\b|\bEnvironmental Protection Agency\b|\bEPA\b", re.I)
 # "serve as the sub-applicant on behalf of homeowners or businesses" (Connecticut HMGP): whoever an applicant applies on
 # behalf of benefits, and does not apply; the clause is cut before tagging (the stored text keeps it).
 ON_BEHALF_RE = re.compile(r"\bon behalf of\b[^.;]*", re.I)
+# "Non-profits and private sector entities may partner with an eligible applicant" (Kentucky CMAQ): a partner, not an
+# applicant; the sentence stays in the stored text and is not tagged.
+PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
 MATCH_RE = re.compile(r"\bmatch(?:ing)?\b[^.]*\brequired\b|\brequire[sd]?\b[^.]*\bmatch\b", re.I)
 MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
 
@@ -369,6 +377,22 @@ def first_date(text: str) -> date | None:
     return None
 
 
+_FULL_DATE = rf"{_MONTHS}\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}}"
+# "Applications Accepted: Dates are April 1, 2026 - September 1, 2026" (Kentucky DLG, every CDBG page): a window with no
+# deadline word, read only when the sentence is about applications and no deadline word was found anywhere.
+RANGE_RE = re.compile(rf"({_FULL_DATE})\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
+
+
+def application_range(sents: list[str]) -> tuple[str, date, date] | None:
+    for s in sents:
+        m = RANGE_RE.search(s)
+        if m and APPLICATION_RE.search(s) and not NOT_DEADLINE_RE.search(s):
+            start, end = _date(m.group(1)), _date(m.group(2))
+            if start and end:
+                return s, start, end
+    return None
+
+
 def deadline(sents: list[str]) -> tuple[str | None, date | None]:
     """The first sentence with a deadline word and a date next to it (not a closeout, report or grant-term date)."""
     for s in sents:
@@ -382,7 +406,8 @@ def deadline(sents: list[str]) -> tuple[str | None, date | None]:
                 d = _date(m.group(0)) if gap <= NEAR_CHARS else None
                 if d:
                     return s, d
-    return None, None
+    window = application_range(sents)
+    return (window[0], window[2]) if window else (None, None)
 
 
 def opening(sents: list[str]) -> date | None:
@@ -391,7 +416,8 @@ def opening(sents: list[str]) -> date | None:
             d = first_date(s)
             if d:
                 return d
-    return None
+    window = application_range(sents)
+    return window[1] if window else None
 
 
 def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
@@ -415,10 +441,15 @@ def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
     return {"status": status, "opens_at": opens, "closes_at": due, "closes_at_text": text}
 
 
+# The labelled lines a page prints under a program's heading (Kentucky's Energy and Environment Cabinet).
+META_LINE_RE = re.compile(r"^(?:administering agency|type of funding|funding source|eligible entities)\s*:", re.I)
+
+
 def summary_for(blocks: Blocks) -> str | None:
-    """The first paragraph that is not a status line."""
+    """The first paragraph that is not a status line or a labelled metadata line."""
     for kind, text in blocks:
-        if kind == "p" and not (AGENCY_OPEN_RE.search(text) or AGENCY_CLOSED_RE.search(text) or DUE_RE.search(text)):
+        if kind == "p" and not (AGENCY_OPEN_RE.search(text) or AGENCY_CLOSED_RE.search(text) or DUE_RE.search(text)
+                                or META_LINE_RE.search(text)):
             return text
     return None
 
@@ -486,6 +517,10 @@ class AgencyPageConnector(HandListConnector):
     # `split_sections`). The first declared program keeps the page's own `source_id`, so a record that was one before
     # the split keeps its history; the others are `slug#sub_slug`.
     SPLITS: dict[str, list[Split]] = {}
+    # source_id -> value, for an agency whose pages mix kinds: the funding type when the name carries no keyword
+    # ("Fund A - Wastewater" is a loan fund), and the portal-style category label when one agency covers several topics.
+    FUNDING_TYPES: dict[str, str] = {}
+    CATEGORY_LABELS: dict[str, str] = {}
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         page = pages[0]
@@ -504,19 +539,20 @@ class AgencyPageConnector(HandListConnector):
         blocks = [tuple(b) for b in page.get("blocks", [])]
         text = " ".join(t for _, t in blocks)
         name = raw.payload.get("name") or clean(page.get("title", "")) or raw.source_id
+        label = self.CATEGORY_LABELS.get(raw.source_id, self.CATEGORY_LABEL)
         lines = applicant_lines(blocks) + quote_lines(self.HAND_QUOTES, raw.source_id)
         match = None if MATCH_NOT_RE.search(text) else (True if MATCH_RE.search(text) else None)
         return dict(
             source_url=self.BASE + path,
             name=name,
-            funding_type=funding_type_for(name) or "grant",
+            funding_type=self.FUNDING_TYPES.get(raw.source_id) or funding_type_for(name) or "grant",
             funding_source=funding_source_for(blocks, text),
             match_required=match,
             rolling=None,
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,
             eligibility_structured=None,
-            applicant_types=applicant_tags([ON_BEHALF_RE.sub("", line) for line in lines]),
-            categories=[CategoryTag(value=v, source_code=self.CATEGORY_LABEL) for v in portal_categories(self.CATEGORY_LABEL)],
+            applicant_types=applicant_tags([ON_BEHALF_RE.sub("", line) for line in lines if not PARTNER_LINE_RE.search(line)]),
+            categories=[CategoryTag(value=v, source_code=label) for v in portal_categories(label)],
             **round_for(blocks, today),
         )

@@ -96,6 +96,10 @@ CONNECTOR_LABEL = {
     "nd_dot": "North Dakota Department of Transportation",
     "nd_des": "North Dakota Department of Emergency Services",
     "nd_parks": "North Dakota Parks and Recreation",
+    "ky_dlgfed": "Kentucky Department for Local Government (federal grants)",
+    "ky_tc": "Kentucky Transportation Cabinet (Office of Local Programs)",
+    "ky_eec": "Kentucky Energy and Environment Cabinet",
+    "ky_kia": "Kentucky Infrastructure Authority",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
