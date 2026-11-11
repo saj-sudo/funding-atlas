@@ -36,10 +36,10 @@ STOP_RE = re.compile(r"(?:need help\??|documents|hud resources|resources|related
 QUALIFY_RE = re.compile(r"^do i qualify\??$", re.I)
 
 
-def parse_page(page_html: str) -> dict[str, Any]:
+def parse_page(page_html: str, selector: str = BODY_SELECTOR) -> dict[str, Any]:
     """title and the body's blocks, contact lines dropped, cut at the first closing section."""
     doc = soup(page_html)
-    body = doc.select_one(BODY_SELECTOR)
+    body = doc.select_one(selector)
     # DED prints the department's name in one `h1` and the program's in the next; the last `h1` is the program.
     h1s = [clean(h.get_text(" ")) for h in doc.find_all("h1")]
     title = next((t for t in reversed(h1s) if t), "")
@@ -80,11 +80,21 @@ class MoAgency(AgencyPageConnector):
     APPLICANT_ITEM_MAX = 400      # DNR's "Who Can Apply" items are whole sentences: "Municipalities, counties, public sewer or water districts, ..."
     # slug -> True for a page that names its programs in two tabs (DED); see `join_tabs`.
     TABBED: dict[str, bool] = {}
+    # slug -> the program's name, for a page whose `h1` is not it
+    NAMES: dict[str, str] = {}
+
+    BODY_SELECTOR = BODY_SELECTOR   # SEMA's older pages keep the program in `#main-content`
 
     def parse_page(self, page_html: str) -> dict[str, Any]:
-        return parse_page(page_html)
+        return parse_page(page_html, self.BODY_SELECTOR)
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
+        records = self._records(slug, spec, pages, count)
+        name = self.NAMES.get(slug)
+        # a page whose last `h1` is not the program's name (MoDOT's Partnership Development prints its application form's)
+        return [(sid, {**payload, "name": name}) if name and "name" not in payload else (sid, payload) for sid, payload in records]
+
+    def _records(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         splits = self.SPLITS.get(slug)
         if not (splits and self.TABBED.get(slug)):
             return super().records_for(slug, spec, pages, count)

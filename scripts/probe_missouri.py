@@ -20,7 +20,7 @@ from pipeline.models import RawRecord  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 GONE = "script, style, svg, noscript, iframe, link, meta, header, footer, nav"
-ALL = ["mo_ded", "mo_dnr"]
+ALL = ["mo_ded", "mo_dnr", "mo_modot", "mo_sema"]
 
 
 def scrub(page_html: str) -> str:

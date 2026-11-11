@@ -102,6 +102,8 @@ CONNECTOR_LABEL = {
     "ky_kia": "Kentucky Infrastructure Authority",
     "mo_ded": "Missouri DED (Community Development Block Grants)",
     "mo_dnr": "Missouri Department of Natural Resources",
+    "mo_modot": "Missouri Department of Transportation (Local Public Agency programs)",
+    "mo_sema": "Missouri State Emergency Management Agency",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

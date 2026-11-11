@@ -1,4 +1,4 @@
-"""Missouri's agency connectors (mo_ded, mo_dnr) and their Drupal base, against saved pages."""
+"""Missouri's agency connectors (mo_ded, mo_dnr, mo_modot, mo_sema) and their Drupal base, against saved pages."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures"
 TODAY = date(2026, 11, 11)
-AGENCIES = ["mo_ded", "mo_dnr"]
+AGENCIES = ["mo_ded", "mo_dnr", "mo_modot", "mo_sema"]
 
 
 def mod(name: str):
@@ -133,6 +133,50 @@ def test_ded_is_hud_money_passed_through_the_state():
     assert program("mo_ded", "competitive-cycle").category_pairs() == [("infrastructure", "community development")]
 
 
+def test_sema_reads_its_older_cms_through_main_content():
+    p = page("mo_sema", "mdag")
+    assert p["title"] == "Missouri Disaster Assistance Grant" and p["blocks"][0] == ("label", "Fiscal Year 2025 Program Summary")
+    assert "Toolbar Links" not in text("mo_sema", "mdag")                       # the page chrome sits outside #main-content
+    assert mo.parse_page("<html><div id='main-content'><h1>X</h1><p>Body.</p></div></html>", "#main-content")["blocks"] == [("p", "Body.")]
+    assert mo.parse_page("<html><h1>X</h1><p>Body.</p></html>")["blocks"] == []   # the Drupal selector finds nothing there
+
+
+def test_sema_programs():
+    got = {slug: program("mo_sema", slug) for slug in mod("mo_sema").PAGES}
+    # all four are event- or cycle-driven and state no open round: the MDAG's "30 days from date of incident", the PA
+    # deadline (2025-01-31) that is past, the mitigation and EMPG pages' links to past years
+    assert {s: p.status for s, p in got.items()} == {"mdag": "unknown", "mitigation": "unknown", "public-assistance": "unknown", "empg": "unknown"}
+    assert got["public-assistance"].closes_at.isoformat() == "2025-01-31"
+    assert tags("mo_sema", "mdag") == {"municipality", "county"}              # "Eligible Applicants: Political Subdivisions (city or county)"
+    assert tags("mo_sema", "empg") == {"municipality", "county"}              # "provides resources to ... local government emergency management agencies"
+    # the mitigation page is one record, named for the three programs it covers (its sections interleave)
+    assert got["mitigation"].name == "Hazard Mitigation Assistance Grants (HMGP, FMA, BRIC)"
+    assert [sid for sid in programs("mo_sema", "mitigation")] == ["mitigation"]
+    # funding source is what the page names: FEMA on three, none on the state-funded MDAG and the EMPG page
+    assert [got[s].funding_source for s in ("mdag", "mitigation", "public-assistance", "empg")] == ["direct", "pass_through", "pass_through", "direct"]
+    assert all(p.category_pairs() == [("public_safety", "emergency management")] for p in got.values())
+
+
+def test_modot_tap_and_partnership_development():
+    tap, pd = program("mo_modot", "tap"), program("mo_modot", "partnership-development")
+    assert tap.name == "Transportation Alternatives Program (TAP)"          # the program's own h1, after the section's
+    assert pd.name == "Partnership Development"                              # the page's last h1 is its application form's
+    # the last call's deadline (2025-07-11) is past and the page names no current round
+    assert tap.status == "unknown" and tap.closes_at.isoformat() == "2025-07-11"
+    assert pd.status == "unknown" and pd.closes_at is None
+    assert tap.funding_source == "pass_through"                              # "Federal TAP funds are provided through the FHWA"
+    assert pd.funding_source == "direct"
+    # neither page says who applies in a word the tagger reads ("the LPA", "public/public and public/private partnerships")
+    assert tags("mo_modot", "tap") == set() and tags("mo_modot", "partnership-development") == set()
+    assert tap.category_pairs() == [("transportation", "transportation")]
+    assert tap.match_required is True                                        # "The LPA is required to match the project with a minimum of 20%"
+
+
+def test_name_override_does_not_touch_split_records():
+    ded = programs("mo_ded", "competitive-cycle")
+    assert [p.name for p in ded.values()] == ["CDBG Community Facilities", "CDBG General Infrastructure", "CDBG Demolition"]
+
+
 def test_dnr_reader_stops_before_the_footer_blocks_and_the_awards_lists():
     for slug in mod("mo_dnr").PAGES:
         t = text("mo_dnr", slug)
@@ -184,6 +228,7 @@ def test_dnr_leaves_out_what_is_not_for_public_bodies():
 
 
 def test_the_shared_phrasings_dnr_added():
+    assert hl.APPLICANT_SENTENCE_RE.search("The program provides resources to the State and local government emergency management agencies.")
     assert hl.AGENCY_OPEN_RE.search("Application Period is Open")
     assert hl.APPLICANT_SENTENCE_RE.search("Eligible recipients include the following:")
     assert hl.APPLICANT_SENTENCE_RE.search("Schools are eligible to submit applications.")
@@ -193,7 +238,7 @@ def test_the_shared_phrasings_dnr_added():
     assert "state" not in {t.value for t in hl.applicant_tags([hl.clause_cut("governmental organizations other than state agencies")])}
 
 
-def test_the_shared_phrasings_missouri_added():
+def test_the_shared_phrasings_ded_added():
     # "is currently open" is open wording; "Do I Qualify?" heads an eligibility list
     assert hl.AGENCY_OPEN_RE.search("The Emergency Cycle is currently open.")
     assert not hl.AGENCY_OPEN_RE.search("The program is open to counties.")

@@ -1,4 +1,4 @@
-# Missouri's agency pages (`mo_ded`, `mo_dnr`): source, raw data and field mapping
+# Missouri's agency pages (`mo_ded`, `mo_dnr`, `mo_modot`, `mo_sema`): source, raw data and field mapping
 
 Milestone 12.6e, the fifth agency state in the 12.6 cost ranking (after Vermont, Connecticut, North Dakota and Kentucky).
 Written 2026-11-11 from a read-only survey of the candidate agencies' hosts and pages, before the parser. The agencies
@@ -9,10 +9,10 @@ are built one at a time, each its own commit; this doc grows with them.
 | Agency | Host | CMS | robots | Verdict |
 |---|---|---|---|---|
 | Economic Development (DED) | `ded.mo.gov` | Drupal 10, Layout Builder (`.node__content`) | allows all | **built** (this doc) |
-| Transportation (MoDOT) | `www.modot.org` (the apex redirects) | Drupal 10 | blocks only `/media/oembed` | next |
-| State Parks and Historic Preservation | `mostateparks.com` (DNR's LWCF, Recreational Trails, Historic Preservation Fund and Certified Local Government pages live here) | not surveyed | not surveyed | after MoDOT, its own module |
+| Transportation (MoDOT) | `www.modot.org` (the apex redirects) | Drupal 10 | blocks only `/media/oembed` | **built** (below), two pages |
+| State Parks and Historic Preservation | `mostateparks.com` (DNR's LWCF, Recreational Trails, Historic Preservation Fund and Certified Local Government pages live here) | not surveyed | not surveyed | **next session**, its own module |
 | Natural Resources (DNR, with Energy) | `dnr.mo.gov` (`energy.mo.gov` redirects to `/energy`) | Drupal 10 | blocks `/taxonomy/` | **built** (below) |
-| Emergency Management (SEMA) | `sema.dps.mo.gov` | not Drupal, an older CMS with `.php` pages and no `.node__content` | blocks only legacy directories | next, its own reader |
+| Emergency Management (SEMA) | `sema.dps.mo.gov` | not Drupal, an older CMS with `.php` pages, a Bootstrap layout and the program in `#main-content` | blocks only legacy directories | **built** (below), the same base with another selector |
 | Housing (MHDC) | `mhdc.com` | no generator tag | no `robots.txt` (404) | deferred: its own CMS, mostly developer tax credits |
 | Conservation (MDC) | `mdc.mo.gov` | Drupal 10 | **`Disallow: /`** in at least one agent block | **stopped** on robots, as ADECA was; recorded, not read |
 
@@ -111,6 +111,60 @@ call them revolving funds and name no federal source, only an EPA handbook). The
 - Ten of twenty records are `unknown` because the page states no round. The revolving-fund loans are year-round by nature,
   but the pages do not say "year-round", and the rule is the source's words.
 
+## Implemented, MoDOT (2026-11-11)
+
+`connectors/mo_modot.py` follows this section. First live run **2 added, 0 errors**; second run **0 changed**. Both are
+`unknown`: the Transportation Alternatives Program's last call ("Notice of 2025 Statewide Call for Rural Projects -
+Applications due July 11, 2025") is past and the page says it funds "every two years (even years)" without naming a 2026
+call, and Partnership Development states no round. TAP is `pass_through` ("Federal TAP funds are provided through the
+FHWA") with a 20% match ("The LPA is required to match the project with a minimum of 20%"); Partnership Development is
+`direct`. Neither page names an applicant in a word the tagger reads (TAP says "the LPA", a local public agency).
+
+MoDOT's `/programs` page is a list of sections, and the other pages read (Aviation, Transit, Freight, Rail, Waterways,
+Highway Safety, the LPA home page) describe what the section does and name no application or round. The money MoDOT passes
+to local governments (the surface transportation block grant, off-system bridges, FTA 5304 and 5310 formula funds) goes to
+metropolitan planning organizations and counties by formula. So MoDOT is two records, on purpose, and a third is a
+line in `PAGES` when a call page appears. Three URL guesses for Cost Share and Safe Routes to School answered 404.
+`NAMES` in the base overrides a name when the page's last `h1` is not the program's (Partnership Development's is
+"Partnership Development Application").
+
+## Implemented, SEMA (2026-11-11)
+
+`connectors/mo_sema.py` follows this section, on the same base with `BODY_SELECTOR = "#main-content"` (the page chrome and
+menus sit outside it). First live run **4 added, 0 errors**; second run **0 changed**. All four are `unknown`: they are
+event- or cycle-driven and state no open round.
+
+| Record | What the page says | Applicants tagged | Funding |
+|---|---|---|---|
+| `mdag`, Missouri Disaster Assistance Grant | "Applications Due: 30 days from date of incident"; for "non-federally declared Stafford Act events"; 50/50 state and local, state share up to $200,000 | `municipality`, `county` ("Eligible Applicants: Political Subdivisions (city or county)") | `direct` (state) |
+| `mitigation`, Hazard Mitigation Assistance Grants (HMGP, FMA, BRIC) | HMGP applications by project type, the FMA process and notice of interest, FEMA GO; subapplicants apply to SEMA as the applicant | `municipality` | `pass_through` (FEMA) |
+| `public-assistance`, Public Assistance Program | "The deadline to submit an RPA is January 31, 2025" (past); 30 days from a disaster declaration | none (see Gaps) | `pass_through` ("Funding is provided through the Federal Emergency Management Agency (FEMA)") |
+| `empg`, Emergency Management Performance Grant | "provides resources to the State Emergency Management Agency and local government emergency management agencies"; reimbursement up to 50% | `municipality`, `county` | `direct` (the page names no federal funder, only "all federal requirements") |
+
+**The Mitigation page is one record, not three** (a deviation from Saj's one-record-per-program rule of 2026-11-11, for
+Saj to overrule). Its sections interleave: HMGP's process is described in two places, with shared "Eligible Subapplicants",
+"Eligible Activities" and planning-requirement blocks between them and the FMA process, and BRIC has no section of its own.
+`split_sections` cuts one contiguous section per program, so a split would give HMGP two records or FMA the HMGP text. A
+reader of the page gets one row that says what the three are. If SEMA reorganises the page by program, it becomes a
+`SPLITS` entry.
+
+Shared change (`APPLICANT_SENTENCE_RE`): `provides (aid|resources) to` (ND DES had `aid`), which reads EMPG's sentence.
+
+## Shared changes in this session, measured together
+
+All of the changes to `connectors/hand_list.py` in the DED, DNR and SEMA commits were measured on the 7,630 stored records
+restored from `gh-pages` (39 connectors) with `scripts/measure_tagger.py`, against a snapshot taken before any of them:
+**0 tag moves, 0 hash moves**, after the first change and again after the last. Vermont, Connecticut, North Dakota and
+Kentucky are therefore untouched. The full suite is 1,065 tests, green.
+
+## The Missouri state page
+
+Built from a scratch database holding all four connectors' records (`cli.py export`): **5 open municipal rows**: CDBG
+Downtown Revitalization, CDBG Emergency, DWSRF Lead Service Line, Flood Resiliency Improvement Grants and Section 319. A row
+that names no local-government applicant (CDBG Water/Wastewater and Industrial Infrastructure, the Well Plugging Grant,
+which names nonprofits) is open but not on the municipal page, by the navigator's existing rule; the rest are `unknown` or
+closed and sit in "between rounds" or "everything".
+
 ## The platform
 
 DED, MoDOT and DNR run the state's Drupal 10 theme. The page's text sits in `.node__content`: an `.alert` block with the
@@ -203,3 +257,14 @@ is one program, not the first tab run into the second. The first program keeps t
   persons." is kept as an eligibility line by the shared `applicants must be` phrasing; it states a condition, not an
   applicant, and tags nothing.
 - The Competitive Cycle's FY27 date is "TBD" on the page, so no opening date is stored.
+
+## Gaps (MoDOT and SEMA, recorded, not hidden)
+
+- `public-assistance` tags no applicant: the page says "eligible public entities" and "eligible applicants" without a word
+  the tagger maps (the public entities are local governments, private nonprofits and tribes, which FEMA defines and the page
+  does not list). `tap` says "LPA" (local public agency), also not a tagger word. A vocabulary change for two records is not
+  made here; a third case in another state adds it.
+- `empg` is `direct` because the page never names FEMA or the Department of Homeland Security, only "all federal
+  requirements"; EMPG is federal money in fact. The rule is what the page says.
+- Missouri's own `mostateparks.com` (LWCF, Recreational Trails, Historic Preservation Fund, Certified Local Government) is
+  not read yet, nor are Housing (MHDC) and Conservation (MDC, blocked by robots).

@@ -344,7 +344,7 @@ APPLICANT_SENTENCE_RE = re.compile(
     # over 5,000", DES's "FEMA provides supplemental aid to state, local, tribal ...".
     r"|^eligible entities\b|\bprogram is open to\b|\bprojects identified by\b"
     r"|\bopportunity for (?:[\w-]+\s+){0,2}(?:cities|counties|towns|townships|municipal\w*)\b"
-    r"|\bprovides?\s+(?:\w+\s+)?aid to\b"
+    r"|\bprovides?\s+(?:\w+\s+)?(?:aid|resources) to\b"   # Missouri SEMA's EMPG: "provides resources to the State ... and local government emergency management agencies"
     r"|\beligible jurisdictions\b[^.]*\bmay submit\b"   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
     # Kentucky (12.6d): DLG's "Who can Apply: ..." line on every CDBG, DRA and ARC page.
     r"|^who (?:can|may) apply\b"
