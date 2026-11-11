@@ -61,7 +61,7 @@ def test_bikeways_awards_announced_is_closed_with_who_can_apply_tags_and_match()
     lines = p.eligibility_text.split("\n")
     assert "Who Can Apply" in lines and "Maryland State Agencies" in lines and "Non-profit organizations" in lines
     assert "Eligible Projects" not in lines and not any("universities" in ln for ln in lines)   # project criteria are not applicants
-    assert {t.value for t in p.applicant_types} == {"municipality", "county", "state", "nonprofit"}
+    assert {t.value for t in p.applicant_types} == {"municipality", "county", "state", "nonprofit", "special_district"}   # "Transit entities" (10.6)
     assert p.match_required is True and p.funding_type == "grant" and p.funding_source == "direct"
     assert p.category_pairs() == [("transportation", "Active Transportation")]
     assert p.summary.startswith("Established in 2012")                                           # not the banner

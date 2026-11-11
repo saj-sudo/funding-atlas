@@ -337,7 +337,8 @@ APPLICANT_SENTENCE_RE = re.compile(
     # over 5,000", DES's "FEMA provides supplemental aid to state, local, tribal ...".
     r"|^eligible entities\b|\bprogram is open to\b|\bprojects identified by\b"
     r"|\bopportunity for (?:[\w-]+\s+){0,2}(?:cities|counties|towns|townships|municipal\w*)\b"
-    r"|\bprovides?\s+(?:\w+\s+)?aid to\b", re.I)
+    r"|\bprovides?\s+(?:\w+\s+)?aid to\b"
+    r"|\beligible jurisdictions\b[^.]*\bmay submit\b", re.I)   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"

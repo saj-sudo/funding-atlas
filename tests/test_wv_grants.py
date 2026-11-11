@@ -129,7 +129,7 @@ def test_normalize_future_posted_ongoing_item_is_forecasted_and_rolling():
     p = normalize("76")
     assert p.status == "forecasted" and p.opens_at == date(2027, 1, 1) and p.closes_at == date(2027, 6, 1)
     assert p.rolling is True and p.closes_at_text == "Ongoing"
-    assert p.applicant_pairs() == []     # "State governments ... can apply": the shared keyword map knows "state agencies", not this
+    assert {t.value for t in p.applicant_types} == {"state"}   # "State governments ... can apply" (10.6)
 
 
 def test_normalize_past_due_with_cycle_text_is_closed_and_keeps_the_text():

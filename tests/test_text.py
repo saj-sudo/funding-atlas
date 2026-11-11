@@ -180,3 +180,60 @@ def test_political_subdivisions_are_local_governments():
     assert v("the FIND program allows for political subdivisions to submit one application") == {"municipality", "county"}
     assert v("provides loans to political subdivisions for eligible essential infrastructure projects") == {"municipality", "county"}
     assert v("Political subdivisions") == {"municipality", "county"}
+
+
+# ---------- 10.6: the recorded gaps, every state so far ----------
+
+def test_state_in_a_list_of_governments():
+    assert "state" in values("The Public Assistance Program provides supplemental financial assistance to State, local "
+                             "governments and certain private non-profit organizations")         # MDEM
+    assert values("State governments in the Chesapeake Bay watershed can apply.") == {"state"}     # West Virginia
+    assert "state" in values("open to state, county, or municipal forensic crime laboratories")    # PA PCCD
+    assert "state" not in values("State funds are matched by local governments")
+    assert "state" not in values("the State will review applications from cities")
+
+
+def test_negation_exemptions():
+    from connectors.maryland_drupal import NEGATION_RE
+    assert not NEGATION_RE.search("Nonprofit entities not within designated urban areas")           # a place limit (MDEM NSGP)
+    assert not NEGATION_RE.search("Eligible costs include, but are not limited to, equipment")    # Texas
+    assert not NEGATION_RE.search("private not-for profit (PNP) entities may submit")             # ND HMGP
+    assert NEGATION_RE.search("Applicants not located in Maryland are ineligible")
+
+
+def test_conditions_and_statistics_are_not_applicants():
+    assert values("Be an Oregon resident;") == set()                                              # Aggie Bond borrower condition
+    assert values("150 percent of the state or county average wage, whichever is less") == set()  # Oregon BEP
+    assert values("larger than 30% of the county's median farm size") == set()
+    assert "county" in values("Lehigh County's MDIT as eligible applicants for 2026")              # a county team still applies
+    assert values("Maryland residents may apply") == {"household"}
+
+
+def test_communities_only_where_they_apply():
+    assert values("All 78 Massachusetts coastal communities are eligible to apply.") == {"municipality"}   # Seaport
+    assert values("Assistance primarily to small and disadvantaged communities for sewer infrastructure") == set()
+    assert "municipality" not in values("tribes or indigenous communities that are not federally-recognized may apply")
+
+
+def test_local_government_words():
+    assert values("Not-for-profit community organizations are eligible to apply as are local political entities.") == {
+        "nonprofit", "municipality", "county"}                                                    # ND Vibrancy
+    assert values("All eligible jurisdictions and private not-for profit (PNP) entities may submit qualifying projects") == {
+        "municipality", "county", "nonprofit"}                                                    # ND HMGP
+    assert values("Local law enforcement agencies in Virginia are eligible to receive this funding.") == {"municipality", "county"}
+    assert values("enter into a memorandum of understanding with a local law enforcement agency") == set()   # a partner (Texas)
+    assert values("grants to subdivisions for flood mitigation") == {"municipality", "county"}      # MDE CFMGP
+
+
+def test_single_purpose_districts_and_authorities():
+    assert values("Park boards and park districts") == {"special_district"}
+    assert values("Water management districts") == {"special_district"}
+    assert values("Transit agencies") == {"special_district"}
+    assert values("Transit entities operating in Maryland") == {"special_district"}
+    assert "special_district" in values("local or regional economic or industrial development authorities may apply")
+    assert "special_district" not in values("the Michigan State Housing Development Authority administers the program")
+    assert values("Metropolitan Planning Organizations (MPOs)") == set()                           # no type (Saj's call)
+
+
+def test_volunteer_emergency_companies_are_nonprofits():
+    assert values("Fully and partially volunteer fire companies, first aid squads and rescue squads.") == {"nonprofit"}

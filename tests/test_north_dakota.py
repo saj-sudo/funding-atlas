@@ -93,18 +93,20 @@ def test_submitted_by_needs_an_application():
 
 
 def test_applicants():
-    for slug in ("slum-blight", "workforce-housing", "facility-planning", "rural-catalyst", "rural-grocery"):
+    assert tags("nd_commerce", "rural-catalyst") == {"municipality", "county", "tribe", "special_district"}   # job development authority
+    for slug in ("slum-blight", "workforce-housing", "facility-planning", "rural-grocery"):
         assert tags("nd_commerce", slug) == {"municipality", "county", "tribe"}, slug
-    assert tags("nd_commerce", "vibrancy") == {"nonprofit"}             # "local political entities" tags nothing
+    assert tags("nd_commerce", "vibrancy") == {"nonprofit", "municipality", "county"}   # "local political entities" (10.6)
     assert tags("nd_commerce", "artists-on-main-street") == set()       # applicants only in its guidelines PDF
     assert tags("nd_dot", "flex-fund") == {"municipality", "county"}     # townships tag as municipality
-    assert tags("nd_dot", "transportation-alternatives") == {"municipality", "county", "school", "tribe"}
+    assert tags("nd_dot", "transportation-alternatives") == {"municipality", "county", "school", "tribe", "special_district"}
     assert tags("nd_dot", "urban-grant") == {"municipality"}
     assert tags("nd_dot", "special-road-fund") == {"municipality", "county", "tribe", "state"}
-    assert tags("nd_des", "public-assistance") == {"tribe"}
-    assert tags("nd_des", "hazard-mitigation") == set()
-    assert tags("nd_parks", "lwcf") == {"municipality", "county", "school", "state", "tribe"}
-    assert tags("nd_parks", "rtp") == {"municipality", "county", "nonprofit", "tribe"}
+    assert tags("nd_des", "public-assistance") == {"tribe", "state"}
+    # "All eligible jurisdictions and private not-for profit (PNP) entities may submit" (10.6)
+    assert tags("nd_des", "hazard-mitigation") == {"municipality", "county", "nonprofit"}
+    assert tags("nd_parks", "lwcf") == {"municipality", "county", "school", "state", "tribe", "special_district"}
+    assert tags("nd_parks", "rtp") == {"municipality", "county", "nonprofit", "tribe", "special_district"}
 
 
 def test_categories_funding_source_and_match():

@@ -53,8 +53,11 @@ APPLICANT_MARKER_RE = re.compile(
 )
 # "not-for-profit" names an applicant. "except" and "excluding" inside a parenthetical carve one case out of a list that
 # still stands ("Any Vermont town, city (except Burlington), ... is eligible"), so they negate only outside parentheses.
+# "not within <place>" limits where, not who ("Nonprofit entities not within designated urban areas", MDEM NSGP), and
+# "not limited to" widens a list ("includes, but is not limited to", Texas); neither negates the sentence; nor does
+# "not-for profit" written with a space (North Dakota HMGP). 10.6.
 NEGATION_RE = re.compile(
-    r"\b(?:not(?!-for-profit)|cannot|ineligible|(?:except|excluding)(?![^()]*\))|unless)\b", re.I)
+    r"\b(?:not(?!-for[- ]profit|\s+within\b|\s+limited\s+to\b)|cannot|ineligible|(?:except|excluding)(?![^()]*\))|unless)\b", re.I)
 CONDITION_LEAD_IN_RE = re.compile(
     r"\b(?:that|must|if|which|who|whose|company|business|businesses|you|categories|tracks|following"
     r"|criteria|requirements)\s*:$",
