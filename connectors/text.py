@@ -30,9 +30,11 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\bmunicipal\b", ("municipality",)),           # "municipal governments", "municipal corporations" (MEA, DNR)
     (r"\bcit(?:y|ies)\b", ("municipality",)),
     (r"\b(?:towns?|villages?|townships?|boroughs?)\b", ("municipality",)),
-    (r"\bcount(?:y|ies)\b", ("county",)),
+    # A county as an adjective is a statistic or a place, not the applicant: "150 percent of the state or county average
+    # wage" (Oregon BEP), "30% of the county's median farm size" (Oregon Aggie Bond). 10.6.
+    (r"\bcount(?:y|ies)\b(?!(?:['’]s)?\s+(?:average|median)\b)", ("county",)),
     (r"\bnon-?profits?\b", ("nonprofit",)),
-    (r"\bnot-for-profits?\b", ("nonprofit",)),
+    (r"\bnot-for[- ]profits?\b", ("nonprofit",)),   # "not-for profit" with a space too (ND HMGP, 10.6)
     (r"501\s?\(c\)\s?\(3\)", ("nonprofit",)),
     (r"(?<!not-)\bfor-profits?\b", ("business",)),
     (r"\bbusiness(?:es)?\b", ("business",)),
@@ -58,10 +60,42 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"local education agenc\w*", ("school",)),
     (r"\btrib(?:al|es?)\b", ("tribe",)),
     (r"\bstate (?:government )?agenc\w*", ("state",)),
+    # 10.6: "state governments" (West Virginia), and "State" at the head of a list of governments ("assistance to State,
+    # local governments and ..." MDEM; "state, local, and Indian Tribal governments" Grants.gov). "State funds" and
+    # "the State will" stay untagged: a comma and a government word must follow.
+    (r"\bstate governments?\b|\bstate(?=,\s*(?:and\s+|or\s+)?(?:local|tribal|territorial|county|municipal)\b)", ("state",)),
     # Special districts: the plain word, and Kentucky's statutory name for them (KRS 65A.010, "Special Purpose
     # Governmental Entities", written "SPGEs" on the DLG Portal).
     (r"\bspecial (?:purpose )?districts?\b", ("special_district",)),
     (r"\bspecial purpose governmental entit(?:y|ies)\b|\bSPGEs?\b", ("special_district",)),
+    # 10.6 (Saj's call, 2026-11-11): districts and authorities that are governments of one purpose are special
+    # districts: park and water management districts (North Dakota LWCF, RTP), transit agencies, authorities and
+    # entities (NDDOT TA, MDOT), development authorities (Virginia DHCD; North Dakota's job development authorities).
+    # A state housing development authority is a state agency, not a district. MPOs and planning district commissions
+    # are regional planning bodies with no type and stay untagged.
+    (r"\b(?:park|water management)\s+districts?\b", ("special_district",)),
+    (r"\btransit\s+(?:agenc\w*|authorit\w*|entit\w*|districts?)\b", ("special_district",)),
+    (r"(?<!housing )\bdevelopment authorit\w*", ("special_district",)),
+    # 9-1-1 authorities (Illinois NG9-1-1 Expenses: "9-1-1 Authorities outside of municipalities with a population over
+    # 500,000 shall be eligible to apply"), a county or municipal emergency telephone system board: Saj's call,
+    # 2026-11-11, `special_district`.
+    (r"\b9-?1-?1 authorit(?:y|ies)\b", ("special_district",)),
+    # 10.6: words for local governments the tagger did not read. "local political entities" (North Dakota Vibrancy),
+    # "eligible jurisdictions" (North Dakota HMGP) and "local law enforcement agencies" (Virginia DCJS), a city's or
+    # county's department.
+    (r"\blocal political entit(?:y|ies)\b", ("municipality", "county")),
+    (r"\beligible jurisdictions?\b", ("municipality", "county")),
+    (r"\blocal law enforcement agenc\w*", ("municipality", "county")),
+    # 10.6 (Saj's call): "communities" is a municipality only where the sentence says the communities apply or are
+    # eligible ("All 78 Massachusetts coastal communities are eligible to apply", Seaport); a sentence about what the
+    # money does for communities stays untagged.
+    # Not "indigenous communities" or "Native American communities" (California's Explore the Coast: tribes "that are
+    # not federally recognized may apply" through a nonprofit).
+    (r"(?<!indigenous )(?<!american )\bcommunities\b(?=[^.;]*\b(?:(?:is|are) eligible|may apply|can apply|eligible to apply)\b)|\beligible communities\b",
+     ("municipality",)),
+    # 10.6 (Saj's call): volunteer fire companies, first aid squads and rescue squads (New Jersey Fire Safety, VESOL) are
+    # nonprofit corporations; a municipal fire department tags municipality through its own words.
+    (r"\bfire compan(?:y|ies)\b|\bfirst aid squads?\b|\brescue squads?\b", ("nonprofit",)),
     (r"\bcolleges?\b|\buniversit\w*|institutions? of higher education", ("higher_ed",)),
 )
 
@@ -87,6 +121,22 @@ def _named_city(line: str, m: re.Match[str]) -> bool:
     return bool(re.match(r"\s+of\s+[A-Z]", line[m.end():]))
 
 
+# "Be an Oregon resident" (Aggie Bond's borrower conditions) is a condition on the applicant, not a household
+# applying; "cooperative participation with ... local law enforcement agencies" (California ESCARS) and "a memorandum
+# of understanding with a local law enforcement agency" (Texas) name a partner, not the applicant. 10.6.
+RESIDENCY_CONDITION_RE = re.compile(r"\bbe (?:a|an)\s+(?:[\w.-]+\s+){0,2}$", re.I)
+PARTNER_RE = re.compile(r"\bwith\b[^.;]{0,70}$", re.I)
+
+
+def _condition(line: str, m: re.Match[str]) -> bool:
+    phrase, before = m.group(0).lower(), line[max(0, m.start() - 80):m.start()]
+    if phrase.startswith("resident"):
+        return bool(RESIDENCY_CONDITION_RE.search(before[-40:]))
+    if phrase.startswith("local law enforcement"):
+        return bool(PARTNER_RE.search(before))
+    return False
+
+
 def applicant_types_for(applicant_text: str | list[str] | None) -> list[ApplicantTag]:
     """Keyword tags over applicant lines. The first match of each phrase that is not in a location
     context wins; the matched phrase is the tag's source_code."""
@@ -95,7 +145,8 @@ def applicant_types_for(applicant_text: str | list[str] | None) -> list[Applican
     for pattern, values in APPLICANT_KEYWORDS:
         phrase = next(
             (m.group(0).lower() for line in lines for m in re.finditer(pattern, line, re.I)
-             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()]) and not _named_city(line, m)),
+             if not LOCATION_CONTEXT_RE.search(line[max(0, m.start() - 60):m.start()]) and not _named_city(line, m)
+             and not _condition(line, m)),
             None,
         )
         if phrase:

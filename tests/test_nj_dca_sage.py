@@ -143,7 +143,7 @@ def test_municipalities_and_units_of_local_government_are_tagged():
 
 def test_nonprofit_only_and_untagged_rounds():
     assert tags(NRTC) == {"nonprofit"}
-    assert tags(VESO) == set()          # volunteer fire companies, first aid squads: not in the shared vocabulary
+    assert tags(VESO) == {"nonprofit"}  # volunteer fire companies, first aid and rescue squads (10.6, Saj's call)
 
 
 def test_a_negated_sentence_is_dropped():

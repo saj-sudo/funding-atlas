@@ -276,7 +276,8 @@ def test_normalize_two_fiscal_years_first_status_wins():
 def test_normalize_rolling_technical_assistance():
     p = normalize(SOLAR_TA)
     assert p.status == "open" and p.rolling is True and p.closes_at is None and p.funding_type is None
-    assert p.applicant_pairs() == []                                   # "provides ... to state and local government entities" is not an applicant sentence
+    # "provides technical assistance, at MEA's cost, to state and local government entities" (10.6)
+    assert {t.value for t in p.applicant_types} == {"municipality", "county"}
 
 
 def test_normalize_page_with_nothing_to_read_is_unknown():

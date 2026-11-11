@@ -92,6 +92,10 @@ CONNECTOR_LABEL = {
     "ct_dot": "Connecticut Department of Transportation",
     "ct_deep": "Connecticut DEEP (Open Space)",
     "ct_demhs": "Connecticut DEMHS (Emergency Management)",
+    "nd_commerce": "North Dakota Commerce (Community Development and Rural Prosperity)",
+    "nd_dot": "North Dakota Department of Transportation",
+    "nd_des": "North Dakota Department of Emergency Services",
+    "nd_parks": "North Dakota Parks and Recreation",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

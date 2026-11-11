@@ -309,11 +309,17 @@ NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant te
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b", re.I)
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b", re.I)
+# "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
+# certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
+APPLICATION_RE = re.compile(r"\bapplications?\b", re.I)
 # A deadline's date sits next to its word; a date further off in the sentence is another fact.
 NEAR_CHARS = 40
 
 ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|may be) eligible\b|\bwho (?:can|may) apply\b"
-                                  r"|\beligible applicants\b", re.I)
+                                  r"|\beligible applicants\b"
+                                  # North Dakota (12.6c): NDDOT's "Eligible Project Applicants"; Parks' "The following
+                                  # entities are eligible to apply:" over a list.
+                                  r"|\beligible project applicants\b|\bentities are eligible\b", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to apply\b"
@@ -324,11 +330,20 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\baccept(?:s|ing) applications from\b|\bapplicants must be\b|\b(?:is|are) (?:only )?available to\b"
     r"|\b(?:funds?|funding|grants?(?:-in-aid)?)\s+to\s+(?:[\w-]+\s+){0,3}"
     r"(?:municipal\w*|towns?|cities|count(?:y|ies)|local governments?)\b"
-    r"|\benables?\b[^.]*\bto apply\b|\bable to apply\b|\bserves? as the sub-?applicant\b", re.I)   # FEMA: a town is the sub-applicant
+    r"|\benables?\b[^.]*\bto apply\b|\bable to apply\b|\bserves? as the sub-?applicant\b"   # FEMA: a town is the sub-applicant
+    # North Dakota (12.6c): Commerce's "Eligible Entities – City, County, ..." (a line that starts with it: SLCGP quotes a
+    # statute's "award grants to eligible entities"), NDDOT's "This program is open to non-oil
+    # townships", "projects identified by political subdivisions" and "an opportunity for cities with a population of
+    # over 5,000", DES's "FEMA provides supplemental aid to state, local, tribal ...".
+    r"|^eligible entities\b|\bprogram is open to\b|\bprojects identified by\b"
+    r"|\bopportunity for (?:[\w-]+\s+){0,2}(?:cities|counties|towns|townships|municipal\w*)\b"
+    r"|\bprovides?\s+(?:\w+\s+)?aid to\b"
+    r"|\beligible jurisdictions\b[^.]*\bmay submit\b", re.I)   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
-    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b", re.I)
+    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
+    r"|\bfunded with federal aid\b", re.I)   # NDDOT's Urban Grant Program (12.6c)
 FUNDING_SOURCE_RE = re.compile(r"^funding source:", re.I)
 FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational Park Service\b", re.I)
 # "serve as the sub-applicant on behalf of homeowners or businesses" (Connecticut HMGP): whoever an applicant applies on
@@ -360,6 +375,8 @@ def deadline(sents: list[str]) -> tuple[str | None, date | None]:
         if NOT_DEADLINE_RE.search(s):
             continue
         for due in DUE_RE.finditer(s):
+            if due.group(0).lower() == "submitted by" and not APPLICATION_RE.search(s):
+                continue
             for m in AGENCY_DATE_RE.finditer(s):
                 gap = m.start() - due.end() if m.start() >= due.end() else due.start() - m.end()
                 d = _date(m.group(0)) if gap <= NEAR_CHARS else None

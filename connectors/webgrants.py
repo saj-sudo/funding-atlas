@@ -144,6 +144,9 @@ def eligibility_sections(blocks: list[list[Any]]) -> list[tuple[str, list[tuple[
     return [(h, lines) for h, lines in out if lines]
 
 
+BULLET_P_RE = re.compile(r"^\s*[-–•·*]\s*\S")
+
+
 def applicant_sentences(lines: list[tuple[str, str]]) -> list[str]:
     """The sentences of one eligibility section that name who applies. The Drupal base's rule for who-may-apply lines
     (the first line is the applicant statement; later lines only if marked; stop at a condition lead-in like
@@ -152,6 +155,10 @@ def applicant_sentences(lines: list[tuple[str, str]]) -> list[str]:
     kept: list[str] = []
     listing = True
     for i, (tag, text) in enumerate(lines):
+        # A paragraph that starts with a dash or bullet under a list lead-in is a list item: Montana's potato research
+        # page writes "Proposals for funding will be accepted from:" over "-Local Governments" paragraphs (10.6).
+        if tag == "p" and listing and i > 0 and BULLET_P_RE.match(text):
+            tag = "li"
         marked = i == 0 or bool(APPLICANT_MARKER_RE.search(text))
         if tag == "p":
             if marked:

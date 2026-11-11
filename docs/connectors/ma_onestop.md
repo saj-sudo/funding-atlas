@@ -135,8 +135,8 @@ round's status and no applicant lines.
 ## Known gaps
 
 - Community Planning Grant Program names no applicant on its page; its guidelines PDF would. Hand quote when a town asks.
-- Seaport Economic Council: "All 78 Massachusetts coastal communities are eligible to apply" tags nothing; whether
-  `coastal communities` should tag a municipality is a shared-tagger question for a measured session (10.x), not this one.
+- (Fixed 2026-11-11, roadmap 10.6, Saj's call.) Seaport Economic Council: "All 78 Massachusetts coastal communities are
+  eligible to apply" now tags municipality: "communities" counts where the sentence says they apply or are eligible.
 - The MassDevelopment sections describe what a good project is, not who applies; same remedy.
 - Fourteen records against one date means the Massachusetts page moves fourteen rows at once on the day the round opens.
 

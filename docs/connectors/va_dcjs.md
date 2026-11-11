@@ -150,9 +150,9 @@ there is none.
 
 ## Known gaps (the source's wording, not the parser's)
 
-- 39 of 59 pages state eligibility only in their guidelines PDF, so most law-enforcement rounds carry no applicant tag
-  even where "local law enforcement agencies" plainly means a locality's department; the tagger does not read "law
-  enforcement agencies" as a government unit, and that is a shared-tagger question, not a Virginia one.
+- 39 of 59 pages state eligibility only in their guidelines PDF, so most law-enforcement rounds carry no applicant tag.
+  Since 2026-11-11 (roadmap 10.6) "local law enforcement agencies" tags municipality and county, which three closed
+  rounds gain; the PDFs are not quoted, because no DCJS round is open and none would reach the page (Saj's rule).
 - Federal pass-throughs (Byrne JAG, VOCA, SASP, RSAT) are `direct` because the page does not label its source.
 - No round was open on the survey day; the Virginia page shows DCJS only in the between-rounds group.
 

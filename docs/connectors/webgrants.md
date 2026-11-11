@@ -196,10 +196,11 @@ date is mapped (`opens_at`), the program officer is not.
 
 ## Known gaps (the source's wording, not the parser's)
 
-- 27 of 40 pages state eligibility only in prose or not at all, so most Iowa education and Montana agriculture rounds
-  carry no applicant tag. Reading the description sentences is a separate, noisier feature.
-- Montana's potato research page lists applicants as plain paragraphs under "Proposals for funding will be accepted
-  from:"; the paragraph-list items are not picked up, so "Local Governments" there is missed.
+- 35 of 48 stored rounds carry no applicant tag (counted 2026-11-11, after 12.6c part 1's who-may-apply sentences and
+  10.6): their pages state eligibility only in prose the tagger has no word for, or not at all. Source-limited.
+- (Fixed 2026-11-11, roadmap 10.6.) Montana's potato research page lists applicants as "-Local Governments" paragraphs
+  under "Proposals for funding will be accepted from:"; a dash paragraph under a list lead-in is now a list item, so the
+  round tags business, municipality, county and individual.
 - (Both fixed 2026-11-03, roadmap 10.2.) The shared tagger did not know "local units of government" (the word order on Iowa's forensic laboratory round), and
   `residents` tags a household on a business grant ("employ residents of Iowa"). Both are tagger items, not this
   connector's.

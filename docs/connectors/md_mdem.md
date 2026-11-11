@@ -159,9 +159,9 @@ never matches.
 
 ## Known gaps
 
-- NSGP's "not within designated urban areas" line is dropped as negated (above). No effect today.
-- "State" as a bare applicant word ("to State, local governments and ...") tags nothing; the shared table reads
-  "state agencies". PA's page therefore carries no `state` tag although the state is an applicant.
+- (Both fixed 2026-11-11, roadmap 10.6.) NSGP's "not within designated urban areas" line is kept ("not within" is a
+  place limit, not a negation), and "State" at the head of a list of governments ("to State, local governments and
+  ...") tags `state`, so PA carries it.
 - The roster says it is incomplete. MDEM's other pass-throughs (HMGP, BRIC, EMPG, HSGP) have no page that names them
   as programs; when the roster grows, the connector reads the new rows with no code change.
 

@@ -111,7 +111,8 @@ def test_parenthetical_negation_drops_the_clause_not_the_line():
              "government/agency may sponsor the project on their behalf)"]
     assert md.roster_clauses(lines) == ["Local Governments and State Agencies"]
     assert md.roster_clauses(["1. Nonprofit entities within designated urban areas",
-                              "2. Nonprofit entities not within designated urban areas"]) == ["Nonprofit entities within designated urban areas"]
+                              "2. Nonprofit entities not within designated urban areas"]) == [
+        "Nonprofit entities within designated urban areas", "Nonprofit entities not within designated urban areas"]   # 10.6: a place limit, not a negation
 
 
 # ---------- normalize ----------
@@ -149,7 +150,7 @@ def test_public_assistance_pass_through_unknown():
     p = normalize(PA)
     assert p.status == "unknown" and p.funding_source == "pass_through" and p.alns == ["97.036"]
     assert p.funding_type == "grant"                                                # "Federal grant assistance"
-    assert {t.value for t in p.applicant_types} == {"municipality", "county", "nonprofit"}
+    assert {t.value for t in p.applicant_types} == {"municipality", "county", "nonprofit", "state"}   # "to State, local governments" (10.6)
 
 
 def test_roster_flip_changes_the_hash():

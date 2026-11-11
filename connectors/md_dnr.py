@@ -33,7 +33,7 @@ from urllib.parse import urlparse
 import httpx
 from bs4 import Tag
 
-from connectors.maryland_drupal import NEGATION_RE, clean, funding_type_for
+from connectors.maryland_drupal import NEGATION_RE, clean, funding_type_for, sentences
 from connectors.maryland_sharepoint import (
     BODY_SELECTOR,
     DATE_RE,
@@ -42,6 +42,7 @@ from connectors.maryland_sharepoint import (
     body_div,
     canonical_url,
     future_marker,
+    leaf_lines,
     main_section,
     page_h1,
     page_sentences,
@@ -171,11 +172,20 @@ def status_fields_for(main_html: str, today: date) -> dict[str, Any]:
 
 
 def applicant_lines_for(main_html: str) -> list[str]:
-    """Sentences that name who may apply, minus negated ones."""
+    """Sentences that name who may apply, minus negated ones. A who-may-apply question is answered by the sentence after
+    it in the same block: Living Shorelines writes "Who is eligible for a 0% interest living shoreline loan?" and, after a
+    line break, "Individuals or groups of homeowners, non-profit organizations, community organizations, counties and
+    municipalities" (10.6)."""
     out: list[str] = []
-    for s in page_sentences(main_html):
-        if APPLICANT_SENTENCE_RE.search(s) and not NEGATION_RE.search(s) and s not in out:
-            out.append(s)
+    for line in leaf_lines(main_html):
+        sents = sentences(line)
+        for i, s in enumerate(sents):
+            if not APPLICANT_SENTENCE_RE.search(s) or NEGATION_RE.search(s):
+                continue
+            answer = sents[i + 1] if s.endswith("?") and i + 1 < len(sents) else None
+            for kept in (s, answer):
+                if kept and not NEGATION_RE.search(kept) and kept not in out:
+                    out.append(kept)
     return out
 
 

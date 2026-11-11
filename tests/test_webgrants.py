@@ -118,9 +118,10 @@ def test_pages_without_an_eligibility_heading_get_no_applicants():
     assert normalize(WEED).eligibility_text is None
 
 
-def test_paragraph_list_items_after_a_colon_are_a_known_gap():
-    """Montana's potato page lists 'Local Governments' as plain paragraphs, so only the lead-in sentence is read."""
-    assert tags(POTATO) == {"individual"}
+def test_dash_paragraphs_after_a_colon_are_list_items():
+    """Montana's potato page lists its applicants as "-Local Governments" paragraphs under "Proposals for funding will be
+    accepted from:" (10.6)."""
+    assert tags(POTATO) == {"individual", "business", "municipality", "county"}
 
 
 def test_applicant_sentences_stop_at_a_condition_lead_in():

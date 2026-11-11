@@ -119,8 +119,8 @@ closing 2026-11-20.
 
 ## Known gaps
 
-- "Maryland State Agencies", "Metropolitan Planning Organizations (MPOs)", "Transit entities" and "Federal public
-  lands agencies" tag `state` only through "State Agencies"; MPOs and transit entities have no applicant type.
+- "Transit entities" tags `special_district` since 2026-11-11 (roadmap 10.6). MPOs stay untagged on purpose (Saj's
+  call: a regional planning body has no applicant type), as do "Federal public lands agencies".
 - The Bikeways cycle wording (letters of intent in winter, applications April to May 31) is only in comments, so the
   record carries no cycle text until MDOT un-hides a banner.
 - The TOD match (10%) is in a comment; `match_required` is null although the NOFO requires it.

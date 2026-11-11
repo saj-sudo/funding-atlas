@@ -81,6 +81,21 @@ def test_a_page_with_no_applicant_sentence_still_tags_from_the_section():
     assert {t.value for t in p.applicant_types} == {"municipality", "county"}
 
 
+def test_access_roads_page_is_three_programs():
+    parts = va.split_page("access-roads-programs", va.parse_page(read("access-roads-programs")))
+    assert [sid for sid, _ in parts] == ["access-roads-programs",   # the first program keeps the page's id
+                                         "access-roads-programs#airport-access", "access-roads-programs#recreational-access"]
+    eda, airport, rec = (page for _, page in parts)
+    assert eda["title"] == "Economic Development Access Program"
+    assert eda["paragraphs"][1].startswith("The Economic Development Access (EDA) Program provides funding")
+    assert not any("Airport" in t for t in eda["paragraphs"])
+    assert airport["paragraphs"][1].startswith("The Airport Access Program") and rec["paragraphs"][1].startswith("The Recreational")
+    p = va.normalize(RawRecord(source_connector=va.CONNECTOR, source_id=parts[1][0],
+                               payload={"card": cards()["access-roads-programs"], "page": airport}), TODAY)
+    assert p.name == "Airport Access Program" and {t.value for t in p.applicant_types} == {"municipality", "county"}
+    assert va.split_page("revenue-sharing", {"title": "x", "paragraphs": []}) == [("revenue-sharing", {"title": "x", "paragraphs": []})]
+
+
 def test_urban_program_names_municipalities():
     p = normalize("urban-program")
     assert any("A municipality qualifies for the urban program" in line for line in p.eligibility_text.split("\n"))
@@ -113,7 +128,8 @@ def test_fetch_reads_the_index_then_each_program_page(monkeypatch):
     monkeypatch.setattr(va.time, "sleep", lambda s: None)
     monkeypatch.setattr(va, "_get", _Site())
     records = va.fetch()
-    assert [r.source_id for r in records] == list(cards())
+    ids = [sid for slug in cards() for sid, _ in va.split_page(slug, {"title": "", "paragraphs": []})]
+    assert [r.source_id for r in records] == ids and len(ids) == len(cards()) + 2   # access roads is three records
     assert records[0].payload["page"]["title"]
     prior = {r.source_id: r.payload for r in records}
     url = cards()["urban-program"]["url"]

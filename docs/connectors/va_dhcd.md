@@ -167,8 +167,9 @@ that cannot be read is skipped, and if it was a program last run its stored copy
 - Status is `unknown` on most records: the pages state cycles in words ("spring of every year"), not dates.
 - `funding_type` is null where the name has no keyword (IRF, VAARC, VEZ, PHCRF): the page does not say grant or loan
   in a labelled field.
-- `localities` tags municipality and county (shared tagger, 2026-11-03); "planning district commissions",
-  "development authorities" and "public housing authorities" tag nothing or `housing_authority` only.
+- `localities` tags municipality and county (shared tagger, 2026-11-03); "development authorities" tags
+  `special_district` since 2026-11-11 (roadmap 10.6: CBL and IRF gain it); "planning district commissions" stay
+  untagged on purpose (Saj's call: no regional type).
 
 ## Out of scope
 

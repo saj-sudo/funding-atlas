@@ -95,6 +95,43 @@ def parse_page(page_html: str) -> dict[str, Any]:
     return {"title": clean(h1.get_text(" ")) if h1 else "", "paragraphs": paragraphs}
 
 
+# One page, several programs: the access roads page describes three programs, each opened by its own "The <name>
+# Program provides funding" paragraph. Each becomes its own record, with the page's first paragraph as context and its
+# own paragraphs after it (10.6). The first part keeps the page's own id, so the stored record of the whole page becomes
+# that program rather than lingering as an `unknown` record no run returns; the others are `slug#part`.
+SPLIT_PAGES: dict[str, list[tuple[str, str, str]]] = {
+    "access-roads-programs": [
+        ("economic-development-access", "Economic Development Access Program", "The Economic Development Access"),
+        ("airport-access", "Airport Access Program", "The Airport Access Program"),
+        ("recreational-access", "Recreational Access Program", "The Recreational Access Program"),
+    ],
+}
+
+
+def _part_id(slug: str, n: int, part: str) -> str:
+    return slug if n == 0 else f"{slug}#{part}"
+
+
+def split_page(slug: str, page: dict[str, Any] | None) -> list[tuple[str, dict[str, Any] | None]]:
+    """(source_id, page) for each program on a page: the page itself, or one part per program in `SPLIT_PAGES`."""
+    parts = SPLIT_PAGES.get(slug)
+    if not parts:
+        return [(slug, page)]
+    if page is None:
+        return [(_part_id(slug, n, part), None) for n, (part, _, _) in enumerate(parts)]
+    paragraphs = page.get("paragraphs", [])
+    starts = [next((i for i, t in enumerate(paragraphs) if t.startswith(lead)), None) for _, _, lead in parts]
+    out: list[tuple[str, dict[str, Any] | None]] = []
+    for n, (part, title, _) in enumerate(parts):
+        start = starts[n]
+        if start is None:
+            out.append((_part_id(slug, n, part), None))
+            continue
+        end = next((s for s in starts[n + 1:] if s is not None), len(paragraphs))
+        out.append((_part_id(slug, n, part), {"title": title, "paragraphs": paragraphs[:1] + paragraphs[start:end]}))
+    return out
+
+
 # ---------- fetch ----------
 
 def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = None) -> list[RawRecord]:
@@ -106,14 +143,16 @@ def fetch(limit: int | None = None, prior: dict[str, dict[str, Any]] | None = No
         if limit:
             cards = cards[:limit]
         for card in cards:
-            payload: dict[str, Any] = {"card": card, "page": None}
             try:
                 time.sleep(DELAY_S)
-                payload["page"] = parse_page(_get(client, card["url"]))
+                page = parse_page(_get(client, card["url"]))
             except httpx.HTTPError:
-                payload["page"] = (prior.get(card["slug"]) or {}).get("page")
-            records.append(RawRecord(source_connector=CONNECTOR, source_id=card["slug"], payload=payload))
-    return records
+                page = None
+            for source_id, part in split_page(card["slug"], page):
+                if part is None:
+                    part = (prior.get(source_id) or {}).get("page")
+                records.append(RawRecord(source_connector=CONNECTOR, source_id=source_id, payload={"card": card, "page": part}))
+    return records[:limit] if limit else records
 
 
 # ---------- normalize ----------

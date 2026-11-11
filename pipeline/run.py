@@ -30,6 +30,10 @@ from connectors import (
     md_mea,
     md_mht,
     nc_grants,
+    nd_commerce,
+    nd_des,
+    nd_dot,
+    nd_parks,
     nj_dca_sage,
     ny_sfs,
     or_biz,
@@ -90,6 +94,10 @@ CONNECTORS: dict[str, ModuleType] = {
     "ct_dot": ct_dot,
     "ct_deep": ct_deep,
     "ct_demhs": ct_demhs,
+    "nd_commerce": nd_commerce,
+    "nd_dot": nd_dot,
+    "nd_des": nd_des,
+    "nd_parks": nd_parks,
 }
 
 

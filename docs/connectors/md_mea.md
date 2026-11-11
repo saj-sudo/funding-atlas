@@ -24,8 +24,8 @@ Two things the probe settled that the survey had not:
 
 Known gaps, all because the page does not say it the way the rules read:
 
-- Solar Technical Assistance "provides technical assistance ... to state and local government entities" in a
-  description sentence, not an applicant sentence, so it carries no tags. Jane E. Lawton moved to the Maryland Clean
+- (Fixed 2026-11-11, roadmap 10.6.) Solar Technical Assistance "provides technical assistance ... to state and local
+  government entities" in a description sentence; that sentence is now its applicant line (municipality, county). Jane E. Lawton moved to the Maryland Clean
   Energy Center on 2026-07-01 and its MEA page is a pointer: `unknown`, no tags.
 - (Fixed the same day, milestone 7.1.) `individual` used to tag the adjective in "individual school facilities" and the
   recipient in "the individual identified to receive funding"; the shared table now matches the noun only.

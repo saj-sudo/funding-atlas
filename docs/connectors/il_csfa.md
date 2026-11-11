@@ -233,6 +233,15 @@ posted date is not mapped. Attachments and contact names stay in the payload.
 - 8 native `Government Organizations` rounds still carry no municipal tag after their NOFOs were read (decision 6):
   the source does not say. Downstate Transit Improvement Fund is among them (its attachment is deleted on the host).
 - The NOFO quotes are a hand-read table (decision 6); a new round's NOFO is unread until someone runs `pdftotext` on it.
+  Read 2026-11-11 (roadmap 10.6): 4359 Oral Health Wellness lists "Corporation – For Profit, Corporation - Not for
+  Profit, Tax Exempt, Government Entity, University / Community College, School District"; not quoted, because
+  "Government Entity" is a broad label that tags nothing and the row would not reach a page. Of the 70 open GMS rows with
+  no local tag, most are DNR, aging and adult-education subawards; IEMA's BRIC 2023 and FMA 2022 say "Applicants
+  have been predetermined by the Federal Emergency Management Agency (FEMA) via the FEMA GO application system", so no
+  town applies there. The Illinois State Police NG9-1-1 Expenses round says "9-1-1
+  Authorities ... shall be eligible to apply" (a county or municipal emergency telephone system board); since
+  2026-11-11 "9-1-1 authorities" tags `special_district` (Saj's call), and the round gains it, the only stored record
+  that moves. It stays in the possible tier: the tier reads local-government wording, not tags.
 - The tagger reads `Baltimore City` and `City of Philadelphia` as named places, not as "cities may apply".
 
 ## Out of scope

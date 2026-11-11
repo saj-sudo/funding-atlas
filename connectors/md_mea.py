@@ -97,8 +97,11 @@ DEPLETED_RE = re.compile(r"deplet|exhaust|fully (?:reserved|awarded|expended|sub
 OPEN_RE = re.compile(r"\bnow open\b|\bis (?:currently )?open\b|\bnow accepting\b|accepting applications|remains open", re.I)
 ROLLING_RE = re.compile(r"ongoing|remains open|until (?:funding|funds)|first-come|rolling", re.I)
 OPENS_RE = re.compile(rf"\b(?:opens|will open|launch(?:es)?)\b[^.]{{0,40}}?({MONTH}\.?\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}})", re.I)
+# The last alternative is Solar Technical Assistance's only applicant statement: "provides technical assistance, at
+# MEA's cost, to state and local government entities" (10.6). Narrow on purpose: assistance to government entities.
 APPLICANT_SENTENCE_RE = re.compile(
-    r"\bmay apply\b|\beligible (?:applicants?|entit\w*|to apply)\b|\b(?:is|are) open to\b|\bavailable to\b", re.I
+    r"\bmay apply\b|\beligible (?:applicants?|entit\w*|to apply)\b|\b(?:is|are) open to\b|\bavailable to\b"
+    r"|\bassistance\b[^.]*\b(?:to|for) (?:state and local|state|local) government entities\b", re.I
 )
 
 
