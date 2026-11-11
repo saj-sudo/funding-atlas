@@ -141,8 +141,8 @@ event- or cycle-driven and state no open round.
 | `public-assistance`, Public Assistance Program | "The deadline to submit an RPA is January 31, 2025" (past); 30 days from a disaster declaration | none (see Gaps) | `pass_through` ("Funding is provided through the Federal Emergency Management Agency (FEMA)") |
 | `empg`, Emergency Management Performance Grant | "provides resources to the State Emergency Management Agency and local government emergency management agencies"; reimbursement up to 50% | `municipality`, `county` | `direct` (the page names no federal funder, only "all federal requirements") |
 
-**The Mitigation page is one record, not three** (a deviation from Saj's one-record-per-program rule of 2026-11-11, for
-Saj to overrule). Its sections interleave: HMGP's process is described in two places, with shared "Eligible Subapplicants",
+**The Mitigation page is one record, not three** (a deviation from Saj's one-record-per-program rule of 2026-11-11,
+**confirmed by Saj on 2026-11-11**). Its sections interleave: HMGP's process is described in two places, with shared "Eligible Subapplicants",
 "Eligible Activities" and planning-requirement blocks between them and the FMA process, and BRIC has no section of its own.
 `split_sections` cuts one contiguous section per program, so a split would give HMGP two records or FMA the HMGP text. A
 reader of the page gets one row that says what the three are. If SEMA reorganises the page by program, it becomes a
