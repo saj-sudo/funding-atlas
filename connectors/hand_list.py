@@ -450,6 +450,30 @@ def funding_source_for(blocks: Blocks, text: str) -> str:
     return "pass_through" if FEDERAL_RE.search(text) else "direct"
 
 
+Split = tuple[str, str | None, re.Pattern[str]]
+
+
+def split_sections(blocks: Blocks, splits: list[Split]) -> list[tuple[str, str, Blocks]]:
+    """A page that holds several programs, cut into one `(sub_slug, name, blocks)` per program (Saj's rule,
+    2026-11-11: a page with three programs is three records). A section starts at the first `label` block that
+    matches a split's pattern and runs to the next label that matches any split's pattern; a split whose name is
+    `None` is a tail (a funding note, a "for more information" link): its blocks belong to no program. What sits above
+    the first section is shared and follows every section, so a page-wide deadline or applicant sentence is never
+    lost, and the section's own first paragraph stays the summary. A split that matches no label yields no section."""
+    starts = [(i, idx) for i, (kind, text) in enumerate(blocks) if kind == "label"
+              for idx, (_, _, pattern) in enumerate(splits) if pattern.search(text)]
+    if not starts:
+        return []
+    shared = blocks[: starts[0][0]]
+    out: list[tuple[str, str, Blocks]] = []
+    for n, (begin, idx) in enumerate(starts):
+        end = starts[n + 1][0] if n + 1 < len(starts) else len(blocks)
+        sub_slug, name, _ = splits[idx]
+        if name is not None:
+            out.append((sub_slug, name, blocks[begin:end] + shared))
+    return out
+
+
 class AgencyPageConnector(HandListConnector):
     """An agency on a state CMS: set CONNECTOR, BASE, AGENCY, AGENCY_CODE, JURISDICTION, CATEGORY_LABEL and PAGES
     (slug -> path); the state's base supplies `parse_page` (title and blocks)."""
@@ -458,16 +482,28 @@ class AgencyPageConnector(HandListConnector):
     # slug -> (date read, source, lines): who may apply, quoted by hand from a document the page links when the page
     # itself names no applicant (the MDOT and Illinois precedent).
     HAND_QUOTES: dict[str, tuple[str, str, list[str]]] = {}
+    # slug -> [(sub_slug, name, heading pattern)] for a page with several programs, in page order (see
+    # `split_sections`). The first declared program keeps the page's own `source_id`, so a record that was one before
+    # the split keeps its history; the others are `slug#sub_slug`.
+    SPLITS: dict[str, list[Split]] = {}
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
-        return [(slug, {"path": spec, "page": pages[0]})]
+        page = pages[0]
+        splits = self.SPLITS.get(slug)
+        sections = split_sections([tuple(b) for b in page.get("blocks", [])], splits) if splits else []
+        if not sections:
+            return [(slug, {"path": spec, "page": page})]
+        first = splits[0][0]
+        return [(slug if sub == first else f"{slug}#{sub}",
+                 {"path": spec, "name": name, "page": {"title": page.get("title", ""), "blocks": blocks}})
+                for sub, name, blocks in sections]
 
     def fields(self, raw: RawRecord, today: date) -> dict[str, Any]:
         page = raw.payload["page"]
         path = raw.payload.get("path") or self.PAGES.get(raw.source_id, "/" + raw.source_id)
         blocks = [tuple(b) for b in page.get("blocks", [])]
         text = " ".join(t for _, t in blocks)
-        name = clean(page.get("title", "")) or raw.source_id
+        name = raw.payload.get("name") or clean(page.get("title", "")) or raw.source_id
         lines = applicant_lines(blocks) + quote_lines(self.HAND_QUOTES, raw.source_id)
         match = None if MATCH_NOT_RE.search(text) else (True if MATCH_RE.search(text) else None)
         return dict(

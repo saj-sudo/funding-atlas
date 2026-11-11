@@ -50,7 +50,7 @@ round never reach the tagger.
 |---|---|---|---|
 | `nd_commerce` | Commerce, Community Development and Rural Prosperity (`ND-COMMERCE`) | community development | Vibrancy, Rural Slum and Blight Removal, Rural Workforce Housing, Rural Facility Planning, Partners in Planning, Artists on Main Street, Rural Catalyst, Rural Grocery Store Sustainability |
 | `nd_dot` | Department of Transportation (`ND-DOT`) | transportation | Flexible Transportation Fund, Transportation Alternatives, Urban Grant Program, Special Road Fund |
-| `nd_des` | Department of Emergency Services (`ND-DES`) | emergency management | Public Assistance, Unified Hazard Mitigation (HMGP, BRIC, FMA on one page) |
+| `nd_des` | Department of Emergency Services (`ND-DES`) | emergency management | Public Assistance, Unified Hazard Mitigation (HMGP, BRIC, FMA: one page, three records) |
 | `nd_parks` | Parks and Recreation Department (`ND-PARKS`) | parks and recreation | Land and Water Conservation Fund, Recreational Trails Program |
 
 URLs: Commerce's eight are under
@@ -126,7 +126,14 @@ to", "projects identified by", "an opportunity for <up to two words> cities/coun
 1. One ND base for four hosts, the Vermont pattern (`BASE` in each agency module), because the theme is shared and the
    hosts are not.
 2. The Flex Fund page holds three grants (non-oil townships $31.1M, non-oil counties and cities $44.85M, bridges
-   $40.25M), all due on one date: one record, the three in its text (Saj's call, 2026-11-11).
+   $40.25M). Saj's first call (2026-11-11) was one record; **the same day Saj reversed it: a page that holds several
+   programs is one record per program.** `nd_dot` and `nd_des` set `SPLITS` (`connectors/hand_list.py`): Flex Fund is
+   `flex-fund` (townships, keeps the old id), `flex-fund#counties-cities` and `flex-fund#bridges`; Unified Hazard
+   Mitigation is `hazard-mitigation` (HMGP), `#bric` and `#fma`. The Flex Fund's "Prairie Dog as Grants" note (where
+   the money comes from, naming every applicant type) and DES's "For more information" link are in no record; the
+   text above the first heading follows every section. Effects: the bridges grant tags `county` only and has no
+   deadline (the 2025-09-19 date is the townships' and the counties-and-cities'); BRIC and FMA tag nothing, because
+   their sections name no applicant (they used to borrow HMGP's). The page's 16 records become 20.
 3. All eight CDRP pages go in, the dormant three included (Rural Catalyst's "final round under SB 2390", Partners in
    Planning "contingent upon State Legislative funding", Artists on Main Street a 2022-2023 pilot) (Saj's call,
    2026-11-11): each shows what its page says, and the change feed catches a reopening.

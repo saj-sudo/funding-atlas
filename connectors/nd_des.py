@@ -9,6 +9,8 @@ See docs/connectors/north_dakota.md.
 
 from __future__ import annotations
 
+import re
+
 from connectors.north_dakota_drupal import NdAgency
 
 CONNECTOR = "nd_des"
@@ -20,6 +22,15 @@ PAGES: dict[str, str] = {
     "public-assistance": "/recovery-mitigation/public-assistance",
     "hazard-mitigation": "/recovery-mitigation/unified-hazard-mitigation-grant-assistance",
 }
+# The unified page has one heading per FEMA program; its closing "For more information" link list belongs to none.
+SPLITS = {
+    "hazard-mitigation": [
+        ("hmgp", "Hazard Mitigation Grant Program (HMGP)", re.compile(r"^Hazard Mitigation Grant Program", re.I)),
+        ("bric", "Building Resilient Infrastructure and Communities Program (BRIC)", re.compile(r"^Building Resilient Infrastructure", re.I)),
+        ("fma", "Flood Mitigation Assistance Grant Program (FMA)", re.compile(r"^Flood Mitigation Assistance", re.I)),
+        ("more-information", None, re.compile(r"^For more information", re.I)),
+    ],
+}
 
 
 class NdDes(NdAgency):
@@ -29,6 +40,7 @@ class NdDes(NdAgency):
     AGENCY_CODE = AGENCY_CODE
     CATEGORY_LABEL = CATEGORY_LABEL
     PAGES = PAGES
+    SPLITS = SPLITS
 
 
 SITE = NdDes()
