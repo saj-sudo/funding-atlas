@@ -100,6 +100,11 @@ CONNECTOR_LABEL = {
     "ky_tc": "Kentucky Transportation Cabinet (Office of Local Programs)",
     "ky_eec": "Kentucky Energy and Environment Cabinet",
     "ky_kia": "Kentucky Infrastructure Authority",
+    "mo_ded": "Missouri DED (Community Development Block Grants)",
+    "mo_dnr": "Missouri Department of Natural Resources",
+    "mo_modot": "Missouri Department of Transportation (Local Public Agency programs)",
+    "mo_sema": "Missouri State Emergency Management Agency",
+    "mo_parks": "Missouri State Parks (grants)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
