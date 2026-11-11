@@ -308,7 +308,8 @@ DUE_RE = re.compile(r"\b(?:due|deadline|submitted by)\b|\bthrough\b(?=[^.]*\bacc
 NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant term|implementation period|reimbursement)\b", re.I)
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
-                            r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b", re.I)   # Kentucky ARC: "Pre-applications ... are being accepted"
+                            r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
+                            r"|\b(?:is|are)\s+currently\s+open\b", re.I)   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b", re.I)
 # "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
 # certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
@@ -322,7 +323,9 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   # entities are eligible to apply:" over a list.
                                   r"|\beligible project applicants\b|\bentities are eligible\b"
                                   # Kentucky (12.6d): KIA's bare "Eligibility:" label over the loan fund's conditions.
-                                  r"|^eligibility:?$", re.I)
+                                  r"|^eligibility:?$"
+                                  # Missouri (12.6e): DED's "Do I Qualify?" tab is its eligibility section.
+                                  r"|^do i qualify\??$", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to apply\b"
