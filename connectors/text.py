@@ -77,11 +77,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\btransit\s+(?:agenc\w*|authorit\w*|entit\w*|districts?)\b", ("special_district",)),
     (r"(?<!housing )\bdevelopment authorit\w*", ("special_district",)),
     # 10.6: words for local governments the tagger did not read. "local political entities" (North Dakota Vibrancy),
-    # "eligible jurisdictions" (North Dakota HMGP), Maryland's statute word in "grants to subdivisions" (MDE CFMGP),
-    # and "local law enforcement agencies" (Virginia DCJS), a city's or county's department.
+    # "eligible jurisdictions" (North Dakota HMGP) and "local law enforcement agencies" (Virginia DCJS), a city's or
+    # county's department.
     (r"\blocal political entit(?:y|ies)\b", ("municipality", "county")),
     (r"\beligible jurisdictions?\b", ("municipality", "county")),
-    (r"\b(?:grants?|loans?|funds?|assistance) to (?:the )?subdivisions\b", ("municipality", "county")),
     (r"\blocal law enforcement agenc\w*", ("municipality", "county")),
     # 10.6 (Saj's call): "communities" is a municipality only where the sentence says the communities apply or are
     # eligible ("All 78 Massachusetts coastal communities are eligible to apply", Seaport); a sentence about what the

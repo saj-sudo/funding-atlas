@@ -126,8 +126,10 @@ Expected on 2026-11-03: all seven `forecasted`.
 
 ## Known gaps
 
-- "small and disadvantaged communities" (Supplemental) and "subdivisions" (CFMGP's statute word, on the index) tag
-  nothing; CFMGP is tagged from its page's "local jurisdictions".
+- "small and disadvantaged communities" (Supplemental) and "subdivisions" (CFMGP's statute word, in quotes on the
+  index) tag nothing; CFMGP is tagged from its page's "local jurisdictions". Settled 2026-11-11 (roadmap 10.6):
+  "Assistance primarily to ... communities" describes who benefits, not who applies (Saj's rule: communities tag only
+  where they apply or are eligible), and the index's "subdivisions" is not in an applicant line; source-limited.
 - The 87.5% / 12.5% split and the $1.5 million ceilings stay in text (`match_pct`, `amount_max` null): the rules read
   sentences, and a `match_pct` parser is a third-case question.
 - MDE's other grants (recycling, lead, the Clean Water Commerce Act project lists, EV charging) are not on this index

@@ -107,18 +107,19 @@ to", "projects identified by", "an opportunity for <up to two words> cities/coun
 
 | Page | Status | Applicant tags |
 |---|---|---|
-| Vibrancy | closed | nonprofit |
-| Slum and Blight, Workforce Housing, Facility Planning, Rural Catalyst, Rural Grocery | closed | municipality, county, tribe |
+| Vibrancy | closed | nonprofit, municipality, county (10.6) |
+| Slum and Blight, Workforce Housing, Facility Planning, Rural Grocery | closed | municipality, county, tribe |
+| Rural Catalyst | closed | municipality, county, tribe, special_district (10.6: job development authority) |
 | Partners in Planning | unknown | none |
 | Artists on Main Street | closed | none |
 | Flex Fund | unknown (2025-09-19) | municipality, county |
-| Transportation Alternatives | unknown | municipality, county, school, tribe |
+| Transportation Alternatives | unknown | municipality, county, school, tribe, special_district (10.6) |
 | Urban Grant Program | open (2026-12-31) | municipality |
 | Special Road Fund | unknown | municipality, county, tribe, state |
-| Public Assistance | unknown | tribe |
-| Hazard Mitigation | unknown | none |
-| LWCF | unknown | municipality, county, school, state, tribe |
-| RTP | unknown | municipality, county, nonprofit, tribe |
+| Public Assistance | unknown | tribe, state (10.6) |
+| Hazard Mitigation | unknown | municipality, county, nonprofit (10.6) |
+| LWCF | unknown | municipality, county, school, state, tribe, special_district (10.6) |
+| RTP | unknown | municipality, county, nonprofit, tribe, special_district (10.6) |
 
 ## Decisions
 
@@ -139,12 +140,14 @@ to", "projects identified by", "an opportunity for <up to two words> cities/coun
 ## Known gaps (recorded, not fixed)
 
 - HMGP's page names no federal agency, so the record is `direct` (the table's rule: a page must name its federal source);
-  BRIC and FMA name no applicant; "All eligible jurisdictions ... may submit" tags nothing ("jurisdictions" is not a
-  tagger word). DES's detail links (`grants.des.nd.gov/site/PA.cfm`, `HM.cfm`) are 404, and that host serves
+  BRIC and FMA name no applicant. (Fixed 2026-11-11, roadmap 10.6: "All eligible jurisdictions and private not-for profit
+  (PNP) entities may submit" is now an applicant sentence and tags municipality, county and nonprofit; "not-for profit"
+  with a space is no longer read as a negation.) DES's detail links (`grants.des.nd.gov/site/PA.cfm`, `HM.cfm`) are 404, and that host serves
   `Disallow: /`.
-- Tagger words seen here and not read (a measured 10.x session if they recur): "local political entities" (Vibrancy),
-  "park districts" and "water management districts" (special districts in LWCF and RTP), "Transit agencies" (TA),
-  "local" alone (Public Assistance). Townships tag as municipality, the tagger's existing reading.
+- (Fixed 2026-11-11, roadmap 10.6.) "local political entities" (Vibrancy: municipality, county), "park districts",
+  "water management districts" (LWCF, RTP), "Transit agencies" (TA) and "job development authority" (Rural Catalyst:
+  `special_district`); Public Assistance gains `state`. Still not read, on purpose (Saj's call): "local" alone. Townships
+  tag as municipality, the tagger's existing reading.
 - Dates live in PDFs: Parks' FY27 timeline, Partners in Planning's guidance, Artists on Main Street's guidelines (which
   also hold its applicants). Rural Grocery's dates carry no year.
 - Facility Planning's "Minimum of a 10% match" does not say "required", so `match_required` is null.

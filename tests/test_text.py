@@ -222,7 +222,6 @@ def test_local_government_words():
         "municipality", "county", "nonprofit"}                                                    # ND HMGP
     assert values("Local law enforcement agencies in Virginia are eligible to receive this funding.") == {"municipality", "county"}
     assert values("enter into a memorandum of understanding with a local law enforcement agency") == set()   # a partner (Texas)
-    assert values("grants to subdivisions for flood mitigation") == {"municipality", "county"}      # MDE CFMGP
 
 
 def test_single_purpose_districts_and_authorities():

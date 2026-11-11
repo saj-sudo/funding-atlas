@@ -29,6 +29,7 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 10.3 | Three tagger follow-ups, measured | 2026-11-03 | the three gaps 10.2 recorded, each answered on its own terms. **Artists**: "Any artist who is 18 years of age or older" and "Individual artists" in a who-may-apply list tag an individual; a bare "artists" does not ("representing disabled artists", "grant payments to artists" name the people served). **"To County"**: not a tagger gap at all. The phrase was New York's Solicitation Profile for `2027 TYCLF`, which is the round's title ("2027 Transportation for Youth to County and Local Fairs"); a profile with no sentence in it is a name, and a name says what the money is for, not who applies, so `ny_sfs` tags nothing from it. **Baltimore City**: no rule. Baltimore City is a county-equivalent under Maryland law, so "county governments, including Baltimore City" is a county program and `county` is the right tag; a Baltimore City reader wants county rows too, which is a navigator view (municipality or county) if that reader ever appears, not a tagger rule. Re-normalized every stored record (6,834 published, 257 New York, 142 Virginia and Delaware): 7 move, all on `applicant_types`. Four WVCA artist rounds (all closed) gain individual; three New York title-only profiles lose a tag: `2027 TYCLF` (county, wrong), Regional School Food Infrastructure (school) and Municipal Waste Reduction and Recycling 2024 (municipal). The last is the cost: a municipal program by its name, open to 2027-11-01, leaves the New York page (4 → 3 open municipal rows) because its grid labels say `Governmental Entity` and its profile is a title. None in Maryland, Virginia or Delaware | `connectors/text.py`, `connectors/ny_sfs.py`, decisions log |
 | 10.4 | Special districts in free text, measured | 2026-11-04 | the tagger had no free-text rule for special districts at all ("special districts are eligible" tagged nothing), so Kentucky's RDAAP ("a system of grants to Special Purpose Governmental Entities") tagged nothing. Two rules in `connectors/text.py`: `special (purpose) district(s)`, and Kentucky's statutory name `special purpose governmental entit(y|ies)` / `SPGE(s)`, both `special_district`. "in partnership with county governments" (RDAAP) is left to the location guard: the counties there are partners that pass a Fiscal Court resolution, the grantee is the SPGE. Re-normalized every stored record in the published database: 121 of 7,574 move, every one an added `special_district` and nothing removed (113 California, 5 PEMA mitigation and cybersecurity rounds, Maryland DNR's LWCF, Kentucky's RDAAP and Line-Items); a sample of eleven read by hand, each a who-may-apply list ("Applicants must be a California-incorporated city, county, special district, or ..."). Consistent with the 2026-10-17 and 2026-10-27 decisions that broad portal labels tag nothing because the free-text line names the real applicants | `connectors/text.py`, `connectors/ky_dlg.md` |
 | 10.5 | "Political subdivisions", measured | 2026-11-05 | forced by North Dakota's FIND (12.6c part 1): the tagger reads "political subdivision(s)" as municipality and county, and migration 0007 recreates `v_municipal_relevance` with it among the local-government words. Tagger, every stored record: 2 of 7,606 move (PA DEP Alternative Fuel Incentive Grants gains county from a "Political subdivisions" line; CA Proposition 1 changes source code only). Tier: 49 SAM.gov listings (all `unknown`, none on a page) and FIND move possible to likely | `connectors/text.py`, `db/migrations/0007_political_subdivisions.sql` |
+| 10.6 | The recorded gaps, every state so far, measured | 2026-11-11 | Saj asked for every recorded imperfection to be addressed before Kentucky. An inventory of every Known gaps section found 64 items: 17 tagger vocabulary, 11 parser or cleanup, 8 PDF-only, 22 source-limited or waiting on an event, 6 waiting on Saj. Measured on all 7,646 stored records with the new `scripts/measure_tagger.py` (re-normalize every raw record, diff tags, status and hash): **89 records change tags** (+38 `state`, +36 `special_district`, +12 municipality, +10 county, +3 nonprofit; −2 county and −1 household that were wrong), 38 change hash only (an extra source phrase for a tag they had; MDEM NSGP keeps its "not within" line), 1 changes status (Oregon CDBG). **Tagger** (`connectors/text.py`, `NEGATION_RE`): "not within <place>", "not limited to" and "not-for profit" are not negations; "state governments" and "State" at the head of a list of governments tag `state` (West Virginia's state-only federal rounds, California's "federal, state, and local" lists, MDEM PA); a county statistic ("county average wage", "the county's median") and a residency condition ("Be an Oregon resident") are not applicants, a partner "with ... a local law enforcement agency" is not either; Saj's four vocabulary calls: "communities" only where they apply or are eligible (Seaport), park and water management districts, transit agencies and development authorities (not housing development authorities) `special_district` with MPOs and PDCs untagged, volunteer fire companies and first aid and rescue squads `nonprofit`, "property owners" and a bare "local" left alone; plus "local political entities", "eligible jurisdictions", "local law enforcement agencies". Every move was read against its phrase before it was kept; four wrong ones were narrowed out (indigenous communities, two partner mentions, a county team's "County's MDIT" kept). No tier migration: the wording-only tier would read "eligible jurisdictions" meaning states (SSBCI) and a Texas partner mention, so 10 rows stay possible. **Parsers**: webgrants dash paragraphs under a list lead-in are list items (Montana potato); md_dnr answers a who-is-eligible question with the next sentence (Living Shorelines); md_mea's Solar TA "assistance ... to state and local government entities"; or_biz reads yearly windows stated without a year (CDBG: closed at 2026-09-30, open Feb 1–Apr 30 and Jul 1–Sep 30); va_vdot's access roads page is three records (EDA keeps the page id, no orphan). **PDFs**, only where a quote would put a row on a page (Saj's rule): none qualified; Illinois 4359 read and not quoted ("Government Entity" tags nothing), IEMA's BRIC and FMA rounds say applicants were predetermined by FEMA. The no-effect rule ("grants to subdivisions") was removed again | `scripts/measure_tagger.py`, `connectors/text.py`, each connector doc's Known gaps |
 | 9.4.1 | Illinois depth: AmpliFund pages and NOFO quotes | 2026-11-03 | the 88 GMS rows read their public AmpliFund page (CSFA number, description, funding source, labelled eligibility, fund activity categories, match), a page that cannot be read falls back to the stored copy; six native rounds whose program text said `N/A` or `SEE NOFO` carry eligibility sentences quoted by hand from their NOFO PDFs (`NOFO_QUOTES`, dated); free text is read sentence by sentence with negated sentences dropped. Found on the way: the shared `NEGATION_RE` had read `not-for-profit` as a negation since 10.1; fixed, one Maryland record and six Illinois rounds move. The Illinois page: 11 → 38 open municipal rows | `connectors/il_csfa.md` |
 | 9.6.1 | Texas funding sources | 2026-11-03 | the Funding Sources page (35 sources, `State Funds` or `Federal Funds`) is read once a run and a round is tied to a source only when the source's name begins the round's, word for word with plurals and grant/program/fund words folded; 97 of 147 rounds match (53 federal → `pass_through`), the 50 that name their source differently stay `direct` with no claim; the Texas page is unchanged | `connectors/tx_egrants.md` decision 9 |
 | 11.1 | Virginia DCJS: `va_dcjs` | 2026-11-03 | the first of Virginia's municipal five: the Drupal "Current Funding Opportunities" view (59 rows, ISO due and posted dates, a link each) plus one program page per row, read from the content block (the mega menu shares its markup); applicants only from a labelled eligibility passage, sentence by sentence; the contact block never read; status from the due date, because the view holds rounds until their archive date and listed none open. 59 added in 45 seconds, second run 0 changed; the Virginia page: 0 open municipal rows, 10 between rounds (599, School Safety Officer, JJDP, Hate Crimes, Byrne JAG, Ceasefire). `localities` added to the shared tagger (three California rounds move, correctly) | `connectors/va_dcjs.md` |
@@ -57,14 +58,22 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 
 ## Next
 
-### Start here (updated 2026-11-11, 12.6c part 2)
+### Start here (updated 2026-11-11, 10.6)
 
 **Before anything else.** 12.6c part 1 is on `main` (PR #22, merged). This branch carries 12.6c part 2 (North Dakota's
-four agencies, `connectors/north_dakota_drupal.py`, 16 programs); once its PR merges and the next daily run has read
-them, start from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`).
+four agencies, 16 programs) and 10.6 (the recorded gaps, measured); once its PR merges and the next daily run has read
+them, start from the latest `main` (`git fetch origin main && git checkout -B <branch> origin/main`). The first daily
+run after the merge will show Virginia VDOT's access roads as one changed record and two added (decision 10.6), Oregon
+CDBG moving to closed, and the tag changes 10.6 lists.
 
-**Next session: 12.6d, Kentucky's agency pages** (the 12.6 ranking's next: DLG pages the KY portal does not list, on the
-hand-list base), with 12.8 (MN and NM, probed read-only from Actions first) alongside. Nevada's 12.6 entry now starts with NEVADA ePro's
+**Next session: 12.6d, Kentucky's agency pages** (the 12.6 ranking's next). Surveyed read-only on 2026-11-11: DLG
+(`dlg.ky.gov/grants/`, ~10 federal program pages: ARC, CDBG's five, DRA, LWCF, RTP; "Who can Apply:" and "Applications
+Accepted: Dates are X - Y" on every CDBG page), the Transportation Cabinet's Office of Local Programs (TAP, CMAQ), the
+Energy and Environment Cabinet (Illegal Open Dump, Litter Abatement, waste tires as three programs on one page, Section
+319(h)) and KIA's loan funds (A, B, C, F) all run classic SharePoint publishing with the body in
+`div.ms-rtestate-field[id$="__ControlWrapper_RichHtmlField"]` (only the control number differs by host), robots allow
+the program pages: one Kentucky reader on the agency-page table, ~20 pages. Kentucky Emergency Management is blocked
+(Akamai 403 on robots.txt and the home page through the proxy): record it, as VDEM. With 12.8 (MN and NM, probed read-only from Actions first) alongside. Nevada's 12.6 entry now starts with NEVADA ePro's
 grant-subaward filter: build it the day the open-bid search shows a grant row. Outreach runs alongside, not after:
 `docs/outreach.md` has the routes, the four questions, the links, the paste-ready note (drafted 2026-11-03, not sent)
 and the contact log.
@@ -85,12 +94,12 @@ named: the agency the census seeds say first (NC's and WA's lists).
   Alabama at all (decision 2026-10-18).
 
 **Small follow-ups, any session** (each is detailed in the doc named):
-- Shared tagger (`connectors/text.py`): two gaps recorded on 2026-11-03 (MDEM): `not within <place>` ("Nonprofit
-  entities not within designated urban areas") reads as a negation and drops the line; a bare "State" as an applicant
-  ("assistance to State, local governments and ...") tags nothing, only "state agencies" does. Neither costs a row today.
-  The third gap makes a session, measured on every stored record as 10.2, 10.3 and 7.3 were.
+- Shared tagger: the recorded vocabulary gaps were closed in 10.6. Open: "9-1-1 authorities" (Illinois NG9-1-1, a
+  county or municipal emergency telephone system board) has no type yet, a call for Saj; "property owners" and a bare
+  "local" are left on purpose. Measure any new rule with `scripts/measure_tagger.py` on the restored database.
 - `webgrants.md`: the "round left the storefront is `unknown`" rule is unverified until a round actually leaves; other
-  Montana agency hosts and other states' storefronts were not searched for; 27 of 40 pages state no eligibility.
+  Montana agency hosts and other states' storefronts were not searched for; 35 of 48 stored rounds carry no applicant
+  tag (source-limited, counted 2026-11-11).
 - `nj_dca_sage.md`: the empty-list check is a guess at what a page with no RFPs looks like (a wrong guess aborts the run,
   which is the safe direction).
 - `tx_egrants.md`: 50 of 147 rounds name their funding source differently from the Funding Sources page and stay
@@ -99,10 +108,11 @@ named: the agency the census seeds say first (NC's and WA's lists).
 - Census gaps: 16 agency-by-agency states (Massachusetts and Oregon built 2026-11-04), 7 with no state index found, 8 blocked
   for good and 2 login portals after the Actions probe, MN and NM moved to 12.8; the two seed lists are built as directories
   (`docs/surveys/state_portals.md`).
-- `or_biz.md`: "Be an Oregon resident" (Aggie Bond) tags a household and "in the county" (BEP) a county: shared-tagger readings
-  to measure with the Seaport "coastal communities" gap in one 10.x session.
-- `ma_onestop.md`: Seaport's "coastal communities are eligible to apply" tags nothing (`communities` is not a tagger word); a
-  measured tagger session if it recurs.
+- PDF-only eligibility (Virginia DCJS's 39 guidelines, Massachusetts's Community Planning Grant, DCR's ORLP and
+  battlefield manuals, DelDOT SRTS, ND Parks' FY27 timeline): quoted by hand only when the row is open and the quote
+  would put it on a page (Saj's rule, 10.6); none qualified on 2026-11-11.
+- Deferred by their own docs' rules: a `match_pct`/`amount_max` sentence parser (MDE, a third case), Virginia DHCD's
+  pages without an Eligibility box (a hand-list session of its own), MD DHCD's `lastmod` gate and slashes in its ids.
 
 Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open notes they carry.
 
@@ -110,9 +120,8 @@ Milestones 6, 7, 8 and 8.1/8.2 below are shipped; they are kept for the open not
 
 Built and published to `gh-pages`; https://saj-sudo.github.io/funding-atlas/ is live (the repository went public on
 2026-11-03). The per-state change feed shipped on 2026-11-03 (6.1: `feed.xml` and `changes.json` beside every page).
-Left for a later session, none blocking: shareable filter links are in the URL hash already; the Grants.gov
-data-cleanup items under milestone 10 show on the page as they are in the database (`&quot;` in deadline text,
-contact names as agencies).
+Shareable filter links are in the URL hash already. (The Grants.gov cleanup this note used to list, `&quot;` in
+deadline text and contact names as agencies, was done on 2026-10-18 under milestone 10; note removed 2026-11-11.)
 
 ### 7. Maryland depth (shipped 2026-10-16 and 2026-11-03, see Done; GOCPP remains)
 
@@ -306,6 +315,11 @@ decide what gets built next.
 | 2026-11-05 | "Political subdivision(s)" is local government: municipality and county in the tagger, local-government wording for the tier | the statutory word North Dakota (and federal listings) use for cities, counties and townships; the same two tags as "local governments". Tagger: 2 of 7,606 records move; tier (migration 0007): 50 move possible to likely, one of them (FIND) on a page | `connectors/text.py`, `db/migrations/0007_political_subdivisions.sql` |
 | 2026-11-11 | North Dakota's Flex Fund is one record, and all eight CDRP pages go in, the dormant three included | Saj's calls: the Flex Fund's three grants share a page and a date; a dormant page shows what it says and the change feed catches a reopening | `connectors/north_dakota.md` |
 | 2026-11-11 | "submitted by" is a deadline only in a sentence about applications | NDDOT's TA page has plans "completed and submitted by January 1, 2028", a construction milestone; Vermont and Connecticut fixtures unchanged | `connectors/hand_list.py`, `connectors/north_dakota.md` |
+| 2026-11-11 | "communities" tags municipality only in a sentence that says they apply or are eligible | Saj's call: a town is a community, but most "communities" sentences describe who benefits; Seaport's "All 78 Massachusetts coastal communities are eligible to apply" is the case | `connectors/text.py`, roadmap 10.6 |
+| 2026-11-11 | Park, water management and transit districts and authorities, and development authorities, tag `special_district`; MPOs and planning district commissions stay untagged | Saj's call: single-purpose local governments are special districts; a regional planning body has no matching type, and a new type would touch the model, views and filters | `connectors/text.py`, roadmap 10.6 |
+| 2026-11-11 | Volunteer fire companies, first aid squads and rescue squads tag `nonprofit`; "property owners" and a bare "local" stay untagged | Saj's call: volunteer companies are nonprofit corporations; owners are often businesses and "local" alone matches too much | `connectors/text.py`, roadmap 10.6 |
+| 2026-11-11 | PDF eligibility is quoted by hand only where the quote would put an open row on a page | Saj's call: dozens of PDFs for closed or non-municipal rows is hand work with no reader benefit | roadmap 10.6 |
+| 2026-11-11 | A shared rule that moves no stored record is not kept | "grants to subdivisions" moved nothing (MDE writes the word in quotes, outside an applicant line); code with no effect on the data is a rule nobody can check | roadmap 10.6 |
 | 2026-10-16 | Shared applicant table gains `municipal` | "county and municipal governments" (MEA) and "governing bodies of municipal corporations" (DNR) matched nothing; one DHCD record changed, correctly | `connectors/maryland_drupal.md` |
 | 2026-10-16 | SharePoint base extracted at the second mdgov site, with MEA's fixture hashes as the gate | same rule that produced `maryland_drupal.py`; MDEM, MDOT and MDE are on the same theme | `connectors/maryland_sharepoint.md` |
 | 2026-10-16 | Text hash, not markup hash, and every page every run on SharePoint | the CDN stamps one `Last-Modified` on every page and Cloudflare rewrites the e-mail markup per response; the sites are small | `connectors/maryland_sharepoint.md` |

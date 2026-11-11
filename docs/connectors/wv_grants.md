@@ -145,7 +145,7 @@ and never change the hash. `prior` is accepted and ignored: the whole list is on
 
 ## Known gaps (the source's wording, not the parser's)
 
-- "State governments in the Chesapeake Bay watershed can apply" tags nothing: the shared keyword map knows `state agencies`, not `state governments`. Adding the phrase is a shared-map change that touches the Maryland connectors; left for the next case that needs it.
+- (Fixed 2026-11-11, roadmap 10.6: "state governments" tags `state`; 10 West Virginia rounds gain it.) "State governments in the Chesapeake Bay watershed can apply" tagged nothing: the shared keyword map knew `state agencies`, not `state governments`. Adding the phrase is a shared-map change that touches the Maryland connectors; left for the next case that needs it.
 - Eight of the ten fixture items land in category `other`: the division map is coarse by design (decision 4).
 
 ## Out of scope

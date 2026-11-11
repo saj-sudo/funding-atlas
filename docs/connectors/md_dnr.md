@@ -14,10 +14,10 @@ program and point at a manual; the diff will show each one the day its page gain
 
 Known gaps, all because the page does not say it the way the rules read:
 
-- Living Shorelines answers "Who is eligible?" in the next block ("Local Governments and non-profits"), so the
-  sentence scan tags homeowners and individuals from other sentences and misses the local governments. The page is
-  `unknown` (no application wording), so nothing surfaces wrongly; joining question headings to their answers is a
-  rule for when a second page needs it.
+- (Fixed 2026-11-11, roadmap 10.6.) Living Shorelines answers "Who is eligible for a 0% interest living shoreline
+  loan?" after a line break in the same block ("Individuals or groups of homeowners, non-profit organizations, community
+  organizations, counties and municipalities"); a who-may-apply question is now answered by the sentence after it, and
+  the page tags county, municipality, nonprofit, household and individual. Status stays `unknown`.
 - The Grants Gateway is one solicitation for six programs. One record, named "Grants Gateway", with the latest of its
   application deadlines (December 11, 2026) and no applicant tags: the page describes eligible projects, not
   applicants.

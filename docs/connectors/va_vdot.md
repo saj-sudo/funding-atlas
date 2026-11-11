@@ -104,7 +104,9 @@ copy; an unreadable index aborts the run.
 
 - Every record is `unknown`: the cycles are stated as seasons and weekdays, never as dates. The between-rounds group
   gets nothing from VDOT until a page states a date.
-- Access road programs are three programs on one page and one record.
+- (Fixed 2026-11-11, roadmap 10.6.) The access roads page is three programs and three records: Economic Development
+  Access keeps the page's id (`access-roads-programs`, so the stored record of the whole page becomes it rather than
+  lingering as an `unknown` no run returns), Airport Access and Recreational Access are `access-roads-programs#...`.
 - TAP, FLAP and SGR's federal share are `direct` because no page labels its source.
 
 ## Out of scope

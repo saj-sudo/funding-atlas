@@ -155,8 +155,8 @@ The hash is over the Program. The page carries no modified stamp; one request is
 
 - No ID: a retitled RFP is a new record (above).
 - No opening date, so a new RFP cannot be told from an old one by `opens_at`; "new" on the page comes from first-seen.
-- The Fire Safety RFP's applicants (volunteer fire companies, first aid squads, rescue squads) are not in the shared
-  tagger's vocabulary and carry no tag.
+- (Fixed 2026-11-11, roadmap 10.6, Saj's call.) Volunteer fire companies, first aid squads and rescue squads tag
+  `nonprofit`; VESOL gains it.
 - The empty-list fixture is built from the real page by removing every RFP; the page has not been seen with no RFP, so
   the instruction-text check is a guess at what an honestly empty page looks like (if it is wrong the run aborts, which is
   the safe direction).

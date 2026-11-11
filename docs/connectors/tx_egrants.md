@@ -172,7 +172,8 @@ The hash is over the Program. The cards carry no modified stamp, so everything i
 ## Known gaps (the source's wording, not the parser's)
 
 - 20 of 147 rounds carry no applicant tag: their text names none of the applicants the shared tagger knows.
-- The shared negation rule reads "but is not limited to" as a negation (decision 2).
+- (Fixed 2026-11-11, roadmap 10.6.) The shared negation rule read "but is not limited to" as a negation (decision 2); it
+  no longer does. "A memorandum of understanding with a local law enforcement agency" names a partner and tags nothing.
 - 50 of 147 rounds name their funding source differently from the Funding Sources page (or have none there) and stay
   `direct` with no source keys (decision 9); the federal ones among them (VAWA, VOCA, UASI's border supplement) are
   federal money the data does not say is federal.

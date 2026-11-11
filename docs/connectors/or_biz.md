@@ -135,11 +135,16 @@ keeps its stored page; with no stored page the record still exists with no round
 
 ## Known gaps
 
-- "Be an Oregon resident" (Aggie Bond) tags a household and "a company must ... in the county" (BEP) tags a county:
-  shared-tagger readings to measure in a 10.x session, not here.
+- (Fixed 2026-11-11, roadmap 10.6.) "Be an Oregon resident" (Aggie Bond) tagged a household and "150 percent of the
+  state or county average wage" (BEP; the county came from the wage statistic, not "in the county") and "the county's
+  median farm size" (Aggie Bond) tagged a county. A residency condition and a county statistic no longer tag; both
+  records now carry no applicant tag, which is what their pages say about governments.
 - 76 of 99 programs have a topic; the 23 alphabetical-only ones (broadband, housing infrastructure, CHIPS) have no
   category tag.
-- A page whose body states two windows a year (CDBG) is `unknown` every day of the year; a reader sees the windows.
+- (Fixed 2026-11-11, roadmap 10.6.) CDBG states two windows a year with no year on them ("February 1–April 30,
+  applications accepted", "July 1–September 30, applications accepted"). Read for the run date's year: inside a window
+  it is `open` to the window's end; between windows `closed` at the last window's end, so it sits in the between-rounds
+  group. The page's "until all funds available for the year have been obligated" is kept in the text, not read.
 
 ## Verification
 
