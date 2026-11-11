@@ -29,6 +29,13 @@ PAGES: dict[str, str] = {
     "community-benefit": "sections", "arpa-programs": "sections", "supportive-housing": "sections",
     "ddd-program": "page", "homeownership-production": "page", "lihtc": "page",
 }
+# slug -> [(sub_id, name, heading pattern)]: a "page" program whose page also holds another program under a plain `h2`
+# (Saj's rule, 2026-11-11: a page with several programs is one record per program). LIHTC's page ends with the Area of
+# Opportunity Land Bank Loan, a $5,000,000 loan program with its own guidelines; it is cut from the heading to the next
+# heading and read as a section, and the page's own record keeps the id and everything else.
+PAGE_SPLITS: dict[str, list[tuple[str, str, re.Pattern[str]]]] = {
+    "lihtc": [("ao-land-bank", "Area of Opportunity Land Bank Loan", re.compile(r"^Area of Opportunity Land Bank Program", re.I))],
+}
 SKIP_SECTIONS = re.compile(r"^(?:on this page|questions|archived)", re.I)
 SKIP_META = re.compile(r"^questions", re.I)
 WHO_APPLIES = "who applies"
@@ -234,7 +241,19 @@ class Dsha(HandListConnector):
         by the record count so far."""
         page = pages[0]
         if spec == "page":
-            return [(slug, {"slug": slug, "mode": spec, "page": page, "section": None})]
+            body, cut = list(page.get("body", [])), []
+            for sub, name, heading in PAGE_SPLITS.get(slug, []):
+                start = next((i for i, (k, t) in enumerate(body) if k == "heading" and heading.search(t)), None)
+                if start is None:
+                    continue
+                end = next((i for i in range(start + 1, len(body)) if body[i][0] == "heading"), len(body))
+                cut.append((f"{slug}#{sub}", name, body[start + 1:end]))
+                body = body[:start] + body[end:]
+            records = [(slug, {"slug": slug, "mode": spec, "page": {**page, "body": body}, "section": None})]
+            for sid, name, blocks in cut:
+                records.append((sid, {"slug": slug, "mode": spec, "page": {k: v for k, v in page.items() if k not in ("sections", "body")},
+                                      "section": {"id": "", "name": name, "badges": [], "blocks": blocks}}))
+            return records
         out: list[tuple[str, dict[str, Any]]] = []
         for section in page["sections"]:
             sid = f"{slug}#{section['id']}" if section["id"] else f"{slug}#{count + len(out)}"

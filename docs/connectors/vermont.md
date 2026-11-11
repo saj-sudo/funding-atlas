@@ -60,7 +60,9 @@ Left out, on purpose: ACCD's Community Investment Program (designations, not a g
 sales tax reallocation (not grants to a town), the Northern Border Regional Commission (a federal commission with its
 own site); VTrans's HSIP page (answered 403 with a generic VTrans page); FPR's Forest Legacy (state acquisition) and
 the links to other organizations (Communities Caring for Canopy, Working Lands). Hazard Mitigation is one page that
-describes HMGP, BRIC, FMA and the Flood Resilient Communities Fund together; it is one record, as the page is.
+describes HMGP, BRIC, FMA and the Flood Resilient Communities Fund together; **it is four records** since 2026-11-11
+(decision 4): HMGP is the page's body (`mitigation`), and FRCF, BRIC and FMA (`mitigation#frcf`, `#bric`, `#fma`) are the
+three paragraphs under "2026 Hazard Mitigation Funding Opportunities".
 
 ## Round sentences, as the pages write them
 
@@ -126,5 +128,10 @@ Read over every sentence of the page's blocks, in page order:
 2. **The pre-application deadline is `closes_at`** where a page states both stages.
 3. **A future deadline with no opening sentence is open** (TAP, MHSMP): the application form for that round is posted
    on the page.
-4. **One record per page**, Hazard Mitigation included.
+4. **One record per page**, Hazard Mitigation included. *Changed 2026-11-11 (Saj's split rule): a page that holds several
+   programs is one record per program.* `vt_vem` sets `SPLITS["mitigation"]` with `SPLIT_KINDS` `("label", "p")`: the
+   first split has no pattern, so HMGP is the head of the page and nothing is shared; the funding-opportunities label is a
+   tail in no record. BRIC owns the State application deadline (May 15, 2026), FRCF says "Funding is currently
+   unavailable" and is `direct` (a state fund that names FEMA, `FUNDING_SOURCES`). BRIC and FMA tag no applicant: their
+   paragraphs say "states, local communities". The Vermont page: 17 programs become 20.
 5. **Scope is the municipal four**; Vermont's Public Service Department (energy) was not probed and is a later addition.

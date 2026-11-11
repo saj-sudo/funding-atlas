@@ -30,7 +30,7 @@ says the current round is open, so list lines are read only when a program has n
 | `/supportive-housing/` | sections | Special Populations Housing Fund, HDF Statewide Emergency Shelter, Housing Trust Fund Permanent Supportive Housing, ARP Homelessness Assistance |
 | `/ddd-program/` | one program | Downtown Development Districts |
 | `/homeownership-production/` | one program | Strong Neighborhoods Housing Fund |
-| `/lihtc/` | one program | Low Income Housing Tax Credit |
+| `/lihtc/` | one program, and the Area of Opportunity Land Bank Loan cut from its end (`PAGE_SPLITS`, 2026-11-11) | Low Income Housing Tax Credit; Area of Opportunity Land Bank Loan |
 
 Six GETs a run. `/local-municipalities/` and `/planning-assistance/` are technical-assistance pilots (zoning reform,
 disaster housing), not funding, and are not read.
@@ -136,3 +136,16 @@ line that is open; if none is, the first line.
 ## Verification
 
 `tests/test_de_dsha.py` against the six saved pages (`scripts/probe_de_dsha.py`); two live runs.
+
+## Split 2026-11-11: LIHTC's page also holds a loan program
+
+Saj's rule (a page with several programs is one record per program) found one case in Delaware. The LIHTC page ends with a
+plain `h2`, "Area of Opportunity Land Bank Program": "Housing Delaware set aside $5,000,000 (subject to availability) ...
+The Area of Opportunity Land Bank Loan ("AO Land Bank") program ... Applications will be accepted on a rolling basis as long
+as funds are available", then two PDF links. `PAGE_SPLITS` in `connectors/de_dsha.py` cuts a `page` program at that heading
+up to the next heading; the page's record keeps `lihtc` and everything else it read (its `record_hash` is unchanged), and
+the loan is `lihtc#ao-land-bank`: `open`, `rolling`, `loan` (the name carries it), no applicant (the page's "Who applies:
+Nonprofit and for-profit developers" is LIHTC's header card), `direct`. The audit found nothing else: DEMA and DelDOT were
+already one record per program, the three `sections` pages split by `h2`, Downtown Development Districts is one program with
+two tracks (rebates rolling, reservations not accepting), and DNREC's non-point-source page is one program that says
+"loans". The Delaware DSHA page: 18 programs.

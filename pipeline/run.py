@@ -20,6 +20,10 @@ from connectors import (
     grants_gov,
     il_csfa,
     ky_dlg,
+    ky_dlgfed,
+    ky_eec,
+    ky_kia,
+    ky_tc,
     ma_onestop,
     md_commerce,
     md_dhcd,
@@ -98,6 +102,10 @@ CONNECTORS: dict[str, ModuleType] = {
     "nd_dot": nd_dot,
     "nd_des": nd_des,
     "nd_parks": nd_parks,
+    "ky_dlgfed": ky_dlgfed,
+    "ky_tc": ky_tc,
+    "ky_eec": ky_eec,
+    "ky_kia": ky_kia,
 }
 
 

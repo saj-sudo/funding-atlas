@@ -19,6 +19,9 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"units? of (?:general )?local government", ("municipality", "county")),
     (r"local units? of (?:general )?government", ("municipality", "county")),   # Iowa's word order
     (r"local governments?", ("municipality", "county")),
+    # 12.6d: Kentucky CMAQ, "Local and state government agencies are eligible to apply" (the state half tags itself).
+    # Agencies only: North Dakota DES's "beyond local and state government recovery capability" names no applicant.
+    (r"\blocal and state government agenc\w*", ("municipality", "county")),
     # "political subdivisions" is the statutory word for a state's local governments (North Dakota's FIND and its
     # revolving funds: "loans to political subdivisions"); the same two tags as "local governments".
     (r"\bpolitical subdivisions?\b", ("municipality", "county")),
@@ -91,7 +94,7 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # money does for communities stays untagged.
     # Not "indigenous communities" or "Native American communities" (California's Explore the Coast: tribes "that are
     # not federally recognized may apply" through a nonprofit).
-    (r"(?<!indigenous )(?<!american )\bcommunities\b(?=[^.;]*\b(?:(?:is|are) eligible|may apply|can apply|eligible to apply)\b)|\beligible communities\b",
+    (r"(?<!indigenous )(?<!american )\bcommunities\b(?=[^.;]*\b(?:(?:is|are) eligible|may apply|can apply|eligible to apply|may submit an application)\b)|\beligible communities\b",
      ("municipality",)),
     # 10.6 (Saj's call): volunteer fire companies, first aid squads and rescue squads (New Jersey Fire Safety, VESOL) are
     # nonprofit corporations; a municipal fire department tags municipality through its own words.

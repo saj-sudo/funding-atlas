@@ -22,10 +22,13 @@ def mod(name: str):
     return importlib.import_module(f"connectors.{name}")
 
 
-def program(name: str, slug: str, today: date = TODAY):
+def program(name: str, sid: str, today: date = TODAY):
+    """The record `sid` (a page key, or `page#sub` for a page that holds several programs), made the way `fetch` makes it."""
     m = mod(name)
+    slug = sid.split("#")[0]
     page = m.SITE.parse_page((FIX / name / f"{slug}.html").read_text(encoding="utf-8"))
-    return m.normalize(RawRecord(source_connector=name, source_id=slug, payload={"path": m.PAGES[slug], "page": page}), today)
+    payload = dict(m.SITE.records_for(slug, m.PAGES[slug], [page], 0))[sid]
+    return m.normalize(RawRecord(source_connector=name, source_id=sid, payload=payload), today)
 
 
 def tags(name: str, slug: str) -> set[str]:
@@ -51,7 +54,7 @@ def test_status_table():
     rows = {(n, s): (program(n, s).status, program(n, s).opens_at, program(n, s).closes_at) for n, s in [
         ("vt_fpr", "rtp"), ("vt_fpr", "vorec"), ("vt_accd", "municipal-planning-grant"), ("vt_vtrans", "transport-alt"),
         ("vt_vtrans", "better-roads"), ("vt_accd", "vcdp"), ("vt_accd", "downtown-transportation-fund"),
-        ("vt_vtrans", "grants-in-aid"), ("vt_vem", "mitigation"), ("vt_vem", "empg")]}
+        ("vt_vtrans", "grants-in-aid"), ("vt_vem", "mitigation"), ("vt_vem", "mitigation#bric"), ("vt_vem", "empg")]}
     assert rows[("vt_fpr", "rtp")] == ("open", date(2026, 9, 29), date(2026, 11, 20))          # pre-application deadline
     assert rows[("vt_fpr", "vorec")] == ("open", date(2026, 10, 6), date(2026, 12, 13))
     assert rows[("vt_accd", "municipal-planning-grant")] == ("open", date(2026, 10, 1), date(2026, 12, 2))
@@ -60,9 +63,10 @@ def test_status_table():
     assert rows[("vt_accd", "vcdp")] == ("open", None, None)                                   # "now open", no date
     assert rows[("vt_accd", "downtown-transportation-fund")][0] == "closed"
     assert rows[("vt_vtrans", "grants-in-aid")] == ("closed", None, date(2026, 5, 1))
-    assert rows[("vt_vem", "mitigation")] == ("unknown", None, date(2026, 5, 15))             # past, nothing else said
+    assert rows[("vt_vem", "mitigation")] == ("unknown", None, None)                          # HMGP: rounds follow disasters
+    assert rows[("vt_vem", "mitigation#bric")] == ("unknown", None, date(2026, 5, 15))        # past, nothing else said
     assert rows[("vt_vem", "empg")][0] == "unknown"
-    assert program("vt_vem", "mitigation").closes_at_text == "State application deadline: May 15, 2026."
+    assert program("vt_vem", "mitigation#bric").closes_at_text == "State application deadline: May 15, 2026."
 
 
 def test_status_moves_with_the_run_date():
@@ -91,6 +95,27 @@ def test_applicants():
     assert program("vt_vtrans", "mhsmp").eligibility_text.startswith(
         "VTrans TAP and MHSMP Grant Guidebook, October 2026 (PDF), Eligible Applicants, read 2026-11-04: A local government.")
     assert tags("vt_vem", "empg") == set()                                # subgrants go to the RPCs
+
+
+def test_hazard_mitigation_page_is_four_programs():
+    """Saj's rule, 2026-11-11: a page with several programs is one record per program. HMGP is the page's body and
+    keeps the id `mitigation`; FRCF, BRIC and FMA are the paragraphs under "2026 Hazard Mitigation Funding Opportunities"."""
+    m = mod("vt_vem")
+    page = m.SITE.parse_page((FIX / "vt_vem" / "mitigation.html").read_text(encoding="utf-8"))
+    records = dict(m.SITE.records_for("mitigation", m.PAGES["mitigation"], [page], 0))
+    assert list(records) == ["mitigation", "mitigation#frcf", "mitigation#bric", "mitigation#fma"]
+    names = [program("vt_vem", sid).name for sid in records]
+    assert names == ["Hazard Mitigation Grant Program (HMGP)", "Flood Resilient Communities Fund (FRCF)",
+                     "Building Resilient Infrastructure and Communities (BRIC)", "Flood Mitigation Assistance (FMA)"]
+    text = {sid: " ".join(t for _, t in p["page"]["blocks"]) for sid, p in records.items()}
+    assert "25% local match" in text["mitigation"] and "2026 Hazard Mitigation Funding Opportunities" not in " ".join(text.values())
+    # nothing is shared: the head's body does not follow the three paragraphs, and each paragraph is its own program
+    assert all(len(records[s]["page"]["blocks"]) == 1 for s in ("mitigation#frcf", "mitigation#bric", "mitigation#fma"))
+    assert "Funding is currently unavailable" in text["mitigation#frcf"] and "Funding is currently unavailable" not in text["mitigation"]
+    # FRCF is a state fund that names FEMA ("not eligible for FEMA funding"); the others are FEMA programs
+    assert program("vt_vem", "mitigation#frcf").funding_source == "direct"
+    assert {program("vt_vem", s).funding_source for s in ("mitigation", "mitigation#bric", "mitigation#fma")} == {"pass_through"}
+    assert tags("vt_vem", "mitigation") == {"municipality"}
 
 
 def test_funding_source_and_match():

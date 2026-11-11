@@ -8,6 +8,8 @@ in `connectors/north_dakota_drupal.py`; status table and field mapping are the a
 
 from __future__ import annotations
 
+import re
+
 from connectors.north_dakota_drupal import NdAgency
 
 CONNECTOR = "nd_dot"
@@ -21,6 +23,16 @@ PAGES: dict[str, str] = {
     "urban-grant": "/construction-and-planning/urban-grant-program-ugp",
     "special-road-fund": "/construction-and-planning/construction-planning/programs-and-planning/special-road-fund-program",
 }
+# The Flex Fund page holds three grants under "Flex Fund Programs", each with its own applicants; "Prairie Dog as
+# Grants" is the Treasurer's note on where the money comes from and names every applicant type, so it belongs to none.
+SPLITS = {
+    "flex-fund": [
+        ("townships", "Flex Fund: Grants for Non-Oil Townships", re.compile(r"^Grants for Non-Oil Townships", re.I)),
+        ("counties-cities", "Flex Fund: Grants for Non-Oil Counties and Cities", re.compile(r"^Grants for Non-Oil Counties and Cities", re.I)),
+        ("bridges", "Flex Fund: Grants for Bridges", re.compile(r"^Grants for Bridges", re.I)),
+        ("funding-note", None, re.compile(r"^Prairie Dog", re.I)),
+    ],
+}
 
 
 class NdDot(NdAgency):
@@ -30,6 +42,7 @@ class NdDot(NdAgency):
     AGENCY_CODE = AGENCY_CODE
     CATEGORY_LABEL = CATEGORY_LABEL
     PAGES = PAGES
+    SPLITS = SPLITS
 
 
 SITE = NdDot()
