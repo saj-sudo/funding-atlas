@@ -101,6 +101,7 @@ CONNECTOR_LABEL = {
     "ky_eec": "Kentucky Energy and Environment Cabinet",
     "ky_kia": "Kentucky Infrastructure Authority",
     "mo_ded": "Missouri DED (Community Development Block Grants)",
+    "mo_dnr": "Missouri Department of Natural Resources",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

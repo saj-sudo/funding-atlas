@@ -1,4 +1,4 @@
-# Missouri's agency pages (`mo_ded` so far): source, raw data and field mapping
+# Missouri's agency pages (`mo_ded`, `mo_dnr`): source, raw data and field mapping
 
 Milestone 12.6e, the fifth agency state in the 12.6 cost ranking (after Vermont, Connecticut, North Dakota and Kentucky).
 Written 2026-11-11 from a read-only survey of the candidate agencies' hosts and pages, before the parser. The agencies
@@ -10,7 +10,8 @@ are built one at a time, each its own commit; this doc grows with them.
 |---|---|---|---|---|
 | Economic Development (DED) | `ded.mo.gov` | Drupal 10, Layout Builder (`.node__content`) | allows all | **built** (this doc) |
 | Transportation (MoDOT) | `www.modot.org` (the apex redirects) | Drupal 10 | blocks only `/media/oembed` | next |
-| Natural Resources (DNR, with Energy) | `dnr.mo.gov` (`energy.mo.gov` redirects to `/energy`) | Drupal 10 | blocks `/taxonomy/` | next |
+| State Parks and Historic Preservation | `mostateparks.com` (DNR's LWCF, Recreational Trails, Historic Preservation Fund and Certified Local Government pages live here) | not surveyed | not surveyed | after MoDOT, its own module |
+| Natural Resources (DNR, with Energy) | `dnr.mo.gov` (`energy.mo.gov` redirects to `/energy`) | Drupal 10 | blocks `/taxonomy/` | **built** (below) |
 | Emergency Management (SEMA) | `sema.dps.mo.gov` | not Drupal, an older CMS with `.php` pages and no `.node__content` | blocks only legacy directories | next, its own reader |
 | Housing (MHDC) | `mhdc.com` | no generator tag | no `robots.txt` (404) | deferred: its own CMS, mostly developer tax credits |
 | Conservation (MDC) | `mdc.mo.gov` | Drupal 10 | **`Disallow: /`** in at least one agent block | **stopped** on robots, as ADECA was; recorded, not read |
@@ -30,6 +31,85 @@ stored records, 39 connectors) with `scripts/measure_tagger.py`: **0 tag moves, 
 - `AGENCY_OPEN_RE` reads "is currently open" ("The Emergency Cycle is currently open."); without it both DED pages
   that say so were `unknown` while the source said open.
 - `ELIGIBILITY_LABEL_RE` reads the heading "Do I Qualify?" as the eligibility section, which DED's pages use for it.
+
+## Implemented, DNR (2026-11-11)
+
+`connectors/mo_dnr.py` on the same base follows this section. First live run on a database that held DED: **20 added,
+0 errors**; second run **0 changed**. Open: Flood Resiliency Improvement Grants, Section 319 Nonpoint Source Subgrants,
+DWSRF Lead Service Line Funding and the Well Plugging Grant (each page's "Application Period is Open" heading); closed:
+EECBG, Energy Loans, Energy Audit Reimbursements, Source Water Protection, Water Safety and Security and the Scrap Tire
+Surface Material Grants ("Application Period is Closed"); `unknown`: the revolving-fund loans and grants with no banner
+and no round sentence (CWSRF and DWSRF loans, the small borrower loan, the CWSRF engineering report, integrated
+management plan and regionalization grants, the DWSRF engineering report grant), the Multipurpose Water Resource Fund,
+Section 604(b) and the Emergency Energy Loans. The source states no round for them, so none is stored.
+
+DNR's program pages share one template: an "Application Period is Open" or "... is Closed" heading, then "Who Can
+Apply", "Eligible Projects and Costs", "Award Amounts and Match", "Application Process" and a closing list of past awards.
+The `.node__content` element also holds the theme's footer blocks ("Popular Links", "Navigation", "Contact Information"),
+so the Missouri reader stops at them and at an "Awards" heading (a list of past recipients, which would tag towns as
+applicants). The five division indexes (`/water/...`, `/energy/...`, `/waste-recycling/...`, `/land-geology/...`,
+`/financial-assistance-opportunities/recreation-historic-preservation`) are the lists these pages came from; the module
+reads the program pages, not the indexes.
+
+| Group | Slugs (all under `https://dnr.mo.gov`) |
+|---|---|
+| Water, clean water | `small-borrower-loan`, `cwsrf-engineering-report`, `cwsrf-integrated-management-plan`, `cwsrf-loan`, `cwsrf-regionalization` |
+| Water, drinking water | `dwsrf-engineering-report`, `dwsrf-lead-service-line`, `dwsrf-loan`, `source-water-protection`, `water-safety-security`, `well-plugging` |
+| Water, other | `flood-resiliency`, `multipurpose-water-resource`, `section-319`, `section-604b` |
+| Energy | `energy-audit`, `energy-loans`, `energy-emergency-loans`, `eecbg` |
+| Waste | `scrap-tire-surface` |
+
+Left out (Saj to overrule): the CWSRF On-site Wastewater grant (a pass-through to nonprofits for homeowners), the
+Operator Certification Training Voucher (individual operators), Scrap Tire Cleanup and Disposal Reimbursement
+(nonprofits only), Brownfields Assessments (a service DNR performs, not funding), Solid Waste Management District Grants
+(a forms page for the 20 districts, which award the money), the Grid Resilience Formula Funding subgrants (electric
+utilities and grid operators, not local governments), Wood Energy Tax Credit and Low-Income Weatherization (businesses and
+households), the Soil and Water Cost-Share Practices (landowners), and every tax credit and every link to another agency
+(DED's CDBG is `mo_ded`; USDA and DOE pages are theirs).
+
+### Shared changes (all in `connectors/hand_list.py`, one per Missouri page that needed it)
+
+Measured with `scripts/measure_tagger.py` on the 7,630 stored records restored from `gh-pages`, before and after all
+changes of this session: **0 tag moves, 0 hash moves**.
+
+- `AGENCY_OPEN_RE` reads "Application Period is Open" (DNR's banner on every open program).
+- `APPLICANT_SENTENCE_RE` reads "Eligible recipients" (EECBG, Energy Loans) and "eligible to submit" (the scrap tire
+  grants). Without the first, the paragraph "Eligible recipients include the following:" was not an applicant sentence, so
+  it ended the list under "Who Can Apply" and every item was dropped (EECBG tagged nothing).
+- `AgencyPageConnector.APPLICANT_ITEM_MAX` (default 160, unchanged for every other state; Missouri sets 400): DNR writes
+  each applicant list item as a whole sentence ("Municipalities, counties, public sewer or water districts, political
+  subdivisions or instrumentalities of the state are eligible for wastewater and nonpoint source pollution control project
+  loans"), which the 160-character limit dropped, leaving the CWSRF loan tagged `nonprofit` and nothing else.
+- `clause_cut` (before tagging, the stored text keeps the clause): "that are not owned by the federal government" (the DWSRF
+  loan's definition of a public body, whose "not" dropped the whole line), "provide ... to a group of households" (the DWSRF
+  engineering report names who the project serves, not who applies) and "other than state agencies" (the scrap tire grants
+  exclude the state; it tagged `state`).
+
+### Funding source
+
+`pass_through` only where the page names a federal source of the money, `direct` otherwise (loans included: the pages
+call them revolving funds and name no federal source, only an EPA handbook). The sentences, verbatim:
+
+| Slug | The page's sentence |
+|---|---|
+| `cwsrf-engineering-report`, `cwsrf-integrated-management-plan`, `cwsrf-regionalization`, `dwsrf-engineering-report` | "Funding is provided by the CWSRF fund, capitalization grant additional subsidization allocation." (the DWSRF page says "DWSRF fund") |
+| `dwsrf-lead-service-line` | "Funding is provided by the Bipartisan Infrastructure Law, and made available through the Drinking Water State Revolving Fund." |
+| `section-319` | "Funding is provided by EPA as subgrants through the department." |
+| `section-604b` | "Under Section 604(b) of the federal Clean Water Act, the Missouri Department of Natural Resources offers grant sub-awards ..." |
+| `source-water-protection`, `water-safety-security`, `well-plugging` | "Section 1452(g) and (k) of the federal Safe Drinking Water Act authorizes the Missouri Department of Natural Resources to distribute part of the Drinking Water State Revolving Fund(s) ..." |
+| `eecbg` | "... is a formula grant offered as a part of the Bipartisan Infrastructure Law (BIL) to cities and counties ..." |
+
+### Gaps (DNR, recorded, not hidden)
+
+- `section-604b` (regional planning commissions and councils of government) and `source-water-protection` (community
+  public water systems) name applicants the shared tagger has no word for, so they carry none. Not a rule change for two
+  records; a tagger session can add `special_district`-style words when a third case appears.
+- `well-plugging` tags `nonprofit` from "Community and not-for-profit noncommunity public water systems", which is a type of
+  public water system; the applicants are public water systems.
+- `energy-loans` and `energy-emergency-loans` are open to businesses and agricultural entities as well as public bodies; the
+  record is one program with the applicant types the page lists.
+- Ten of twenty records are `unknown` because the page states no round. The revolving-fund loans are year-round by nature,
+  but the pages do not say "year-round", and the rule is the source's words.
 
 ## The platform
 

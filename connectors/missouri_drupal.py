@@ -29,7 +29,9 @@ DROP_RE = re.compile(r"\bPhone:|\bTTY\b|\bEmail:|\bE-mail\b|@(?:ded|dnr|modot|se
 INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 # Where a page's own text ends: the help and contact section, the document and resource lists, past awards.
 STOP_RE = re.compile(r"(?:need help\??|documents|hud resources|resources|related links|past (?:awards|recipients)"
-                     r"|.*\bawarded projects\b|.*\bgrant recipients\b)$", re.I)
+                     r"|.*\bawarded projects\b|.*\bgrant recipients\b"
+                     # DNR: the lists of past awards, then the theme's footer blocks that sit inside the body element
+                     r"|awards|after awards|popular links|navigation|contact information|in this section:?)$", re.I)
 # The tab that repeats DED's program headings.
 QUALIFY_RE = re.compile(r"^do i qualify\??$", re.I)
 
@@ -75,6 +77,7 @@ class MoAgency(AgencyPageConnector):
     """A Missouri agency: set CONNECTOR, BASE, AGENCY, AGENCY_CODE, CATEGORY_LABEL and PAGES (slug -> path)."""
 
     JURISDICTION = JURISDICTION
+    APPLICANT_ITEM_MAX = 400      # DNR's "Who Can Apply" items are whole sentences: "Municipalities, counties, public sewer or water districts, ..."
     # slug -> True for a page that names its programs in two tabs (DED); see `join_tabs`.
     TABBED: dict[str, bool] = {}
 

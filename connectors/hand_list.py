@@ -309,7 +309,8 @@ NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant te
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
                             r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
-                            r"|\b(?:is|are)\s+currently\s+open\b", re.I)   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
+                            r"|\b(?:is|are)\s+currently\s+open\b"   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
+                            r"|\bapplication period is open\b", re.I)   # Missouri DNR's banner heading on every program page
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b", re.I)
 # "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
 # certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
@@ -328,7 +329,7 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   r"|^do i qualify\??$", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
-    r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to apply\b"
+    r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to (?:apply|submit)\b"
     r"|\b(?:is|are) eligible for funding\b|\bfor local municipalities\b"
     # Connecticut (12.6b): "accepting applications from municipalities", "Applicants must be a municipality",
     # "only available to Connecticut towns and cities", "State funds to urbanized area municipal governments",
@@ -346,7 +347,9 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\bprovides?\s+(?:\w+\s+)?aid to\b"
     r"|\beligible jurisdictions\b[^.]*\bmay submit\b"   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
     # Kentucky (12.6d): DLG's "Who can Apply: ..." line on every CDBG, DRA and ARC page.
-    r"|^who (?:can|may) apply\b", re.I)
+    r"|^who (?:can|may) apply\b"
+    # Missouri (12.6e): DNR's "Eligible recipients include the following:" over the list of who may apply (EECBG, Energy Loans).
+    r"|\beligible recipients\b", re.I)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
@@ -357,11 +360,25 @@ FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational 
 # "serve as the sub-applicant on behalf of homeowners or businesses" (Connecticut HMGP): whoever an applicant applies on
 # behalf of benefits, and does not apply; the clause is cut before tagging (the stored text keeps it).
 ON_BEHALF_RE = re.compile(r"\bon behalf of\b[^.;]*", re.I)
+# Missouri DNR (12.6e): "Counties, incorporated cities and towns, ... and political subdivisions that are not owned by the
+# federal government" defines the applicants, and its "not" would drop the whole line; and "...a plan to provide safe
+# drinking water to a group of households" names who the project serves, not who applies. Both clauses are cut before
+# tagging (the stored text keeps them).
+NOT_FEDERAL_RE = re.compile(r"\b(?:that|which) are not owned by (?:the )?federal government\b", re.I)
+BENEFICIARY_RE = re.compile(r"\bprovide\b[^.;]*?\bto (?:a group of )?(?:households|homeowners|residents)\b[^.;]*", re.I)
+# "governmental organizations other than state agencies are eligible" (Missouri scrap tire grants) excludes the state; it
+# does not name it.
+OTHER_THAN_STATE_RE = re.compile(r"\bother than (?:the )?state\b[^.;,]*", re.I)
 # "Non-profits and private sector entities may partner with an eligible applicant" (Kentucky CMAQ): a partner, not an
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
 MATCH_RE = re.compile(r"\bmatch(?:ing)?\b[^.]*\brequired\b|\brequire[sd]?\b[^.]*\bmatch\b", re.I)
 MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
+
+
+def clause_cut(line: str) -> str:
+    """The line with the clauses that name a beneficiary, or define an applicant by what it is not, cut before tagging."""
+    return OTHER_THAN_STATE_RE.sub("", BENEFICIARY_RE.sub("", NOT_FEDERAL_RE.sub("", ON_BEHALF_RE.sub("", line))))
 
 
 def all_sentences(blocks: Blocks) -> list[str]:
@@ -457,15 +474,15 @@ def summary_for(blocks: Blocks) -> str | None:
     return None
 
 
-def applicant_lines(blocks: Blocks) -> list[str]:
-    """Short list items under an applicant label, kept whole; from every block (bold labels included) the sentences
-    that say who may apply. A paragraph that says neither ends the label's list."""
+def applicant_lines(blocks: Blocks, short_item: int = SHORT_ITEM) -> list[str]:
+    """List items under an applicant label (up to `short_item` characters), kept whole; from every block (bold labels
+    included) the sentences that say who may apply. A paragraph that says neither ends the label's list."""
     out: list[str] = []
     on = False
     for kind, text in blocks:
         if kind == "label":
             on = bool(ELIGIBILITY_LABEL_RE.search(text))
-        elif on and kind == "li" and len(text) <= SHORT_ITEM:
+        elif on and kind == "li" and len(text) <= short_item:
             if text not in out:
                 out.append(text)
             continue
@@ -519,6 +536,8 @@ class AgencyPageConnector(HandListConnector):
     (slug -> path); the state's base supplies `parse_page` (title and blocks)."""
 
     CATEGORY_LABEL: str = ""
+    # The longest list item kept whole under an eligibility label (Missouri DNR lists whole sentences of applicants).
+    APPLICANT_ITEM_MAX: int = SHORT_ITEM
     # slug -> (date read, source, lines): who may apply, quoted by hand from a document the page links when the page
     # itself names no applicant (the MDOT and Illinois precedent).
     HAND_QUOTES: dict[str, tuple[str, str, list[str]]] = {}
@@ -554,7 +573,7 @@ class AgencyPageConnector(HandListConnector):
         text = " ".join(t for _, t in blocks)
         name = raw.payload.get("name") or clean(page.get("title", "")) or raw.source_id
         label = self.CATEGORY_LABELS.get(raw.source_id, self.CATEGORY_LABEL)
-        lines = applicant_lines(blocks) + quote_lines(self.HAND_QUOTES, raw.source_id)
+        lines = applicant_lines(blocks, self.APPLICANT_ITEM_MAX) + quote_lines(self.HAND_QUOTES, raw.source_id)
         match = None if MATCH_NOT_RE.search(text) else (True if MATCH_RE.search(text) else None)
         return dict(
             source_url=self.BASE + path,
@@ -566,7 +585,7 @@ class AgencyPageConnector(HandListConnector):
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,
             eligibility_structured=None,
-            applicant_types=applicant_tags([ON_BEHALF_RE.sub("", line) for line in lines if not PARTNER_LINE_RE.search(line)]),
+            applicant_types=applicant_tags([clause_cut(line) for line in lines if not PARTNER_LINE_RE.search(line)]),
             categories=[CategoryTag(value=v, source_code=label) for v in portal_categories(label)],
             **round_for(blocks, today),
         )

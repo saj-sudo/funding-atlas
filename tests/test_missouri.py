@@ -1,4 +1,4 @@
-"""Missouri's agency connectors (mo_ded so far) and their Drupal base, against saved pages."""
+"""Missouri's agency connectors (mo_ded, mo_dnr) and their Drupal base, against saved pages."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures"
 TODAY = date(2026, 11, 11)
-AGENCIES = ["mo_ded"]
+AGENCIES = ["mo_ded", "mo_dnr"]
 
 
 def mod(name: str):
@@ -133,6 +133,66 @@ def test_ded_is_hud_money_passed_through_the_state():
     assert program("mo_ded", "competitive-cycle").category_pairs() == [("infrastructure", "community development")]
 
 
+def test_dnr_reader_stops_before_the_footer_blocks_and_the_awards_lists():
+    for slug in mod("mo_dnr").PAGES:
+        t = text("mo_dnr", slug)
+        assert "Popular Links" not in t and "Contact Information" not in t, slug
+    labels = [t for k, t in page("mo_dnr", "eecbg")["blocks"] if k == "label"]
+    assert "Who Can Apply" in labels and "Awards" not in labels      # the list of past awardees is not read
+
+
+def test_dnr_statuses_come_from_the_application_period_banner():
+    got = {slug: program("mo_dnr", slug).status for slug in mod("mo_dnr").PAGES}
+    assert got["flood-resiliency"] == "open" and got["section-319"] == "open" and got["well-plugging"] == "open"
+    assert got["dwsrf-lead-service-line"] == "open"
+    assert got["eecbg"] == "closed" and got["energy-loans"] == "closed" and got["scrap-tire-surface"] == "closed"
+    # no banner and no round sentence: the source states none, so `unknown`
+    assert got["cwsrf-loan"] == "unknown" and got["dwsrf-loan"] == "unknown" and got["multipurpose-water-resource"] == "unknown"
+
+
+def test_dnr_applicants_include_the_long_list_items_and_not_the_beneficiaries():
+    # a whole sentence of applicants is one list item; "that are not owned by the federal government" is not a negation
+    assert {"county", "municipality"} <= tags("mo_dnr", "dwsrf-loan")
+    assert {"county", "municipality"} <= tags("mo_dnr", "cwsrf-loan")
+    # "Eligible recipients include the following:" keeps its list (EECBG, Energy Loans)
+    assert tags("mo_dnr", "eecbg") == {"municipality", "county"}
+    assert {"municipality", "county", "school", "higher_ed", "nonprofit", "business"} <= tags("mo_dnr", "energy-loans")
+    # a plan "to provide safe drinking water to a group of households" names who the project serves, not who applies
+    assert "household" not in tags("mo_dnr", "dwsrf-engineering-report")
+    assert "household" in {t.value for t in hl.applicant_tags(["Homeowners may apply."])}
+    # "governmental organizations other than state agencies are eligible to submit applications" excludes the state
+    assert "state" not in tags("mo_dnr", "scrap-tire-surface")
+    assert "school" in tags("mo_dnr", "scrap-tire-surface")
+    # no tagger word for these two, so nothing is tagged rather than something wrong
+    assert tags("mo_dnr", "section-604b") == set() and tags("mo_dnr", "source-water-protection") == set()
+
+
+def test_dnr_funding_source_is_what_the_page_names():
+    for slug in ("cwsrf-engineering-report", "dwsrf-lead-service-line", "section-319", "eecbg", "well-plugging"):
+        assert program("mo_dnr", slug).funding_source == "pass_through", slug
+    for slug in ("cwsrf-loan", "dwsrf-loan", "flood-resiliency", "energy-loans"):
+        assert program("mo_dnr", slug).funding_source == "direct", slug
+    assert program("mo_dnr", "cwsrf-loan").funding_type == "loan" and program("mo_dnr", "eecbg").funding_type == "grant"
+    assert program("mo_dnr", "flood-resiliency").category_pairs() == [("public_safety", "emergency mitigation")]
+    assert program("mo_dnr", "energy-audit").category_pairs() == [("energy", "energy")]
+
+
+def test_dnr_leaves_out_what_is_not_for_public_bodies():
+    for slug in ("cwsrf-onsite", "operator-training-voucher", "brownfields-assessments", "scrap-tire-cleanup", "swmd-grants",
+                 "grid-resilience", "wood-energy-tax-credit"):
+        assert slug not in mod("mo_dnr").PAGES
+
+
+def test_the_shared_phrasings_dnr_added():
+    assert hl.AGENCY_OPEN_RE.search("Application Period is Open")
+    assert hl.APPLICANT_SENTENCE_RE.search("Eligible recipients include the following:")
+    assert hl.APPLICANT_SENTENCE_RE.search("Schools are eligible to submit applications.")
+    assert hl.clause_cut("Cities and political subdivisions that are not owned by the federal government") == "Cities and political subdivisions "
+    assert hl.NEGATION_RE.search("Cities that are not owned by the federal government")      # the guard it works around
+    # an exclusion is a limit on the other names, not a name
+    assert "state" not in {t.value for t in hl.applicant_tags([hl.clause_cut("governmental organizations other than state agencies")])}
+
+
 def test_the_shared_phrasings_missouri_added():
     # "is currently open" is open wording; "Do I Qualify?" heads an eligibility list
     assert hl.AGENCY_OPEN_RE.search("The Emergency Cycle is currently open.")
@@ -163,6 +223,25 @@ def test_fetch_and_fallback(monkeypatch):
     again = {r.source_id: r.payload for r in m.fetch(prior=prior)}
     assert all(again[sid] == prior[sid] for sid in prior if sid.startswith("competitive-cycle"))
     assert m.resolve_missing("emergency") == {"status": "unknown"}
+
+
+def test_dnr_fetch_and_fallback(monkeypatch):
+    m = mod("mo_dnr")
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+
+    def site(client, url, broken=()):
+        if url in broken:
+            raise httpx.ConnectError("down")
+        slug = next(s for s, p in m.PAGES.items() if url == m.BASE + p)
+        return (FIX / "mo_dnr" / f"{slug}.html").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(hl, "get", site)
+    records = m.fetch()
+    assert [r.source_id for r in records] == list(m.PAGES)
+    prior = {r.source_id: r.payload for r in records}
+    monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["eecbg"],)))
+    assert {r.source_id: r.payload for r in m.fetch(prior=prior)}["eecbg"] == prior["eecbg"]
+    assert m.resolve_missing("eecbg") == {"status": "unknown"}
 
 
 def test_base_without_a_body():
