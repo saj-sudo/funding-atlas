@@ -76,6 +76,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"\b(?:park|water management)\s+districts?\b", ("special_district",)),
     (r"\btransit\s+(?:agenc\w*|authorit\w*|entit\w*|districts?)\b", ("special_district",)),
     (r"(?<!housing )\bdevelopment authorit\w*", ("special_district",)),
+    # 9-1-1 authorities (Illinois NG9-1-1 Expenses: "9-1-1 Authorities outside of municipalities with a population over
+    # 500,000 shall be eligible to apply"), a county or municipal emergency telephone system board: Saj's call,
+    # 2026-11-11, `special_district`.
+    (r"\b9-?1-?1 authorit(?:y|ies)\b", ("special_district",)),
     # 10.6: words for local governments the tagger did not read. "local political entities" (North Dakota Vibrancy),
     # "eligible jurisdictions" (North Dakota HMGP) and "local law enforcement agencies" (Virginia DCJS), a city's or
     # county's department.

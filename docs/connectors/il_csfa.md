@@ -239,8 +239,9 @@ posted date is not mapped. Attachments and contact names stay in the payload.
   no local tag, most are DNR, aging and adult-education subawards; IEMA's BRIC 2023 and FMA 2022 say "Applicants
   have been predetermined by the Federal Emergency Management Agency (FEMA) via the FEMA GO application system", so no
   town applies there. The Illinois State Police NG9-1-1 Expenses round says "9-1-1
-  Authorities ... shall be eligible to apply"; "9-1-1 authorities" is not in the shared vocabulary (a county or
-  municipal emergency telephone system board), a type question for Saj.
+  Authorities ... shall be eligible to apply" (a county or municipal emergency telephone system board); since
+  2026-11-11 "9-1-1 authorities" tags `special_district` (Saj's call), and the round gains it, the only stored record
+  that moves. It stays in the possible tier: the tier reads local-government wording, not tags.
 - The tagger reads `Baltimore City` and `City of Philadelphia` as named places, not as "cities may apply".
 
 ## Out of scope

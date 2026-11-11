@@ -236,3 +236,11 @@ def test_single_purpose_districts_and_authorities():
 
 def test_volunteer_emergency_companies_are_nonprofits():
     assert values("Fully and partially volunteer fire companies, first aid squads and rescue squads.") == {"nonprofit"}
+
+
+def test_9_1_1_authorities_are_special_districts():
+    # Saj's call, 2026-11-11 (Illinois NG9-1-1 Expenses)
+    assert values("Applicants that are eligible for NG9-1-1 Expenses Grants are 9-1-1 Authorities outside of a "
+                  "municipality with a population over 500,000.") >= {"special_district"}
+    assert values("911 authority") == {"special_district"}
+    assert values("the Office of the Statewide 9-1-1 Administrator") == set()
