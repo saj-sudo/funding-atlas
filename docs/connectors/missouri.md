@@ -1,4 +1,4 @@
-# Missouri's agency pages (`mo_ded`, `mo_dnr`, `mo_modot`, `mo_sema`): source, raw data and field mapping
+# Missouri's agency pages (`mo_ded`, `mo_dnr`, `mo_modot`, `mo_sema`, `mo_parks`): source, raw data and field mapping
 
 Milestone 12.6e, the fifth agency state in the 12.6 cost ranking (after Vermont, Connecticut, North Dakota and Kentucky).
 Written 2026-11-11 from a read-only survey of the candidate agencies' hosts and pages, before the parser. The agencies
@@ -10,7 +10,7 @@ are built one at a time, each its own commit; this doc grows with them.
 |---|---|---|---|---|
 | Economic Development (DED) | `ded.mo.gov` | Drupal 10, Layout Builder (`.node__content`) | allows all | **built** (this doc) |
 | Transportation (MoDOT) | `www.modot.org` (the apex redirects) | Drupal 10 | blocks only `/media/oembed` | **built** (below), two pages |
-| State Parks and Historic Preservation | `mostateparks.com` (DNR's LWCF, Recreational Trails, Historic Preservation Fund and Certified Local Government pages live here) | not surveyed | not surveyed | **next session**, its own module |
+| State Parks and Historic Preservation | `mostateparks.com` | Drupal 10, same `.node__content` layout | `User-agent: *`, no disallows | **built** (12.6f, below) |
 | Natural Resources (DNR, with Energy) | `dnr.mo.gov` (`energy.mo.gov` redirects to `/energy`) | Drupal 10 | blocks `/taxonomy/` | **built** (below) |
 | Emergency Management (SEMA) | `sema.dps.mo.gov` | not Drupal, an older CMS with `.php` pages, a Bootstrap layout and the program in `#main-content` | blocks only legacy directories | **built** (below), the same base with another selector |
 | Housing (MHDC) | `mhdc.com` | no generator tag | no `robots.txt` (404) | deferred: its own CMS, mostly developer tax credits |
@@ -155,7 +155,7 @@ Shared change (`APPLICANT_SENTENCE_RE`): `provides (aid|resources) to` (ND DES h
 All of the changes to `connectors/hand_list.py` in the DED, DNR and SEMA commits were measured on the 7,630 stored records
 restored from `gh-pages` (39 connectors) with `scripts/measure_tagger.py`, against a snapshot taken before any of them:
 **0 tag moves, 0 hash moves**, after the first change and again after the last. Vermont, Connecticut, North Dakota and
-Kentucky are therefore untouched. The full suite is 1,065 tests, green.
+Kentucky are therefore untouched. (That measurement rested on the stored database, which did not hold Kentucky's records; 12.6f re-checked these changes against every fixture of the four states, 78 records, clean worktrees of `99d4c9f` and `d1c82b5`: **0 moved**.) The full suite is 1,065 tests, green.
 
 ## The Missouri state page
 
@@ -164,6 +164,97 @@ Downtown Revitalization, CDBG Emergency, DWSRF Lead Service Line, Flood Resilien
 that names no local-government applicant (CDBG Water/Wastewater and Industrial Infrastructure, the Well Plugging Grant,
 which names nonprofits) is open but not on the municipal page, by the navigator's existing rule; the rest are `unknown` or
 closed and sit in "between rounds" or "everything".
+
+## Implemented, State Parks (2026-11-11, 12.6f)
+
+Written from a read-only survey before the parser. `mostateparks.com` is the Missouri Department of Natural Resources'
+Division of State Parks site: Drupal 10, the same `.node__content` layout as DED and DNR, a `robots.txt` of
+`User-agent: *` with no disallows. DNR's recreation page links its grants out to it. The **Grant Opportunities** page
+(`/page/grant-opportunities`; `/basic-page/grant-opportunities` redirects to it) is the hub: a "Grants Currently
+Accepting Applications" list, then one section per program, with a page of its own for each program but one.
+
+| Slug | Page | The page's own words (2026-11-11) |
+|---|---|---|
+| `lwcf` | `/basic-page/land-and-water-conservation-fund-lwcf-grants` | "The application period for 2027 LWCF Grants is now OPEN." "Application packets must be postmarked on or before Nov. 13, 2026." "Grants can be awarded to any local government, city, county or public school district." 50% match, minimum $25,000 |
+| `rtp` | `/page/recreational-trails-program-rtp-grants` | "The 2026 RTP Grant Round is currently closed. The 2027 RTP Grant Round will open in December." "available to local and state governments, school districts and nonprofit organizations"; 20% match; $250,000 maximum |
+| `orlp` | a section of the hub, no page of its own | "The department is currently accepting ORLP project applications." "Project applications for the 2027 round must be submitted to the Division of Missouri State Parks by June 30, 2027, at 5 p.m." Eligible: state agencies and local governments in an urban area of 25,000 or more, and tribes; $300,000 to $15 million |
+| `bus` | `/page/missouri-state-parks-bus-grant-program` | "The Bus Grant Program grant round is currently open and is accepting applications for the 2026-2027 school year." "Applications must be submitted by email or mail by May 14, 2027"; "one state-funded grant program"; schools and youth nonprofits |
+| `hpf` | `/page/state-historic-preservation-office/historic-preservation-fund-grants` | "We are not accepting applications for Historic Preservation Fund grants at this time." 60/40 match; a "Who can apply:" section |
+
+**ORLP is read from the hub** with `SPLITS` (the Kentucky EEC mechanism): its own section is the record, and two tails (the
+top "Grants Currently Accepting Applications" list, and the Recreational Trails section onward) belong to no record, so
+LWCF's and the bus grant's deadlines cannot reach ORLP. The federal Notice of Funding Opportunity is also on Grants.gov,
+which is the `grants_gov` connector's row; the two are not merged.
+
+Left out (Saj to overrule): the Certified Local Government page (a designation program; its money is the Historic
+Preservation Fund's 10% pass-through, which `hpf` covers), Grant Workshops (an event list), and every "Past recipients" and
+"Administration guide" list (towns as recipients, not applicants).
+
+### Result (2026-11-11)
+
+`connectors/mo_parks.py` follows this section, on the Missouri base. First live run **5 added, 0 errors**; second run
+**0 changed**. Open: LWCF (to **2026-11-13**), ORLP (to 2027-06-30), the Bus Grant (to 2027-05-14); closed: RTP ("The 2026
+RTP Grant Round is currently closed. The 2027 ... will open in December.": closed, not `forecasted`, because the page gives no
+year or date and the rule is the source's words) and the Historic Preservation Fund. With the other four Missouri connectors
+the Missouri page has **7 open municipal rows** (it had 5): LWCF and ORLP are the two new ones. The Bus Grant tags `school` and
+`nonprofit` and does not appear on the municipal page.
+
+| Record | Applicants tagged | Funding source (the sentence) |
+|---|---|---|
+| `lwcf` | `municipality`, `county`, `school` ("Grants can be awarded to any local government, city, county or public school district.") | `pass_through`: the page says "Federal funding available for LWCF grants"; the hub says "federally funded through the U.S. Department of the Interior, National Park Service" |
+| `rtp` | `municipality`, `county`, `state`, `school`, `nonprofit` ("available to local and state governments, school districts and nonprofit organizations") | `pass_through`: the hub says RTP "is federally funded through the Department of Transportation's Federal Highway Administration"; the RTP page names no federal agency |
+| `orlp` | `state`, `municipality`, `county`, `special_district`, `tribe` (the "Eligible Applicants Include:" list, an `h5`) | `pass_through`: "funded through the National Park Service" |
+| `bus` | `school`, `nonprofit` ("Bus grants have been made available to Missouri schools and youth-focused nonprofit organizations") | `direct`: the hub says "one state-funded grant program" |
+| `hpf` | `municipality`, `county`, `nonprofit` ("Who can apply:" Certified Local Governments, county governmental entities, municipalities, qualified nonprofits) | `pass_through`: the hub says "federally funded through the National Park Service"; the HPF page names no federal agency |
+
+RTP and HPF are set per record (`FUNDING_SOURCES`) from the hub's sentence because their own pages name no federal agency.
+RTP read `pass_through` at first only by accident, from a mention in its past-recipients tail, and went `direct` the moment the
+reader stopped at that tail; a test now pins it.
+
+### Shared changes in this session (all measured, two ways)
+
+1. **The stored database** (7,630 records from `gh-pages`, 39 connectors), one change at a time, each snapshot diffed against the one
+   before: **0 tag moves, 0 hash moves** after every change and cumulatively. This cannot see a connector that is not in that
+   database yet: it holds none of Kentucky's (12.6d) or Missouri's records, and not North Dakota's part 2 when it was taken.
+2. **Every fixture of every agency-page connector** (Vermont, Connecticut, North Dakota, Kentucky, Missouri: 116 records), record
+   hash, status, close date and tags, before and after the shared files: **6 moved**.
+   - The four State Parks records (new, expected): `lwcf` gains its close date and applicants, `orlp` its close date, `rtp` and `hpf` read
+     `closed` instead of `unknown`, `rtp` gains `municipality` and `county`.
+   - **`ky_tc/cmaq`: `unknown` to `closed`.** Its page says "The Office of Local Programs is not currently accepting applications for
+     funding." That is the wording the new closed rule reads; it was `unknown` only because no rule read it. Judged correct (the source
+     states it); `tests/test_kentucky.py` now pins `closed`. The first daily run after the merge shows it as a changed record.
+   - **`mo_dnr/well-plugging`: `closes_at` none to 2026-12-31.** The page says "To receive priority funding consideration,
+     applications must be submitted by Dec. 31, 2026" and "Applications received between Jan. 1, 2027, through Feb. 28, 2027, may be
+     awarded on a first-come, first-serve basis if funds remain available." The date is a real, stated priority deadline but not the
+     final close. Kept (the Vermont pre-application precedent): the stored `closes_at_text` is that sentence, so the page shows
+     "priority funding consideration", and a test pins both. **Saj can overrule**: dropping it is a guard in `deadline()`.
+   - The 33 earlier Missouri records and the 78 Vermont, Connecticut, North Dakota and Kentucky records otherwise keep identical hashes.
+   - **12.6e's own shared changes, re-checked the same way** against clean worktrees of `99d4c9f` and `d1c82b5`: 78 of those fixtures
+     compared, **0 moved**. (12.6e's note above rested on the stored database alone; this is the stronger check and it agrees.)
+
+Each rule is kept because it moves a named record that a test pins.
+
+- `AGENCY_CLOSED_RE`: "is currently closed" (RTP) and "not (currently) accepting applications" (HPF). The second matched the
+  *open* regex and lost to the negation guard, which left a page that says "not accepting" as `unknown`.
+- Abbreviated months, with or without the period ("Nov. 13, 2026", `Sept.`, `Dec`), in `AGENCY_DATE_RE` and `_date()`. Needs a day
+  and a year, so "the Mar 2026 report" is no date.
+- `DUE_RE`: "postmarked" (LWCF) and "submitted to ... by" (ORLP: "must be submitted to the Division of Missouri State Parks by
+  June 30, 2027"), the second only in a sentence about applications, the existing "submitted by" guard. Before it, ORLP read
+  "open" from the wrong sentence ("NPS will be accepting applications for the ORLP grant once a year") and stored no deadline.
+- `APPLICANT_SENTENCE_RE`: "Grants can be awarded to" (LWCF).
+- `connectors/text.py`: "local and state governments" tags `municipality` and `county` (RTP). The singular "local and state
+  government recovery capability" (North Dakota DES) is untouched and still tags only `state`, as before.
+- The Missouri reader (not shared): reads `h5` and `h6` headings (ORLP's applicant list is headed by an `h5`) and stops at the
+  past-administration-guides, sample-projects and funded-grants lists, which name towns as recipients, not applicants.
+
+### Gaps (State Parks, recorded, not hidden)
+
+- LWCF names its applicants in one sentence only; the "public school district" tags `school` beside the two local-government tags.
+- RTP's 2027 round "will open in December" (no year, no date). The status is `closed` and the page's sentence is stored; when the
+  page announces the round, it reads open on the next run.
+- ORLP's eligible applicants must be in "a qualifying area" (an urban area of 25,000 or more); the tags say who may apply, not
+  whether a given town qualifies, which is the page's own limit.
+- The Certified Local Government program (a designation) and its HPF set-aside are not separate records.
 
 ## The platform
 
@@ -266,5 +357,4 @@ is one program, not the first tab run into the second. The first program keeps t
   made here; a third case in another state adds it.
 - `empg` is `direct` because the page never names FEMA or the Department of Homeland Security, only "all federal
   requirements"; EMPG is federal money in fact. The rule is what the page says.
-- Missouri's own `mostateparks.com` (LWCF, Recreational Trails, Historic Preservation Fund, Certified Local Government) is
-  not read yet, nor are Housing (MHDC) and Conservation (MDC, blocked by robots).
+- Housing (MHDC) is not read, nor is Conservation (MDC, blocked by robots). State Parks is read (12.6f, above).
