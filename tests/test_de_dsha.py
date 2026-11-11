@@ -52,7 +52,7 @@ def test_header_meta_sections_and_badges():
 
 def test_fetch_yields_sections_and_pages(site):
     ids = [r.source_id for r in de.fetch()]
-    assert "community-benefit#cdbg" in ids and "ddd-program" in ids and "lihtc" in ids and len(ids) == 17
+    assert "community-benefit#cdbg" in ids and "ddd-program" in ids and "lihtc" in ids and "lihtc#ao-land-bank" in ids and len(ids) == 18
     assert len(de.fetch(limit=3)) == 3
 
 
@@ -87,6 +87,22 @@ def test_one_program_pages(site):
     assert lihtc.status == "open" and lihtc.closes_at is None and lihtc.funding_type == "tax_credit"
     assert "Nonprofit and for-profit developers" in lihtc.eligibility_text
     assert got["homeownership-production"].status == "open" and got["homeownership-production"].rolling is True
+
+
+def test_lihtc_page_also_holds_the_land_bank_loan(site):
+    """Saj's rule, 2026-11-11: a page with several programs is one record per program. The Land Bank keeps no id of the
+    page's own; LIHTC keeps `lihtc` and loses nothing it read before."""
+    got = programs()
+    land = got["lihtc#ao-land-bank"]
+    assert (land.name, land.status, land.rolling, land.funding_type) == ("Area of Opportunity Land Bank Loan", "open", True, "loan")
+    assert land.closes_at_text == "Applications will be accepted on a rolling basis as long as funds are available."
+    assert land.applicant_types == [] and land.eligibility_text is None      # "Who applies" is LIHTC's header card
+    assert "$5,000,000" in land.summary and "Land Bank" not in (got["lihtc"].summary or "")
+    assert len(got) == 18
+    # a page whose heading changed is one record again
+    page = de.parse_page(read("lihtc"))
+    page["body"] = [(k, t.replace("Area of Opportunity Land Bank Program", "Land Bank")) for k, t in page["body"]]
+    assert [sid for sid, _ in de.SITE.records_for("lihtc", "page", [page], 0)] == ["lihtc"]
 
 
 def test_eligible_activities_is_not_an_eligibility_heading(site):

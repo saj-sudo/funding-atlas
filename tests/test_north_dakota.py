@@ -164,6 +164,14 @@ def test_split_sections_edges():
     assert hl.split_sections(blocks, splits) == [("a", "A", [("label", "Alpha"), ("p", "a"), ("p", "shared")]),
                                                  ("b", "B", [("label", "Beta"), ("p", "b"), ("p", "shared")])]
     assert hl.split_sections(blocks, [("x", "X", re.compile("^Gamma"))]) == []     # no heading matches: no sections
+    # a head section (first split with no pattern) is the blocks above the first match, and nothing is shared; paragraphs
+    # can be headings when the kinds say so (Vermont's Hazard Mitigation page)
+    flat = [("p", "body"), ("label", "Funding"), ("p", "Alpha: one"), ("p", "Beta: two")]
+    head = [("h", "Head", None), ("f", None, re.compile("^Funding")), ("a", "A", re.compile("^Alpha")), ("b", "B", re.compile("^Beta"))]
+    assert hl.split_sections(flat, head, ("label", "p")) == [("h", "Head", [("p", "body")]), ("a", "A", [("p", "Alpha: one")]),
+                                                             ("b", "B", [("p", "Beta: two")])]
+    # labels only: the paragraphs are not headings, so only the head (cut at the "Funding" label) is a program
+    assert hl.split_sections(flat, head) == [("h", "Head", [("p", "body")])]
     # a page whose headings changed falls back to one record under the page's own id
     site = mod("nd_dot").SITE
     assert [sid for sid, _ in site.records_for("flex-fund", "/flexfund", [{"title": "T", "blocks": [("p", "x")]}], 0)] == ["flex-fund"]

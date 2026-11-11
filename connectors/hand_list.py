@@ -481,22 +481,28 @@ def funding_source_for(blocks: Blocks, text: str) -> str:
     return "pass_through" if FEDERAL_RE.search(text) else "direct"
 
 
-Split = tuple[str, str | None, re.Pattern[str]]
+Split = tuple[str, str | None, re.Pattern[str] | None]
 
 
-def split_sections(blocks: Blocks, splits: list[Split]) -> list[tuple[str, str, Blocks]]:
+def split_sections(blocks: Blocks, splits: list[Split], kinds: tuple[str, ...] = ("label",)) -> list[tuple[str, str, Blocks]]:
     """A page that holds several programs, cut into one `(sub_slug, name, blocks)` per program (Saj's rule,
-    2026-11-11: a page with three programs is three records). A section starts at the first `label` block that
-    matches a split's pattern and runs to the next label that matches any split's pattern; a split whose name is
-    `None` is a tail (a funding note, a "for more information" link): its blocks belong to no program. What sits above
-    the first section is shared and follows every section, so a page-wide deadline or applicant sentence is never
-    lost, and the section's own first paragraph stays the summary. A split that matches no label yields no section."""
-    starts = [(i, idx) for i, (kind, text) in enumerate(blocks) if kind == "label"
-              for idx, (_, _, pattern) in enumerate(splits) if pattern.search(text)]
+    2026-11-11: a page with three programs is three records). A section starts at the first block of a kind in `kinds`
+    (headings; a page that names its programs only in paragraphs adds `p`) that matches a split's pattern and runs to
+    the next such block that matches any split's pattern; a split whose name is `None` is a tail (a funding note, a "for
+    more information" link): its blocks belong to no program. What sits above the first section is shared and follows
+    every section, so a page-wide deadline or applicant sentence is never lost, and the section's own first paragraph
+    stays the summary. **A first split with no pattern is the page's head**: the blocks above the first match are its
+    program (HMGP is the body of Vermont's page, the others are paragraphs at the end) and nothing is shared. A split that
+    matches no block yields no section."""
+    head = bool(splits) and splits[0][2] is None
+    starts = [(i, idx) for i, (kind, text) in enumerate(blocks) if kind in kinds
+              for idx, (_, _, pattern) in enumerate(splits) if pattern is not None and pattern.search(text)]
     if not starts:
         return []
-    shared = blocks[: starts[0][0]]
+    shared: Blocks = [] if head else blocks[: starts[0][0]]
     out: list[tuple[str, str, Blocks]] = []
+    if head and splits[0][1] is not None:
+        out.append((splits[0][0], splits[0][1], blocks[: starts[0][0]]))
     for n, (begin, idx) in enumerate(starts):
         end = starts[n + 1][0] if n + 1 < len(starts) else len(blocks)
         sub_slug, name, _ = splits[idx]
@@ -517,15 +523,20 @@ class AgencyPageConnector(HandListConnector):
     # `split_sections`). The first declared program keeps the page's own `source_id`, so a record that was one before
     # the split keeps its history; the others are `slug#sub_slug`.
     SPLITS: dict[str, list[Split]] = {}
+    # slug -> the block kinds a split heading may be (default: labels only; a page that names its programs in paragraphs
+    # says ("label", "p")).
+    SPLIT_KINDS: dict[str, tuple[str, ...]] = {}
     # source_id -> value, for an agency whose pages mix kinds: the funding type when the name carries no keyword
     # ("Fund A - Wastewater" is a loan fund), and the portal-style category label when one agency covers several topics.
     FUNDING_TYPES: dict[str, str] = {}
+    # source_id -> "direct" | "pass_through" where the page mentions a federal agency without being federally funded.
+    FUNDING_SOURCES: dict[str, str] = {}
     CATEGORY_LABELS: dict[str, str] = {}
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         page = pages[0]
         splits = self.SPLITS.get(slug)
-        sections = split_sections([tuple(b) for b in page.get("blocks", [])], splits) if splits else []
+        sections = split_sections([tuple(b) for b in page.get("blocks", [])], splits, self.SPLIT_KINDS.get(slug, ("label",))) if splits else []
         if not sections:
             return [(slug, {"path": spec, "page": page})]
         first = splits[0][0]
@@ -546,7 +557,7 @@ class AgencyPageConnector(HandListConnector):
             source_url=self.BASE + path,
             name=name,
             funding_type=self.FUNDING_TYPES.get(raw.source_id) or funding_type_for(name) or "grant",
-            funding_source=funding_source_for(blocks, text),
+            funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text),
             match_required=match,
             rolling=None,
             summary=summary_for(blocks),

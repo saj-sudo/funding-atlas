@@ -73,9 +73,12 @@ constants, all keyed the same way:
 - `SPLITS[slug] = [(sub_slug, name, heading_re), ...]` for a page that holds several programs (Saj's rule, 2026-11-11:
   one record per program). `split_sections` cuts the page's blocks at the `label` blocks that match; a split whose name is
   `None` is a tail (a funding note, a link list) that belongs to no record; the text above the first heading follows every
-  section. The first declared program keeps the page's own `source_id`; the others are `slug#sub_slug`. A page whose
+  section. A first split with no pattern is the page's **head** (its blocks up to the first match are that program, nothing
+  is shared: Vermont's HMGP), and `SPLIT_KINDS[slug] = ("label", "p")` lets a paragraph be a heading (a page that names its
+  programs only in paragraphs). The first declared program keeps the page's own `source_id`; the others are `slug#sub_slug`. A page whose
   headings changed falls back to one record under the page's id.
-- `FUNDING_TYPES[source_id]` for names with no funding-type keyword (KIA's "Fund A - Wastewater" is a loan).
+- `FUNDING_TYPES[source_id]` for names with no funding-type keyword (KIA's "Fund A - Wastewater" is a loan);
+  `FUNDING_SOURCES[source_id]` where a page names a federal agency without being federally funded (Vermont's FRCF).
 - `CATEGORY_LABELS[source_id]` for an agency that covers several topics (the portal-table label a record would carry).
 
 The table also reads an application window ("Applications Accepted: April 1, 2026 - September 1, 2026") as opening and
