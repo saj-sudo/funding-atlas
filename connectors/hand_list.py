@@ -300,18 +300,27 @@ class HandListConnector:
 # `connecticut_portal.py`); the status table, the applicant reader and the field mapping below are what two such
 # states share. docs/connectors/vermont.md and docs/connectors/connecticut.md give the reasons for each rule.
 
-AGENCY_DATE_RE = re.compile(rf"\b{_MONTHS}\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}}\b|\b\d{{1,2}}/\d{{1,2}}/\d{{4}}\b")
+# Abbreviated months, with or without the period ("Nov. 13, 2026", Missouri State Parks 12.6f), are read too.
+_MONTH_ABBR = r"(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)\.?"
+AGENCY_DATE_RE = re.compile(rf"\b(?:{_MONTHS}|{_MONTH_ABBR})\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}}\b|\b\d{{1,2}}/\d{{1,2}}/\d{{4}}\b")
+_ABBR_FULL = {"jan": "January", "feb": "February", "mar": "March", "apr": "April", "jun": "June", "jul": "July", "aug": "August",
+              "sep": "September", "sept": "September", "oct": "October", "nov": "November", "dec": "December"}
+_ABBR_RE = re.compile(r"\b(Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)\.?(?=\s+\d)")
 # The words a deadline sits next to: "due", "deadline", "submitted by" (Connecticut DEEP: "Applications must be
 # submitted by November 6, 2026"), and "through" only in a sentence that says applications are being accepted
 # ("Through December 4, 2026, the Department is currently accepting applications"), never a grant term's "through".
-DUE_RE = re.compile(r"\b(?:due|deadline|submitted by)\b|\bthrough\b(?=[^.]*\baccepting\b)", re.I)
+# Missouri State Parks (12.6f): "must be postmarked on or before Nov. 13, 2026" and "must be submitted to the Division ... by
+# June 30, 2027" (the second needs an application in its sentence, like "submitted by").
+DUE_RE = re.compile(r"\b(?:due|deadline|submitted by|postmarked)\b|\bsubmitted\s+to\b[^.]{0,80}?\bby\b|\bthrough\b(?=[^.]*\baccepting\b)", re.I)
 NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant term|implementation period|reimbursement)\b", re.I)
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
                             r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
                             r"|\b(?:is|are)\s+currently\s+open\b"   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
                             r"|\bapplication period is open\b", re.I)   # Missouri DNR's banner heading on every program page
-AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b", re.I)
+AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+|currently\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b"
+                              # Missouri State Parks (12.6f): "We are not accepting applications for ... grants at this time."
+                              r"|\bnot\s+(?:currently\s+)?accepting\s+applications\b", re.I)
 # "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
 # certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
 APPLICATION_RE = re.compile(r"\bapplications?\b", re.I)
@@ -348,6 +357,8 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\beligible jurisdictions\b[^.]*\bmay submit\b"   # ND HMGP: "All eligible jurisdictions ... may submit" (10.6)
     # Kentucky (12.6d): DLG's "Who can Apply: ..." line on every CDBG, DRA and ARC page.
     r"|^who (?:can|may) apply\b"
+    # Missouri State Parks (12.6f): LWCF's "Grants can be awarded to any local government, city, county or public school district."
+    r"|\bgrants?\s+can be awarded to\b"
     # Missouri (12.6e): DNR's "Eligible recipients include the following:" over the list of who may apply (EECBG, Energy Loans).
     r"|\beligible recipients\b", re.I)
 SHORT_ITEM = 160
@@ -386,7 +397,7 @@ def all_sentences(blocks: Blocks) -> list[str]:
 
 
 def _date(text: str) -> date | None:
-    return parse_date(_ORDINAL_RE.sub(r"\1", text))
+    return parse_date(_ABBR_RE.sub(lambda m: _ABBR_FULL[m.group(1).lower()], _ORDINAL_RE.sub(r"\1", text)))
 
 
 def first_date(text: str) -> date | None:
@@ -419,7 +430,7 @@ def deadline(sents: list[str]) -> tuple[str | None, date | None]:
         if NOT_DEADLINE_RE.search(s):
             continue
         for due in DUE_RE.finditer(s):
-            if due.group(0).lower() == "submitted by" and not APPLICATION_RE.search(s):
+            if due.group(0).lower().startswith("submitted") and not APPLICATION_RE.search(s):
                 continue
             for m in AGENCY_DATE_RE.finditer(s):
                 gap = m.start() - due.end() if m.start() >= due.end() else due.start() - m.end()

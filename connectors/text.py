@@ -22,6 +22,9 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # 12.6d: Kentucky CMAQ, "Local and state government agencies are eligible to apply" (the state half tags itself).
     # Agencies only: North Dakota DES's "beyond local and state government recovery capability" names no applicant.
     (r"\blocal and state government agenc\w*", ("municipality", "county")),
+    # Missouri State Parks (12.6f): RTP grants "are available to local and state governments, school districts ...": the plural
+    # names both kinds of entity, unlike the singular "local and state government recovery capability" above.
+    (r"\blocal and state governments\b", ("municipality", "county")),
     # "political subdivisions" is the statutory word for a state's local governments (North Dakota's FIND and its
     # revolving funds: "loans to political subdivisions"); the same two tags as "local governments".
     (r"\bpolitical subdivisions?\b", ("municipality", "county")),

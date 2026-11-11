@@ -36,6 +36,7 @@ from connectors import (
     mo_ded,
     mo_dnr,
     mo_modot,
+    mo_parks,
     mo_sema,
     nc_grants,
     nd_commerce,
@@ -113,6 +114,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "mo_ded": mo_ded,
     "mo_dnr": mo_dnr,
     "mo_modot": mo_modot,
+    "mo_parks": mo_parks,
     "mo_sema": mo_sema,
 }
 

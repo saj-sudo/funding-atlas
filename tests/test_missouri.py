@@ -1,4 +1,4 @@
-"""Missouri's agency connectors (mo_ded, mo_dnr, mo_modot, mo_sema) and their Drupal base, against saved pages."""
+"""Missouri's agency connectors (mo_ded, mo_dnr, mo_modot, mo_sema, mo_parks) and their Drupal base, against saved pages."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures"
 TODAY = date(2026, 11, 11)
-AGENCIES = ["mo_ded", "mo_dnr", "mo_modot", "mo_sema"]
+AGENCIES = ["mo_ded", "mo_dnr", "mo_modot", "mo_sema", "mo_parks"]
 
 
 def mod(name: str):
@@ -211,6 +211,16 @@ def test_dnr_applicants_include_the_long_list_items_and_not_the_beneficiaries():
     assert tags("mo_dnr", "section-604b") == set() and tags("mo_dnr", "source-water-protection") == set()
 
 
+def test_dnr_well_plugging_keeps_its_priority_deadline_and_says_so():
+    """12.6f's date rule (an abbreviated month, "Dec. 31, 2026") reads this page's priority deadline, which is not its final
+    close: applications from Jan. 1 to Feb. 28, 2027 "may be awarded on a first-come, first-serve basis". The date is stored with
+    the sentence that qualifies it, so the page shows "priority funding consideration", and the later window is in the text."""
+    p = program("mo_dnr", "well-plugging")
+    assert p.status == "open" and p.closes_at == date(2026, 12, 31)
+    assert "priority funding consideration" in p.closes_at_text
+    assert "first-come, first-serve" in text("mo_dnr", "well-plugging")
+
+
 def test_dnr_funding_source_is_what_the_page_names():
     for slug in ("cwsrf-engineering-report", "dwsrf-lead-service-line", "section-319", "eecbg", "well-plugging"):
         assert program("mo_dnr", slug).funding_source == "pass_through", slug
@@ -287,6 +297,100 @@ def test_dnr_fetch_and_fallback(monkeypatch):
     monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["eecbg"],)))
     assert {r.source_id: r.payload for r in m.fetch(prior=prior)}["eecbg"] == prior["eecbg"]
     assert m.resolve_missing("eecbg") == {"status": "unknown"}
+
+
+def test_parks_statuses_and_dates_come_from_each_pages_own_words():
+    got = {slug: program("mo_parks", slug) for slug in mod("mo_parks").PAGES}
+    assert {s: p.status for s, p in got.items()} == {"lwcf": "open", "rtp": "closed", "orlp": "open", "bus": "open", "hpf": "closed"}
+    assert got["lwcf"].closes_at == date(2026, 11, 13)       # "postmarked on or before Nov. 13, 2026" (abbreviated month, a period)
+    assert got["orlp"].closes_at == date(2027, 6, 30)        # "must be submitted to the Division of Missouri State Parks by June 30, 2027"
+    assert got["bus"].closes_at == date(2027, 5, 14)
+    assert got["rtp"].closes_at is None and got["hpf"].closes_at is None
+    assert "currently closed" in got["rtp"].closes_at_text and "not accepting applications" in got["hpf"].closes_at_text
+    # a past date is `unknown`, not open: the same page read after the deadline
+    assert program("mo_parks", "lwcf", date(2026, 11, 14)).status == "unknown"
+
+
+def test_parks_orlp_is_the_hubs_own_section_and_nothing_of_the_others():
+    """ORLP has no page of its own: it is a section of Grant Opportunities, and the hub's open-rounds list and the other
+    programs' sections are tails, so LWCF's and the bus grant's deadlines cannot reach it."""
+    m = mod("mo_parks")
+    records = m.SITE.records_for("orlp", m.PAGES["orlp"], [page("mo_parks", "orlp")], 0)
+    assert [sid for sid, _ in records] == ["orlp"]
+    body = " ".join(t for _, t in records[0][1]["page"]["blocks"])
+    assert "Nov. 13, 2026" not in body and "May 14, 2027" not in body       # LWCF's and the bus grant's deadlines
+    assert "Bus Grant" not in body and "Recreational Trails Program" not in body and "Historic Preservation Fund" not in body
+    assert "June 30, 2027" in body and "$15 million" in body
+    p = program("mo_parks", "orlp")
+    assert p.name == "Outdoor Recreation Legacy Partnership Program (ORLP)" and p.source_url == "https://mostateparks.com/page/grant-opportunities"
+
+
+def test_parks_applicants_are_only_what_the_page_says():
+    assert tags("mo_parks", "lwcf") == {"municipality", "county", "school"}          # "any local government, city, county or public school district"
+    assert tags("mo_parks", "orlp") == {"state", "municipality", "county", "special_district", "tribe"}   # the h5 "Eligible Applicants Include:" list
+    assert tags("mo_parks", "rtp") == {"municipality", "county", "state", "school", "nonprofit"}         # "local and state governments, school districts and nonprofit organizations"
+    assert tags("mo_parks", "hpf") == {"municipality", "county", "nonprofit"}         # "Who can apply:" (CLGs, county governments, municipalities, nonprofits)
+    assert tags("mo_parks", "bus") == {"school", "nonprofit"}
+    assert "Eligible Applicants Include:" in program("mo_parks", "orlp").eligibility_text
+
+
+def test_parks_funding_source_category_and_type():
+    assert {s: program("mo_parks", s).funding_source for s in mod("mo_parks").PAGES} == {
+        "lwcf": "pass_through", "rtp": "pass_through", "orlp": "pass_through", "hpf": "pass_through", "bus": "direct"}
+    for slug in mod("mo_parks").PAGES:
+        assert program("mo_parks", slug).category_pairs() == [("parks", "parks and recreation")], slug
+        assert program("mo_parks", slug).funding_type == "grant", slug
+
+
+def test_parks_reader_reads_h5_and_stops_at_the_lists_of_past_recipients():
+    labels = [t for k, t in page("mo_parks", "orlp")["blocks"] if k == "label"]
+    assert "Eligible Applicants Include:" in labels                   # an h5; the other Missouri pages have none, so their records did not move
+    for slug in ("lwcf", "rtp"):
+        t = text("mo_parks", slug)
+        assert "FY2025 Funded Grants" not in t and "FY2014 Grant Recipients" not in t, slug
+
+
+def test_the_shared_phrasings_state_parks_added():
+    for s in ("The 2026 RTP Grant Round is currently closed.", "We are not accepting applications for Historic Preservation Fund grants at this time.",
+              "The round is not currently accepting applications."):
+        assert hl.AGENCY_CLOSED_RE.search(s), s
+    assert not hl.AGENCY_CLOSED_RE.search("The program is accepting applications now.")
+    # abbreviated months, with and without a period, read the same date
+    for s, want in (("Nov. 13, 2026", date(2026, 11, 13)), ("Sept. 1, 2027", date(2027, 9, 1)), ("Dec 3, 2026", date(2026, 12, 3)),
+                    ("March 1st, 2027", date(2027, 3, 1))):
+        m = hl.AGENCY_DATE_RE.search(f"due {s}")
+        assert m and hl._date(m.group(0)) == want, s
+    assert not hl.AGENCY_DATE_RE.search("The Mar 2026 report")        # no day, no date
+    assert hl.DUE_RE.search("Packets must be postmarked on or before Nov. 13, 2026.")
+    assert hl.DUE_RE.search("Applications must be submitted to the Division of Missouri State Parks by June 30, 2027.")
+    # "submitted to ... by" is a deadline only in a sentence about applications (the "submitted by" guard)
+    assert hl.deadline(["Plans must be submitted to the engineer by June 30, 2027."]) == (None, None)
+    assert hl.deadline(["Applications must be submitted to the Division by June 30, 2027."])[1] == date(2027, 6, 30)
+    assert hl.APPLICANT_SENTENCE_RE.search("Grants can be awarded to any local government, city, county or public school district.")
+    assert {t.value for t in hl.applicant_tags(["Available to local and state governments."])} == {"municipality", "county", "state"}
+    # the singular names no applicant (North Dakota DES): untouched
+    assert {t.value for t in hl.applicant_tags(["Events beyond local and state government recovery capability."])} == {"state"}   # as before
+
+
+def test_parks_fetch_and_fallback(monkeypatch):
+    m = mod("mo_parks")
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+
+    def site(client, url, broken=()):
+        if url in broken:
+            raise httpx.ConnectError("down")
+        slug = next(s for s, p in m.PAGES.items() if url == m.BASE + p)
+        return (FIX / "mo_parks" / f"{slug}.html").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(hl, "get", site)
+    records = m.fetch()
+    assert [r.source_id for r in records] == ["lwcf", "rtp", "orlp", "bus", "hpf"]
+    prior = {r.source_id: r.payload for r in records}
+    monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["orlp"],)))
+    assert {r.source_id: r.payload for r in m.fetch(prior=prior)}["orlp"] == prior["orlp"]
+    # the hub, when its heading is renamed, falls back to one record under the page's id rather than none
+    assert [sid for sid, _ in m.SITE.records_for("orlp", m.PAGES["orlp"], [{"title": "Grant Opportunities", "blocks": [("p", "x")]}], 0)] == ["orlp"]
+    assert m.resolve_missing("lwcf") == {"status": "unknown"}
 
 
 def test_base_without_a_body():

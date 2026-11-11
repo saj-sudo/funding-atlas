@@ -31,7 +31,9 @@ INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 STOP_RE = re.compile(r"(?:need help\??|documents|hud resources|resources|related links|past (?:awards|recipients)"
                      r"|.*\bawarded projects\b|.*\bgrant recipients\b"
                      # DNR: the lists of past awards, then the theme's footer blocks that sit inside the body element
-                     r"|awards|after awards|popular links|navigation|contact information|in this section:?)$", re.I)
+                     r"|awards|after awards|popular links|navigation|contact information|in this section:?"
+                     # State Parks: the lists of past administration guides, sample projects and funded grants / recipients
+                     r"|past administration guides:?|sample projects:?|fy\d{4} funded grants:?|past grant recipients:?)$", re.I)
 # The tab that repeats DED's program headings.
 QUALIFY_RE = re.compile(r"^do i qualify\??$", re.I)
 
@@ -51,7 +53,8 @@ def parse_page(page_html: str, selector: str = BODY_SELECTOR) -> dict[str, Any]:
         if not li.find(["ul", "ol"]):
             for tag in li.find_all(INLINE):
                 tag.unwrap()
-    blocks = blocks_from(body, ["h2", "h3", "h4", "p", "li"], stop_re=STOP_RE, drop_re=DROP_RE, bold_max=LABEL_MAX_CHARS)
+    # h5 and h6 too: State Parks heads ORLP's applicant list "Eligible Applicants Include:" with an `h5` (12.6f)
+    blocks = blocks_from(body, ["h2", "h3", "h4", "h5", "h6", "p", "li"], stop_re=STOP_RE, drop_re=DROP_RE, bold_max=LABEL_MAX_CHARS)
     return {"title": title, "blocks": blocks}
 
 

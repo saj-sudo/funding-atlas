@@ -104,6 +104,7 @@ CONNECTOR_LABEL = {
     "mo_dnr": "Missouri Department of Natural Resources",
     "mo_modot": "Missouri Department of Transportation (Local Public Agency programs)",
     "mo_sema": "Missouri State Emergency Management Agency",
+    "mo_parks": "Missouri State Parks (grants)",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

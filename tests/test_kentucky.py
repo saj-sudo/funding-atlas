@@ -78,7 +78,7 @@ def test_status_and_dates():
         ("ky_dlgfed", "lwcf"): ("unknown", None, date(2026, 10, 30)),
         ("ky_dlgfed", "dra"): ("unknown", None, None),
         ("ky_tc", "tap"): ("unknown", None, None),                  # "The next application cycle ... will be held in 2027"
-        ("ky_tc", "cmaq"): ("unknown", None, None),
+        ("ky_tc", "cmaq"): ("closed", None, None),                  # "The Office of Local Programs is not currently accepting applications for funding." (12.6f)
         ("ky_kia", "fund-a"): ("unknown", None, None),
     }
     for (name, sid), (status, opens, closes) in cases.items():
