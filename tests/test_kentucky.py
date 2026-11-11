@@ -110,9 +110,18 @@ def test_applicants():
     assert tags("ky_tc", "cmaq") == {"municipality", "county", "state"}
     assert "may partner with an eligible applicant" in program("ky_tc", "cmaq").eligibility_text
     assert tags("ky_tc", "tap") == set()
-    # "The applicant must be a governmental agency" is kept as the eligibility text; the tagger has no type for it
+    # "The applicant must be a governmental agency" is kept as the eligibility text; the statute that defines the phrase is
+    # quoted for the three pages that use it (Saj's call, 2026-11-11), dated and attributed, and tags municipality and county
     assert "The applicant must be a governmental agency" in program("ky_kia", "fund-b").eligibility_text
-    assert tags("ky_kia", "fund-b") == set() and tags("ky_kia", "fund-f") == set()
+    for sid in ("fund-b", "fund-c", "fund-f"):
+        quote = program("ky_kia", sid).eligibility_text
+        assert 'KRS 224A.011(21), definition of "governmental agency", read 2026-11-11: ' in quote, sid
+        assert "incorporated cities; counties" in quote and "water districts" in quote and "[...]" in quote, sid
+        assert "not by way of limitation" not in quote, sid          # cut: the tagger drops a negated sentence
+        assert tags("ky_kia", sid) == {"municipality", "county"}, sid
+    # Fund A and the Cleaner Water grants name no applicant and borrow none
+    assert tags("ky_kia", "fund-a") == set() and tags("ky_kia", "cleaner-water") == set()
+    assert "KRS 224A" not in (program("ky_kia", "fund-a").eligibility_text or "")
 
 
 def test_categories_funding_type_and_source():

@@ -13,9 +13,9 @@ Fund (to 2027-01-31) and the ARC Area Development Program (pre-applications roll
 Public Services is open too but names no applicant, so it is not on the page. `unknown`: the rest (Community Projects and
 Public Facilities windows ended 2026-09-01, LWCF's and RTP's deadline passed 2026-10-30, TAP's 2026 awards are out and
 "the next application cycle ... will be held in 2027", everything on the EEC and KIA pages states no round). The Kentucky
-page: 12 new rows (8 DLG, 1 Transportation, 3 EEC), 4 open municipal beside the portal's 2. The other 12 new records are
-off it: the 5 KIA loans (see "Gaps"), six that name no applicant (RTP, Recovery Housing, Public Services, TAP, Nonpoint
-Source, Waste Tire) and Illegal Dump (counties only).
+page: 15 new rows (8 DLG, 1 Transportation, 3 EEC, and KIA's Funds B, C and F, decision 8), 4 open municipal beside the
+portal's 2. The other 9 new records are off it: Fund A and the Cleaner Water grants, six that name no applicant (RTP,
+Recovery Housing, Public Services, TAP, Nonpoint Source, Waste Tire) and Illegal Dump (counties only).
 
 Found while writing the parser:
 
@@ -115,11 +115,26 @@ The agency-page table in `connectors/hand_list.py` (`AgencyPageConnector`); per 
 7. **TAP's and RTP's applicants stay empty**: the pages name them only in an FHWA document and an RTP guidance PDF, and
    TAP and RTP are not open (Saj's PDF rule, 10.6).
 
+8. **KIA's Funds B, C and F quote the statute for their applicants** (Saj's call, 2026-11-11). The three pages say "The
+   applicant must be a governmental agency" (Fund F: "Governmental agencies, other than federal agencies") and name no
+   type. KRS 224A.011(21) defines the term: "any incorporated city or municipal corporation, or other agency, or unit of
+   government within or a department or a cabinet of the Commonwealth ... incorporated cities; counties ...; sanitation
+   districts; water districts; water associations; sewer construction districts; metropolitan sewer districts ...".
+   `ky_kia.HAND_QUOTES` quotes that definition, dated 2026-11-11 and attributed, for those three pages (the MDOT, Illinois and
+   Vermont precedent), with "but not by way of limitation" cut as `[...]` (the tagger drops a sentence that holds a
+   negation). They tag `municipality` and `county` and reach the Kentucky page as `unknown` rows. **Not a shared rule:**
+   "governmental agenc*" appears in 54 stored records (22 SAM.gov, 17 Texas, 8 California, 1 West Virginia, KIA's 2), loose
+   federal wording ("quasi-governmental agencies", "a State governmental agency"), and a global rule would move about fifty
+   tags the statute does not govern. **An exception to the 10.6 rule** (PDF eligibility is quoted by hand only where the
+   quote would put an open row on a page): the rows are `unknown`, but this is a statute, not a PDF, one quote serves three
+   pages, and unknown rows already show on the page (the EEC's). Fund A is not quoted: its page cites nothing.
+
 ## Gaps (recorded, not hidden)
 
-- **KIA's four loan funds tag no applicant**, so they are not on the Kentucky page. Funds B, C and F say "governmental
-  agency" (KRS 224A), Fund A names none. A tagger rule for "governmental agency" is a call for Saj: the statute's list
-  would be cities, counties and special districts, but the page does not say so and nothing was invented.
+- **KIA's Fund A and the Cleaner Water grants tag no applicant**: their pages name none (Fund A is the Clean Water SRF; the
+  EEC's index says only "public wastewater systems"). Funds B, C and F are decision 8.
+- The sanitation, water and sewer districts in the statute's list stay untagged on Funds B, C and F: the tagger has no
+  "water district" word. A rule is a separate, measured change.
 - The waste programs' "solid waste management districts" are not in the tagger's special-district words
   (Recycling and HHW tags municipality, county, school and higher_ed from the rest of its line).
 - The Waste Tire page's "offers grants for Kentucky schools, city and county governments, businesses ..." is not read as an
