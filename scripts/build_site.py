@@ -117,6 +117,9 @@ CONNECTOR_LABEL = {
     "ar_adem": "Arkansas Division of Emergency Management",
     "ar_ooo": "Arkansas Office of Outdoor Recreation",
     "ar_aedc": "Arkansas Economic Development Commission",
+    "sd_goed": "South Dakota Governor's Office of Economic Development",
+    "sd_dot": "South Dakota Department of Transportation",
+    "sd_danr": "South Dakota Department of Agriculture and Natural Resources (Environmental Funding)",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.

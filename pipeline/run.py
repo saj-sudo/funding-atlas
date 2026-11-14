@@ -55,6 +55,9 @@ from connectors import (
     or_biz,
     pa_grants,
     sam_assistance_listings,
+    sd_danr,
+    sd_dot,
+    sd_goed,
     tx_egrants,
     va_dcjs,
     va_dcr,
@@ -130,6 +133,9 @@ CONNECTORS: dict[str, ModuleType] = {
     "ar_adem": ar_adem,
     "ar_ooo": ar_ooo,
     "ar_aedc": ar_aedc,
+    "sd_goed": sd_goed,
+    "sd_dot": sd_dot,
+    "sd_danr": sd_danr,
 }
 
 
