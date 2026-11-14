@@ -118,3 +118,62 @@ h3  What sites are eligible for consideration?
 div   Greenfield industrial sites
 div   Minimum of 30 acres contiguous land
 ```
+
+## Implemented (2026-11-14)
+
+`connectors/arkansas_wordpress.py` (the base: `ArAgency`, the content widgets, `<title>` as the title, inline tags unwrapped
+inside list items so a bold "Eligible applicants:" stays with its item, a paragraph under an eligibility heading read sentence
+by sentence, a line a second widget repeats read once, footnote paragraphs starting with `*` dropped) and four modules:
+`ar_anrd`, `ar_adem`, `ar_ooo` (both `DELAY_S = 10`, the robots files' `Crawl-delay`), `ar_aedc` (its own Sitefinity
+reader: the first `.page-content`, a `div` with no block inside read as a paragraph, a list whose every item is one link
+dropped, the CAPER notice dropped, the read stopped at "CONTACT US", "Administrative Procedures Manual" and "For Questions
+Contact:"). First live runs on a copy of the restored database: **15 added, 0 errors**; second runs **0 changed**.
+`scripts/probe_arkansas.py` saved the fixtures.
+
+| Record | Status on 2026-11-14 | Applicants tagged | Source |
+|---|---|---|---|
+| Water and Wastewater Funding (`loan`) | closed: "Applications ... are currently closed." | municipality, county, special district | direct |
+| High Hazard Potential Dam Grant Program | unknown | state, county, municipality, special district, nonprofit | pass_through |
+| Section 319 Nonpoint Source Grant Program | unknown (timeline months, no year) | municipality, county, nonprofit | pass_through |
+| Hazard Mitigation Grant Program | unknown | municipality, county | pass_through |
+| State of Arkansas Hazard Mitigation Grant Program | unknown: NOI window 2026-05-26 to 2026-06-15, past | municipality, county, nonprofit | direct |
+| BRIC | unknown | tribe ("local communities" is not a tag) | pass_through |
+| Homeland Security Grant Program | closed: "not accepting additional applications" | none named | pass_through |
+| Outdoor Recreation Matching Grants, FUN Park Grants | unknown: window 2026-05-01 to 2026-08-28, past | municipality, county | direct |
+| Trails for Life Grants (Great Strides) | unknown: window 2026-03-09 to 2026-06-30, past | municipality, county | direct |
+| Community Development Block Grant | unknown: deadlines are in the guidelines PDF | municipality, county | pass_through |
+| Arkansas Site Development Program | unknown: opened 2026-08-25, closed 2026-11-06 | municipality, county | direct |
+| **Rural Community Grant Program** | **open to 2027-03-11** (Cycle II; Cycle I, 2026-08-13, has passed) | municipality | direct |
+| Rural Services Block Grant Program | unknown: deadline 2026-10-16, past | municipality | direct |
+| Wildlife Education Grant Program | unknown: deadline 2026-11-12, past | school | direct |
+
+The Arkansas page builds with one open state row (Rural Community Grant), four under "Status not confirmed" and seven under
+"Closed recently"; no script errors and no sideways scroll at 390px.
+
+### Shared changes (`connectors/hand_list.py`)
+
+Each measured on its own: the database restored from `gh-pages` (7,734 stored records) re-normalized through
+`scripts/measure_tagger.py` before and after, and the 143 fixture records of every other agency-page connector (Vermont,
+Connecticut, North Dakota, Kentucky, Missouri, Nebraska) compared by `record_hash`. **Every change: 0 tag moves, 0 hash
+moves, 143 of 143 fixtures identical.**
+
+- `OPENS_RE` reads "Opens:" (Outdoor Recreation's "Opens: May 1, 2026 Due: August 28, 2026"; `opening()` already takes the
+  date between the two words).
+- `AGENCY_CLOSED_RE` reads "not accepting additional applications" and "not accepting new applications" (HSGP).
+- `APPLICATION_RE` counts a Notice of Intent as the application stage, so the state mitigation program's "accepting Notices of
+  Intent (NOI's) May 26, 2026 through June 15, 2026" is a window.
+- `cycle_deadline`: a plural "Deadlines are:" over two or more dates gives the first one still ahead of the run date, or the
+  last once all have passed (Rural Community Grant's two cycles). The singular word keeps the old rule.
+- `BENEFITS_RE`, cut before tagging: "cities and counties may apply for projects that will benefit non-profit groups, for-profit
+  companies, or LMI persons" tagged nonprofit and business on CDBG. Whom a project benefits does not apply.
+- `APPLICANT_SENTENCE_RE`: "must be submitted by local governments ..." and "Applicants from incorporated towns ...".
+
+### Gaps and follow-ups
+
+- **ARDOT is not read** (`ClaudeBot: Disallow: /`), so Arkansas's Transportation Alternatives, Recreational Trails and Safe
+  Routes rounds are missing. Reopen only if ARDOT changes its robots file or gives permission.
+- The CDBG round's deadlines are in its guidelines PDF; the record stays `unknown` until the page states them.
+- BRIC: FEMA ended the program in 2025; the page does not say so, and the registry stores what the page says.
+- Not read, so neither in nor out: Heritage's county courthouse and historic preservation grants (`arkansasheritage.com`),
+  Agriculture's "Water and Sewer Treatment Facility Grant Program (State Matching Grant)", named on the water page as
+  coming, no page yet.
