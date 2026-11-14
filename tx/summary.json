@@ -1,0 +1,28 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "TX",
+  "name": "Texas"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/tx/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 125
+ },
+ "by_category": [],
+ "closing_soon": [
+  {
+   "name": "ALERRT Travel Assistance, FY2027",
+   "agency": "Office of the Governor",
+   "closes_at": "2027-08-31",
+   "days_to_close": 290,
+   "link": "https://saj-sudo.github.io/funding-atlas/tx/#p=alerrt-travel-assistance-fy2027-tx-egrants-alerrt-travel-assistance-fy2027"
+  }
+ ]
+}

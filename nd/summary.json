@@ -1,0 +1,40 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "ND",
+  "name": "North Dakota"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/nd/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 2,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "transportation",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Urban Grant Program (UGP)",
+   "agency": "North Dakota Department of Transportation",
+   "closes_at": "2026-12-31",
+   "days_to_close": 47,
+   "link": "https://saj-sudo.github.io/funding-atlas/nd/#p=urban-grant-program-ugp-nd-dot-urban-grant"
+  },
+  {
+   "name": "July 2026 - June 2027 Infrastructure Request",
+   "agency": "Funding for Infrastructure in North Dakota",
+   "closes_at": "2027-06-30",
+   "days_to_close": 228,
+   "link": "https://saj-sudo.github.io/funding-atlas/nd/#p=july-2026-june-2027-infrastructure-request-webgrants-nd-1088301"
+  }
+ ]
+}

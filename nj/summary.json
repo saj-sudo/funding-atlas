@@ -1,0 +1,42 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "NJ",
+  "name": "New Jersey"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/nj/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 3,
+  "federal": 125
+ },
+ "by_category": [],
+ "closing_soon": [
+  {
+   "name": "Affordable Housing Trust Fund 2027",
+   "agency": "Department of Community Affairs, Division of Housing and Community Resources",
+   "closes_at": "2026-11-19",
+   "days_to_close": 5,
+   "link": "https://saj-sudo.github.io/funding-atlas/nj/#p=affordable-housing-trust-fund-2027-nj-dca-sage-affordable-housing-trust-fund-2027"
+  },
+  {
+   "name": "Lead-Safe Home Remediation 2026",
+   "agency": "Department of Community Affairs, Division of Housing and Community Resources",
+   "closes_at": "2026-12-22",
+   "days_to_close": 38,
+   "link": "https://saj-sudo.github.io/funding-atlas/nj/#p=lead-safe-home-remediation-2026-nj-dca-sage-lead-safe-home-remediation-2026"
+  },
+  {
+   "name": "NJHOMES LAUNCHPAD PREDEVELOPMENT FUND 2027",
+   "agency": "Department of Community Affairs, Division of Housing and Community Resources",
+   "closes_at": "2027-06-30",
+   "days_to_close": 228,
+   "link": "https://saj-sudo.github.io/funding-atlas/nj/#p=njhomes-launchpad-predevelopment-fund-2027-nj-dca-sage-njhomes-launchpad-predevelopment-fund-2027"
+  }
+ ]
+}

@@ -1,0 +1,55 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "NY",
+  "name": "New York"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ny/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 3,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "other",
+   "open": 2
+  },
+  {
+   "category": "health",
+   "open": 1
+  },
+  {
+   "category": "public_safety",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "ERPO Infrastructure and Implementation",
+   "agency": "Div of Criminal Justice Serv",
+   "closes_at": "2026-12-02",
+   "days_to_close": 18,
+   "link": "https://saj-sudo.github.io/funding-atlas/ny/#p=erpo-infrastructure-and-implementation-ny-sfs-DCJ01-EVT0000010"
+  },
+  {
+   "name": "Round 20 Farmland Protection Implementation Grants",
+   "agency": "AGRICULTURE & MARKETS",
+   "closes_at": "2027-06-01",
+   "days_to_close": 199,
+   "link": "https://saj-sudo.github.io/funding-atlas/ny/#p=round-20-farmland-protection-implementation-grants-ny-sfs-AGM01-FPIG20"
+  },
+  {
+   "name": "Drinking Water Fluoridation RFA",
+   "agency": "Department of Health",
+   "closes_at": "2028-09-28",
+   "days_to_close": 684,
+   "link": "https://saj-sudo.github.io/funding-atlas/ny/#p=drinking-water-fluoridation-rfa-ny-sfs-DOH01-DWFRFA2028"
+  }
+ ]
+}

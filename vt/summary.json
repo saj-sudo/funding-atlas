@@ -1,0 +1,69 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "VT",
+  "name": "Vermont"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/vt/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 6,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "parks",
+   "open": 3
+  },
+  {
+   "category": "infrastructure",
+   "open": 2
+  },
+  {
+   "category": "transportation",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Better Roads",
+   "agency": "Vermont Agency of Transportation",
+   "closes_at": "2026-11-20",
+   "days_to_close": 6,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=better-roads-vt-vtrans-better-roads"
+  },
+  {
+   "name": "Land and Water Conservation Fund",
+   "agency": "Vermont Department of Forests, Parks and Recreation",
+   "closes_at": "2026-11-20",
+   "days_to_close": 6,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=land-and-water-conservation-fund-vt-fpr-lwcf"
+  },
+  {
+   "name": "Recreational Trails Program",
+   "agency": "Vermont Department of Forests, Parks and Recreation",
+   "closes_at": "2026-11-20",
+   "days_to_close": 6,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=recreational-trails-program-vt-fpr-rtp"
+  },
+  {
+   "name": "Municipal Planning Grant",
+   "agency": "Agency of Commerce and Community Development, Department of Housing and Community Development",
+   "closes_at": "2026-12-02",
+   "days_to_close": 18,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=municipal-planning-grant-vt-accd-municipal-planning-grant"
+  },
+  {
+   "name": "VOREC Community Grant Program",
+   "agency": "Vermont Department of Forests, Parks and Recreation",
+   "closes_at": "2026-12-13",
+   "days_to_close": 29,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=vorec-community-grant-program-vt-fpr-vorec"
+  }
+ ]
+}

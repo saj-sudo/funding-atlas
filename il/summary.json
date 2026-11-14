@@ -1,0 +1,77 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "IL",
+  "name": "Illinois"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/il/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 35,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "other",
+   "open": 11
+  },
+  {
+   "category": "infrastructure",
+   "open": 9
+  },
+  {
+   "category": "public_safety",
+   "open": 4
+  },
+  {
+   "category": "workforce",
+   "open": 3
+  },
+  {
+   "category": "housing",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "FY27 Law Enforcement Camera Grant",
+   "agency": "Illinois Law Enforcement Training Standards Board",
+   "closes_at": "2026-11-18",
+   "days_to_close": 4,
+   "link": "https://saj-sudo.github.io/funding-atlas/il/#p=fy27-law-enforcement-camera-grant-il-csfa-gms-a7a97ce6-7f6f-4353-9659-705a1233f916"
+  },
+  {
+   "name": "RPSA Violence Prevention Services",
+   "agency": "Department Of Human Services",
+   "closes_at": "2026-12-01",
+   "days_to_close": 17,
+   "link": "https://saj-sudo.github.io/funding-atlas/il/#p=rpsa-violence-prevention-services-il-csfa-nofo-4355"
+  },
+  {
+   "name": "Illinois Grocery Initiative",
+   "agency": "Department Of Commerce And Economic Opportunity",
+   "closes_at": "2026-12-09",
+   "days_to_close": 25,
+   "link": "https://saj-sudo.github.io/funding-atlas/il/#p=illinois-grocery-initiative-il-csfa-nofo-4240"
+  },
+  {
+   "name": "Community Partnership for Deflection and Substance Use Disorder Treatment",
+   "agency": "Illinois Criminal Justice Information Authority",
+   "closes_at": "2026-12-15",
+   "days_to_close": 31,
+   "link": "https://saj-sudo.github.io/funding-atlas/il/#p=community-partnership-for-deflection-and-substance-use-disorder-treatment-il-csfa-gms-57829f10-29d5-4f05-8cc5-f7dcd235a7b4"
+  },
+  {
+   "name": "Transportation Alternatives Program - Metropolitan Planning Organization +200,000 population selected",
+   "agency": "Department Of Transportation",
+   "closes_at": "2026-12-18",
+   "days_to_close": 34,
+   "link": "https://saj-sudo.github.io/funding-atlas/il/#p=transportation-alternatives-program-metropolitan-planning-organization-200-000-p-il-csfa-nofo-4356"
+  }
+ ]
+}

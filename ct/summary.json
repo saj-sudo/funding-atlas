@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "CT",
+  "name": "Connecticut"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ct/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "parks",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Urban Green and Community Garden Grant Program",
+   "agency": "Connecticut Department of Energy and Environmental Protection",
+   "closes_at": "2026-12-04",
+   "days_to_close": 20,
+   "link": "https://saj-sudo.github.io/funding-atlas/ct/#p=urban-green-and-community-garden-grant-program-ct-deep-ugcg"
+  }
+ ]
+}

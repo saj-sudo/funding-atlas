@@ -1,0 +1,20 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "MN",
+  "name": "Minnesota"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/mn/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 0,
+  "federal": 125
+ },
+ "by_category": [],
+ "closing_soon": []
+}

@@ -1,0 +1,37 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "DE",
+  "name": "Delaware"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/de/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 2,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 1
+  },
+  {
+   "category": "water",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Emergency Solutions Grants Program (ESG)",
+   "agency": "Delaware State Housing Authority",
+   "closes_at": "2026-12-01",
+   "days_to_close": 17,
+   "link": "https://saj-sudo.github.io/funding-atlas/de/#p=emergency-solutions-grants-program-esg-de-dsha-community-benefit%23esg"
+  }
+ ]
+}

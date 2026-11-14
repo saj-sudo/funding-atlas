@@ -1,0 +1,2016 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Federal and Kansas public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta name="color-scheme" content="light dark">
+<title>Kansas: open funding for local governments · Funding Atlas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<style>
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("../fonts/public-sans-latin.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("../fonts/source-serif-4-latin.woff2") format("woff2"); }
+/* Funding Atlas: one stylesheet for the index and every state page. Inlined by scripts/build_site.py.
+   Tokens on :root; dark mode by preference; print rules at the end. Two self-hosted fonts (fonts/), no other assets. */
+
+/* Direction A, "Civic" (13.2, Saj 2026-11-14): blue-biased paper, navy ink, Source Serif 4 for headings and program
+   names, Public Sans (the US Web Design System's face) for everything else. Both fonts are served from fonts/. */
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --ink: #14213d;
+  --muted: #56607a;
+  --line: #dde1ea;
+  --soft: #eef1f6;
+  --accent: #1f3f8f;
+  --accent-ink: #ffffff;
+  --accent-soft: #e7ecf8;
+  --likely: #17663a;
+  --likely-soft: #e2f1e7;
+  --possible: #8a5a00;
+  --possible-soft: #fbf0d9;
+  --closing: #b42318;
+  --closing-soft: #fde8e6;
+  --open: #17663a;
+  --forecast: #5a3fa8;
+  --s-fed: #2a78d6;
+  --s-state: #eb6834;
+  --s3: #1baf7a;
+  --caution: #ffcd00;
+  --caution-ink: #0b0d10;
+  --q-ink: #ffffff;
+  --q1: #cde2fb; --q2: #9ec5f4; --q3: #6da7ec; --q4: #3987e5; --q5: #256abf; --q6: #184f95; --q7: #0d366b;
+  --shadow: 0 1px 2px rgba(20, 33, 61, .06), 0 8px 24px rgba(20, 33, 61, .08);
+  --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --radius: 10px;
+  --max: 1180px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1420;
+    --surface: #161d2c;
+    --ink: #e6eaf4;
+    --muted: #a3adc4;
+    --line: #2a3347;
+    --soft: #1c2436;
+    --accent: #9db5ff;
+    --accent-ink: #0d1733;
+    --accent-soft: #1d2945;
+    --likely: #7fd3a0;
+    --likely-soft: #173324;
+    --possible: #f0c06a;
+    --possible-soft: #33291a;
+    --closing: #ff8f85;
+    --closing-soft: #3a1f1d;
+    --open: #7fd3a0;
+    --forecast: #c2adff;
+    --s-fed: #3987e5;
+    --s-state: #d95926;
+    --s3: #199e70;
+    --caution: #ffd23a;
+    --caution-ink: #0b0d10;
+    --q-ink: #0d1733;
+    --q1: #1b2a44; --q2: #1d3a66; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #b7d3f6;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 var(--f-body);
+}
+a { color: var(--accent); }
+a:hover { text-decoration-thickness: 2px; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+h1, h2, h3 { line-height: 1.2; margin: 0; letter-spacing: -.01em; }
+h1 { font: 700 clamp(1.7rem, 1.2rem + 2vw, 2.5rem)/1.12 var(--f-display); text-wrap: balance; }
+h2 { font-size: 1.25rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 650; }
+p { margin: 0; }
+ul, ol { margin: 0; padding: 0; }
+.muted { color: var(--muted); }
+.small { font-size: .875rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+[hidden] { display: none !important; }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- skip link, top bar ---------- */
+.skip { position: absolute; left: 16px; top: -60px; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; border-radius: 6px; z-index: 50; text-decoration: none; }
+.skip:focus { top: 12px; }
+.skip.inside { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip.inside:focus { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: inline-block; margin: 0 0 10px; }
+#results:focus { outline: none; }
+.topbar { border-bottom: 1px solid var(--line); background: var(--surface); position: sticky; top: 0; z-index: 20; }
+.topbar .wrap { display: flex; align-items: center; gap: 14px; min-height: 56px; flex-wrap: wrap; padding-top: 6px; padding-bottom: 6px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 750; text-decoration: none; color: var(--ink); letter-spacing: -.01em; }
+.brand .mark { width: 26px; height: 26px; display: inline-grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.brand .mark i { display: block; background: var(--accent); border-radius: 2px; }
+.brand .mark i:nth-child(2), .brand .mark i:nth-child(6), .brand .mark i:nth-child(7) { background: var(--likely); }
+.brand .mark i:nth-child(4), .brand .mark i:nth-child(8) { background: var(--possible); opacity: .9; }
+.topbar .spacer { flex: 1; }
+.topbar label { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+.topbar select { padding: 6px 30px 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); max-width: 220px; }
+.topbar .gen { font-size: .85rem; color: var(--muted); white-space: nowrap; }
+.topbar label.switch select { max-width: 200px; }
+
+/* ---------- hero ---------- */
+.hero { padding: 28px 0 10px; }
+.hero h1 { margin-bottom: 8px; }
+.hero .lede { font-size: 1.05rem; max-width: 70ch; }
+.coverage { margin-top: 10px; font-size: .9rem; color: var(--muted); }
+.coverage summary { cursor: pointer; display: inline; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.coverage summary::-webkit-details-marker { display: none; }
+.coverage summary::after { content: " ▾"; }
+.coverage[open] summary::after { content: " ▴"; }
+.coverage-body { margin-top: 8px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: grid; gap: 6px; max-width: 80ch; }
+.coverage-body b { color: var(--ink); font-weight: 650; }
+.coverage-body .srcs { list-style: disc; padding-left: 20px; }
+
+/* ---------- the briefing: sentences that filter ---------- */
+.briefing { margin: 18px 0 4px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: var(--radius); display: grid; gap: 6px; }
+.briefing h2 { font: 700 .78rem/1.2 var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.briefing ul { list-style: none; display: grid; gap: 4px; }
+.briefing li { font: 600 1.12rem/1.4 var(--f-display); }
+.brief-link { all: unset; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.brief-link:hover { text-decoration-color: var(--accent); }
+.brief-more { display: none; }
+.briefing li.brief-more button { padding-left: 0; }
+.brief-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.brief-link[aria-pressed="true"] { text-decoration-color: var(--accent); color: var(--accent); }
+
+/* ---------- tabs ---------- */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 18px 0 14px; }
+.tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; font-weight: 650; color: var(--muted); margin-bottom: -1px; border-radius: 6px 6px 0 0; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tab .n { display: inline-block; min-width: 1.6em; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--soft); font-size: .8rem; font-weight: 650; color: var(--muted); }
+
+/* ---------- toolbar ---------- */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.search { flex: 1 1 260px; display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; }
+.search svg { width: 18px; height: 18px; flex: none; color: var(--muted); }
+.search input { flex: 1; border: 0; background: none; padding: 10px 0; min-width: 0; }
+.search input:focus { outline: none; }
+.search:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.toolbar label.sort { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--muted); }
+.toolbar select { padding: 9px 30px 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-weight: 600; text-decoration: none; color: var(--ink); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.quiet { border-color: transparent; background: none; color: var(--accent); padding-left: 6px; padding-right: 6px; }
+.btn .n { background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 0 7px; font-size: .8rem; }
+.count { font-weight: 650; margin-left: auto; white-space: nowrap; }
+
+/* ---------- layout: facets + results ---------- */
+.layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 24px; align-items: start; }
+.facets { position: sticky; top: 70px; max-height: calc(100vh - 86px); overflow: auto; padding-right: 4px; }
+.facet { border-top: 1px solid var(--line); padding: 10px 0 12px; }
+.facet:first-child { border-top: 0; padding-top: 0; }
+.facet summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-weight: 650; padding: 4px 0; }
+.facet summary::-webkit-details-marker { display: none; }
+.facet summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform .15s; margin-right: 4px; }
+.facet[open] summary::after { transform: rotate(-135deg); }
+.facet ul { list-style: none; display: grid; gap: 2px; margin-top: 4px; }
+.facet li label { display: flex; align-items: center; gap: 8px; padding: 4px 4px; border-radius: 6px; cursor: pointer; }
+.facet li label:hover { background: var(--soft); }
+.facet input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; flex: none; }
+.facet .lbl { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.facet .cnt { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.facet li.zero label { color: var(--muted); opacity: .6; }
+.facet li.zero label:hover { background: none; cursor: default; }
+.facets .clear { margin-top: 10px; }
+.filters-toggle { display: none; }
+
+/* ---------- cards ---------- */
+.results { display: grid; gap: 10px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+  display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; position: relative; cursor: pointer;
+  transition: box-shadow .12s ease, border-color .12s ease;
+}
+.card:hover { box-shadow: var(--shadow); border-color: var(--accent); }
+.card .cbody { display: grid; gap: 4px; min-width: 0; align-content: start; }
+/* the date column: the deadline is the first thing the eye lands on */
+.card .date { display: grid; align-content: start; justify-items: center; text-align: center; padding-right: 12px; border-right: 1px solid var(--line); }
+.card .date .m { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
+.card .date .dd { font: 700 2rem/1 var(--f-display); font-variant-numeric: tabular-nums; color: var(--ink); }
+/* caution panel and topic badges (13.17, borrowed from Wayfinding) */
+.caution { background: var(--caution); color: var(--caution-ink); border-radius: 4px; padding: 0 8px; font-weight: 800; line-height: 1.6; }
+.topic { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--muted); background: var(--surface); margin-top: 8px; flex: none; }
+.topic b { font: 800 .74rem/1 var(--f-body); color: var(--ink); }
+.topic.t-env { border-color: var(--s-fed); } .topic.t-inf { border-color: var(--s-state); } .topic.t-com { border-color: var(--s3); } .topic.t-oth { border-color: var(--muted); border-style: dotted; }
+.topic-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: .85rem; color: var(--muted); margin: -6px 0 14px; }
+.topic-key .topic { margin: 0 6px 0 0; width: 22px; height: 22px; border-width: 2.5px; }
+.tkey { display: inline-flex; align-items: center; }
+.tkey-l { font-weight: 650; }
+.card .date.soon .dd, .card .date.soon .m { color: var(--closing); }
+.card .date .nd { font-size: .78rem; line-height: 1.25; color: var(--muted); padding-top: 2px; }
+.card .date.past .dd { color: var(--muted); }
+.list .bucket { margin: 8px 0 0; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.list .bucket:first-child { margin-top: 0; }
+.card:focus-within { outline: 3px solid var(--accent); outline-offset: 1px; }
+.card .when, dialog.detail .when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 650; font-size: .95rem; }
+.card .when .soon { color: var(--closing); }
+.card h3 { font: 600 1.14rem/1.3 var(--f-display); letter-spacing: 0; }
+.card h3 button { all: unset; cursor: pointer; color: var(--ink); text-wrap: pretty; }
+.card h3 button:focus-visible { outline: none; }
+.card .meta { color: var(--muted); font-size: .9rem; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.card .meta .tier-likely { color: var(--likely); font-weight: 600; }
+.card .meta .tier-possible { color: var(--possible); font-weight: 600; }
+.card .facts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .92rem; margin-top: 2px; }
+.card .facts span b { font-weight: 650; }
+.card .facts .soon { color: var(--closing); font-weight: 650; }
+.card .facts .k { color: var(--muted); }
+.card.st-closed, .card.st-unknown, .card.st-paused, .card.st-exhausted { border-style: dashed; }
+.card.st-closed h3 button, .card.st-exhausted h3 button { color: var(--muted); }
+
+/* status tags: sentence case, one per card, static (no hover), never colour alone: the word carries it */
+.tag { display: inline-flex; align-items: center; padding: 1px 9px; border-radius: 6px; font-size: .82rem; font-weight: 650; line-height: 1.5; white-space: nowrap; border: 1px solid currentColor; }
+.tag.st-open { color: var(--open); background: var(--likely-soft); }
+.tag.st-forecasted { color: var(--forecast); }
+.tag.st-unknown { color: var(--possible); border-style: dashed; }
+.tag.st-closed, .tag.st-paused, .tag.st-exhausted { color: var(--muted); }
+.tag.new { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.tag.upd { color: var(--muted); border-color: var(--line); background: var(--soft); }
+
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.chips li { font-size: .78rem; padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
+.chips li.more { border-style: dashed; }
+
+.empty { padding: 18px 16px; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
+
+/* ---------- groups: the state's own programs first, then the folded groups, then federal ---------- */
+.results { gap: 28px; }
+.group { display: grid; gap: 10px; align-content: start; }
+.group h2 { font: 600 1.4rem/1.2 var(--f-display); letter-spacing: 0; }
+.group h2 .n { font-family: var(--f-body); }
+.group h2 .n, .group .n { display: inline-block; min-width: 1.6em; padding: 0 7px; margin-left: 4px; border-radius: 999px; background: var(--soft); font-size: .85rem; font-weight: 650; color: var(--muted); vertical-align: middle; text-align: center; }
+.group .d { color: var(--muted); font-size: .92rem; max-width: 78ch; }
+.group .list { display: grid; gap: 10px; }
+.group.fold { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); }
+.group.fold > .btn { justify-self: start; }
+#g-federal { padding-top: 18px; border-top: 1px solid var(--line); }
+
+/* ---------- the active filters line ---------- */
+.active { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: -4px 0 14px; font-size: .9rem; }
+.active .count { font-weight: 650; margin-right: 6px; }
+.active .lbl { color: var(--muted); }
+.fchip { border: 1px solid var(--accent); color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 10px; font-size: .85rem; font-weight: 600; }
+.facet-note { font-size: .8rem; color: var(--muted); margin-top: 6px; }
+
+/* ---------- the source's own cycle wording on a card ---------- */
+.card .cycle { font-size: .9rem; background: var(--soft); padding: 8px 10px; border-radius: 8px; overflow-wrap: anywhere; }
+.card .cycle .k { color: var(--muted); }
+.empty b { color: var(--ink); }
+
+/* ---------- charts (13.14) ---------- */
+.chart { margin: 28px 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 10px; min-width: 0; }
+.chart h2 { font: 600 1.4rem/1.2 var(--f-display); }
+.chart .sub { color: var(--muted); max-width: 72ch; }
+.chart .src { font-size: .82rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+.chart-scroll { overflow-x: auto; }
+.chart-scroll svg { display: block; max-width: 100%; height: auto; }
+.legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 0; }
+.sw.fed { background: var(--s-fed); } .sw.st { background: var(--s-state); } .sw.s1 { background: var(--s-fed); } .sw.s2 { background: var(--s-state); } .sw.s3 { background: var(--s3); }
+.ctext { fill: var(--muted); font: 12px var(--f-body); }
+.clab { fill: var(--ink); font-weight: 600; }
+.cmuted { fill: var(--muted); font-weight: 400; }
+.cval { fill: var(--ink); font-size: 11px; }
+.cval.inv { fill: var(--q-ink); }
+.cgrid { stroke: var(--line); stroke-width: 1; }
+.caxis { stroke: var(--muted); stroke-width: 1; }
+.cmed { stroke: var(--ink); stroke-width: 2; }
+.m-fed { fill: var(--s-fed); }
+.m-code { fill: var(--muted); fill-opacity: .55; }
+.sw.code { background: var(--muted); opacity: .55; } .m-st { fill: var(--s-state); } .m-s1 { fill: var(--s-fed); } .m-s2 { fill: var(--s-state); } .m-s3 { fill: var(--s3); }
+.cdot { stroke: var(--surface); stroke-width: 2; }
+circle.cdot.m-fed, circle.cdot.m-st { fill-opacity: .85; }
+.ctip { position: fixed; z-index: 60; pointer-events: none; background: var(--ink); color: var(--bg); font-size: .85rem; padding: 6px 9px; border-radius: 6px; max-width: 300px; box-shadow: var(--shadow); }
+.ctable { border-collapse: collapse; font-size: .88rem; width: 100%; margin-top: 8px; }
+.ctable th, .ctable td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.ctable th:first-child, .ctable td:first-child { text-align: left; }
+.c-table summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.ahead { margin-top: 4px; }
+.ahead summary { cursor: pointer; color: var(--accent); font: 600 .9rem/1.4 var(--f-body); }
+.ahead[open] { display: grid; gap: 8px; }
+.season { display: grid; gap: 4px; }
+.navlink { font-size: .9rem; font-weight: 600; text-decoration: none; }
+.navlink:hover { text-decoration: underline; }
+main.about { padding-bottom: 12px; }
+
+/* ---------- view switch and the open-window timeline (13.10) ---------- */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.segb { border: 0; background: none; padding: 9px 12px; font-weight: 600; }
+.segb + .segb { border-left: 1px solid var(--line); }
+.segb[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.tl-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; }
+#tl-svg { display: block; max-width: none; height: auto; }
+#tl-svg text { font: 12px var(--f-body); }
+.tl-t { fill: var(--muted); }
+.tl-n { fill: var(--ink); }
+.tl-grid { stroke: var(--line); }
+.tl-today { stroke: var(--closing); stroke-width: 1.5; }
+.tl-today-t { fill: var(--closing); }
+.tl-hit { fill: transparent; }
+.tl-row { cursor: pointer; outline: none; }
+.tl-row:hover .tl-hit, .tl-row:focus .tl-hit { fill: var(--soft); }
+.tl-bar.st, .tl-dot.st { fill: var(--s-state); }
+.tl-bar.fed, .tl-dot.fed { fill: var(--s-fed); }
+.tl-dot { stroke: var(--surface); stroke-width: 2; }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .88rem; color: var(--muted); }
+.tl-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.tl-legend .sw.st { background: var(--s-state); }
+.tl-legend .sw.fed { background: var(--s-fed); }
+.tl-legend .sw.dot { background: var(--muted); border-radius: 50%; }
+
+/* ---------- title, paging, the phone filter tray (13.16) ---------- */
+.h1-sub { display: block; font: 600 1.05rem/1.3 var(--f-body); color: var(--muted); letter-spacing: 0; margin-top: 4px; }
+.btn.more { justify-self: start; margin-top: 4px; }
+.tray-head { display: none; }
+.tray-backdrop { position: fixed; inset: 0; background: rgba(15, 20, 32, .45); z-index: 39; }
+@media (max-width: 899px) {
+  .facets:not([hidden]) { position: fixed; top: 0; right: 0; bottom: 0; width: min(92vw, 420px); z-index: 40; max-height: none; overflow: auto;
+    border-radius: 0; border: 0; border-left: 1px solid var(--line); box-shadow: var(--shadow); padding: 0 16px 24px; background: var(--surface);
+    padding-top: env(safe-area-inset-top, 0px); }
+  .tray-head { display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--surface); padding: 12px 0; margin-bottom: 8px; border-bottom: 1px solid var(--line); z-index: 1; }
+  body.tray-open { overflow: hidden; }
+}
+
+/* ---------- fit check (13.11) ---------- */
+.fit { margin: 0 0 12px; padding: 10px 12px; background: var(--accent-soft); border-radius: var(--radius); }
+.fit-q { flex-direction: column; }
+.fit summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+.fit-q { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 10px 0 6px; }
+.fit-q label { display: grid; gap: 4px; font-size: .9rem; color: var(--muted); }
+.fit-q select { padding: 8px 30px 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); max-width: 100%; }
+
+/* ---------- stars and the watchlist (13.9) ---------- */
+.card .star { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 1.3rem; line-height: 1; color: var(--muted); border-radius: 999px; }
+.card .star:hover { background: var(--soft); }
+.card .star[aria-pressed="true"] { color: var(--possible); }
+.card .cbody { padding-right: 34px; }
+.watch { margin: 0 0 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: grid; gap: 8px; }
+.watch h2 { font: 600 1.2rem/1.2 var(--f-display); }
+.watch-list { list-style: none; display: grid; gap: 4px; }
+.btn.small, .btn .small { font-size: .85rem; padding: 2px 8px; }
+.btn:disabled { opacity: .5; cursor: default; }
+dialog.detail .star-btn[aria-pressed="true"] { color: var(--possible); border-color: var(--possible); }
+
+/* ---------- digest (13.8) ---------- */
+#panel-digest { display: grid; gap: 14px; }
+#panel-digest[hidden] { display: none !important; }
+.digest-d { color: var(--muted); max-width: 72ch; }
+.digest-controls { display: grid; gap: 10px; }
+.dg-lbl { display: block; font-size: .8rem; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.dg-check { display: inline-flex; gap: 8px; align-items: center; }
+#dg-cats .chip[aria-pressed="true"], #dg-win .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#dg-out { width: 100%; min-height: 360px; font: .88rem/1.5 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; background: var(--surface); color: var(--ink); resize: vertical; }
+.dg-actions { display: flex; gap: 12px; align-items: center; }
+
+/* ---------- wording diff in the feed (13.12) ---------- */
+.diff { margin-top: 4px; font-size: .9rem; }
+.diff summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.diff-f { margin-top: 6px; display: grid; gap: 2px; }
+.diff-k { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; }
+.diff-t { line-height: 1.6; overflow-wrap: anywhere; max-width: 80ch; }
+.diff del { background: var(--closing-soft); color: var(--closing); text-decoration: line-through; text-decoration-thickness: 1px; }
+.diff ins { background: var(--likely-soft); color: var(--likely); text-decoration: none; border-bottom: 2px solid var(--likely); }
+
+/* ---------- changes feed ---------- */
+.chipbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: .9rem; font-weight: 600; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.feed { list-style: none; display: grid; gap: 18px; }
+.feed .day h3 { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+.feed .day ul { list-style: none; display: grid; gap: 2px; }
+.feed li.ev { display: grid; grid-template-columns: 86px 1fr; gap: 10px; padding: 7px 6px; border-radius: 8px; align-items: baseline; }
+.feed li.ev:hover { background: var(--soft); }
+.feed .type { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding-top: 2px; }
+.feed .type.added { color: var(--accent); }
+.feed .type.changed { color: var(--possible); }
+.feed .type.missing { color: var(--closing); }
+.feed .what { color: var(--muted); font-size: .9rem; }
+.feed .what b { color: var(--ink); font-weight: 600; }
+.feed .name button { all: unset; cursor: pointer; color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.feed .name a { color: var(--accent); }
+.feed .who { font-size: .85rem; color: var(--muted); }
+
+/* ---------- detail dialog ---------- */
+dialog.detail { border: 0; padding: 0; margin: 0; max-width: none; max-height: none; width: min(640px, 100vw); height: 100dvh; margin-left: auto; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+dialog.detail::backdrop { background: rgba(20, 18, 12, .45); }
+dialog.detail .inner { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
+dialog.detail header { display: flex; gap: 12px; align-items: flex-start; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
+dialog.detail header h2 { font: 600 1.4rem/1.25 var(--f-display); flex: 1; text-wrap: pretty; }
+dialog.detail .close { flex: none; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 1.2rem; line-height: 1; display: grid; place-items: center; }
+dialog.detail .body { overflow: auto; padding: 16px 20px 24px; display: grid; gap: 18px; align-content: start; }
+dialog.detail .sect h3 { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+dialog.detail .answers { display: grid; gap: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--radius); }
+dialog.detail .answers div { display: grid; grid-template-columns: 11.5em 1fr; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line); }
+dialog.detail .answers div:first-child { border-top: 0; }
+dialog.detail .answers dt { font-weight: 650; }
+dialog.detail .answers dd { margin: 0; overflow-wrap: anywhere; }
+dialog.detail .answers dd.soon { color: var(--closing); font-weight: 650; }
+dialog.detail .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; }
+dialog.detail .facts div { display: grid; gap: 1px; }
+dialog.detail .facts .k { font-size: .78rem; color: var(--muted); }
+dialog.detail .facts .v { font-weight: 600; }
+dialog.detail .facts .v.soon { color: var(--closing); }
+dialog.detail .verbatim { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--soft); padding: 12px 14px; border-radius: 8px; font-size: .95rem; line-height: 1.55; max-height: 40vh; overflow: auto; }
+dialog.detail .prose { line-height: 1.6; max-width: 65ch; overflow-wrap: anywhere; }
+dialog.detail .list { list-style: none; display: grid; gap: 4px; }
+dialog.detail .list li { display: flex; gap: 8px; flex-wrap: wrap; }
+dialog.detail .list .aln { font-variant-numeric: tabular-nums; font-weight: 650; }
+dialog.detail footer { padding: 12px 20px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--surface); }
+dialog.detail footer .src { flex: 1; min-width: 0; }
+dialog.detail .copied { color: var(--likely); font-size: .85rem; }
+dialog.detail .trail { font-size: .85rem; color: var(--muted); }
+/* history strip (13.7) */
+svg.hist { width: 100%; height: auto; display: block; }
+svg.hist .hl { stroke: var(--line); stroke-width: 2; }
+svg.hist .today { stroke: var(--closing); stroke-width: 1.5; }
+svg.hist .dl { stroke: var(--ink); stroke-width: 2; }
+svg.hist .ht { fill: var(--muted); font: 11px var(--f-body); }
+svg.hist circle { stroke: var(--surface); stroke-width: 2; }
+.ev-added { fill: var(--surface); stroke: var(--muted) !important; }
+.ev-open, .ev-reopen { fill: var(--open); }
+.ev-close { fill: var(--muted); }
+.ev-other, .ev-missing, .ev-edit { fill: var(--possible); }
+svg.hist .ev-date { stroke: var(--accent); stroke-width: 2; }
+.hist-list { list-style: none; display: grid; gap: 3px; margin-top: 8px; font-size: .9rem; max-height: 220px; overflow: auto; }
+.hist-list li { display: grid; grid-template-columns: 7.5em 12px minmax(0, 1fr); gap: 8px; align-items: center; }
+.hist-list .hd { color: var(--muted); font-variant-numeric: tabular-nums; }
+.hist-list .hk { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.hist-list .hk.ev-open, .hist-list .hk.ev-reopen { background: var(--open); }
+.hist-list .hk.ev-close { background: var(--muted); }
+.hist-list .hk.ev-date { background: var(--accent); border-radius: 2px; }
+.hist-list .hk.ev-added { background: var(--surface); border: 2px solid var(--muted); }
+.feed .cause { font-size: .85rem; color: var(--possible); }
+svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 2 2; }
+.hist-list .hk.ev-other, .hist-list .hk.ev-missing, .hist-list .hk.ev-edit { background: var(--possible); }
+
+/* ---------- index: tile map ---------- */
+.index-hero { padding: 36px 0 12px; }
+.index-hero h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3.1rem); max-width: 18ch; }
+.index-hero .lede { font-size: 1.1rem; max-width: 62ch; margin-top: 12px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 22px 0 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; display: grid; gap: 2px; }
+.stat .v { font: 700 1.9rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.stat .k { font-size: .85rem; color: var(--muted); }
+.map-wrap { margin: 24px 0 8px; }
+.map { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 5px; max-width: 760px; }
+.map a.t { aspect-ratio: 1; display: grid; place-content: center; justify-items: center; gap: 0; line-height: 1.05; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: clamp(.7rem, .55rem + .8vw, 1rem); color: var(--ink); background: var(--soft); border: 1px solid var(--line); transition: transform .1s ease, box-shadow .1s ease; }
+.map a.t .o { font-size: .72em; font-weight: 600; opacity: .9; }
+/* coverage kinds (13.13): fill and border carry the kind, the legend and each tile's text name it */
+.map a.t.k-portal { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.map a.t.k-agencies { background: var(--accent-soft); color: var(--accent); border: 2px solid var(--accent); }
+.map a.t.k-directory { background: var(--surface); color: var(--accent); border: 2px dashed var(--accent); }
+.map a.t.k-blocked { color: var(--muted); background: repeating-linear-gradient(135deg, var(--soft) 0 5px, var(--line) 5px 7px); }
+.map a.t.k-federal { background: var(--soft); color: var(--muted); }
+.map a.t:hover, .map a.t:focus-visible { transform: scale(1.08); box-shadow: var(--shadow); z-index: 2; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: .9rem; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; border: 1px solid var(--line); background: var(--soft); }
+.legend i.k-portal { background: var(--accent); border-color: var(--accent); }
+.legend i.k-agencies { background: var(--accent-soft); border: 2px solid var(--accent); }
+.legend i.k-directory { background: var(--surface); border: 2px dashed var(--accent); }
+.legend i.k-blocked { background: repeating-linear-gradient(135deg, var(--soft) 0 3px, var(--line) 3px 5px); }
+.legend i.k-federal { background: var(--soft); }
+.hover { margin-top: 12px; min-height: 2.6em; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.hover b { font-weight: 700; }
+.goto { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.goto select { padding: 9px 30px 9px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); min-width: 220px; }
+.index-feed { margin-top: 36px; }
+.index-feed h2 { margin-bottom: 12px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+
+/* ---------- footer ---------- */
+footer.site { margin-top: 48px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: .92rem; }
+footer.site .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+footer.site h2 { font-size: 1rem; color: var(--ink); margin-bottom: 8px; }
+footer.site p + p { margin-top: 8px; }
+footer.site ol { padding-left: 20px; display: grid; gap: 4px; }
+footer.site b { color: var(--ink); }
+.noscript { background: var(--possible-soft); color: var(--possible); padding: 12px 16px; border-radius: 8px; margin: 16px 0; }
+
+/* ---------- phone ---------- */
+@media (max-width: 899px) {
+  .layout { grid-template-columns: 1fr; gap: 12px; }
+  .facets { position: static; max-height: none; overflow: visible; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+  .facets[hidden] { display: none !important; }
+  .filters-toggle { display: inline-flex; }
+  .count { margin-left: 0; }
+  .two { grid-template-columns: 1fr; }
+  .topbar .gen { display: none; }
+  .topbar .wrap { flex-wrap: nowrap; min-height: 52px; }
+  .topbar label.switch .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .topbar label.switch select { max-width: 46vw; }
+  .hero { padding-top: 16px; }
+  .hero h1 { font-size: 1.6rem; margin-bottom: 6px; }
+  .hero .lede { font-size: 1rem; }
+  .briefing { padding: 10px 12px; margin-top: 10px; gap: 4px; }
+  .briefing ul { gap: 2px; }
+  .briefing li { font: 600 .95rem/1.35 var(--f-body); }
+  .tab { padding: 10px 10px; white-space: nowrap; }
+  .tab .n { margin-left: 4px; }
+  .seg { display: none; }
+  .fit { padding: 8px 12px; }
+  .tabs { margin: 12px 0 10px; }
+  dialog.detail .answers div { grid-template-columns: 1fr; gap: 2px; }
+  dialog.detail { width: 100vw; }
+  .feed li.ev { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (max-width: 480px) {
+  .hero .lede { display: none; }
+  .cov-when, .wlbl, .slbl, .ahead, .briefing h2, .topic-key { display: none; }
+  .hero { padding-top: 10px; }
+  .briefing { margin-top: 8px; }
+  .tabs { margin: 10px 0 8px; }
+  .briefing li:nth-child(n+2):not(.brief-more) { display: none; }
+  .briefing ul.all li { display: list-item !important; }
+  .briefing ul.all li.brief-more { display: block; }
+  .toolbar { gap: 8px; }
+  .toolbar .search { flex-basis: 100%; }
+  .toolbar label.sort { flex: 1 1 0; min-width: 0; }
+  .briefing li.brief-more { display: block; }
+  .coverage summary::after { content: ""; }
+  .toolbar label.sort select { width: 100%; }
+  .active { font-size: .85rem; }
+  .group h2 { font-size: 1.2rem; }
+  body[data-page="state"] .navlink { display: none; }
+  .group.fold { padding: 12px; }
+  .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
+  .card .date { padding-right: 8px; }
+  .card .date .dd { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+/* ---------- print ---------- */
+@media print {
+  :root { --bg: #fff; --surface: #fff; --ink: #000; --muted: #333; --line: #bbb; --soft: #f2f2f2; }
+  .topbar, .tabs, .toolbar, .facets, .filters-toggle, .skip, dialog, .chipbar, .goto, .hover { display: none !important; }
+  .group .list[hidden] { display: grid !important; }
+  .group.fold > .btn, .active { display: none !important; }
+  .layout { grid-template-columns: 1fr; }
+  .card { break-inside: avoid; box-shadow: none; }
+  .card .date.soon .dd, .card .date.soon .m { color: #000; }
+  .caution { border: 1px solid #000; }
+  .card:focus-within { outline: none; }
+  .card h3 button::after { content: " (" attr(data-url) ")"; font-weight: 400; font-size: .8rem; color: #333; }
+  #panel-changes[hidden] { display: block !important; }
+  #panel-changes::before { content: "Changes"; display: block; font-weight: 700; font-size: 1.2rem; margin: 24px 0 8px; }
+  footer.site { page-break-before: auto; }
+  a { color: #000; }
+}
+
+/* long facet lists (agencies) scroll inside the sidebar */
+.facet ul.long { max-height: 260px; overflow: auto; padding-right: 4px; }
+
+</style>
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="../"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="../about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built 2026-11-14.</p></noscript>
+  </section>
+
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+    <details class="ahead" id="ahead">
+      <summary>Deadlines over the next 26 weeks</summary>
+      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st" id="ahead-st"></i><span id="ahead-st-l">State</span></span></div>
+      <div class="chart-scroll"><svg id="ahead-svg" role="img" aria-label="Deadlines per week, next 26 weeks"></svg></div>
+      <p class="muted small" id="ahead-note"></p>
+    </details>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
+    </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <p class="topic-key" id="topic-key"></p>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{"generated_at":"2026-11-14T13:04:32Z","site_url":"https://saj-sudo.github.io/funding-atlas/","repo_url":"https://github.com/saj-sudo/funding-atlas","state":{"code":"KS","name":"Kansas"},"states":[{"code":"AK","name":"Alaska"},{"code":"ME","name":"Maine"},{"code":"VT","name":"Vermont"},{"code":"NH","name":"New Hampshire"},{"code":"WA","name":"Washington"},{"code":"ID","name":"Idaho"},{"code":"MT","name":"Montana"},{"code":"ND","name":"North Dakota"},{"code":"MN","name":"Minnesota"},{"code":"IL","name":"Illinois"},{"code":"WI","name":"Wisconsin"},{"code":"MI","name":"Michigan"},{"code":"NY","name":"New York"},{"code":"MA","name":"Massachusetts"},{"code":"OR","name":"Oregon"},{"code":"NV","name":"Nevada"},{"code":"WY","name":"Wyoming"},{"code":"SD","name":"South Dakota"},{"code":"IA","name":"Iowa"},{"code":"IN","name":"Indiana"},{"code":"OH","name":"Ohio"},{"code":"PA","name":"Pennsylvania"},{"code":"NJ","name":"New Jersey"},{"code":"CT","name":"Connecticut"},{"code":"RI","name":"Rhode Island"},{"code":"CA","name":"California"},{"code":"UT","name":"Utah"},{"code":"CO","name":"Colorado"},{"code":"NE","name":"Nebraska"},{"code":"MO","name":"Missouri"},{"code":"KY","name":"Kentucky"},{"code":"WV","name":"West Virginia"},{"code":"VA","name":"Virginia"},{"code":"MD","name":"Maryland"},{"code":"DE","name":"Delaware"},{"code":"AZ","name":"Arizona"},{"code":"NM","name":"New Mexico"},{"code":"KS","name":"Kansas"},{"code":"AR","name":"Arkansas"},{"code":"TN","name":"Tennessee"},{"code":"NC","name":"North Carolina"},{"code":"SC","name":"South Carolina"},{"code":"DC","name":"District of Columbia"},{"code":"OK","name":"Oklahoma"},{"code":"LA","name":"Louisiana"},{"code":"MS","name":"Mississippi"},{"code":"AL","name":"Alabama"},{"code":"GA","name":"Georgia"},{"code":"HI","name":"Hawaii"},{"code":"TX","name":"Texas"},{"code":"FL","name":"Florida"}],"rules":{"new_days":7,"updated_days":7,"closing_days":30,"feed_n":200,"between_months":15},"coverage":{"federal":{"open":125,"sources":[{"connector":"grants_gov","label":"Grants.gov","last_ok":"2026-11-13T17:40:17Z"},{"connector":"sam_assistance_listings","label":"SAM.gov Assistance Listings","last_ok":"2026-11-13T17:40:24Z"}]},"state":null},"excluded_unlikely":643,"questions":["What is open right now that is not on this page?","Which rows should not be here, and why?","Which columns do you actually use when deciding whether to apply? Which are noise?","Where do you look for this today, and what does that source get right that this one does not?"],"programs":[],"between":[],"unstated":[],"season":null,"changes":[]}</script>
+<script src="../federal.js?v=2026-11-14"></script>
+<script>
+/* Funding Atlas page script. Shared by the index and every state page; inlined by scripts/build_site.py.
+   Plain browser JavaScript, no build step, no network: everything comes from the JSON block in the page.
+   Nothing here invents data. A null stays blank; the only computed things are counts, sort orders and the
+   wording of dates relative to the build date. */
+(function () {
+  'use strict';
+
+  var DATA = JSON.parse(document.getElementById('data').textContent);
+  var PAGE = document.body.getAttribute('data-page');
+  var ROOT = PAGE === 'state' || PAGE === 'about' ? '../' : '';
+  var TODAY = DATA.generated_at.slice(0, 10);
+  // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
+  var FEDERAL_LOADED = !!window.FA_FEDERAL;
+  if (PAGE === 'state' && FEDERAL_LOADED) {
+    DATA.programs = DATA.programs.concat(window.FA_FEDERAL.programs);
+    DATA.changes = DATA.changes.concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+  }
+
+  // ---------- helpers ----------
+
+  function h(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function cap(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
+  function words(s) { return cap(String(s || '').replace(/_/g, ' ')); }
+  function money(n) { return n == null ? '' : '$' + Number(n).toLocaleString('en-US'); }
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function fmtDate(iso, withYear) {
+    if (!iso) return '';
+    var y = +iso.slice(0, 4), m = +iso.slice(5, 7), d = +iso.slice(8, 10);
+    var out = MONTHS[m - 1] + ' ' + d;
+    return (withYear === false || (withYear === undefined && String(y) === TODAY.slice(0, 4))) ? out : out + ', ' + y;
+  }
+  function daysBetween(a, b) {
+    return Math.round((Date.UTC(+b.slice(0, 4), +b.slice(5, 7) - 1, +b.slice(8, 10)) -
+                       Date.UTC(+a.slice(0, 4), +a.slice(5, 7) - 1, +a.slice(8, 10))) / 86400000);
+  }
+  function relDays(d) {
+    if (d < 0) return 'deadline passed ' + (-d) + (d === -1 ? ' day' : ' days') + ' ago';
+    if (d === 0) return 'closes today';
+    if (d === 1) return 'closes tomorrow';
+    if (d < 14) return 'closes in ' + d + ' days';
+    if (d < 60) return 'closes in ' + Math.round(d / 7) + ' weeks';
+    return 'closes in ' + Math.round(d / 30) + ' months';
+  }
+  function isSoon(p) { return p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= DATA.rules.closing_days; }
+  function stateName(code) {
+    var s = (DATA.states || []).filter(function (x) { return x.code === code; })[0];
+    return s ? s.name : code;
+  }
+  function el(id) { return document.getElementById(id); }
+
+  // Plain words for the stored values. The data keeps its own vocabulary (forecasted, unknown, between rounds);
+  // these are only the labels a reader sees (decision 2026-11-14, docs/design/ux_review_2026-11.md).
+  var STATUS_LABEL = {
+    open: 'Open', forecasted: 'Announced', unknown: 'Status not confirmed', closed: 'Closed',
+    paused: 'Paused', exhausted: 'Funds used up'
+  };
+  var STATUS_GLOSS = {
+    open: 'The source says applications are open.',
+    forecasted: 'The agency has announced it. Applications may not be open yet.',
+    unknown: 'The agency\'s page does not say whether it is open. Check the page before planning around it.',
+    closed: 'The source says this round is closed.',
+    paused: 'The source says this program is paused.',
+    exhausted: 'The source says the money for this round is used up.'
+  };
+  var TIER_LABEL = { likely: 'Likely fit', possible: 'May fit' };
+  var TIER_LONG = {
+    likely: 'Likely fits local governments: the source names towns, cities or counties as eligible.',
+    possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
+  };
+  function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
+  // Topic lines (13.17, borrowed from Wayfinding): the eleven categories folded into three, each with a letter so the
+  // colour never carries the meaning alone. A program in several shows the first line that matches, in this order.
+  var TOPIC_LINES = [
+    { key: 'env', letter: 'E', name: 'Environment: water, energy, parks', cats: ['water', 'energy', 'parks'] },
+    { key: 'inf', letter: 'I', name: 'Infrastructure: transportation, infrastructure, broadband', cats: ['transportation', 'infrastructure', 'broadband'] },
+    { key: 'com', letter: 'C', name: 'Community: housing, health, workforce, public safety', cats: ['housing', 'health', 'workforce', 'public_safety'] }
+  ];
+  var TOPIC_OTHER = { key: 'oth', letter: 'O', name: 'Other or not stated', cats: [] };
+  function topicLine(p) {
+    for (var i = 0; i < TOPIC_LINES.length; i++) {
+      if ((p.categories || []).some(function (c) { return TOPIC_LINES[i].cats.indexOf(c) >= 0; })) return TOPIC_LINES[i];
+    }
+    return TOPIC_OTHER;
+  }
+  function topicKey() {
+    return '<span class="tkey-l">Topics:</span>' + TOPIC_LINES.concat([TOPIC_OTHER]).map(function (t) {
+      return '<span class="tkey"><span class="topic t-' + t.key + '" aria-hidden="true"><b>' + t.letter + '</b></span>' + h(t.name.split(':')[0]) + '</span>';
+    }).join('');
+  }
+  function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
+  function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
+  function badges(p) { return (p.is_new ? '<span class="tag new">New</span>' : '') + (p.is_updated ? '<span class="tag upd">Updated</span>' : ''); }
+  function sourceLine(src) {
+    return h(src.label) + (src.last_ok ? ' read ' + fmtDate(src.last_ok) : ' (no successful read yet)');
+  }
+
+  // Display only: an agency name the source writes in capitals reads as shouting, and a leading office code
+  // ("69A345 Office of ...") is a portal key, not a name. Nothing is invented; the stored value is unchanged.
+  var KEEP_UPPER = { US: 1, USA: 1, USDA: 1, HUD: 1, EPA: 1, FEMA: 1, NASA: 1, NOAA: 1, NIH: 1, NSF: 1, DOE: 1, DOJ: 1,
+    DOI: 1, DOT: 1, HHS: 1, ACF: 1, OJP: 1, BJA: 1, NEA: 1, NEH: 1, IMLS: 1, CDC: 1, FAA: 1, FTA: 1, FHWA: 1, NPS: 1,
+    BLM: 1, ARC: 1, EDA: 1, SBA: 1, DHS: 1, II: 1, III: 1 };
+  var SMALL = { OF: 1, THE: 1, AND: 1, FOR: 1, TO: 1, IN: 1, ON: 1, AT: 1, BY: 1, A: 1, AN: 1, OR: 1 };
+  function agencyName(p) {
+    var s = p.agency || p.agency_code || '';
+    s = s.replace(/^(?=\S*\d)\S+\s+(?=\S)/, '');
+    if (/[a-z]/.test(s)) return s;
+    var first = true;
+    return s.replace(/[A-Z][A-Z']*/g, function (w) {
+      var out = KEEP_UPPER[w] ? w : (SMALL[w] && !first) ? w.toLowerCase() : w.charAt(0) + w.slice(1).toLowerCase();
+      first = false;
+      return out;
+    });
+  }
+  function amountText(p) {
+    var lo = p.amount_min, hi = p.amount_max;
+    if (lo === 0) lo = null;   // "$0 to $500,000" is a form default, not a floor
+    if (lo != null && hi != null && lo !== hi) return money(lo) + ' to ' + money(hi);
+    if (hi != null) return 'Up to ' + money(hi);
+    if (lo != null) return 'From ' + money(lo);
+    return null;
+  }
+
+  // Wording of a change's field diff, for the feed.
+  var FIELD_LABEL = {
+    status: 'status', closes_at: 'closes', opens_at: 'opens', closes_at_text: 'deadline wording',
+    amount_max: 'max award', amount_min: 'min award', match_required: 'match required', match_pct: 'match %',
+    name: 'name', summary: 'summary', eligibility_text: 'eligibility text', funding_type: 'funding type',
+    administering_agency: 'agency', applicant_types: 'applicant tags', categories: 'categories', alns: 'listings cited',
+    rolling: 'rolling', source_url: 'source URL', external_number: 'number'
+  };
+  function fmtVal(field, v) {
+    if (v == null || v === '') return '(blank)';
+    if (field === 'amount_max' || field === 'amount_min') return money(v);
+    if (field === 'closes_at' || field === 'opens_at') return fmtDate(v);
+    if (field === 'match_required' || field === 'rolling') return v ? 'yes' : 'no';
+    if (typeof v === 'object') return Array.isArray(v) ? v.length + ' values' : 'changed';
+    return String(v).length > 40 ? String(v).slice(0, 39) + '…' : String(v);
+  }
+  function describe(c) {
+    var lead = [], rest = [];
+    c.fields.forEach(function (f) {
+      if (f.field === 'status' || f.field === 'closes_at' || f.field === 'amount_max' || f.field === 'opens_at') {
+        lead.push(h(FIELD_LABEL[f.field]) + ' <b>' + h(fmtVal(f.field, f.old)) + '</b> → <b>' + h(fmtVal(f.field, f.new)) + '</b>');
+      } else {
+        rest.push(FIELD_LABEL[f.field] || f.field.replace(/_/g, ' '));
+      }
+    });
+    var out = lead.join(' · ');
+    if (c.type === 'added') out = 'added to the registry' + (out ? ' · ' + out : '');
+    if (c.type === 'missing') out = 'no longer listed by the source' + (out ? ' · ' + out : '');
+    if (rest.length) out += (out ? ' · ' : '') + (lead.length || c.type !== 'changed' ? 'also ' : '') + h(rest.join(', '));
+    return out || 'changed';
+  }
+
+  // ---- what changed, in words (13.12): a word-level diff of the wording fields the change log stores in full ----
+  var TEXT_FIELDS = { closes_at_text: 'Deadline wording', eligibility_text: 'Eligibility', summary: 'Summary', name: 'Name' };
+  function wordDiff(a, b) {
+    var x = String(a || '').split(/(\s+)/), y = String(b || '').split(/(\s+)/);
+    if (x.length * y.length > 360000) return null;    // too long to diff in the browser: show both in full instead
+    var n = x.length, m = y.length, L = [], i, j;
+    for (i = 0; i <= n; i++) { L.push(new Uint16Array(m + 1)); }
+    for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) L[i][j] = x[i] === y[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    var out = '', del = '', ins = '';
+    function flush() { if (del) out += '<del>' + h(del) + '</del>'; if (ins) out += '<ins>' + h(ins) + '</ins>'; del = ins = ''; }
+    i = 0; j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { flush(); out += h(x[i]); i++; j++; }
+      else if (L[i + 1][j] >= L[i][j + 1]) { del += x[i++]; }
+      else { ins += y[j++]; }
+    }
+    while (i < n) del += x[i++];
+    while (j < m) ins += y[j++];
+    flush();
+    return out;
+  }
+  function diffHtml(c) {
+    var parts = c.fields.filter(function (f) { return TEXT_FIELDS[f.field] && (f.old || f.new); }).map(function (f) {
+      var d = wordDiff(f.old, f.new);
+      return '<div class="diff-f"><span class="diff-k">' + TEXT_FIELDS[f.field] + '</span>' +
+        (d != null ? '<p class="diff-t">' + d + '</p>'
+          : '<p class="diff-t"><span class="muted small">Before:</span> <del>' + h(f.old || '(blank)') + '</del></p><p class="diff-t"><span class="muted small">After:</span> <ins>' + h(f.new || '(blank)') + '</ins></p>') + '</div>';
+    });
+    return parts.length ? '<details class="diff"><summary>Show what changed in the wording</summary>' + parts.join('') + '</details>' : '';
+  }
+
+  // Build-and-forget list of the feed, grouped by day. `link(c)` returns the HTML for the program name.
+  function renderFeed(list, changes, link) {
+    if (!changes.length) {
+      list.innerHTML = '<li class="empty">No changes match.</li>';
+      return;
+    }
+    var days = [], byDay = {};
+    changes.forEach(function (c) {
+      var d = c.at.slice(0, 10);
+      if (!byDay[d]) { byDay[d] = []; days.push(d); }
+      byDay[d].push(c);
+    });
+    list.innerHTML = days.map(function (d) {
+      var ago = daysBetween(d, TODAY);
+      var label = fmtDate(d) + (ago === 0 ? ' (today)' : ago === 1 ? ' (yesterday)' : ago < 14 ? ' (' + ago + ' days ago)' : '');
+      return '<li class="day"><h3>' + h(label) + '</h3><ul>' + byDay[d].map(function (c) {
+        var who = (agencyName({ agency: c.agency }) || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
+        return '<li class="ev"><span class="type ' + h(c.type) + '">' + h(c.type) + '</span><div>' +
+          '<div class="name">' + link(c) + '</div>' +
+          '<div class="what">' + describe(c) + '</div>' +
+          (c.cause === 'code' ? '<div class="cause">After a change to how the registry reads this source: the agency may not have changed anything.</div>' : '') +
+          (c.type === 'changed' ? diffHtml(c) : '') +
+          '<div class="who">' + h(who) + '</div></div></li>';
+      }).join('') + '</ul></li>';
+    }).join('');
+  }
+
+  function renderFooter(extra) {
+    var f = el('footer');
+    if (!f) return;
+    var q = (DATA.questions || []).map(function (x) { return '<li>' + h(x) + '</li>'; }).join('');
+    f.innerHTML =
+      '<div><h2>About this page</h2>' +
+      '<p>This is a registry export, not advice. Each row is one program page or federal notice read by a connector; the status and dates are what that source said on the run date. Programs that only give a month ("Application opens: February") keep that wording rather than a guessed date. Blank fields mean the source did not state the value.</p>' +
+      (extra || '') +
+      '<p><b>New</b> marks a record first seen in the last ' + DATA.rules.new_days + ' days, after the source\'s first full read. <b>Updated</b> marks one whose source text changed in that window.</p></div>' +
+      '<div><h2>What I would like to know from you</h2><ol>' + q + '</ol></div>' +
+      '<div><h2>Data and code</h2>' +
+      '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db.gz">atlas.db.gz</a> (SQLite, gzipped: every record, every raw payload and every logged change).</p>' +
+      (PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
+      '<p>Subscribe to this page\'s change log: <a href="feed.xml" type="application/atom+xml">Atom feed</a> · <a href="changes.json" type="application/json">JSON</a>') +
+      (PAGE === 'state' ? ' · <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">every state (Atom)</a>' : '') +
+      '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' +
+      '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a> · <a href="' + h(ROOT) + 'about/">About the data</a></p></div>';
+  }
+
+  // =====================================================================================
+  // Charts (13.14): plain SVG, one shared tooltip. Colours come from the theme tokens (--s-fed, --s-state,
+  // --s3, the --q ramp); every chart has a legend or direct labels, and the stated-fields chart a table.
+  // =====================================================================================
+
+  var tipEl = null;
+  function tip(e, html) {
+    if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'ctip'; tipEl.setAttribute('role', 'tooltip'); document.body.appendChild(tipEl); }
+    if (!html) { tipEl.hidden = true; return; }
+    tipEl.innerHTML = html; tipEl.hidden = false;
+    var x = Math.min(e.clientX + 14, window.innerWidth - tipEl.offsetWidth - 8), y = e.clientY + 14;
+    if (y + tipEl.offsetHeight > window.innerHeight) y = e.clientY - tipEl.offsetHeight - 10;
+    tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+  }
+  function wireTips(svgEl) {
+    svgEl.addEventListener('mousemove', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); });
+    svgEl.addEventListener('mouseleave', function () { tip(null, null); });
+  }
+  function drawSvg(svgEl, w, hh, inner) {
+    svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w);
+    svgEl.innerHTML = inner; wireTips(svgEl);
+  }
+  function barPath(x, y, w, hh, roundTop) {      // 4px rounded data end, anchored to the baseline
+    if (hh <= 0) return '';
+    var r = Math.min(4, w / 2, hh);
+    return roundTop ? 'M' + x + ',' + (y + hh) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + hh) + 'Z'
+                    : 'M' + x + ',' + y + 'H' + (x + w) + 'V' + (y + hh) + 'H' + x + 'Z';
+  }
+  function shortMoney(n) { return n >= 1e9 ? '$' + (n / 1e9) + 'B' : n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? '$' + Math.round(n / 1e3) + 'K' : '$' + n; }
+  function isoAdd(iso, n) { return new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10) + n)).toISOString().slice(0, 10); }
+
+  // deadlines: [[state|null, closes_at, placeholder], ...] -> weekly stacked bars, federal below state
+  function chartRunway(svgEl, deadlines, weeks, compact) {
+    var W = [], i;
+    for (i = 0; i < weeks; i++) W.push({ start: isoAdd(TODAY, 7 * i), f: 0, s: 0 });
+    var later = 0;
+    deadlines.forEach(function (d) {
+      if (!d[1] || d[2]) return;
+      var k = Math.floor(daysBetween(TODAY, d[1].slice(0, 10)) / 7);
+      if (k < 0) return;
+      if (k >= weeks) { later++; return; }
+      if (d[0]) W[k].s++; else W[k].f++;
+    });
+    var w = compact ? 760 : 900, hh = compact ? 150 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
+    W.forEach(function (x) { max = Math.max(max, x.f + x.s); });
+    var step = max > 20 ? 10 : 5, top = Math.ceil(max / step) * step, y = function (v) { return T + (hh - T - B) * (1 - v / top); }, g = '';
+    for (var v = 0; v <= top; v += step) g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="ctext" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+    W.forEach(function (x, j) {
+      var x0 = L + j * bw + 1.5, bwi = Math.max(2, bw - 3), base = y(0), hf = base - y(x.f), hs = base - y(x.s);
+      var t = 'Week of ' + fmtDate(x.start) + ': ' + (x.f + x.s) + ' deadlines (' + x.s + ' state, ' + x.f + ' federal)';
+      g += '<g data-tip="' + h(t) + '"><rect x="' + (L + j * bw) + '" y="' + T + '" width="' + bw + '" height="' + (hh - T - B) + '" fill="transparent"/>';
+      if (x.f) g += '<path class="m-fed" d="' + barPath(x0, base - hf, bwi, hf, !x.s) + '"/>';
+      if (x.s) g += '<path class="m-st" d="' + barPath(x0, base - hf - hs - (x.f ? 2 : 0), bwi, hs, true) + '"/>';
+      g += '</g>';
+      if (j % 4 === 0) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
+    });
+    g += '<line class="caxis" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+    drawSvg(svgEl, w, hh, g);
+    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s };
+  }
+
+  // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
+  var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
+  function chartSeason(svgEl, rows, compact) {
+    var w = compact ? 760 : 900, L = compact ? 10 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
+    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + m + '</text>'; });
+    rows.forEach(function (r, ri) {
+      var tot = r[1].reduce(function (a, b) { return a + b; }, 0), yy = T + ri * (ch + 2);
+      if (!compact) g += '<text class="ctext clab" x="' + (L - 10) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="end">' + h(r[0]) + '</text>';
+      r[1].forEach(function (v, i) {
+        var share = tot ? v / tot : 0, k = v ? Math.min(6, Math.floor(share / 0.3 * 7)) : -1;
+        g += '<rect data-tip="' + h(r[0] + ', ' + MONTHS[i] + ': ' + v + ' of ' + tot + ' deadlines (' + Math.round(share * 100) + '%)') + '" x="' + (L + i * cw + 1) + '" y="' + yy + '" width="' + (cw - 2) + '" height="' + ch + '" rx="3" fill="' + (k < 0 ? 'var(--soft)' : RAMP[k]) + '"/>';
+        if (compact && v) g += '<text class="ctext cval' + (k >= 4 ? ' inv' : '') + '" x="' + (L + i * cw + cw / 2) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="middle">' + v + '</text>';
+      });
+    });
+    drawSvg(svgEl, w, hh, g);
+  }
+  function seasonLegend() {
+    return '<span><i class="sw" style="background:var(--soft)"></i>none</span><span>small share</span>' + RAMP.map(function (c) { return '<i class="sw" style="background:' + c + ';margin:0 1px"></i>'; }).join('') + '<span>26% or more of the row</span>';
+  }
+
+  function chartStated(svgEl, tableEl, rows) {
+    var w = 900, L = 150, R = 30, T = 24, rh = 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
+    [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
+    var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
+    rows.forEach(function (r, i) {
+      var yy = T + i * rh + rh / 2, name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
+      g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
+      ser.forEach(function (sr, j) {
+        var v = r.n ? r[sr[0]] / r.n : 0;
+        g += '<circle class="' + sr[1] + ' cdot" data-tip="' + h(name + ': ' + Math.round(v * 100) + '% state ' + sr[2] + ' (' + r[sr[0]] + ' of ' + r.n + ')') + '" cx="' + x(v) + '" cy="' + (yy + (j - 1) * 8) + '" r="6"/>';
+      });
+    });
+    drawSvg(svgEl, w, hh, g);
+    if (tableEl) tableEl.innerHTML = '<table class="ctable"><thead><tr><th>Source</th><th>Programs</th><th>States a status</th><th>States a deadline</th><th>States an amount</th></tr></thead><tbody>' +
+      rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
+        return '<tr><td>' + h(r.state === 'US' ? 'Federal, open now' : stateName(r.state)) + '</td><td>' + r.n + '</td><td>' + p('status_stated') + '</td><td>' + p('date_stated') + '</td><td>' + p('amount_stated') + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+
+  // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
+  function chartFlips(svgEl, flips) {
+    var pairs = {}, order = [];
+    flips.forEach(function (f) {
+      var k = (f.old_status || 'unknown') + '>' + (f.new_status || 'unknown');
+      if (!pairs[k]) { pairs[k] = { o: f.old_status || 'unknown', n: f.new_status || 'unknown', src: 0, code: 0, other: 0, a: f.first_at, b: f.last_at }; order.push(k); }
+      var p = pairs[k];
+      if (f.cause === 'code') p.code += f.n; else if (f.cause === 'source') p.src += f.n; else p.other += f.n;
+      if (f.first_at < p.a) p.a = f.first_at; if (f.last_at > p.b) p.b = f.last_at;
+    });
+    var rows = order.map(function (k) { return pairs[k]; }).sort(function (a, b) { return (b.src + b.code + b.other) - (a.src + a.code + a.other); });
+    var w = 900, L = 250, R = 60, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
+    rows.forEach(function (r) { max = Math.max(max, r.src + r.code + r.other); });
+    var x = function (v) { return L + (w - L - R) * v / max; };
+    rows.forEach(function (r, i) {
+      var yy = i * rh + 3, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
+      var reopen = (r.o === 'closed' || r.o === 'exhausted') && (r.n === 'open' || r.n === 'forecasted');
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
+      var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
+      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>';
+      var x0 = L;
+      [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
+        var v = r[seg[0]]; if (!v) return;
+        var x1 = x0 + (x(v) - L), last = x1 >= x(tot) - 0.5;
+        g += '<path class="' + seg[1] + '" d="' + (last ? 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 4) + 'Q' + x1 + ',' + (yy + 4) + ' ' + x1 + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x1 + ',' + (yy + 20) + ' ' + (x1 - 4) + ',' + (yy + 20) + 'H' + x0 + 'Z'
+          : 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 2) + 'V' + (yy + 20) + 'H' + x0 + 'Z') + '"/>';
+        x0 = x1;
+      });
+      g += '</g><text class="ctext" x="' + (x(tot) + 8) + '" y="' + (yy + 17) + '">' + tot + '</text>';
+    });
+    g += '<line class="caxis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + hh + '"/>';
+    drawSvg(svgEl, w, hh, g);
+    return rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+  }
+
+  // awards: [[state|null, amount, name], ...]
+  function chartAwards(svgEl, awards) {
+    var w = 900, L = 80, R = 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
+    var x = function (v) { return L + (w - L - R) * (Math.log10(v) - lo) / (hi - lo); };
+    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/><text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>';
+    [['fed', 'Federal', 'm-fed'], ['st', 'State', 'm-st']].forEach(function (grp, gi) {
+      var pts = awards.filter(function (a) { return (grp[0] === 'st') === !!a[0] && a[1] >= 1000 && a[1] <= 1e9; }).map(function (a) { return a; });
+      var vals = pts.map(function (a) { return a[1]; }).sort(function (a, b) { return a - b; });
+      var m = vals.length ? (vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2) : null;
+      med[grp[0]] = { n: vals.length, m: m };
+      var yy = T + gi * rh + rh / 2, seed = 11;
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + grp[1] + '</text>';
+      pts.forEach(function (a) { seed = (seed * 9301 + 49297) % 233280; var j = (seed / 233280 - 0.5) * (rh - 26);
+        g += '<circle class="' + grp[2] + ' cdot" data-tip="' + h(a[2] + ': up to $' + Number(a[1]).toLocaleString('en-US')) + '" cx="' + x(a[1]) + '" cy="' + (yy + j) + '" r="4.5"/>'; });
+      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '">median ' + shortMoney(m) + '</text>';
+    });
+    drawSvg(svgEl, w, hh, g);
+    return med;
+  }
+
+  // =====================================================================================
+  // About the data page
+  // =====================================================================================
+
+  function aboutPage() {
+    var A = DATA;
+    var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
+    el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
+    var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
+      .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
+      .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
+      .map(function (r) { return [stateName(r[0]), r[1]]; });
+    var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
+    chartSeason(el('c2'), rows.concat([['All states', all]]), false);
+    el('c2-leg').innerHTML = seasonLegend();
+    chartStated(el('c3'), el('c3-table'), A.stated.filter(function (r) { return r.n >= 7; }));
+    var fc = chartFlips(el('c4'), A.flips);
+    var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
+    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
+      fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
+    var med = chartAwards(el('c5'), A.awards);
+    el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+    renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
+  }
+
+  // =====================================================================================
+  // State page
+  // =====================================================================================
+
+  function statePage() {
+    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var cov = DATA.coverage;
+    P.concat(B, U).forEach(function (p) {
+      p._text = [p.name, p.agency, agencyName(p), p.agency_code, p.number, p.summary].join(' ').toLowerCase();
+    });
+    var byId = {}, bySlug = {};
+    P.concat(B, U).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
+
+    var FACETS = [
+      { key: 'tier', label: 'Fit for a local government', get: function (p) { return [p.tier]; },
+        lab: function (v) { return v === 'likely' ? 'Likely fit' : 'May fit: check eligibility'; }, chip: function (v) { return TIER_LABEL[v]; },
+        order: ['likely', 'possible'], open: true },
+      { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: function (v) { return v === 'state' ? S.name : cap(v); }, open: true },
+      { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: statusLabel, open: true, openOnly: true },
+      { key: 'deadline', label: 'Deadline', get: function (p) { return [p.closes_at && !p.deadline_placeholder ? 'dated' : p.rolling ? 'rolling' : p.closes_text ? 'text' : 'none']; },
+        lab: function (v) { return { dated: 'Has a date', rolling: 'Rolling or year-round', text: 'Described in words', none: 'Not stated' }[v]; },
+        order: ['dated', 'rolling', 'text', 'none'], open: true, openOnly: true },
+      { key: 'category', label: 'Category', get: function (p) { return p.categories.length ? p.categories : ['none']; },
+        lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: true },
+      { key: 'applicant', label: 'Who can apply (read from the text)', get: function (p) { return p.applicant_types.length ? p.applicant_types : ['none']; },
+        lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: false },
+      { key: 'match', label: 'Matching share', get: function (p) { return [p.match_required == null ? 'unknown' : p.match_required ? 'yes' : 'no']; },
+        lab: function (v) { return { yes: 'Match required', no: 'No match required', unknown: 'Not stated' }[v]; }, order: ['no', 'unknown', 'yes'], open: false },
+      { key: 'funding_type', label: 'Funding type', get: function (p) { return [p.funding_type || 'none']; },
+        lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: false },
+      { key: 'agency', label: 'Agency', get: function (p) { return [agencyName(p) || 'Not stated']; },
+        lab: function (v) { return v; }, open: false, long: true }
+    ];
+    var DEFAULT_SEL = { tier: ['likely'] };
+
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, view: 'list' };
+    function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
+    resetSel();
+
+    // ---- URL state (shareable filters; the detail panel is #p=slug) ----
+    function parseHash() {
+      var out = {};
+      location.hash.replace(/^#/, '').split('&').forEach(function (kv) {
+        if (!kv) return;
+        var i = kv.indexOf('='), k = decodeURIComponent(i < 0 ? kv : kv.slice(0, i)), v = i < 0 ? '' : decodeURIComponent(kv.slice(i + 1));
+        out[k] = v;
+      });
+      return out;
+    }
+    function readHash() {
+      var hsh = parseHash();
+      if (hsh.q !== undefined) st.q = hsh.q;
+      if (hsh.sort) st.sort = hsh.sort;
+      if (hsh.tab === 'changes' || hsh.tab === 'digest') st.tab = hsh.tab;
+      if (hsh.feed) st.feed = hsh.feed;
+      if (hsh.quick) st.quick = hsh.quick;
+      if (hsh.between === '1') st.between = true;
+      if (hsh.unstated === '1') st.unstated = true;
+      if (hsh.view === 'timeline') st.view = 'timeline';
+      var any = false;
+      FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
+      if (hsh.all === '1' && !any) st.sel = {};
+      return hsh.p || null;
+    }
+    function writeHash(slug) {
+      var parts = [];
+      if (st.q) parts.push('q=' + encodeURIComponent(st.q));
+      if (st.sort !== 'closing') parts.push('sort=' + st.sort);
+      if (st.quick) parts.push('quick=' + st.quick);
+      if (st.tab !== 'programs') parts.push('tab=' + st.tab);
+      if (st.feed !== 'all') parts.push('feed=' + st.feed);
+      if (st.between) parts.push('between=1');
+      if (st.unstated) parts.push('unstated=1');
+      if (st.view !== 'list') parts.push('view=' + st.view);
+      var same = true;
+      FACETS.forEach(function (f) {
+        var cur = (st.sel[f.key] || []).slice().sort().join(','), def = (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+        if (cur !== def) { same = false; if (cur) parts.push(f.key + '=' + encodeURIComponent(cur)); }
+      });
+      if (!same && !FACETS.some(function (f) { return (st.sel[f.key] || []).length; })) parts.push('all=1');
+      if (slug) parts.push('p=' + encodeURIComponent(slug));
+      var hash = parts.length ? '#' + parts.join('&') : '';
+      if (hash !== location.hash && !(hash === '' && location.hash === '')) {
+        history.replaceState(null, '', location.pathname + location.search + hash);
+      }
+    }
+
+    // ---- matching ----
+    // `skip` leaves one facet out (for its own counts). `folded` marks the closed and status-not-confirmed groups:
+    // the status and deadline facets describe open rows, so they do not filter those groups.
+    function termsOf(q) { return q.toLowerCase().split(/\s+/).filter(Boolean); }
+    function matches(p, skip, folded) {
+      if (st.quick === 'new' && !p.is_new) return false;
+      if (st.quick === 'closing' && !isSoon(p)) return false;
+      if (st.quick === 'week' && !inWeek(p)) return false;
+      if (st.quick === 'starred' && !watched[p.slug]) return false;
+      var terms = termsOf(st.q);
+      for (var i = 0; i < terms.length; i++) if (p._text.indexOf(terms[i]) < 0) return false;
+      for (var j = 0; j < FACETS.length; j++) {
+        var f = FACETS[j];
+        if (f.key === skip || (folded && f.openOnly)) continue;
+        var sel = st.sel[f.key];
+        if (!sel || !sel.length) continue;
+        var vals = f.get(p), ok = false;
+        for (var k = 0; k < vals.length; k++) if (sel.indexOf(vals[k]) >= 0) { ok = true; break; }
+        if (!ok) return false;
+      }
+      return true;
+    }
+    function closeKey(p) {
+      return p.closes_at && !p.deadline_placeholder ? '0' + p.closes_at : p.closes_text ? '1' : p.rolling ? '2' : '3';
+    }
+    var SORTS = {
+      closing: function (a, b) { return closeKey(a).localeCompare(closeKey(b)) || a.name.localeCompare(b.name); },
+      newest: function (a, b) { return b.first_seen.localeCompare(a.first_seen) || a.name.localeCompare(b.name); },
+      changed: function (a, b) { return b.last_changed.localeCompare(a.last_changed) || a.name.localeCompare(b.name); },
+      amount: function (a, b) { return (b.amount_max || -1) - (a.amount_max || -1) || a.name.localeCompare(b.name); },
+      name: function (a, b) { return a.name.localeCompare(b.name); }
+    };
+
+    // ---- header ----
+    var PS = P.filter(function (p) { return p.state; }), PF = P.filter(function (p) { return !p.state; });
+    el('title').innerHTML = h(S.name) + '<span class="h1-sub">Funding for local governments</span>';
+    el('lede').textContent = cov.state
+      ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
+      : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
+    var sources = cov.federal.sources.concat(cov.state ? cov.state.sources : []);
+    var lastRead = sources.map(function (s) { return s.last_ok || ''; }).sort().pop();
+    el('coverage-sum').innerHTML = (cov.state
+      ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
+      : 'Read daily from Grants.gov') +
+      '<span class="cov-when">' + (lastRead ? ' · last read ' + h(fmtDate(lastRead)) : '') + ' · built ' + h(fmtDate(DATA.generated_at)) + '</span>';
+    el('coverage-body').innerHTML =
+      '<p><b>Federal:</b> ' + cov.federal.open + ' open or announced notices · ' +
+      (cov.federal.sources.length ? cov.federal.sources.map(sourceLine).join(' · ') : 'no sources read yet') + '</p>' +
+      (cov.state
+        ? '<p><b>' + h(S.name) + ':</b> ' + cov.state.programs + ' programs read from ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
+          '; ' + cov.state.open + ' open or announced for local governments, ' + (cov.state.unstated || 0) + ' with no status stated, ' +
+          cov.state.between + ' closed recently.</p><ul class="srcs">' + cov.state.sources.map(function (s) { return '<li>' + sourceLine(s) + '</li>'; }).join('') + '</ul>'
+        : '<p><b>' + h(S.name) + ':</b> no state agency sources yet. Federal notices only.</p>');
+
+    var sw = el('state-switch');
+    sw.innerHTML = DATA.states.map(function (s) { return '<option value="' + h(s.code) + '"' + (s.code === S.code ? ' selected' : '') + '>' + h(s.name) + '</option>'; }).join('');
+    sw.addEventListener('change', function () { location.href = ROOT + sw.value.toLowerCase() + '/'; });
+
+    // ---- the briefing: three or four sentences that each filter the page (13.6). Every number is a count of rows
+    // already on the page; a sentence with nothing to say is left out, except the first.
+    function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+    function inWeek(p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= 7; }
+    var nWeekState = PS.filter(inWeek).length, nWeekFed = PF.filter(inWeek).length;
+    var nNew = P.filter(function (p) { return p.is_new; }).length;
+    var nClosing = P.filter(isSoon).length;
+    var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
+    var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
+    var brief = [];
+    if (nWeekState + nWeekFed) {
+      brief.push(['week', (cov.state ? plural(nWeekState, S.name + ' program', S.name + ' programs') + ' and ' : '') + plural(nWeekFed, 'federal notice', 'federal notices') + ' close in the next 7 days.']);
+    } else {
+      brief.push([nClosing ? 'closing' : null, 'Nothing on this page closes in the next 7 days' + (nClosing ? '; ' + nClosing + ' close within ' + R.closing_days + '.' : '.')]);
+    }
+    if (opened.length) brief.push(['opened', plural(opened.length, 'program', 'programs') + ' opened or were announced in the last ' + R.new_days + ' days.']);
+    if (nNew) brief.push(['new', plural(nNew, 'program is', 'programs are') + ' new to the registry this week.']);
+    if (U.length) brief.push(['unstated', plural(U.length, S.name + ' program has', S.name + ' programs have') + ' no status on the agency\'s page.']);
+    el('brief').innerHTML = brief.map(function (b) {
+      return '<li>' + (b[0] ? '<button type="button" class="brief-link" data-act="' + b[0] + '">' + h(b[1]) + '</button>' : h(b[1])) + '</li>';
+    }).join('') + (brief.length > 1 ? '<li class="brief-more"><button type="button" class="btn quiet small" id="brief-more" aria-expanded="false">' + (brief.length - 1) + ' more this week</button></li>' : '');
+    if (el('brief-more')) el('brief-more').addEventListener('click', function () {
+      var open = el('brief').classList.toggle('all');
+      this.setAttribute('aria-expanded', String(open)); this.textContent = open ? 'Fewer' : (brief.length - 1) + ' more this week';
+    });
+    el('tab-n-changes').textContent = C.length;
+    el('tab-n-programs').textContent = P.length + B.length + U.length;
+    if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
+
+    // ---- facets (built once over the open rows; counts updated in place) ----
+    var facetsEl = el('facets'), facetList = el('facet-list');
+    function buildFacets() {
+      facetList.innerHTML = FACETS.map(function (f) {
+        var seen = {};
+        P.forEach(function (p) { f.get(p).forEach(function (v) { seen[v] = (seen[v] || 0) + 1; }); });
+        var vals = Object.keys(seen);
+        if (f.order) vals.sort(function (a, b) { return f.order.indexOf(a) - f.order.indexOf(b); });
+        else if (f.long) vals.sort(function (a, b) { return seen[b] - seen[a] || a.localeCompare(b); });
+        else vals.sort(function (a, b) { return f.lab(a).localeCompare(f.lab(b)); });
+        return '<details class="facet" data-facet="' + f.key + '"' + (f.open ? ' open' : '') + '><summary>' + h(f.label) + '</summary>' +
+          '<ul' + (f.long ? ' class="long"' : '') + '>' + vals.map(function (v) {
+            var id = 'f-' + f.key + '-' + v.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+            return '<li data-v="' + h(v) + '"><label for="' + id + '"><input type="checkbox" id="' + id + '" name="' + h(f.key) + '" value="' + h(v) + '">' +
+              '<span class="lbl">' + h(f.lab(v)) + '</span><span class="cnt" aria-label="count"></span></label></li>';
+          }).join('') + '</ul></details>';
+      }).join('') + '<p class="facet-note">Counts are open and announced programs.</p>';
+      facetsEl.addEventListener('change', function (e) {
+        var cb = e.target;
+        if (cb.type !== 'checkbox') return;
+        var sel = st.sel[cb.name] || (st.sel[cb.name] = []);
+        var i = sel.indexOf(cb.value);
+        if (cb.checked && i < 0) sel.push(cb.value);
+        if (!cb.checked && i >= 0) sel.splice(i, 1);
+        render();
+      });
+    }
+    function updateFacets() {
+      var active = 0;
+      FACETS.forEach(function (f) {
+        var sel = st.sel[f.key] || [];
+        if (sel.length) active += sel.length;
+        var counts = {};
+        P.forEach(function (p) { if (matches(p, f.key)) f.get(p).forEach(function (v) { counts[v] = (counts[v] || 0) + 1; }); });
+        var det = facetsEl.querySelector('[data-facet="' + f.key + '"]');
+        Array.prototype.forEach.call(det.querySelectorAll('li'), function (li) {
+          var v = li.getAttribute('data-v'), n = counts[v] || 0, cb = li.querySelector('input');
+          li.querySelector('.cnt').textContent = n;
+          cb.checked = sel.indexOf(v) >= 0;
+          li.classList.toggle('zero', n === 0 && !cb.checked);
+        });
+      });
+      var fn = el('filters-n');
+      fn.hidden = !active; fn.textContent = active;
+    }
+
+    // ---- fit check (13.11): three questions that set the facets above; nothing hidden, every answer a chip ----
+    (function () {
+      var who = {}, topics = {};
+      P.concat(U, B).forEach(function (p) { p.applicant_types.forEach(function (t) { who[t] = 1; }); p.categories.forEach(function (c) { topics[c] = 1; }); });
+      var WHO = ['municipality', 'county', 'special_district', 'housing_authority', 'tribe', 'school'].filter(function (t) { return who[t]; });
+      var WHO_LAB = { municipality: 'town or city', county: 'county', special_district: 'special district or authority', housing_authority: 'housing authority', tribe: 'tribal government', school: 'school district or school' };
+      el('fit-who').innerHTML += WHO.map(function (t) { return '<option value="' + t + '">' + h(WHO_LAB[t]) + '</option>'; }).join('');
+      el('fit-topic').innerHTML += Object.keys(topics).sort().map(function (c) { return '<option value="' + h(c) + '">' + h(words(c)) + '</option>'; }).join('');
+      function set(key, val) { if (val) st.sel[key] = val; else delete st.sel[key]; render(); }
+      el('fit-who').addEventListener('change', function () { set('applicant', this.value ? [this.value] : null); });
+      el('fit-topic').addEventListener('change', function () { set('category', this.value ? [this.value] : null); });
+      el('fit-match').addEventListener('change', function () { set('match', this.value === 'no' ? ['no', 'unknown'] : null); });
+    })();
+    function syncFit() {
+      var a = st.sel.applicant || [], c = st.sel.category || [], m = st.sel.match || [];
+      el('fit-who').value = a.length === 1 && el('fit-who').querySelector('option[value="' + a[0] + '"]') ? a[0] : '';
+      el('fit-topic').value = c.length === 1 ? c[0] : '';
+      el('fit-match').value = m.length === 2 && m.indexOf('no') >= 0 && m.indexOf('unknown') >= 0 ? 'no' : '';
+    }
+
+    // ---- the active filters, always visible: the default "Likely fit" is a choice the reader can see and undo ----
+    var activeEl = el('active');
+    function renderActive(shown) {
+      var chips = [];
+      var QUICK = { 'new': 'New this week', closing: 'Closing within ' + R.closing_days + ' days', week: 'Closing within 7 days', starred: 'Starred' };
+      if (st.quick) chips.push('<button class="fchip" data-clear="quick" aria-label="Remove filter: ' + h(QUICK[st.quick] || st.quick) + '">' + h(QUICK[st.quick] || st.quick) + ' <span aria-hidden="true">×</span></button>');
+      if (st.q) chips.push('<button class="fchip" data-clear="q" aria-label="Clear the search">“' + h(st.q) + '” <span aria-hidden="true">×</span></button>');
+      FACETS.forEach(function (f) {
+        (st.sel[f.key] || []).forEach(function (v) {
+          var t = f.chip ? f.chip(v) : f.lab(v);
+          chips.push('<button class="fchip" data-facet="' + f.key + '" data-v="' + h(v) + '" aria-label="Remove filter: ' + h(t) + '">' + h(t) + ' <span aria-hidden="true">×</span></button>');
+        });
+      });
+      var total = P.length + B.length + U.length;
+      var isDefault = !st.q && !st.quick && FACETS.every(function (f) {
+        return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+      });
+      activeEl.innerHTML = '<span class="count num">Showing ' + shown + ' of ' + total + '</span>' +
+        (chips.length ? '<span class="lbl">Filtered to</span>' + chips.join('') : '') +
+        (chips.length ? '<button class="btn quiet" data-clear="all">' + (isDefault ? 'Show all ' + total : 'Clear all') + '</button>' : '');
+    }
+    activeEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      var c = b.getAttribute('data-clear'), fk = b.getAttribute('data-facet');
+      if (c === 'all') { st.sel = {}; st.q = ''; st.quick = null; }
+      else if (c === 'q') st.q = '';
+      else if (c === 'quick') st.quick = null;
+      else if (fk) { var sel = st.sel[fk] || []; sel.splice(sel.indexOf(b.getAttribute('data-v')), 1); }
+      render();
+      el('q').focus();
+    });
+
+    // ---- cards: one layout everywhere, status and deadline first, then name, agency, money ----
+    function deadlineHtml(p) {
+      if (p.closes_at && p.deadline_placeholder) return '<span>' + (p.rolling ? 'Rolling deadline' : 'No deadline stated') + '</span>';
+      if (p.closes_at && p.days_to_close != null && p.days_to_close >= 0) {
+        // within 7 days: the caution panel (13.17, borrowed from Wayfinding); the words carry it, the yellow repeats it
+        if (p.days_to_close <= 7) return '<span class="caution">' + h(cap(relDays(p.days_to_close))) + '</span><span class="sr-only">, ' + h(fmtDate(p.closes_at, true)) + '</span>';
+        return '<span class="' + (isSoon(p) ? 'soon' : '') + '">' + h(cap(relDays(p.days_to_close))) + ', ' + h(fmtDate(p.closes_at)) + '</span>';
+      }
+      if (p.closes_at) return '<span>Last deadline ' + h(fmtDate(p.closes_at, true)) + (p.days_since_deadline != null ? ' (' + h(agoDays(p.days_since_deadline)) + ')' : '') + '</span>';
+      if (p.rolling) return '<span>Rolling deadline</span>';
+      if (p.closes_text) return '<span>Deadline in the source\'s words below</span>';
+      return '<span class="muted">No deadline stated</span>';
+    }
+    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
+    function card(p) {
+      var amount = amountText(p);
+      var facts = [
+        '<span>' + (amount ? '<b class="num">' + h(amount) + '</b>' : '<span class="muted">Amount not published</span>') + '</span>'
+      ];
+      if (p.match_required != null) facts.push('<span>' + (p.match_required ? 'Match required' : 'No match required') + '</span>');
+      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span>' + h(words(p.funding_type)) + '</span>');
+      if (p.last_reopened) facts.push('<span>Reopened last on ' + h(fmtDate(p.last_reopened, true)) + '</span>');
+      var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
+        (p.categories.length > 3 ? '<li class="more">+' + (p.categories.length - 3) + '</li>' : '');
+      var quoteText = p.closes_text && (!p.closes_at || p.status !== 'open') && !p.rolling ? p.closes_text : null;
+      return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
+        '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
+        '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
+        '<div class="facts">' + facts.join('') + '</div>' +
+        (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
+        (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
+        '</div></article>';
+    }
+    // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
+    // Decorative for screen readers: the same date is in words on the card's first line.
+    function dateCol(p) {
+      var dated = p.closes_at && !p.deadline_placeholder, L = topicLine(p);
+      var badge = '<span class="topic t-' + L.key + '" title="' + h(L.name) + '"><b>' + L.letter + '</b></span><span class="sr-only">Topic: ' + h(L.name) + '. </span>';
+      if (dated) {
+        var past = p.days_to_close != null && p.days_to_close < 0;
+        return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
+          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + badge + '</div>';
+      }
+      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span>' + badge + '</div>';
+    }
+    // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
+    var BUCKETS = [
+      ['Closes within 7 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close >= 0 && p.days_to_close <= 7; }],
+      ['Closes within 30 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > 7 && p.days_to_close <= R.closing_days; }],
+      ['Closes later', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > R.closing_days; }],
+      ['No fixed date', function (p) { return !p.closes_at || p.deadline_placeholder; }]
+    ];
+    function bucketed(rows) {
+      if (st.sort !== 'closing') return rows.map(card).join('');
+      return BUCKETS.map(function (b) {
+        var r = rows.filter(b[1]);
+        return r.length ? '<p class="bucket" role="heading" aria-level="3">' + h(b[0]) + ' · ' + r.length + '</p>' + r.map(card).join('') : '';
+      }).join('');
+    }
+
+    el('topic-key').innerHTML = topicKey();
+
+    // ---- the four groups ----
+    var resultsEl = el('results');
+    resultsEl.tabIndex = -1;
+    el('g-state-t').textContent = S.name + ' programs open or announced';
+    el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
+    el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
+      ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
+    // Paging (13.16): 30 cards a group until the reader asks for all; filters and search still see every row.
+    var PAGE_N = 30, more = {};
+    function paged(rows, key) {
+      if (more[key] || rows.length <= PAGE_N + 5) return { rows: rows, button: '' };
+      return { rows: rows.slice(0, PAGE_N), button: '<button class="btn more" type="button" data-more="' + key + '">Show all ' + rows.length + '</button>' };
+    }
+    function groupHtml(rows, empty, key) {
+      if (!rows.length) return '<p class="empty">' + empty + '</p>';
+      var pg = paged(rows, key);
+      return bucketed(pg.rows) + pg.button;
+    }
+    function renderGroups() {
+      var sort = SORTS[st.sort] || SORTS.closing;
+      var rs = PS.filter(function (p) { return matches(p, null); }).sort(sort);
+      var rf = PF.filter(function (p) { return matches(p, null); }).sort(sort);
+      var ru = U.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      var rb = B.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      el('g-state-n').textContent = rs.length;
+      el('g-federal-n').textContent = rf.length;
+      el('g-unstated-n').textContent = ru.length;
+      el('g-between-n').textContent = rb.length;
+
+      var stateEmpty;
+      if (!cov.state) stateEmpty = 'No ' + h(S.name) + ' agency sources are connected yet, so this page lists federal notices only.';
+      else if (!PS.length) stateEmpty = 'No ' + h(S.name) + ' programs are open or announced right now.' +
+        (ru.length || rb.length ? ' ' + [ru.length ? ru.length + (ru.length === 1 ? ' has' : ' have') + ' no status on the agency\'s page' : '', rb.length ? rb.length + ' closed recently' : ''].filter(Boolean).join(' and ') + ': see below.' : '');
+      else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
+      el('list-state').innerHTML = groupHtml(rs, stateEmpty, 'state');
+      el('g-state-d').hidden = true;
+      el('list-federal').innerHTML = FEDERAL_LOADED ? groupHtml(rf, 'No federal notices match these filters.', 'federal')
+        : '<p class="empty">The federal notices did not load (federal.js). Reload the page, or see them on <a href="https://simpler.grants.gov/search">Grants.gov</a>.</p>';
+
+      el('g-unstated').hidden = !ru.length;
+      el('g-between').hidden = !rb.length;
+      var pu = paged(ru, 'unstated'), pb = paged(rb, 'between');
+      el('list-unstated').innerHTML = pu.rows.map(card).join('') + pu.button;
+      el('list-between').innerHTML = pb.rows.map(card).join('') + pb.button;
+      [['unstated', 'unstated-toggle', 'list-unstated', ru.length], ['between', 'between-toggle', 'list-between', rb.length]].forEach(function (g) {
+        var open = st[g[0]], t = el(g[1]);
+        t.setAttribute('aria-expanded', String(open));
+        t.textContent = open ? 'Hide' : 'Show ' + g[3];
+        el(g[2]).hidden = !open;
+      });
+      renderActive(rs.length + rf.length + ru.length + rb.length);
+      el('tray-done').textContent = 'Show ' + (rs.length + rf.length + ru.length + rb.length) + ' results';
+      var tl = st.view === 'timeline';
+      ['g-state', 'g-unstated', 'g-between', 'g-federal'].forEach(function (id) { if (tl) el(id).hidden = true; });
+      if (!tl) { el('g-state').hidden = false; el('g-federal').hidden = false; }
+      el('g-timeline').hidden = !tl;
+      if (tl) renderTimeline(rs.concat(rf));
+      Array.prototype.forEach.call(document.querySelectorAll('.segb'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === st.view)); });
+    }
+
+    // ---- the open-window timeline (13.10): a bar from the stated opening date to the stated deadline; a dot at the
+    // deadline when no opening date is stated. Nothing is drawn that the source did not state.
+    var NS_SVG = 'http://www.w3.org/2000/svg';
+    function addDays(iso, n) { return new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10) + n)).toISOString().slice(0, 10); }
+    function renderTimeline(rows) {
+      var start = addDays(TODAY, -30), end = addDays(TODAY, 180), span = daysBetween(start, end);
+      var inWin = rows.filter(function (p) { return p.closes_at && !p.deadline_placeholder && p.closes_at.slice(0, 10) >= TODAY && p.closes_at.slice(0, 10) <= end; })
+        .sort(function (a, b) { return a.closes_at.localeCompare(b.closes_at) || a.name.localeCompare(b.name); });
+      el('g-timeline-n').textContent = inWin.length;
+      el('tl-state-l').textContent = S.name;
+      el('g-timeline-d').textContent = (rows.length - inWin.length) + ' of the ' + rows.length + ' programs matching your filters have no stated deadline in this window and are not drawn. Select a row for its details.';
+      var w = 980, L = 320, R = 16, T = 28, rh = 24, hh = T + inWin.length * rh + 8;
+      var x = function (iso) { return L + (w - L - R) * Math.max(0, Math.min(span, daysBetween(start, iso))) / span; };
+      var g = '';
+      for (var m = 0; m < 8; m++) {
+        var d = new Date(Date.UTC(+start.slice(0, 4), +start.slice(5, 7) - 1 + m, 1)).toISOString().slice(0, 10);
+        if (d < start || d > end) continue;
+        g += '<line class="tl-grid" x1="' + x(d) + '" x2="' + x(d) + '" y1="' + (T - 8) + '" y2="' + hh + '"/><text class="tl-t" x="' + (x(d) + 4) + '" y="14">' + MONTHS[+d.slice(5, 7) - 1] + '</text>';
+      }
+      g += '<line class="tl-today" x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="' + (T - 10) + '" y2="' + hh + '"/><text class="tl-t tl-today-t" x="' + (x(TODAY) + 4) + '" y="' + (T - 12) + '">today</text>';
+      inWin.forEach(function (p, i) {
+        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', nm = p.name.length > 48 ? p.name.slice(0, 47) + '…' : p.name;
+        var label = p.name + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
+        g += '<g class="tl-row" data-id="' + p.id + '" tabindex="0" role="button" aria-label="' + h(label) + '"><rect class="tl-hit" x="0" y="' + yy + '" width="' + w + '" height="' + rh + '"/>' +
+          '<text class="tl-n" x="' + (L - 10) + '" y="' + (yy + 16) + '" text-anchor="end">' + h(nm) + '</text>';
+        if (p.opens_at) { var x0 = x(p.opens_at.slice(0, 10)), x1 = x(c); g += '<rect class="tl-bar ' + cls + '" x="' + x0 + '" y="' + (yy + 7) + '" width="' + Math.max(4, x1 - x0) + '" height="10" rx="4"/>'; }
+        else g += '<circle class="tl-dot ' + cls + '" cx="' + x(c) + '" cy="' + (yy + 12) + '" r="5.5"/>';
+        g += '<title>' + h(label) + '</title></g>';
+      });
+      var svgEl = el('tl-svg');
+      svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w); svgEl.innerHTML = g;
+    }
+    el('tl-svg').addEventListener('click', function (e) { var r = e.target.closest('.tl-row'); if (r) openDetail(byId[r.getAttribute('data-id')], r); });
+    el('tl-svg').addEventListener('keydown', function (e) { if (e.key !== 'Enter' && e.key !== ' ') return; var r = e.target.closest('.tl-row'); if (r) { e.preventDefault(); openDetail(byId[r.getAttribute('data-id')], r); } });
+    Array.prototype.forEach.call(document.querySelectorAll('.segb'), function (b) {
+      b.addEventListener('click', function () { st.view = b.getAttribute('data-view'); render(); });
+    });
+    el('unstated-toggle').addEventListener('click', function () { st.unstated = !st.unstated; render(); });
+    el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
+    resultsEl.addEventListener('click', function (e) {
+      var mb = e.target.closest('button[data-more]');
+      if (mb) { more[mb.getAttribute('data-more')] = true; render(); return; }
+      var sb = e.target.closest('button[data-star]');
+      if (sb) { toggleStar(byId[sb.closest('.card').getAttribute('data-id')]); return; }
+      if (e.target.closest('a')) return;
+      var c = e.target.closest('.card');
+      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
+    });
+
+    // ---- the two state-page charts (13.14): deadlines ahead, and when this state's deadlines have fallen ----
+    el('ahead-st-l').textContent = S.name;
+    var aheadDone = false;
+    el('ahead').addEventListener('toggle', function () {
+      if (!el('ahead').open || aheadDone) return;
+      aheadDone = true;
+      var r = chartRunway(el('ahead-svg'), P.map(function (p) { return [p.state, p.closes_at, p.deadline_placeholder]; }), 26, true);
+      el('ahead-note').textContent = r.total + ' deadlines in the next 26 weeks on this page, before filters; ' + r.later + ' later. Hover a week for its count.';
+    });
+    var SEA = DATA.season, seaTot = SEA ? SEA.reduce(function (a, b) { return a + b; }, 0) : 0;
+    if (seaTot >= 8) {
+      el('season').hidden = false;
+      el('season-h').textContent = 'When ' + S.name + '\'s deadlines have fallen:';
+      el('season-d').textContent = seaTot + ' stated deadlines of programs open to local governments, two years either side of today, by month. A pattern, not a forecast.';
+      chartSeason(el('season-svg'), [[S.name, SEA]], true);
+    }
+
+    // ---- briefing, tabs, feed ----
+    el('brief').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-act]');
+      if (!b) return;
+      var k = b.getAttribute('data-act');
+      if (k === 'opened') { st.tab = 'changes'; st.feed = 'status'; }
+      else if (k === 'unstated') { st.tab = 'programs'; st.unstated = true; }
+      else if (st.quick === k) { st.quick = null; resetSel(); }
+      else { st.quick = k; st.sel = {}; st.q = ''; el('q').value = ''; st.tab = 'programs'; }
+      render();
+      var target = k === 'opened' ? el('panel-changes') : k === 'unstated' ? el('g-unstated') : el('panel-programs');
+      if (target && target.scrollIntoView) target.scrollIntoView({ block: 'start' });
+    });
+    var TABS = ['programs', 'changes', 'digest'], tabs = TABS.map(function (k) { return el('tab-' + k); });
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { st.tab = TABS[i]; render(); });
+      t.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); }
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) {
+      c.addEventListener('click', function () { st.feed = c.getAttribute('data-feed'); render(); });
+    });
+    function feedRows() {
+      return C.filter(function (c) {
+        if (st.feed === 'status') return c.status_flip;
+        if (st.feed === 'federal') return c.state == null;
+        if (st.feed === 'state') return c.state === S.code;
+        return true;
+      });
+    }
+    var feedEl = el('feed');
+    feedEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-open]');
+      if (b) openDetail(byId[b.getAttribute('data-open')], b);
+    });
+
+    // ---- detail dialog: five answers first, then the source's own words ----
+    var dlg = el('detail'), lastFocus = null, current = null;
+    function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
+    function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
+    function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
+    var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
+    function detailHtml(p) {
+      var listingName = {};
+      p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
+      var amount = amountText(p);
+      var closes;
+      if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
+      else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
+      else if (p.rolling) closes = 'Rolling deadline';
+      else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
+      else if (p.closes_text) closes = 'In the source\'s words, below';
+      else closes = NOT_PUBLISHED;
+      var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
+      var answers =
+        '<dl class="answers">' +
+        '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+        '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
+        '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
+        '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
+        '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
+        '</dl>';
+      var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
+      var facts =
+        fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
+        fact('Match required', match ? h(match) : null) +
+        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
+        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
+        fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
+        fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
+        fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
+        fact('Number', p.number ? h(p.number) : null);
+      var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
+        return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
+      }).join('') + '</ul>' : '';
+      var trail = 'First seen ' + fmtDate(p.first_seen, true) +
+        (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
+        ' · read from ' + (sources.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
+      return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
+        answers +
+        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
+        sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
+        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        sect('History, as the registry saw it', historyHtml(p)) +
+        sect('More details', '<div class="facts">' + facts + '</div>') +
+        sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
+        sect('Assistance Listings this notice cites', alns) +
+        '<p class="trail">' + h(trail) + '</p>';
+    }
+    // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
+    function histWords(e) {
+      var k = e[1];
+      if (k === 'added') return 'First seen by the registry';
+      if (k === 'missing') return 'No longer listed by the source';
+      if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
+      if (k === 'status') {
+        var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
+        return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
+      }
+      var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
+      return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
+    }
+    function histKind(e) {
+      if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
+      if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
+      return e[1];
+    }
+    function historyHtml(p) {
+      var ev = p.history || [];
+      if (!ev.length) return '';
+      var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
+      if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
+      var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
+      var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
+      var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+      g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
+      if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+      ev.forEach(function (e) {
+        var k = histKind(e), cx = x(e[0]);
+        if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
+        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
+      });
+      g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+      var list = ev.slice().reverse().map(function (e) {
+        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
+          (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
+      }).join('');
+      return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+        '<ol class="hist-list">' + list + '</ol>' +
+        '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+    }
+
+    function syncDetailStar() {
+      var b = el('detail-star'), on = !!(current && watched[current.slug]);
+      b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '★ Starred' : '☆ Star';
+    }
+    el('detail-star').addEventListener('click', function () { toggleStar(current); });
+    function openDetail(p, trigger, viaHistory) {
+      if (!p) return;
+      current = p;
+      syncDetailStar();
+      lastFocus = trigger || document.activeElement;
+      el('detail-title').textContent = p.name;
+      el('detail-body').innerHTML = detailHtml(p);
+      el('detail-source').href = p.source_url;
+      el('detail-copied').hidden = true;
+      if (!dlg.open) dlg.showModal();
+      el('detail-body').scrollTop = 0;
+      el('detail-close').focus();
+      if (!viaHistory) {
+        var hsh = parseHash();
+        hsh.p = p.slug;
+        history.pushState({ p: p.slug }, '', location.pathname + location.search + '#' + Object.keys(hsh).map(function (k) { return k + '=' + encodeURIComponent(hsh[k]); }).join('&'));
+      }
+    }
+    dlg.addEventListener('close', function () {
+      current = null;
+      if (parseHash().p) writeHash(null);
+      if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+    });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+    el('detail-close').addEventListener('click', function () { dlg.close(); });
+    el('detail-copy').addEventListener('click', function () {
+      var url = location.href;
+      var done = function () { el('detail-copied').hidden = false; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
+      else window.prompt('Copy this link', url);
+    });
+    window.addEventListener('popstate', function () {
+      var slug = parseHash().p;
+      if (slug && bySlug[slug]) { if (!current || current.slug !== slug) openDetail(bySlug[slug], null, true); }
+      else if (dlg.open) dlg.close();
+    });
+
+    // ---- toolbar ----
+    var qEl = el('q'), qTimer = null;
+    qEl.addEventListener('input', function () {
+      clearTimeout(qTimer);
+      qTimer = setTimeout(function () { st.q = qEl.value.trim(); render(); }, 120);
+    });
+    el('sort').addEventListener('change', function () { st.sort = el('sort').value; render(); });
+    // On phones the filters are a tray over the results (13.16, NN/g): the result count stays on its button.
+    var ft = el('filters-toggle'), backdrop = el('tray-backdrop');
+    function setTray(open) {
+      ft.setAttribute('aria-expanded', String(open));
+      facetsEl.hidden = !open && !window.matchMedia('(min-width: 900px)').matches;
+      backdrop.hidden = !open || window.matchMedia('(min-width: 900px)').matches;
+      document.body.classList.toggle('tray-open', open && !window.matchMedia('(min-width: 900px)').matches);
+      if (open) { var first = facetsEl.querySelector('summary, input, select'); if (first) first.focus(); } else ft.focus();
+    }
+    ft.addEventListener('click', function () { setTray(ft.getAttribute('aria-expanded') !== 'true'); });
+    el('tray-done').addEventListener('click', function () { setTray(false); });
+    backdrop.addEventListener('click', function () { setTray(false); });
+    facetsEl.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ft.getAttribute('aria-expanded') === 'true') setTray(false); });
+    function syncFacetsVisibility() {
+      var wide = window.matchMedia('(min-width: 900px)').matches;
+      facetsEl.hidden = !wide && ft.getAttribute('aria-expanded') !== 'true';
+    }
+    window.addEventListener('resize', syncFacetsVisibility);
+
+    // ---- stars and the watchlist (13.9): kept in this browser; each program has its own feed at p/<slug>.xml ----
+    var WKEY = 'fa-watch', watched = {};
+    try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
+    function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
+    function saveWatch() { try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: stars last for this visit */ } }
+    function toggleStar(p) {
+      if (!p) return;
+      if (watched[p.slug]) delete watched[p.slug];
+      else watched[p.slug] = { n: p.name, s: p.state || S.code, f: p.state ? p.state : null };
+      saveWatch(); render();
+      if (current && current.slug === p.slug) syncDetailStar();
+    }
+    function renderWatch() {
+      var keys = Object.keys(watched);
+      el('watch-n').textContent = keys.length;
+      el('watch-list').innerHTML = keys.length ? keys.map(function (k) {
+        var w = watched[k], page = ROOT + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k);
+        return '<li><a href="' + h(page) + '">' + h(w.n) + '</a> <span class="muted small">' + h(w.f ? stateName(w.f) : 'Federal') + '</span>' +
+          ' · <a class="small" href="' + h(ROOT + feedPath(k)) + '" type="application/atom+xml">feed</a>' +
+          ' <button type="button" class="btn quiet small" data-unstar="' + h(k) + '" aria-label="Remove ' + h(w.n) + '">Remove</button></li>';
+      }).join('') : '<li class="muted">Nothing starred yet. Use the ☆ on any program.</li>';
+      el('watch-only').disabled = el('watch-opml').disabled = !keys.length;
+    }
+    el('watch-btn').addEventListener('click', function () {
+      var w = el('watch'), open = w.hidden; w.hidden = !open; el('watch-btn').setAttribute('aria-expanded', String(open));
+    });
+    el('watch-list').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-unstar]'); if (!b) return;
+      delete watched[b.getAttribute('data-unstar')]; saveWatch(); render();
+    });
+    el('watch-only').addEventListener('click', function () { st.quick = st.quick === 'starred' ? null : 'starred'; st.tab = 'programs'; render(); });
+    el('watch-opml').addEventListener('click', function () {
+      var base = DATA.site_url;
+      var xml = '<?xml version="1.0" encoding="utf-8"?>\n<opml version="2.0"><head><title>Funding Atlas: starred programs</title></head><body>\n' +
+        Object.keys(watched).map(function (k) { var w = watched[k];
+          return '  <outline type="rss" text="' + h(w.n) + '" title="' + h(w.n) + '" xmlUrl="' + h(base + feedPath(k)) + '" htmlUrl="' + h(base + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k)) + '"/>'; }).join('\n') +
+        '\n</body></opml>\n';
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([xml], { type: 'text/x-opml' }));
+      a.download = 'funding-atlas-starred.opml';
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    });
+
+    // ---- the digest (13.8): plain text a regional planner can paste into a newsletter. Real rows, their own words
+    // and links; the only choices are which rows. Kept out of the URL: it is a tool, not a view to share.
+    var dg = { cats: {}, win: 60 };
+    (function () {
+      var seen = {};
+      P.forEach(function (p) { p.categories.forEach(function (c) { seen[c] = (seen[c] || 0) + 1; }); });
+      el('dg-cats').innerHTML = Object.keys(seen).sort(function (a, b) { return seen[b] - seen[a]; }).map(function (c) {
+        return '<button class="chip" type="button" data-c="' + h(c) + '" aria-pressed="false">' + h(words(c)) + '</button>';
+      }).join('');
+      el('dg-d').textContent = 'Text to paste into a newsletter or an email to member towns: ' + (cov.state ? S.name + ' programs first, then federal notices' : 'federal notices') +
+        ', each with its agency, deadline, amount where stated, and link. Check each agency page before you send.';
+      el('dg-cats').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var c = b.getAttribute('data-c'); dg.cats[c] = !dg.cats[c]; b.setAttribute('aria-pressed', String(!!dg.cats[c])); renderDigest(); });
+      el('dg-win').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; dg.win = +b.getAttribute('data-w');
+        Array.prototype.forEach.call(el('dg-win').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderDigest(); });
+      el('dg-fed').addEventListener('change', renderDigest);
+      el('dg-nodate').addEventListener('change', renderDigest);
+      if (!cov.state) el('dg-nodate').closest('label').hidden = true;
+      el('dg-copy').addEventListener('click', function () {
+        var ta = el('dg-out'), msg = el('dg-msg');
+        var ok = function () { msg.textContent = 'Copied.'; }, fail = function () { ta.focus(); ta.select(); msg.textContent = 'Selected: press Ctrl+C or Cmd+C.'; };
+        try { navigator.clipboard.writeText(ta.value).then(ok, fail); } catch (er) { fail(); }
+      });
+    })();
+    function renderDigest() {
+      var on = Object.keys(dg.cats).filter(function (k) { return dg.cats[k]; });
+      var topic = function (p) { return !on.length || p.categories.some(function (c) { return on.indexOf(c) >= 0; }); };
+      var dated = function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= dg.win; };
+      var sortD = function (a, b) { return closeKey(a).localeCompare(closeKey(b)) || a.name.localeCompare(b.name); };
+      var st1 = PS.filter(function (p) { return topic(p) && dated(p); }).sort(sortD);
+      var st2 = el('dg-nodate').checked ? PS.filter(function (p) { return topic(p) && (!p.closes_at || p.deadline_placeholder); }).sort(sortD) : [];
+      var fd = el('dg-fed').checked ? PF.filter(function (p) { return topic(p) && dated(p) && p.tier === 'likely'; }).sort(sortD) : [];
+      function line(p) {
+        var when = p.closes_at && !p.deadline_placeholder ? 'Closes ' + fmtDate(p.closes_at, true) + '.' : p.rolling ? 'Rolling deadline.' : p.closes_text ? 'Deadline, in the agency\'s words: "' + (p.closes_text.length > 140 ? p.closes_text.slice(0, 139) + '…' : p.closes_text) + '"' : 'No deadline stated.';
+        var amt = amountText(p);
+        return '- ' + p.name + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
+      }
+      var head = 'Funding open to ' + S.name + ' local governments, closing in the next ' + dg.win + ' days' + (on.length ? ' (' + on.map(words).join(', ') + ')' : '') +
+        '\nFrom Funding Atlas, built ' + fmtDate(DATA.generated_at, true) + '. Status and dates are what each agency\'s page said that day.\n';
+      var out = head;
+      if (cov.state) out += '\n' + S.name.toUpperCase() + ' PROGRAMS\n' + (st1.length ? st1.map(line).join('\n') : '(none closing in this window)') + '\n';
+      if (st2.length) out += '\n' + S.name.toUpperCase() + ' PROGRAMS WITH NO FIXED DATE\n' + st2.map(line).join('\n') + '\n';
+      if (el('dg-fed').checked) out += '\nFEDERAL NOTICES\n' + (fd.length ? fd.map(line).join('\n') : '(none closing in this window)') + '\n';
+      out += '\nEverything, with filters and a change feed: ' + DATA.site_url + S.code.toLowerCase() + '/';
+      el('dg-out').value = out;
+      el('dg-msg').textContent = (st1.length + st2.length + fd.length) + ' programs in this digest.';
+    }
+
+    // ---- render everything from state ----
+    function render() {
+      tabs.forEach(function (t, i) {
+        var on = TABS[i] === st.tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      TABS.forEach(function (k) { el('panel-' + k).hidden = st.tab !== k; });
+      if (st.tab === 'digest') renderDigest();
+      Array.prototype.forEach.call(el('brief').querySelectorAll('button[data-act]'), function (b) {
+        var k = b.getAttribute('data-act');
+        b.setAttribute('aria-pressed', String(k === 'opened' ? st.tab === 'changes' && st.feed === 'status' : k === 'unstated' ? false : st.quick === k));
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
+      el('sort').value = st.sort;
+      if (qEl.value.trim() !== st.q) qEl.value = st.q;
+      updateFacets();
+      renderGroups();
+      renderWatch();
+      syncFit();
+      renderFeed(feedEl, feedRows(), function (c) {
+        return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
+          : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
+      });
+      writeHash(current ? current.slug : null);
+    }
+
+    buildFacets();
+    var slug = readHash();
+    syncFacetsVisibility();
+    render();
+    renderFooter(
+      '<p><b>Likely fit</b> and <b>May fit</b> are rule-based readings of each record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>may fit</i> means local governments are eligible but the signal is weaker. ' +
+      DATA.excluded_unlikely + ' further open records that list local governments as eligible are left off this page as unlikely (research notices, requests for information, foreign-facing programs).</p>' +
+      '<p><b>Announced</b> is what Grants.gov and state portals call forecasted: the agency has said the program is coming. <b>Status not confirmed</b> means the agency\'s page states no status and no date; the page is listed, not judged. <b>Closed recently</b> lists state programs for local governments that closed within ' + (R.between_months || 15) + ' months, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
+    );
+    if (slug && bySlug[slug]) openDetail(bySlug[slug], null, true);
+  }
+
+  // =====================================================================================
+  // Index page
+  // =====================================================================================
+
+  function indexPage() {
+    var S = DATA.states, F = DATA.federal;
+    var withSources = S.filter(function (s) { return s.programs > 0; });
+    el('stats').innerHTML =
+      '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
+      '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
+      '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
+      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open or announced for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' closed recently</span></div>';
+
+    var KIND_TEXT = {
+      portal: 'state grants portal read', agencies: 'agency pages read', portal_agencies: 'state portal and agency pages read',
+      directory: 'a state directory read (it lists programs but states no status or dates)', blocked: 'state sources blocked',
+      login: 'state sources login only', stopped: 'state source needs a browser script; not read', none: 'no state list found', federal: 'no state sources read yet'
+    };
+    function kindClass(k) { return k === 'portal_agencies' ? 'portal' : (k === 'login' || k === 'stopped') ? 'blocked' : k === 'none' ? 'federal' : k; }
+    function covText(s) {
+      var head = s.name + ': ' + KIND_TEXT[s.kind] + '. ';
+      var body = s.programs > 0
+        ? s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open or announced for local governments' + (s.unstated ? ', ' + s.unstated + ' with no status stated' : '') + (s.between ? ', ' + s.between + ' closed recently' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. '
+        : (s.note ? s.note + ' ' : '');
+      return head + body + 'Plus ' + F.open + ' federal notices.';
+    }
+    var map = el('map');
+    map.innerHTML = S.map(function (s) {
+      var k = kindClass(s.kind);
+      return '<a class="t k-' + k + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
+        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + s.open + '</span>' : '') +
+        '<span class="sr-only">, ' + h(covText(s)) + '</span></a>';
+    }).join('');
+    var hover = el('hover');
+    function show(e) {
+      var a = e.target.closest('a.t');
+      if (!a) return;
+      var s = S.filter(function (x) { return x.code === a.getAttribute('data-code'); })[0];
+      hover.innerHTML = '<b>' + h(s.name) + '</b> · ' + h(covText(s).replace(s.name + ': ', ''));
+    }
+    map.addEventListener('mouseover', show);
+    map.addEventListener('focusin', show);
+
+    var sel = el('goto-select');
+    sel.innerHTML = S.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).map(function (s) {
+      return '<option value="' + h(s.code) + '">' + h(s.name) + (s.programs > 0 ? ' (state sources)' : '') + '</option>';
+    }).join('');
+    el('goto').addEventListener('submit', function (e) { e.preventDefault(); location.href = sel.value.toLowerCase() + '/'; });
+
+    renderFeed(el('feed'), DATA.changes, function (c) {
+      var href = c.state && c.listed ? c.state.toLowerCase() + '/#p=' + encodeURIComponent(c.slug) : c.source_url;
+      return '<a href="' + h(href) + '">' + h(c.name) + '</a>';
+    });
+    renderFooter('<p>Each state page carries every federal notice plus that state\'s agency programs where connectors exist. Coverage is stated on the page; a state with no sources yet says so.</p>');
+  }
+
+  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "CA",
+  "name": "California"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ca/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 37,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "water",
+   "open": 25
+  },
+  {
+   "category": "parks",
+   "open": 17
+  },
+  {
+   "category": "other",
+   "open": 14
+  },
+  {
+   "category": "housing",
+   "open": 8
+  },
+  {
+   "category": "infrastructure",
+   "open": 8
+  },
+  {
+   "category": "public_safety",
+   "open": 6
+  },
+  {
+   "category": "transportation",
+   "open": 3
+  },
+  {
+   "category": "energy",
+   "open": 1
+  },
+  {
+   "category": "health",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "2026 Trade Corridor Enhancement Program",
+   "agency": "Transportation Commission",
+   "closes_at": "2026-11-20",
+   "days_to_close": 6,
+   "link": "https://saj-sudo.github.io/funding-atlas/ca/#p=2026-trade-corridor-enhancement-program-ca-grants-192288"
+  },
+  {
+   "name": "Cannabis Equity Grants Program for Local Jurisdictions",
+   "agency": "Governor's Office of Business and Economic Development",
+   "closes_at": "2026-12-01",
+   "days_to_close": 17,
+   "link": "https://saj-sudo.github.io/funding-atlas/ca/#p=cannabis-equity-grants-program-for-local-jurisdictions-ca-grants-192603"
+  },
+  {
+   "name": "Mojave Desert Tortoise Recovery",
+   "agency": "Department of Fish and Wildlife",
+   "closes_at": "2026-12-03",
+   "days_to_close": 19,
+   "link": "https://saj-sudo.github.io/funding-atlas/ca/#p=mojave-desert-tortoise-recovery-ca-grants-193758"
+  },
+  {
+   "name": "Delta-Based Decontamination Control Sites to Prevent the Spread of Golden Mussel",
+   "agency": "Department of Fish and Wildlife",
+   "closes_at": "2026-12-15",
+   "days_to_close": 31,
+   "link": "https://saj-sudo.github.io/funding-atlas/ca/#p=delta-based-decontamination-control-sites-to-prevent-the-spread-of-golden-mussel-ca-grants-194406"
+  },
+  {
+   "name": "Statewide Park Development and Community Revitalization Program (SPP) – Round 5 – Proposition 4",
+   "agency": "Department of Parks and Recreation",
+   "closes_at": "2026-12-17",
+   "days_to_close": 33,
+   "link": "https://saj-sudo.github.io/funding-atlas/ca/#p=statewide-park-development-and-community-revitalization-program-spp-round-5-prop-ca-grants-191124"
+  }
+ ]
+}

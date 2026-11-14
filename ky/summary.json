@@ -1,0 +1,55 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "KY",
+  "name": "Kentucky"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ky/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 6,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 2
+  },
+  {
+   "category": "housing",
+   "open": 1
+  },
+  {
+   "category": "public_safety",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Community Emergency Relief Fund",
+   "agency": "Kentucky Department for Local Government",
+   "closes_at": "2027-01-31",
+   "days_to_close": 78,
+   "link": "https://saj-sudo.github.io/funding-atlas/ky/#p=community-emergency-relief-fund-ky-dlgfed-cdbg-emergency"
+  },
+  {
+   "name": "Housing Program",
+   "agency": "Kentucky Department for Local Government",
+   "closes_at": "2027-02-01",
+   "days_to_close": 79,
+   "link": "https://saj-sudo.github.io/funding-atlas/ky/#p=housing-program-ky-dlgfed-cdbg-housing"
+  },
+  {
+   "name": "Economic Development",
+   "agency": "Kentucky Department for Local Government",
+   "closes_at": "2027-03-01",
+   "days_to_close": 107,
+   "link": "https://saj-sudo.github.io/funding-atlas/ky/#p=economic-development-ky-dlgfed-cdbg-economic"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "WV",
+  "name": "West Virginia"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/wv/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "other",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Clean Water State Revolving Fund Assistance (CWSRF)",
+   "agency": "Department of Environmental Protection Division of Water and Waste Management/Office of Water Resources",
+   "closes_at": "2026-12-31",
+   "days_to_close": 47,
+   "link": "https://saj-sudo.github.io/funding-atlas/wv/#p=clean-water-state-revolving-fund-assistance-cwsrf-wv-grants-78"
+  }
+ ]
+}

@@ -1,0 +1,45 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "MO",
+  "name": "Missouri"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/mo/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 6,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 2
+  },
+  {
+   "category": "water",
+   "open": 2
+  },
+  {
+   "category": "parks",
+   "open": 1
+  },
+  {
+   "category": "public_safety",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Outdoor Recreation Legacy Partnership Program (ORLP)",
+   "agency": "Missouri Department of Natural Resources, Division of State Parks",
+   "closes_at": "2027-06-30",
+   "days_to_close": 228,
+   "link": "https://saj-sudo.github.io/funding-atlas/mo/#p=outdoor-recreation-legacy-partnership-program-orlp-mo-parks-orlp"
+  }
+ ]
+}

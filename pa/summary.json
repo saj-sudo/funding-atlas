@@ -1,0 +1,93 @@
+{
+ "generated_at": "2026-11-14T13:04:32Z",
+ "state": {
+  "code": "PA",
+  "name": "Pennsylvania"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/pa/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 37,
+  "federal": 125
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 15
+  },
+  {
+   "category": "parks",
+   "open": 8
+  },
+  {
+   "category": "water",
+   "open": 6
+  },
+  {
+   "category": "other",
+   "open": 2
+  },
+  {
+   "category": "energy",
+   "open": 1
+  },
+  {
+   "category": "health",
+   "open": 1
+  },
+  {
+   "category": "housing",
+   "open": 1
+  },
+  {
+   "category": "public_safety",
+   "open": 1
+  },
+  {
+   "category": "workforce",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "State and Local Cybersecurity Grant Program (SLCGP)",
+   "agency": "Emergency Management Agency",
+   "closes_at": "2026-11-18",
+   "days_to_close": 4,
+   "link": "https://saj-sudo.github.io/funding-atlas/pa/#p=state-and-local-cybersecurity-grant-program-slcgp-pa-grants-pema/13"
+  },
+  {
+   "name": "Abandoned Mine Lands and Abandoned Mine Drainage (AML/AMD) Grant Program",
+   "agency": "Environmental Protection",
+   "closes_at": "2026-11-30",
+   "days_to_close": 16,
+   "link": "https://saj-sudo.github.io/funding-atlas/pa/#p=abandoned-mine-lands-and-abandoned-mine-drainage-aml-amd-grant-program-pa-grants-dep/37"
+  },
+  {
+   "name": "FY 2026-27 Violence Intervention and Prevention (VIP) & Building Opportunities Through Out",
+   "agency": "Pennsylvania Commission on Crime and Delinquency",
+   "closes_at": "2026-12-10",
+   "days_to_close": 26,
+   "link": "https://saj-sudo.github.io/funding-atlas/pa/#p=fy-2026-27-violence-intervention-and-prevention-vip-building-opportunities-throu-pa-grants-pccd/66"
+  },
+  {
+   "name": "Workforce Development Third-Party Payment Administrator",
+   "agency": "Labor & Industry",
+   "closes_at": "2026-12-10",
+   "days_to_close": 26,
+   "link": "https://saj-sudo.github.io/funding-atlas/pa/#p=workforce-development-third-party-payment-administrator-pa-grants-dli/35"
+  },
+  {
+   "name": "904 Recycling Performance Grant",
+   "agency": "Environmental Protection",
+   "closes_at": "2026-12-31",
+   "days_to_close": 47,
+   "link": "https://saj-sudo.github.io/funding-atlas/pa/#p=904-recycling-performance-grant-pa-grants-dep/38"
+  }
+ ]
+}
