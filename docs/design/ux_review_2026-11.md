@@ -186,6 +186,14 @@ page). The roadmap's Done table has the detail (13.6 to 13.14). Not built, becau
 pass-through flow from federal programs to the state programs they fund (6 of 956 eligible state programs cite a
 federal listing).
 
+## Third round: Wayfinding compared, Civic kept (2026-11-14)
+
+Saj asked for alternatives to Civic and to see Wayfinding (road-sign type, guide-sign headers, topic lines). The
+comparison is at https://claude.ai/artifact/3fTZWdD5LzzJm7CnUDqCXb (private). Saj kept Civic and borrowed three
+things: the yellow caution panel for anything closing within 7 days, a heavier date column, and a lettered topic
+badge on every card (13.17). The costs the second round left (phone fold, page weight, which changes are ours,
+feeds for programs that leave the page) were paid in 13.15 and 13.16.
+
 ## The rest of milestone 13 (one session each)
 
 - **13.2 Visual direction.** Apply Saj's pick: type scale, palette tokens, card layout, the date column if A; dark mode
