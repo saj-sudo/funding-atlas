@@ -82,3 +82,54 @@ li  Be sponsored by one of the following entities: a special purpose district ..
 p   Application Deadlines and Award Dates Drinking water project applications are considered on a quarterly basis and must be
     postmarked or received by the department on or before the first day of January, April, July, and October.
 ```
+
+## Implemented (2026-11-14)
+
+Three modules, each with its own reader: `sd_goed` (`<main>`, each repeated tab line read once, the CAPER notice dropped, the
+read stopped at the "Planning Districts" tab), `sd_dot` (`<main>`, a list item that wraps paragraphs read through its
+paragraphs once, the read stopped at the Commission's award announcements) and `sd_danr` (the main column, the first `h2` as
+the title). First live runs on a copy of the restored database: **10 added, 0 errors**; second runs **0 changed**.
+`scripts/probe_south_dakota.py` saved the fixtures.
+
+| Record | Status on 2026-11-14 | Applicants tagged | Source |
+|---|---|---|---|
+| Community Development Block Grants | unknown: "Deadlines are April 1 and October 1." (kept) | municipality, county | pass_through |
+| Local Infrastructure Improvement | unknown: quarterly deadlines, no year (kept) | municipality, county | direct |
+| **Bridge Improvement Grants** | **open to 2027-01-02** | county | direct |
+| Industrial Park Road Grants, Agri-Business Road Grants | unknown: "Applications are due April 15, July 15, or October 15." | municipality, county | direct |
+| Community Access Grants | unknown: "Applications are due July 15." | municipality | direct |
+| Transportation Alternatives | unknown: due 2026-10-01, past | none named on the page | pass_through |
+| Drinking Water, Sanitary and Storm Sewer Project Funding (`loan`) | unknown: quarterly, "on or before the first day of January, April, July, and October" | special district, state, municipality, county, tribe, nonprofit | direct |
+| Solid Waste Disposal and Recycling Project Funding (`loan`) | unknown, the same | individual, county, municipality, tribe, special district | direct |
+
+**The South Dakota page lists 0 open rows on 2026-11-14.** Bridge Improvement Grants is open, but its applicants are counties
+(a county with a wheel tax and a five-year plan), and the navigator lists programs a municipality can apply to. It is stored,
+in the feeds and in the data; eight municipal records show under "Status not confirmed". No script errors and no sideways
+scroll at 390px.
+
+### Shared changes (`connectors/hand_list.py`)
+
+Each measured on its own: the restored database (7,734 records) and the 158 fixture records of every other agency-page
+connector (Arkansas's included). **Every change: 0 tag moves, 0 hash moves.**
+
+- `YEARLESS_RE` on `AgencyPageConnector`, off by default: a module that sets it keeps the first sentence it matches (with no
+  year in it) as `closes_at_text` when the status is `unknown` and nothing else was kept. Nebraska's DED and NDOT carry their
+  own copies (12.6g); this is the third case, so it moved to the base. Nebraska's were not migrated (their hashes would have to
+  be re-checked; a follow-up for a quiet session).
+- `APPLICANT_SENTENCE_RE`: "grants will be made to ...", "Local governments interested in ...", "funds for towns ...", "to be
+  eligible for ..., a county must ...", "sponsored by one of the following ...".
+- Cut before tagging: a purpose clause ("for the development of new or expanded agri-business industries", "are for the
+  construction or reconstruction of major streets ... schools, hospitals") and a program's name as the subject ("The
+  Agri-Business grants will be made to ..."). Without them Agri-Business tagged `business` and Community Access `school`.
+
+### Gaps and follow-ups
+
+- **Emergency Management is not read**: the Office of Emergency Management is on `www.sd.gov`'s ServiceNow portal, a
+  JavaScript shell. Ask Saj before any headless read (CLAUDE.md).
+- **Game, Fish and Parks is deferred**: LWCF and Recreational Trails have no page this survey found. Reopen with the parks
+  division's grants URL.
+- SD Housing disallows `ClaudeBot`: not read.
+- Transportation Alternatives names its applicants only in the application guide (a PDF): quoted by hand only if a round is
+  open and the quote would put it on the page (Saj's 10.6 rule).
+- Every municipal round on the page today is `unknown` because the agencies state deadlines without a year. If Saj ever
+  relaxes the no-year rule ("the next April 1"), South Dakota is where it would show most.
