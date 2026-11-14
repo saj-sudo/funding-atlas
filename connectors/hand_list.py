@@ -388,8 +388,20 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\bsubmitted by\s+(?:[\w-]+\s+){0,2}(?:local governments?|municipal\w*|cities|towns|count(?:y|ies)|political subdivisions)\b"
     # Arkansas Rural Services (12.6h): "Applicants from incorporated towns of less than 3,000 in population and unincorporated
     # rural areas are eligible for up to $15,000 in matching funds"
-    r"|^applicants from\s+(?:[\w-]+\s+){0,2}(?:towns?|cities|municipal\w*|count(?:y|ies)|communities)\b", re.I)
+    r"|^applicants from\s+(?:[\w-]+\s+){0,2}(?:towns?|cities|municipal\w*|count(?:y|ies)|communities)\b"
+    # South Dakota DOT (12.6i): "The Industrial Park grants will be made to any local unit of government ..."
+    r"|\b(?:grants?|funds?|loans?)\s+(?:will|shall|may|are)\s+be\s+(?:made|awarded|given)\s+to\b"
+    # South Dakota GOED (12.6i): "Local governments interested in funding through this program should work with ..."
+    r"|^(?:local governments?|municipalities|cities|towns|counties)\s+interested in\b"
+    # South Dakota DOT (12.6i): "Community Access Grants are state funds for towns less than 5,000 in population"
+    r"|\b(?:funds?|grants?)\s+for\s+(?:towns?|cities|municipalities|counties)\b"
+    # South Dakota DOT (12.6i): "in order to be eligible for a BIG grant, a county must impose a wheel tax"
+    r"|\bto be eligible\b[^.]*,\s*(?:a|the|each)\s+(?:county|city|town|township|municipality)\s+must\b"
+    # South Dakota DANR (12.6i): "Be sponsored by one of the following entities: a special purpose district ...; a
+    # municipality, county, or township; ..."
+    r"|\bsponsored by one of the following\b", re.I)
 SHORT_ITEM = 160
+YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
     r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
@@ -415,6 +427,13 @@ NOT_DESIGNATED_RE = re.compile(r"\bnot designated as\b[^.;]*?(?=\s+(?:is|are)\b|
 # "cities and counties may apply for projects that will benefit non-profit groups, for-profit companies, or LMI persons"
 # (Arkansas CDBG, 12.6h): who a project benefits does not apply. Cut before tagging; the stored text keeps it.
 BENEFITS_RE = re.compile(r"\bprojects?\s+(?:that|which)\s+(?:will\s+)?benefit\b[^.;]*", re.I)
+# "grants will be made to any local unit of government for the development of new or expanded agri-business industries",
+# "state funds for towns ... and are for the construction or reconstruction of major streets ... schools, hospitals"
+# (South Dakota DOT, 12.6i): what the money builds is not who applies. Cut before tagging; the stored text keeps it.
+# "The Agri-Business grants will be made to any local unit of government" (South Dakota DOT, 12.6i): the program's name as
+# the subject is not an applicant. Cut before tagging.
+SUBJECT_NAME_RE = re.compile(r"^the\s+(?:[\w-]+\s+){1,3}?grants?\s+(?=(?:will|shall|may|are|is)\s+(?:be\s+)?(?:made|awarded|given|available)\b)", re.I)
+PURPOSE_RE = re.compile(r"\b(?:(?:and\s+)?(?:are|is)\s+)?for\s+the\s+(?:development|construction|reconstruction|purchase|renovation)(?:\s+or\s+\w+)?\s+of\b[^.;]*", re.I)
 # "Non-profits and private sector entities may partner with an eligible applicant" (Kentucky CMAQ): a partner, not an
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
@@ -424,7 +443,7 @@ MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
 
 def clause_cut(line: str) -> str:
     """The line with the clauses that name a beneficiary, or define an applicant by what it is not, cut before tagging."""
-    line = BENEFITS_RE.sub("", line)
+    line = SUBJECT_NAME_RE.sub("", PURPOSE_RE.sub("", BENEFITS_RE.sub("", line)))
     return NOT_DESIGNATED_RE.sub("", OTHER_THAN_STATE_RE.sub("", BENEFICIARY_RE.sub("", NOT_FEDERAL_RE.sub("", ON_BEHALF_RE.sub("", line)))))
 
 
@@ -629,6 +648,11 @@ class AgencyPageConnector(HandListConnector):
     # source_id -> "direct" | "pass_through" where the page mentions a federal agency without being federally funded.
     FUNDING_SOURCES: dict[str, str] = {}
     CATEGORY_LABELS: dict[str, str] = {}
+    # A round stated with a month and a day and no year ("Applications are due April 15, July 15, or October 15") is not a
+    # date: the status stays `unknown` and `closes_at` null, but the first sentence this matches (and that names no year)
+    # is kept as `closes_at_text`. Off by default; Nebraska's DED and NDOT carry their own copies (12.6g), South Dakota's
+    # agencies (12.6i) set this.
+    YEARLESS_RE: re.Pattern[str] | None = None
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         page = pages[0]
@@ -662,5 +686,12 @@ class AgencyPageConnector(HandListConnector):
             eligibility_structured=None,
             applicant_types=applicant_tags([clause_cut(line) for line in lines if not PARTNER_LINE_RE.search(line)]),
             categories=[CategoryTag(value=v, source_code=label) for v in portal_categories(label)],
-            **round_for(blocks, today),
+            **self.round_with_yearless(blocks, today),
         )
+
+    def round_with_yearless(self, blocks: Blocks, today: date) -> dict[str, Any]:
+        out = round_for(blocks, today)
+        if self.YEARLESS_RE is not None and out["status"] == "unknown" and not out["closes_at_text"]:
+            out["closes_at_text"] = next((s for s in all_sentences(blocks)
+                                          if self.YEARLESS_RE.search(s) and not YEAR_RE.search(s)), None)
+        return out
