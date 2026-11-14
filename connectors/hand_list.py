@@ -323,7 +323,9 @@ OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
                             r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
                             r"|\b(?:is|are)\s+currently\s+open\b"   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
-                            r"|\bapplication period is open\b", re.I)   # Missouri DNR's banner heading on every program page
+                            r"|\bapplication period is open\b"   # Missouri DNR's banner heading on every program page
+                            # Nebraska DWEE (12.6g): the energy pages' labelled status line, "Status: Program open."
+                            r"|\bstatus:\s*(?:program\s+)?open\b", re.I)
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+|currently\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b"
                               # Missouri State Parks (12.6f): "We are not accepting applications for ... grants at this time."
                               r"|\bnot\s+(?:currently\s+)?accepting\s+applications\b", re.I)
@@ -341,7 +343,10 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   # Kentucky (12.6d): KIA's bare "Eligibility:" label over the loan fund's conditions.
                                   r"|^eligibility:?$"
                                   # Missouri (12.6e): DED's "Do I Qualify?" tab is its eligibility section.
-                                  r"|^do i qualify\??$", re.I)
+                                  r"|^do i qualify\??$"
+                                  # Nebraska DWEE (12.6g): "Who's Eligible" heads the waste pages' answer, "What communities are
+                                  # considered for these grants?" the drinking water planning grants'.
+                                  r"|\bwho['\u2019]s eligible\b|\bwhat communities are considered\b", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to (?:apply|submit)\b"
@@ -369,7 +374,10 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\beligible recipients\b"
     # Nebraska DED (12.6g): SBDF's "Local governments and Nebraska nonprofits are eligible." (a sentence that names a kind of
     # local government and ends on "are eligible", no "to apply" after it).
-    r"|\b(?:governments?|municipalit(?:y|ies)|cities|towns|villages|count(?:y|ies))\b[^.]*\b(?:is|are) eligible\s*\.?\s*$", re.I)
+    r"|\b(?:governments?|municipalit(?:y|ies)|cities|towns|villages|count(?:y|ies))\b[^.]*\b(?:is|are) eligible\s*\.?\s*$"
+    # Nebraska DWEE (12.6g): Section 319's "Funding is distributed to local governments, educational institutions, ..." and
+    # the school energy loans' "K-12 public schools can now apply for low-interest loans".
+    r"|\b(?:funds?|funding|grants?)\b[^.]*\bdistributed to\b|\bcan now apply\b", re.I)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"

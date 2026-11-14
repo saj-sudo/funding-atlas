@@ -106,6 +106,7 @@ CONNECTOR_LABEL = {
     "mo_sema": "Missouri State Emergency Management Agency",
     "mo_parks": "Missouri State Parks (grants)",
     "ne_ded": "Nebraska Department of Economic Development",
+    "ne_dwee": "Nebraska Department of Water, Energy, and Environment",
 }
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",

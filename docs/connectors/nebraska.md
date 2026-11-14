@@ -137,6 +137,69 @@ Connecticut, North Dakota, Kentucky, Missouri) compared by `record_hash`. **Ever
 - The CDBG page's "Announcements" and "Recent Updates" blocks follow every CDBG record as shared text; none carries a date the
   reader takes, checked on the 2026-11-14 page.
 
+## Implemented, DWEE (2026-11-14)
+
+`connectors/ne_dwee.py` (Drupal 10, its own reader in the module) follows this section. First live run on a database that
+held DED: **9 added, 0 errors**; second run **0 changed**. The agency's menu is the same on every page, so one fetch of the
+Aid section's three index pages (water, waste, air) listed every program. The program text sits in one of two body fields,
+`field--name-body` or, on the waste pages, `field--name-field-full-width-paragraph`; the theme repeats small copies of the
+first in its menus, so the reader takes the larger field. Contact lines, the footer and "Related information" are dropped.
+
+| Record | Status on 2026-11-14 | Applicants tagged | Source |
+|---|---|---|---|
+| Clean Water State Revolving Loan Fund | `unknown`: the survey is "due by January 15th", no year | municipality | direct |
+| Drinking Water State Revolving Loan Fund | `unknown` | none: "owners of public drinking water systems" is not a tag | pass_through (EPA) |
+| Planning Grants: Drinking Water Preliminary Engineering Reports | `unknown`: the state sends applications to the communities it selects | municipality ("Any city, town, village, ... may be eligible"; privately owned systems are not) | direct |
+| Nonpoint Source Water Quality Grants (Section 319) | `unknown` | municipality, county, nonprofit ("Funding is distributed to local governments, educational institutions, and nonprofit organizations") | pass_through |
+| Deconstruction Grants Program | `unknown`: "Application deadlines are posted with the online application information" | municipality, county ("Cities of the first class, cities of the second class, villages and counties of 5,000 or less population") | direct |
+| Illegal Dumpsite Cleanup Program | `unknown`: reimbursement, "no specific deadlines" | municipality, county ("Political subdivisions. This can include municipalities, counties, Natural Resources Districts, ...") | direct |
+| Scrap Tire Management Grant Programs | `unknown` | municipality, county, nonprofit ("private entities, nonprofit organizations, and political subdivisions") | direct |
+| Energy Efficiency and Conservation Block Grant | `unknown`: "The second-round application period is open through April 15, 2026" has passed; `closes_at` is the first deadline sentence, the 2023 formula award | municipality, county ("Nebraska counties and local communities are eligible to apply for subawards") | pass_through |
+| Energy Efficiency Revolving Loan Fund (K-12 schools) | **open**, no dates: "Status: Program open." | school ("Nebraska K-12 public schools can now apply") | direct, loan |
+
+### Where each `pass_through` comes from (the page's own sentence)
+
+- DWSRF: "The Environmental Protection Agency makes the capitalization grants to states to help establish their DWSRF programs."
+- Section 319: "Under Section 319 of the federal Clean Water Act, the federal government provides funding to the Nebraska Department of
+  Water, Energy, and Environment (DWEE)".
+- EECBG: "Counties, cities, and tribes that received direct federal EECBG funding are not eligible for subawards from DWEE."
+- The CWSRF page says loans "can be combined with other federal and state funding assistance" and names no federal source of its own
+  money, so it stays `direct` (the Missouri DNR precedent for the revolving-fund loans). The school energy loans say "capitalization
+  grants to States" and do not say whose: `direct`, by the same rule.
+
+### Shared changes (`connectors/hand_list.py`)
+
+Measured together, as the DED changes were (stored database of 7,734 records, and the 116 fixture records of the other agencies):
+**0 tag moves, 0 hash moves, fixtures identical.** A first version of the "can apply" phrase was measured too and moved three
+records (two Missouri DED CDBG pages gained a `household` tag, Kentucky's CMAQ page changed text) because "the maximum amount any
+applicant can apply for is $500,000 or $5,000 per household" is an amount limit, not an eligibility statement; the phrase is now
+"can now apply" and a test pins the amount sentence as not an applicant sentence.
+
+- `AGENCY_OPEN_RE` reads the labelled line "Status: Program open." (the energy pages).
+- `ELIGIBILITY_LABEL_RE` reads "Who's Eligible" (straight or curly apostrophe: the waste pages) and "What communities are considered
+  for these grants?" (the drinking water planning grants).
+- `APPLICANT_SENTENCE_RE` reads "Funding ... distributed to ..." (Section 319) and "can now apply" (the school loans).
+- Reader, not shared: the waste and planning pages answer "Who's Eligible" in a paragraph, so each sentence of a paragraph under an
+  eligibility heading is read as one of that heading's list items (`APPLICANT_ITEM_MAX` 400).
+
+### Scope calls (Saj to overrule; each is one line in `PAGES`)
+
+- **In (nine pages):** the pages that name local governments or public bodies as applicants.
+- **Out, applicants named are not local governments:** Litter Reduction and Recycling ("public and private entities"), the electric grid
+  resilience grants (Nebraska utilities, application closed 2024-06-21, "anticipates a future application opportunity ... in 2027"),
+  lead testing for schools and childcare facilities, the VW trust and Clean Diesel rebates (school buses, past rounds).
+- **Out, not open for applications yet:** the State Energy Program ("Awarded-Program Under Development") and ONE RED (a $307 million
+  EPA award; "DWEE is working to set up the funding programs"). ONE RED's three programs go on when a page opens a round.
+- **Not read this session:** the Brownfields pages and the Dollar and Energy Saving Loans page (the school loans are read through
+  the EERLF page, which says "Program open" and points to it). Either may belong on the list; read them before deciding.
+
+### Gaps
+
+- The two revolving funds' (CWSRF and DWSRF) rounds are the biennial Needs Survey and an annual Intended Use Plan, which the pages name
+  without a year: `unknown`, nothing guessed.
+- EECBG's `closes_at` is the first deadline sentence on the page (the 2023 formula award); the later rounds, to 2026-04-15, are in the
+  text. Status is `unknown` either way.
+
 ## Decisions on the way in
 
 1. **"Sept. 15" has no year.** Four of CDBG's six opportunities state a deadline with no year. The status rule is "what the source

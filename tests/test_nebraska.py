@@ -1,4 +1,4 @@
-"""Nebraska's agency connectors (ne_ded) against saved pages, and the shared rules Nebraska DED added."""
+"""Nebraska's agency connectors (ne_ded, ne_dwee) against saved pages, and the shared rules Nebraska added."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures"
 TODAY = date(2026, 11, 14)
-AGENCIES = ["ne_ded"]
+AGENCIES = ["ne_ded", "ne_dwee"]
 
 
 def mod(name: str):
@@ -194,6 +194,89 @@ def test_dates_after_the_deadline_word_win_over_the_opening_date():
 def test_tagger_reads_local_and_governmental_subdivisions():
     assert {t.value for t in hl.applicant_tags(["Local and Governmental Subdivisions"])} == {"municipality", "county"}
 
+
+
+# ---------- Water, Energy, and Environment ----------
+
+
+def test_dwee_reader_takes_the_larger_body_field_and_leaves_out_contacts_and_the_footer():
+    for slug in mod("ne_dwee").PAGES:
+        t = text("ne_dwee", slug)
+        assert len(t) > 400, slug                                  # the menus' small copies of the body field are not it
+        assert "@nebraska.gov" not in t and "Official Nebraska Government Website" not in t, slug
+    # the waste pages keep their text in the other body field
+    assert "Cities of the first class" in text("ne_dwee", "deconstruction")
+    assert page("ne_dwee", "illegal-dumpsite")["title"] == "Illegal Dumpsite Cleanup Program"
+
+
+def test_dwee_statuses_the_pages_state_no_round_except_the_school_loans():
+    got = {slug: program("ne_dwee", slug) for slug in mod("ne_dwee").PAGES}
+    assert {s: p.status for s, p in got.items()} == {
+        "cwsrf": "unknown", "dwsrf": "unknown", "dw-planning": "unknown", "section-319": "unknown", "deconstruction": "unknown",
+        "illegal-dumpsite": "unknown", "scrap-tire": "unknown",
+        "eecbg": "unknown",        # "The second-round application period is open through April 15, 2026": past on 2026-11-14
+        "eerlf": "open",           # "Status: Program open."
+    }
+    # a deadline the page states and that has passed is kept as the page's sentence
+    assert got["eecbg"].closes_at_text.startswith("Application deadline for the formula award was July 31, 2023")
+
+
+def test_dwee_applicants_are_what_each_page_says():
+    assert tags("ne_dwee", "cwsrf") == {"municipality"}
+    assert tags("ne_dwee", "dw-planning") == {"municipality"}                       # "Any city, town, village, ... may be eligible."
+    assert tags("ne_dwee", "section-319") == {"municipality", "county", "nonprofit"}  # "Funding is distributed to local governments, ..."
+    assert tags("ne_dwee", "deconstruction") == {"municipality", "county"}          # under "Who\u2019s Eligible"
+    assert tags("ne_dwee", "illegal-dumpsite") == {"municipality", "county"}        # "Political subdivisions. This can include ..."
+    assert tags("ne_dwee", "scrap-tire") == {"municipality", "county", "nonprofit"}
+    assert tags("ne_dwee", "eecbg") == {"municipality", "county"}
+    assert tags("ne_dwee", "eerlf") == {"school"}                                    # "K-12 public schools can now apply"
+    assert tags("ne_dwee", "dwsrf") == set()        # "owners of public drinking water systems": no tag says who
+
+
+def test_dwee_privately_owned_systems_are_not_applicants():
+    p = program("ne_dwee", "dw-planning")
+    assert "Privately-owned water supply systems are not eligible for assistance." in p.eligibility_text
+    assert {t.value for t in p.applicant_types} == {"municipality"}
+
+
+def test_dwee_funding_source_type_and_category():
+    got = {slug: program("ne_dwee", slug) for slug in mod("ne_dwee").PAGES}
+    assert {s: p.funding_source for s, p in got.items()} == {
+        "cwsrf": "direct", "dwsrf": "pass_through", "dw-planning": "direct", "section-319": "pass_through", "deconstruction": "direct",
+        "illegal-dumpsite": "direct", "scrap-tire": "direct", "eecbg": "pass_through", "eerlf": "direct"}
+    assert got["eerlf"].funding_type == "loan" and got["cwsrf"].funding_type == "loan" and got["deconstruction"].funding_type == "grant"
+    assert [c.value for c in got["cwsrf"].categories] == ["water"] and [c.value for c in got["eecbg"].categories] == ["energy"]
+    assert [c.value for c in got["deconstruction"].categories] == ["other"]       # waste is not a label the shared table knows
+
+
+def test_dwee_fetch_and_fallback(monkeypatch):
+    m = mod("ne_dwee")
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+
+    def site(client, url, broken=()):
+        if url in broken:
+            raise httpx.ConnectError("down")
+        slug = next(s for s, p in m.PAGES.items() if url == m.BASE + p)
+        return (FIX / "ne_dwee" / f"{slug}.html").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(hl, "get", site)
+    records = m.fetch()
+    assert [r.source_id for r in records] == list(m.PAGES)
+    prior = {r.source_id: r.payload for r in records}
+    monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["eecbg"],)))
+    assert {r.source_id: r.payload for r in m.fetch(prior=prior)}["eecbg"] == prior["eecbg"]
+    assert m.resolve_missing("eecbg") == {"status": "unknown"}
+
+
+def test_the_shared_phrasings_nebraska_dwee_added():
+    assert hl.AGENCY_OPEN_RE.search("Status: Program open.") and hl.AGENCY_OPEN_RE.search("status: open")
+    assert not hl.AGENCY_OPEN_RE.search("The program is open to counties.")
+    for label in ("Who\u2019s Eligible", "Who's Eligible?", "What communities are considered for these grants?"):
+        assert hl.ELIGIBILITY_LABEL_RE.search(label), label
+    assert hl.APPLICANT_SENTENCE_RE.search("Funding is distributed to local governments, educational institutions, and nonprofit organizations.")
+    assert hl.APPLICANT_SENTENCE_RE.search("Nebraska K-12 public schools can now apply for low-interest loans through the program.")
+    # an amount limit is not an eligibility statement (Missouri DED, Kentucky CMAQ: "the amount any applicant can apply for")
+    assert not hl.APPLICANT_SENTENCE_RE.search("The maximum amount any applicant can apply for is $500,000 or $5,000 per household.")
 
 @pytest.mark.parametrize("name", AGENCIES)
 def test_module_contract(name):

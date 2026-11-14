@@ -44,6 +44,7 @@ from connectors import (
     nd_dot,
     nd_parks,
     ne_ded,
+    ne_dwee,
     nj_dca_sage,
     ny_sfs,
     or_biz,
@@ -118,6 +119,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "mo_parks": mo_parks,
     "mo_sema": mo_sema,
     "ne_ded": ne_ded,
+    "ne_dwee": ne_dwee,
 }
 
 
