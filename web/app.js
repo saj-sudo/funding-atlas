@@ -426,14 +426,39 @@
       var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
         (p.categories.length > 3 ? '<li class="more">+' + (p.categories.length - 3) + '</li>' : '');
       var quoteText = p.closes_text && (!p.closes_at || p.status !== 'open') && !p.rolling ? p.closes_text : null;
-      return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' +
+      return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + ' · ' + h(levelLabel(p)) + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
-        '</article>';
+        '</div></article>';
+    }
+    // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
+    // Decorative for screen readers: the same date is in words on the card's first line.
+    function dateCol(p) {
+      var dated = p.closes_at && !p.deadline_placeholder;
+      if (dated) {
+        var past = p.days_to_close != null && p.days_to_close < 0;
+        return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '" aria-hidden="true"><span class="m">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
+          '</span><span class="dd">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd">closed</span>' : '') + '</div>';
+      }
+      return '<div class="date" aria-hidden="true"><span class="nd">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
+    }
+    // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
+    var BUCKETS = [
+      ['Closes within 7 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close >= 0 && p.days_to_close <= 7; }],
+      ['Closes within 30 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > 7 && p.days_to_close <= R.closing_days; }],
+      ['Closes later', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > R.closing_days; }],
+      ['No fixed date', function (p) { return !p.closes_at || p.deadline_placeholder; }]
+    ];
+    function bucketed(rows) {
+      if (st.sort !== 'closing') return rows.map(card).join('');
+      return BUCKETS.map(function (b) {
+        var r = rows.filter(b[1]);
+        return r.length ? '<p class="bucket" role="heading" aria-level="3">' + h(b[0]) + ' · ' + r.length + '</p>' + r.map(card).join('') : '';
+      }).join('');
     }
 
     // ---- the four groups ----
@@ -443,7 +468,7 @@
     el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
-    function groupHtml(rows, empty) { return rows.length ? rows.map(card).join('') : '<p class="empty">' + empty + '</p>'; }
+    function groupHtml(rows, empty) { return rows.length ? bucketed(rows) : '<p class="empty">' + empty + '</p>'; }
     function renderGroups() {
       var sort = SORTS[st.sort] || SORTS.closing;
       var rs = PS.filter(function (p) { return matches(p, null); }).sort(sort);

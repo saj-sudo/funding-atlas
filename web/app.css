@@ -1,48 +1,52 @@
 /* Funding Atlas: one stylesheet for the index and every state page. Inlined by scripts/build_site.py.
-   Tokens on :root; dark mode by preference; print rules at the end. System fonts, no assets. */
+   Tokens on :root; dark mode by preference; print rules at the end. Two self-hosted fonts (fonts/), no other assets. */
 
+/* Direction A, "Civic" (13.2, Saj 2026-11-14): blue-biased paper, navy ink, Source Serif 4 for headings and program
+   names, Public Sans (the US Web Design System's face) for everything else. Both fonts are served from fonts/. */
 :root {
-  --bg: #faf9f6;
+  --bg: #f7f8fa;
   --surface: #ffffff;
-  --ink: #1c1b18;
-  --muted: #5d5a53;
-  --line: #e2dfd7;
-  --soft: #f0eee8;
-  --accent: #1d5bb8;
+  --ink: #14213d;
+  --muted: #56607a;
+  --line: #dde1ea;
+  --soft: #eef1f6;
+  --accent: #1f3f8f;
   --accent-ink: #ffffff;
-  --accent-soft: #e6eefb;
-  --likely: #1b6a3d;
-  --likely-soft: #e3f2e8;
-  --possible: #8a5500;
+  --accent-soft: #e7ecf8;
+  --likely: #17663a;
+  --likely-soft: #e2f1e7;
+  --possible: #8a5a00;
   --possible-soft: #fbf0d9;
-  --closing: #b3261e;
+  --closing: #b42318;
   --closing-soft: #fde8e6;
-  --open: #1b6a3d;
-  --forecast: #6b4fbb;
-  --shadow: 0 1px 2px rgba(28, 27, 24, .06), 0 8px 24px rgba(28, 27, 24, .08);
+  --open: #17663a;
+  --forecast: #5a3fa8;
+  --shadow: 0 1px 2px rgba(20, 33, 61, .06), 0 8px 24px rgba(20, 33, 61, .08);
+  --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --radius: 10px;
   --max: 1180px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #15140f;
-    --surface: #1e1d18;
-    --ink: #ebe8df;
-    --muted: #aaa598;
-    --line: #35332c;
-    --soft: #262520;
-    --accent: #86aeff;
-    --accent-ink: #0d1b33;
-    --accent-soft: #1f2a40;
-    --likely: #7fd09b;
-    --likely-soft: #1b2e22;
-    --possible: #f2c069;
-    --possible-soft: #332a18;
-    --closing: #ff8a80;
+    --bg: #0f1420;
+    --surface: #161d2c;
+    --ink: #e6eaf4;
+    --muted: #a3adc4;
+    --line: #2a3347;
+    --soft: #1c2436;
+    --accent: #9db5ff;
+    --accent-ink: #0d1733;
+    --accent-soft: #1d2945;
+    --likely: #7fd3a0;
+    --likely-soft: #173324;
+    --possible: #f0c06a;
+    --possible-soft: #33291a;
+    --closing: #ff8f85;
     --closing-soft: #3a1f1d;
-    --open: #7fd09b;
-    --forecast: #b9a6f2;
+    --open: #7fd3a0;
+    --forecast: #c2adff;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
@@ -54,7 +58,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font: 16px/1.55 var(--f-body);
 }
 a { color: var(--accent); }
 a:hover { text-decoration-thickness: 2px; }
@@ -62,7 +66,7 @@ button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 h1, h2, h3 { line-height: 1.2; margin: 0; letter-spacing: -.01em; }
-h1 { font-size: clamp(1.6rem, 1.1rem + 2vw, 2.4rem); font-weight: 750; }
+h1 { font: 700 clamp(1.7rem, 1.2rem + 2vw, 2.5rem)/1.12 var(--f-display); text-wrap: balance; }
 h2 { font-size: 1.25rem; font-weight: 700; }
 h3 { font-size: 1.05rem; font-weight: 650; }
 p { margin: 0; }
@@ -114,7 +118,7 @@ ul, ol { margin: 0; padding: 0; }
 }
 .tile:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .tile .k { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; }
-.tile .v { font-size: 2rem; font-weight: 750; line-height: 1.1; }
+.tile .v { font: 700 2rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
 .tile .d { font-size: .85rem; color: var(--muted); }
 .tile[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
 .tile.new .v { color: var(--accent); }
@@ -167,13 +171,24 @@ ul, ol { margin: 0; padding: 0; }
 .results { display: grid; gap: 10px; }
 .card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
-  display: grid; gap: 6px; position: relative; cursor: pointer; transition: box-shadow .12s ease, border-color .12s ease;
+  display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; position: relative; cursor: pointer;
+  transition: box-shadow .12s ease, border-color .12s ease;
 }
-.card:hover { box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--line), var(--muted) 30%); }
+.card:hover { box-shadow: var(--shadow); border-color: var(--accent); }
+.card .cbody { display: grid; gap: 4px; min-width: 0; align-content: start; }
+/* the date column: the deadline is the first thing the eye lands on */
+.card .date { display: grid; align-content: start; justify-items: center; text-align: center; padding-right: 12px; border-right: 1px solid var(--line); }
+.card .date .m { font-size: .72rem; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.card .date .dd { font: 700 1.65rem/1.05 var(--f-display); font-variant-numeric: tabular-nums; }
+.card .date.soon .dd, .card .date.soon .m { color: var(--closing); }
+.card .date .nd { font-size: .78rem; line-height: 1.25; color: var(--muted); padding-top: 2px; }
+.card .date.past .dd { color: var(--muted); }
+.list .bucket { margin: 8px 0 0; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.list .bucket:first-child { margin-top: 0; }
 .card:focus-within { outline: 3px solid var(--accent); outline-offset: 1px; }
 .card .when, dialog.detail .when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 650; font-size: .95rem; }
 .card .when .soon { color: var(--closing); }
-.card h3 { font-size: 1.05rem; }
+.card h3 { font: 600 1.14rem/1.3 var(--f-display); letter-spacing: 0; }
 .card h3 button { all: unset; cursor: pointer; color: var(--ink); text-wrap: pretty; }
 .card h3 button:focus-visible { outline: none; }
 .card .meta { color: var(--muted); font-size: .9rem; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
@@ -204,7 +219,8 @@ ul, ol { margin: 0; padding: 0; }
 /* ---------- groups: the state's own programs first, then the folded groups, then federal ---------- */
 .results { gap: 28px; }
 .group { display: grid; gap: 10px; align-content: start; }
-.group h2 { font-size: 1.2rem; }
+.group h2 { font: 600 1.4rem/1.2 var(--f-display); letter-spacing: 0; }
+.group h2 .n { font-family: var(--f-body); }
 .group h2 .n, .group .n { display: inline-block; min-width: 1.6em; padding: 0 7px; margin-left: 4px; border-radius: 999px; background: var(--soft); font-size: .85rem; font-weight: 650; color: var(--muted); vertical-align: middle; text-align: center; }
 .group .d { color: var(--muted); font-size: .92rem; max-width: 78ch; }
 .group .list { display: grid; gap: 10px; }
@@ -248,7 +264,7 @@ dialog.detail { border: 0; padding: 0; margin: 0; max-width: none; max-height: n
 dialog.detail::backdrop { background: rgba(20, 18, 12, .45); }
 dialog.detail .inner { display: grid; grid-template-rows: auto 1fr auto; height: 100%; }
 dialog.detail header { display: flex; gap: 12px; align-items: flex-start; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
-dialog.detail header h2 { font-size: 1.3rem; flex: 1; text-wrap: pretty; }
+dialog.detail header h2 { font: 600 1.4rem/1.25 var(--f-display); flex: 1; text-wrap: pretty; }
 dialog.detail .close { flex: none; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 1.2rem; line-height: 1; display: grid; place-items: center; }
 dialog.detail .body { overflow: auto; padding: 16px 20px 24px; display: grid; gap: 18px; align-content: start; }
 dialog.detail .sect h3 { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
@@ -275,11 +291,11 @@ dialog.detail .trail { font-size: .85rem; color: var(--muted); }
 
 /* ---------- index: tile map ---------- */
 .index-hero { padding: 36px 0 12px; }
-.index-hero h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3rem); max-width: 18ch; }
+.index-hero h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3.1rem); max-width: 18ch; }
 .index-hero .lede { font-size: 1.1rem; max-width: 62ch; margin-top: 12px; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 22px 0 8px; }
 .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; display: grid; gap: 2px; }
-.stat .v { font-size: 1.8rem; font-weight: 750; line-height: 1.1; }
+.stat .v { font: 700 1.9rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
 .stat .k { font-size: .85rem; color: var(--muted); }
 .map-wrap { margin: 24px 0 8px; }
 .map { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 5px; max-width: 760px; }
@@ -322,7 +338,7 @@ footer.site b { color: var(--ink); }
   .topbar label.switch select { max-width: 46vw; }
   .hero { padding-top: 16px; }
   .pulse { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
-  .hero h1 { font-size: 1.5rem; margin-bottom: 6px; }
+  .hero h1 { font-size: 1.6rem; margin-bottom: 6px; }
   .hero .lede { font-size: 1rem; }
   .tile { padding: 8px 10px; gap: 0; }
   .tile .v { order: -1; font-size: 1.4rem; }
@@ -335,7 +351,9 @@ footer.site b { color: var(--ink); }
 }
 @media (max-width: 480px) {
   .group.fold { padding: 12px; }
-  .card { padding: 12px 14px; }
+  .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
+  .card .date { padding-right: 8px; }
+  .card .date .dd { font-size: 1.4rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -350,6 +368,7 @@ footer.site b { color: var(--ink); }
   .group.fold > .btn, .active { display: none !important; }
   .layout { grid-template-columns: 1fr; }
   .card { break-inside: avoid; box-shadow: none; }
+  .card .date.soon .dd, .card .date.soon .m { color: #000; }
   .card:focus-within { outline: none; }
   .card h3 button::after { content: " (" attr(data-url) ")"; font-weight: 400; font-size: .8rem; color: #333; }
   #panel-changes[hidden] { display: block !important; }

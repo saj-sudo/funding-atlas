@@ -239,6 +239,9 @@ def test_write_site(conn, tmp_path):
     assert "url(http" not in body and "cdn" not in body
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'data-page="index"' in index and "Funding Atlas" in index
+    # web fonts are served from the site itself, with their licences, and referenced relative to each page
+    assert (out / "fonts" / "public-sans-latin.woff2").exists() and (out / "fonts" / "OFL-SourceSerif4.txt").exists()
+    assert 'url("../fonts/source-serif-4-latin.woff2")' in page and 'url("fonts/public-sans-latin.woff2")' in index
     # rebuilding wipes stale files
     (out / "stale.txt").write_text("x")
     build_site.write(conn, out, generated_at=GEN)

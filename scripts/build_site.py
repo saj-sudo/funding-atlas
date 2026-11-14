@@ -611,6 +611,9 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         shutil.rmtree(out)
     out.mkdir(parents=True)
     (out / ".nojekyll").write_text("")
+    # The two web fonts (SIL Open Font License, the licence files go with them): same origin, so the pages still
+    # make no request to anyone else. The @font-face rules are in the templates, where {{ROOT}} is filled.
+    shutil.copytree(WEB / "fonts", out / "fonts")
     (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
     generated_at = site["index"]["generated_at"]
     (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",
