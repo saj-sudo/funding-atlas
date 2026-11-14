@@ -482,6 +482,7 @@ decide what gets built next.
 | 2026-11-14 | A change that follows a code release is labelled, not hidden or reclassified | a release in between means the change may be ours; it may also be the agency's, and the log cannot tell, so the label says "may" and the record stays as read | migration 0010 |
 | 2026-11-14 | Per-program feeds for every program with a logged change, not only listed ones | a reader who starred a program should hear that it left the page, and when it comes back | `scripts/build_site.py` |
 | 2026-11-14 | Civic stays; the caution panel, a heavier date column and lettered topic badges come from Wayfinding (Saj) | Wayfinding read better at arm's length on a phone; Civic reads better for long text and as a public notice; the three borrowed pieces carry the first without the second's capitals and condensed type. The topic lines are a display grouping, not data: categories are unchanged | `docs/design/ux_review_2026-11.md` |
+| 2026-11-14 | `summary.json` beside every state page | a second site (CivicRadar's state pages) wants "N programs open to towns here" and a link; pulling JSON out of the HTML is fragile and `changes.json` is the change log, not the open list. Counts and the nearest five stated deadlines over the page's own rows, nothing invented, additive only. Federal rows are one number. Cross-use with the livability map waits on that map being published and carrying a state or county key | `docs/summary_json.md` |
 
 ## Open questions (do not resolve in code yet)
 

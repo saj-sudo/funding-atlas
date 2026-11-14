@@ -469,3 +469,52 @@ def test_control_characters_do_not_break_atom():
     text = build_site.render_atom([entry], state="MD", self_url="https://s/md/feed.xml", alternate_url="https://s/md/", updated=GEN)
     root = ET.fromstring(text)
     assert root.find("{http://www.w3.org/2005/Atom}entry/{http://www.w3.org/2005/Atom}title").text == "added: Badname"
+
+
+def test_summary_json_counts_the_pages_own_rows(conn, tmp_path):
+    """summary.json is the page in numbers: it must agree with the JSON the page embeds, row for row."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    for code in ("md", "va", "wy"):
+        page = (out / code / "index.html").read_text(encoding="utf-8")
+        data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+        summary = json.loads((out / code / "summary.json").read_text(encoding="utf-8"))
+        own = [p for p in data["programs"] if p["state"] is not None]
+        assert summary["state"] == data["state"]
+        assert summary["page"] == f"{build_site.SITE_URL}{code}/"
+        # The page embeds the state's own rows; federal rows ship once in federal.js (13.16), so the federal
+        # number is checked against the count the page states for them.
+        assert len(own) == len(data["programs"])
+        assert summary["open"] == {"state": len(own), "federal": data["coverage"]["federal"]["open"]}
+        assert sum(c["open"] for c in summary["by_category"]) == sum(len(p["categories"]) for p in own)
+        assert summary["license"]["records"] == "ODbL-1.0" and summary["audience"] == "local governments"
+
+
+def test_summary_json_lists_only_real_upcoming_deadlines():
+    """No placeholder dates, nothing already past, nearest first, and never more than SUMMARY_SOON_N."""
+    def row(name, days, *, state="MD", placeholder=False):
+        return {"name": name, "state": state, "agency": "Agency", "slug": name.lower().replace(" ", "-"),
+                "categories": ["housing"], "closes_at": "2026-12-01", "days_to_close": days,
+                "deadline_placeholder": placeholder}
+    data = {
+        "generated_at": GEN,
+        "state": {"code": "MD", "name": "Maryland"},
+        "programs": [
+            row("Past", -3), row("Placeholder", 4000, placeholder=True), row("No date", None),
+            row("Federal", 2, state=None),
+            *[row(f"Round {i}", 10 + i) for i in range(build_site.SUMMARY_SOON_N + 2)],
+            row("Soonest", 1),
+        ],
+    }
+    summary = json.loads(build_site.summary_json(data))
+    names = [c["name"] for c in summary["closing_soon"]]
+    assert names[0] == "Soonest" and len(names) == build_site.SUMMARY_SOON_N
+    assert not {"Past", "Placeholder", "No date", "Federal"} & set(names)
+    assert summary["closing_soon"][0]["link"] == f"{build_site.SITE_URL}md/#p=soonest"
+    assert summary["open"]["federal"] == 1
+
+
+def test_summary_json_exists_for_every_state(conn, tmp_path):
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    for code, _, _, _ in build_site.STATES:
+        summary = json.loads((out / code.lower() / "summary.json").read_text(encoding="utf-8"))
+        assert summary["state"]["code"] == code
