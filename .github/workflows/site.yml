@@ -37,6 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # the whole history: code-releases reads which commits changed each connector
 
       - uses: astral-sh/setup-uv@v5
         with:
@@ -52,6 +54,7 @@ jobs:
             echo "no gh-pages branch yet: starting from an empty database"
           fi
           uv run python cli.py init-db
+          uv run python cli.py code-releases      # refilled from git each run (migration 0010)
 
       - name: Run the connectors
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_connectors)

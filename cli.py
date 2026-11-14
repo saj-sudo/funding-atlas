@@ -24,6 +24,19 @@ def init_db(db_path: DbOpt = db.DEFAULT_DB) -> None:
     typer.echo(f"{db_path}: schema version {db.schema_version(conn)}")
 
 
+@app.command("code-releases")
+def code_releases(
+    ref: Annotated[str, typer.Option(help="the git ref whose first-parent history counts as released (main in CI)")] = "HEAD",
+    db_path: DbOpt = db.DEFAULT_DB,
+) -> None:
+    """Record which commits changed how each connector reads (migration 0010), from git history."""
+    from pipeline.code_release import refresh
+    conn = db.connect(db_path)
+    db.apply_schema(conn)
+    n = refresh(conn, CONNECTORS, ref)
+    typer.echo(f"{db_path}: {n} code releases across {len(CONNECTORS)} connectors (ref {ref})")
+
+
 @app.command()
 def run(
     connector: Annotated[str, typer.Argument(help=f"one of: {', '.join(CONNECTORS)}")],
