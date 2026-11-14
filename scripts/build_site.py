@@ -419,11 +419,12 @@ def _text(value: Any) -> str:
     return _CONTROL_RE.sub("", str(value if value is not None else ""))
 
 
-def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: str, alternate_url: str, updated: str) -> str:
+def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: str, alternate_url: str, updated: str,
+                title: str | None = None) -> str:
     """An Atom feed of the change entries. Built with the standard library; the library escapes the text."""
     feed = ET.Element("feed", xmlns=ATOM_NS)
     where = f"{STATE_NAME[state]} and federal" if state else "every source"
-    ET.SubElement(feed, "title").text = f"{FEED_TITLE} ({where})"
+    ET.SubElement(feed, "title").text = _text(title or f"{FEED_TITLE} ({where})")
     ET.SubElement(feed, "subtitle").text = "Programs a local government could apply to: added, changed or no longer listed, as read from each source."
     ET.SubElement(feed, "id").text = self_url
     ET.SubElement(feed, "updated").text = updated
@@ -631,7 +632,22 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
     listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
-    return {"index": index, "states": states, "feed": feed}
+    # One feed per listed program (13.9): its whole change log, for the watchlist. A program's feed exists while
+    # the program is listed on some page; the watchlist says so.
+    own: dict[int, list[dict[str, Any]]] = {}
+    for c in changes:
+        if c["program_id"] in listed_all:
+            own.setdefault(c["program_id"], []).append(shape_change(c, listed_all))
+    program_feeds = [
+        {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"], "entries": own.get(p["id"], [])}
+        for p in {p["id"]: p for p in programs + between + unstated}.values()
+    ]
+    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds}
+
+
+def program_feed_path(slug: str) -> str:
+    """Where a program's own feed lives, relative to the site root (p/<slug>.xml); app.js builds the same path."""
+    return "p/" + re.sub(r"[^a-z0-9-]+", "-", (slug or "").lower()) + ".xml"
 
 
 def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
@@ -665,6 +681,12 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         counts[code] = len(data["programs"])
+    (out / "p").mkdir()
+    for pf in site["program_feeds"]:
+        path = program_feed_path(pf["slug"])
+        alt = f"{SITE_URL}{pf['state'].lower()}/#p={quote(pf['slug'])}" if pf["state"] else (pf["source_url"] or SITE_URL)
+        (out / path).write_text(render_atom(pf["entries"], state=pf["state"], self_url=SITE_URL + path, alternate_url=alt,
+                                            updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
     return out, counts
 
 

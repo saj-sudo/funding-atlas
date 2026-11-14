@@ -58,12 +58,35 @@
         <option value="amount">Largest award</option>
         <option value="name">Name A to Z</option>
       </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch">Starred <span class="n num" id="watch-n">0</span></button>
       <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
     </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A feed lasts while the program is listed on a page.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <details class="fit" id="fit">
+      <summary>Check fit in three questions</summary>
+      <div class="fit-q">
+        <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+        <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+        <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+      </div>
+      <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+    </details>
     <div class="active" id="active" role="status" aria-live="polite"></div>
     <div class="layout">
       <aside class="facets" id="facets" aria-label="Filters"><a class="skip inside" href="#results">Skip filters, go to results</a><div id="facet-list"></div></aside>
       <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
         <section class="group" id="g-state" aria-labelledby="g-state-h">
           <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
           <p class="d" id="g-state-d"></p>
@@ -124,6 +147,7 @@
     <div class="body" id="detail-body"></div>
     <footer>
       <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
       <button class="btn" id="detail-copy">Copy link</button>
       <span class="copied" id="detail-copied" hidden>Copied</span>
     </footer>

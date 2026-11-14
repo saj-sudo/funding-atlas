@@ -307,6 +307,20 @@ def test_feed_files_exist_for_root_and_every_state(conn, tmp_path):
     assert '<link rel="alternate" type="application/atom+xml"' in (out / "index.html").read_text(encoding="utf-8")
 
 
+def test_every_listed_program_has_its_own_feed(conn, tmp_path):
+    import xml.etree.ElementTree as ET
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    site = build_site.build(conn, generated_at=GEN)
+    listed = {p["slug"] for d in site["states"].values() for p in d["programs"] + d["between"] + d["unstated"]}
+    files = {f.name for f in (out / "p").iterdir()}
+    assert len(files) == len(listed) and all(build_site.program_feed_path(sl)[2:] in files for sl in listed)
+    closed = next(p for p in site["states"]["MD"]["between"] if p["name"] == "Will Close Later")
+    root = ET.parse(out / build_site.program_feed_path(closed["slug"])).getroot()
+    ns = {"a": build_site.ATOM_NS}
+    assert root.find("a:title", ns).text.endswith(": Will Close Later")
+    assert sorted(e.find("a:title", ns).text for e in root.findall("a:entry", ns)) == ["added: Will Close Later", "changed: Will Close Later"]
+
+
 def test_atom_parses_ids_unique_and_scoped_to_the_state(conn, tmp_path):
     import xml.etree.ElementTree as ET
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)

@@ -21,6 +21,8 @@
   --closing-soft: #fde8e6;
   --open: #17663a;
   --forecast: #5a3fa8;
+  --s-fed: #2a78d6;
+  --s-state: #eb6834;
   --shadow: 0 1px 2px rgba(20, 33, 61, .06), 0 8px 24px rgba(20, 33, 61, .08);
   --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
   --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -47,6 +49,8 @@
     --closing-soft: #3a1f1d;
     --open: #7fd3a0;
     --forecast: #c2adff;
+    --s-fed: #3987e5;
+    --s-state: #d95926;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
@@ -234,6 +238,50 @@ ul, ol { margin: 0; padding: 0; }
 .card .cycle .k { color: var(--muted); }
 .empty b { color: var(--ink); }
 
+/* ---------- view switch and the open-window timeline (13.10) ---------- */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.segb { border: 0; background: none; padding: 9px 12px; font-weight: 600; }
+.segb + .segb { border-left: 1px solid var(--line); }
+.segb[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.tl-scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; }
+#tl-svg { display: block; max-width: none; height: auto; }
+#tl-svg text { font: 12px var(--f-body); }
+.tl-t { fill: var(--muted); }
+.tl-n { fill: var(--ink); }
+.tl-grid { stroke: var(--line); }
+.tl-today { stroke: var(--closing); stroke-width: 1.5; }
+.tl-today-t { fill: var(--closing); }
+.tl-hit { fill: transparent; }
+.tl-row { cursor: pointer; outline: none; }
+.tl-row:hover .tl-hit, .tl-row:focus .tl-hit { fill: var(--soft); }
+.tl-bar.st, .tl-dot.st { fill: var(--s-state); }
+.tl-bar.fed, .tl-dot.fed { fill: var(--s-fed); }
+.tl-dot { stroke: var(--surface); stroke-width: 2; }
+.tl-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .88rem; color: var(--muted); }
+.tl-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.tl-legend .sw.st { background: var(--s-state); }
+.tl-legend .sw.fed { background: var(--s-fed); }
+.tl-legend .sw.dot { background: var(--muted); border-radius: 50%; }
+
+/* ---------- fit check (13.11) ---------- */
+.fit { margin: 0 0 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.fit summary { cursor: pointer; font-weight: 650; color: var(--accent); }
+.fit-q { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 10px 0 6px; }
+.fit-q label { display: grid; gap: 4px; font-size: .9rem; color: var(--muted); }
+.fit-q select { padding: 8px 30px 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); max-width: 100%; }
+
+/* ---------- stars and the watchlist (13.9) ---------- */
+.card .star { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; background: none; font-size: 1.3rem; line-height: 1; color: var(--muted); border-radius: 999px; }
+.card .star:hover { background: var(--soft); }
+.card .star[aria-pressed="true"] { color: var(--possible); }
+.card .cbody { padding-right: 34px; }
+.watch { margin: 0 0 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); display: grid; gap: 8px; }
+.watch h2 { font: 600 1.2rem/1.2 var(--f-display); }
+.watch-list { list-style: none; display: grid; gap: 4px; }
+.btn.small, .btn .small { font-size: .85rem; padding: 2px 8px; }
+.btn:disabled { opacity: .5; cursor: default; }
+dialog.detail .star-btn[aria-pressed="true"] { color: var(--possible); border-color: var(--possible); }
+
 /* ---------- digest (13.8) ---------- */
 #panel-digest { display: grid; gap: 14px; }
 #panel-digest[hidden] { display: none !important; }
@@ -244,6 +292,15 @@ ul, ol { margin: 0; padding: 0; }
 #dg-cats .chip[aria-pressed="true"], #dg-win .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 #dg-out { width: 100%; min-height: 360px; font: .88rem/1.5 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; background: var(--surface); color: var(--ink); resize: vertical; }
 .dg-actions { display: flex; gap: 12px; align-items: center; }
+
+/* ---------- wording diff in the feed (13.12) ---------- */
+.diff { margin-top: 4px; font-size: .9rem; }
+.diff summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.diff-f { margin-top: 6px; display: grid; gap: 2px; }
+.diff-k { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; }
+.diff-t { line-height: 1.6; overflow-wrap: anywhere; max-width: 80ch; }
+.diff del { background: var(--closing-soft); color: var(--closing); text-decoration: line-through; text-decoration-thickness: 1px; }
+.diff ins { background: var(--likely-soft); color: var(--likely); text-decoration: none; border-bottom: 2px solid var(--likely); }
 
 /* ---------- changes feed ---------- */
 .chipbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
@@ -365,14 +422,20 @@ footer.site b { color: var(--ink); }
   .hero { padding-top: 16px; }
   .hero h1 { font-size: 1.6rem; margin-bottom: 6px; }
   .hero .lede { font-size: 1rem; }
-  .briefing { padding: 10px 14px; margin-top: 12px; }
-  .briefing li { font-size: 1rem; }
+  .briefing { padding: 10px 12px; margin-top: 10px; gap: 4px; }
+  .briefing ul { gap: 2px; }
+  .briefing li { font: 600 .95rem/1.35 var(--f-body); }
+  .tab { padding: 10px 10px; white-space: nowrap; }
+  .tab .n { margin-left: 4px; }
+  .seg { display: none; }
+  .fit { padding: 8px 12px; }
   .tabs { margin: 12px 0 10px; }
   dialog.detail .answers div { grid-template-columns: 1fr; gap: 2px; }
   dialog.detail { width: 100vw; }
   .feed li.ev { grid-template-columns: 1fr; gap: 2px; }
 }
 @media (max-width: 480px) {
+  .hero .lede { display: none; }
   .group.fold { padding: 12px; }
   .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
   .card .date { padding-right: 8px; }
