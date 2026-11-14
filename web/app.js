@@ -44,13 +44,58 @@
     return s ? s.name : code;
   }
   function el(id) { return document.getElementById(id); }
-  function pill(cls, text) { return '<span class="pill ' + cls + '">' + h(text) + '</span>'; }
-  function tierPill(t) { return pill('tier-' + t, t === 'likely' ? 'Likely' : 'Possible'); }
-  function statusPill(s) { return pill('st-' + s, cap(s)); }
-  function levelPill(p) { return pill('lvl', p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level))); }
-  function badges(p) { return (p.is_new ? pill('new', 'New') : '') + (p.is_updated ? pill('upd', 'Updated') : ''); }
+
+  // Plain words for the stored values. The data keeps its own vocabulary (forecasted, unknown, between rounds);
+  // these are only the labels a reader sees (decision 2026-11-14, docs/design/ux_review_2026-11.md).
+  var STATUS_LABEL = {
+    open: 'Open', forecasted: 'Announced', unknown: 'Status not confirmed', closed: 'Closed',
+    paused: 'Paused', exhausted: 'Funds used up'
+  };
+  var STATUS_GLOSS = {
+    open: 'The source says applications are open.',
+    forecasted: 'The agency has announced it. Applications may not be open yet.',
+    unknown: 'The agency\'s page does not say whether it is open. Check the page before planning around it.',
+    closed: 'The source says this round is closed.',
+    paused: 'The source says this program is paused.',
+    exhausted: 'The source says the money for this round is used up.'
+  };
+  var TIER_LABEL = { likely: 'Likely fit', possible: 'May fit' };
+  var TIER_LONG = {
+    likely: 'Likely fits local governments: the source names towns, cities or counties as eligible.',
+    possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
+  };
+  function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
+  function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
+  function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
+  function badges(p) { return (p.is_new ? '<span class="tag new">New</span>' : '') + (p.is_updated ? '<span class="tag upd">Updated</span>' : ''); }
   function sourceLine(src) {
     return h(src.label) + (src.last_ok ? ' read ' + fmtDate(src.last_ok) : ' (no successful read yet)');
+  }
+
+  // Display only: an agency name the source writes in capitals reads as shouting, and a leading office code
+  // ("69A345 Office of ...") is a portal key, not a name. Nothing is invented; the stored value is unchanged.
+  var KEEP_UPPER = { US: 1, USA: 1, USDA: 1, HUD: 1, EPA: 1, FEMA: 1, NASA: 1, NOAA: 1, NIH: 1, NSF: 1, DOE: 1, DOJ: 1,
+    DOI: 1, DOT: 1, HHS: 1, ACF: 1, OJP: 1, BJA: 1, NEA: 1, NEH: 1, IMLS: 1, CDC: 1, FAA: 1, FTA: 1, FHWA: 1, NPS: 1,
+    BLM: 1, ARC: 1, EDA: 1, SBA: 1, DHS: 1, II: 1, III: 1 };
+  var SMALL = { OF: 1, THE: 1, AND: 1, FOR: 1, TO: 1, IN: 1, ON: 1, AT: 1, BY: 1, A: 1, AN: 1, OR: 1 };
+  function agencyName(p) {
+    var s = p.agency || p.agency_code || '';
+    s = s.replace(/^(?=\S*\d)\S+\s+(?=\S)/, '');
+    if (/[a-z]/.test(s)) return s;
+    var first = true;
+    return s.replace(/[A-Z][A-Z']*/g, function (w) {
+      var out = KEEP_UPPER[w] ? w : (SMALL[w] && !first) ? w.toLowerCase() : w.charAt(0) + w.slice(1).toLowerCase();
+      first = false;
+      return out;
+    });
+  }
+  function amountText(p) {
+    var lo = p.amount_min, hi = p.amount_max;
+    if (lo === 0) lo = null;   // "$0 to $500,000" is a form default, not a floor
+    if (lo != null && hi != null && lo !== hi) return money(lo) + ' to ' + money(hi);
+    if (hi != null) return 'Up to ' + money(hi);
+    if (lo != null) return 'From ' + money(lo);
+    return null;
   }
 
   // Wording of a change's field diff, for the feed.
@@ -101,7 +146,7 @@
       var ago = daysBetween(d, TODAY);
       var label = fmtDate(d) + (ago === 0 ? ' (today)' : ago === 1 ? ' (yesterday)' : ago < 14 ? ' (' + ago + ' days ago)' : '');
       return '<li class="day"><h3>' + h(label) + '</h3><ul>' + byDay[d].map(function (c) {
-        var who = (c.agency || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
+        var who = (agencyName({ agency: c.agency }) || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
         return '<li class="ev"><span class="type ' + h(c.type) + '">' + h(c.type) + '</span><div>' +
           '<div class="name">' + link(c) + '</div>' +
           '<div class="what">' + describe(c) + '</div>' +
@@ -133,31 +178,33 @@
   // =====================================================================================
 
   function statePage() {
-    var P = DATA.programs, B = DATA.between || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
-    P.forEach(function (p) {
-      p._text = [p.name, p.agency, p.agency_code, p.number, p.summary].join(' ').toLowerCase();
+    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var cov = DATA.coverage;
+    P.concat(B, U).forEach(function (p) {
+      p._text = [p.name, p.agency, agencyName(p), p.agency_code, p.number, p.summary].join(' ').toLowerCase();
     });
     var byId = {}, bySlug = {};
-    P.concat(B).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
+    P.concat(B, U).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
 
     var FACETS = [
-      { key: 'tier', label: 'Relevance to a municipality', get: function (p) { return [p.tier]; },
-        lab: function (v) { return v === 'likely' ? 'Likely' : 'Possible'; }, order: ['likely', 'possible'], open: true },
-      { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: cap, open: true },
-      { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: cap, open: true },
+      { key: 'tier', label: 'Fit for a local government', get: function (p) { return [p.tier]; },
+        lab: function (v) { return v === 'likely' ? 'Likely fit' : 'May fit: check eligibility'; }, chip: function (v) { return TIER_LABEL[v]; },
+        order: ['likely', 'possible'], open: true },
+      { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: function (v) { return v === 'state' ? S.name : cap(v); }, open: true },
+      { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: statusLabel, open: true, openOnly: true },
       { key: 'deadline', label: 'Deadline', get: function (p) { return [p.closes_at && !p.deadline_placeholder ? 'dated' : p.rolling ? 'rolling' : p.closes_text ? 'text' : 'none']; },
         lab: function (v) { return { dated: 'Has a date', rolling: 'Rolling or year-round', text: 'Described in words', none: 'Not stated' }[v]; },
-        order: ['dated', 'rolling', 'text', 'none'], open: true },
+        order: ['dated', 'rolling', 'text', 'none'], open: true, openOnly: true },
       { key: 'category', label: 'Category', get: function (p) { return p.categories.length ? p.categories : ['none']; },
         lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: true },
       { key: 'funding_type', label: 'Funding type', get: function (p) { return [p.funding_type || 'none']; },
         lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: false },
-      { key: 'agency', label: 'Agency', get: function (p) { return [p.agency || p.agency_code || 'Not stated']; },
+      { key: 'agency', label: 'Agency', get: function (p) { return [agencyName(p) || 'Not stated']; },
         lab: function (v) { return v; }, open: false, long: true }
     ];
     var DEFAULT_SEL = { tier: ['likely'] };
 
-    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false };
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false };
     function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
     resetSel();
 
@@ -179,6 +226,7 @@
       if (hsh.feed) st.feed = hsh.feed;
       if (hsh.quick) st.quick = hsh.quick;
       if (hsh.between === '1') st.between = true;
+      if (hsh.unstated === '1') st.unstated = true;
       var any = false;
       FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
       if (hsh.all === '1' && !any) st.sel = {};
@@ -192,6 +240,7 @@
       if (st.tab === 'changes') parts.push('tab=changes');
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
       if (st.between) parts.push('between=1');
+      if (st.unstated) parts.push('unstated=1');
       var same = true;
       FACETS.forEach(function (f) {
         var cur = (st.sel[f.key] || []).slice().sort().join(','), def = (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
@@ -206,15 +255,17 @@
     }
 
     // ---- matching ----
+    // `skip` leaves one facet out (for its own counts). `folded` marks the closed and status-not-confirmed groups:
+    // the status and deadline facets describe open rows, so they do not filter those groups.
     function termsOf(q) { return q.toLowerCase().split(/\s+/).filter(Boolean); }
-    function matches(p, skip) {
+    function matches(p, skip, folded) {
       if (st.quick === 'new' && !p.is_new) return false;
       if (st.quick === 'closing' && !isSoon(p)) return false;
       var terms = termsOf(st.q);
       for (var i = 0; i < terms.length; i++) if (p._text.indexOf(terms[i]) < 0) return false;
       for (var j = 0; j < FACETS.length; j++) {
         var f = FACETS[j];
-        if (f.key === skip) continue;
+        if (f.key === skip || (folded && f.openOnly)) continue;
         var sel = st.sel[f.key];
         if (!sel || !sel.length) continue;
         var vals = f.get(p), ok = false;
@@ -235,22 +286,25 @@
     };
 
     // ---- header ----
-    el('title').textContent = S.name + ': open funding for local governments';
-    var cov = DATA.coverage, nState = cov.state ? cov.state.open : 0;
-    el('lede').textContent = P.length + ' program' + (P.length === 1 ? '' : 's') + ' a town, city or county in ' + S.name +
-      ' can apply to now or soon: ' + cov.federal.open + ' federal' + (cov.state ? ' and ' + nState + ' from ' + S.name + ' agencies' : '') +
-      '. Sorted by deadline. Open a card for the source\'s own eligibility wording.';
-    var covHtml = '<span class="cov"><b>Federal:</b> ' + cov.federal.open + ' open notices' +
-      (cov.federal.sources.length ? ' · ' + cov.federal.sources.map(sourceLine).join(' · ') : ' · no sources read yet') + '</span>';
-    if (cov.state) {
-      covHtml += '<span class="cov"><b>' + h(S.name) + ':</b> ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
-        ' · ' + cov.state.programs + ' programs read · ' + cov.state.open + ' open for local governments' +
-        (cov.state.between ? ' · ' + cov.state.between + ' between rounds' : '') +
-        (cov.state.last_ok ? ' · read ' + fmtDate(cov.state.last_ok) : '') + '</span>';
-    } else {
-      covHtml += '<span class="cov none"><b>' + h(S.name) + ':</b> no state sources yet. Federal notices only.</span>';
-    }
-    el('coverage').innerHTML = covHtml;
+    var PS = P.filter(function (p) { return p.state; }), PF = P.filter(function (p) { return !p.state; });
+    el('title').textContent = S.name + ': funding for local governments';
+    el('lede').textContent = cov.state
+      ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
+      : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
+    var sources = cov.federal.sources.concat(cov.state ? cov.state.sources : []);
+    var lastRead = sources.map(function (s) { return s.last_ok || ''; }).sort().pop();
+    el('coverage-sum').innerHTML = (cov.state
+      ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
+      : 'Read daily from Grants.gov') +
+      (lastRead ? ' · last read ' + h(fmtDate(lastRead)) : '') + ' · built ' + h(fmtDate(DATA.generated_at));
+    el('coverage-body').innerHTML =
+      '<p><b>Federal:</b> ' + cov.federal.open + ' open or announced notices · ' +
+      (cov.federal.sources.length ? cov.federal.sources.map(sourceLine).join(' · ') : 'no sources read yet') + '</p>' +
+      (cov.state
+        ? '<p><b>' + h(S.name) + ':</b> ' + cov.state.programs + ' programs read from ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
+          '; ' + cov.state.open + ' open or announced for local governments, ' + (cov.state.unstated || 0) + ' with no status stated, ' +
+          cov.state.between + ' closed recently.</p><ul class="srcs">' + cov.state.sources.map(function (s) { return '<li>' + sourceLine(s) + '</li>'; }).join('') + '</ul>'
+        : '<p><b>' + h(S.name) + ':</b> no state agency sources yet. Federal notices only.</p>');
 
     var sw = el('state-switch');
     sw.innerHTML = DATA.states.map(function (s) { return '<option value="' + h(s.code) + '"' + (s.code === S.code ? ' selected' : '') + '>' + h(s.name) + '</option>'; }).join('');
@@ -261,17 +315,17 @@
     var nClosing = P.filter(isSoon).length;
     var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
     el('n-new').textContent = nNew; el('n-closing').textContent = nClosing; el('n-changed').textContent = flips.length;
-    el('tile-new').querySelector('.d').textContent = 'first seen by the registry in the last ' + R.new_days + ' days';
-    el('tile-closing').querySelector('.d').textContent = 'deadline between today and ' + R.closing_days + ' days out';
-    el('tile-changed').querySelector('.d').textContent = 'status flipped in the last ' + R.new_days + ' days';
+    el('tile-new').querySelector('.d').textContent = 'first seen in the last ' + R.new_days + ' days';
+    el('tile-closing').querySelector('.d').textContent = 'deadline in the next ' + R.closing_days + ' days';
+    el('tile-changed').querySelector('.d').textContent = 'opened, closed or announced in the last ' + R.new_days + ' days';
     if (!nNew) el('tile-new').disabled = true;
     if (!nClosing) el('tile-closing').disabled = true;
     if (!flips.length) el('tile-changed').disabled = true;
     el('tab-n-changes').textContent = C.length;
-    el('tab-n-programs').textContent = P.length;
+    el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
 
-    // ---- facets (built once; counts updated in place) ----
+    // ---- facets (built once over the open rows; counts updated in place) ----
     var facetsEl = el('facets'), facetList = el('facet-list');
     function buildFacets() {
       facetList.innerHTML = FACETS.map(function (f) {
@@ -287,7 +341,7 @@
             return '<li data-v="' + h(v) + '"><label for="' + id + '"><input type="checkbox" id="' + id + '" name="' + h(f.key) + '" value="' + h(v) + '">' +
               '<span class="lbl">' + h(f.lab(v)) + '</span><span class="cnt" aria-label="count"></span></label></li>';
           }).join('') + '</ul></details>';
-      }).join('') + '<button class="btn quiet clear" id="clear" type="button">Clear filters</button>';
+      }).join('') + '<p class="facet-note">Counts are open and announced programs.</p>';
       facetsEl.addEventListener('change', function (e) {
         var cb = e.target;
         if (cb.type !== 'checkbox') return;
@@ -297,7 +351,6 @@
         if (!cb.checked && i >= 0) sel.splice(i, 1);
         render();
       });
-      el('clear').addEventListener('click', function () { st.sel = {}; st.q = ''; st.quick = null; el('q').value = ''; render(); el('q').focus(); });
     }
     function updateFacets() {
       var active = 0;
@@ -316,89 +369,119 @@
       });
       var fn = el('filters-n');
       fn.hidden = !active; fn.textContent = active;
-      el('clear').hidden = !active && !st.q && !st.quick;
     }
 
-    // ---- results ----
-    function closesHtml(p) {
-      if (p.closes_at && p.deadline_placeholder) {
-        // The source states a far-off date (2035, 2999) as its way of saying "no deadline"; show that, keep the date.
-        return '<span><b>' + (p.rolling ? 'Rolling' : 'No deadline stated') + '</b> · source lists ' + h(fmtDate(p.closes_at)) + '</span>';
-      }
-      if (p.closes_at) {
-        var soon = isSoon(p);
-        return '<span class="' + (soon ? 'soon' : '') + '"><b>' + h(relDays(p.days_to_close)) + '</b> · ' + h(fmtDate(p.closes_at)) + '</span>';
-      }
-      if (p.closes_text) return '<span><span class="k">Deadline</span> ' + h(p.closes_text) + '</span>';
-      if (p.rolling) return '<span><b>Rolling</b> · applications accepted year-round</span>';
-      return '<span class="k">No deadline stated</span>';
+    // ---- the active filters, always visible: the default "Likely fit" is a choice the reader can see and undo ----
+    var activeEl = el('active');
+    function renderActive(shown) {
+      var chips = [];
+      if (st.quick) chips.push('<button class="fchip" data-clear="quick" aria-label="Remove filter: ' + (st.quick === 'new' ? 'new this week' : 'closing soon') + '">' + (st.quick === 'new' ? 'New this week' : 'Closing soon') + ' <span aria-hidden="true">×</span></button>');
+      if (st.q) chips.push('<button class="fchip" data-clear="q" aria-label="Clear the search">“' + h(st.q) + '” <span aria-hidden="true">×</span></button>');
+      FACETS.forEach(function (f) {
+        (st.sel[f.key] || []).forEach(function (v) {
+          var t = f.chip ? f.chip(v) : f.lab(v);
+          chips.push('<button class="fchip" data-facet="' + f.key + '" data-v="' + h(v) + '" aria-label="Remove filter: ' + h(t) + '">' + h(t) + ' <span aria-hidden="true">×</span></button>');
+        });
+      });
+      var total = P.length + B.length + U.length;
+      var isDefault = !st.q && !st.quick && FACETS.every(function (f) {
+        return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+      });
+      activeEl.innerHTML = '<span class="count num">Showing ' + shown + ' of ' + total + '</span>' +
+        (chips.length ? '<span class="lbl">Filtered to</span>' + chips.join('') : '') +
+        (chips.length ? '<button class="btn quiet" data-clear="all">' + (isDefault ? 'Show all ' + total : 'Clear all') + '</button>' : '');
     }
+    activeEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      var c = b.getAttribute('data-clear'), fk = b.getAttribute('data-facet');
+      if (c === 'all') { st.sel = {}; st.q = ''; st.quick = null; }
+      else if (c === 'q') st.q = '';
+      else if (c === 'quick') st.quick = null;
+      else if (fk) { var sel = st.sel[fk] || []; sel.splice(sel.indexOf(b.getAttribute('data-v')), 1); }
+      render();
+      el('q').focus();
+    });
+
+    // ---- cards: one layout everywhere, status and deadline first, then name, agency, money ----
+    function deadlineHtml(p) {
+      if (p.closes_at && p.deadline_placeholder) return '<span>' + (p.rolling ? 'Rolling deadline' : 'No deadline stated') + '</span>';
+      if (p.closes_at && p.days_to_close != null && p.days_to_close >= 0) {
+        return '<span class="' + (isSoon(p) ? 'soon' : '') + '">' + h(cap(relDays(p.days_to_close))) + ', ' + h(fmtDate(p.closes_at)) + '</span>';
+      }
+      if (p.closes_at) return '<span>Last deadline ' + h(fmtDate(p.closes_at, true)) + (p.days_since_deadline != null ? ' (' + h(agoDays(p.days_since_deadline)) + ')' : '') + '</span>';
+      if (p.rolling) return '<span>Rolling deadline</span>';
+      if (p.closes_text) return '<span>Deadline in the source\'s words below</span>';
+      return '<span class="muted">No deadline stated</span>';
+    }
+    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     function card(p) {
-      var meta = [p.agency || p.agency_code, p.number].filter(Boolean).join(' · ');
-      var facts = [closesHtml(p)];
-      if (p.amount_max != null) facts.push('<span><span class="k">Max award</span> <b class="num">' + money(p.amount_max) + '</b></span>');
-      else if (p.amount_min != null) facts.push('<span><span class="k">From</span> <b class="num">' + money(p.amount_min) + '</b></span>');
-      if (p.match_required != null) facts.push('<span><span class="k">Match</span> <b>' + (p.match_required ? 'required' : 'not required') + '</b></span>');
-      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span class="k">' + h(words(p.funding_type)) + '</span>');
-      return '<article class="card" data-id="' + p.id + '">' +
-        '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
+      var amount = amountText(p);
+      var facts = [
+        '<span>' + (amount ? '<b class="num">' + h(amount) + '</b>' : '<span class="muted">Amount not published</span>') + '</span>'
+      ];
+      if (p.match_required != null) facts.push('<span>' + (p.match_required ? 'Match required' : 'No match required') + '</span>');
+      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span>' + h(words(p.funding_type)) + '</span>');
+      if (p.last_reopened) facts.push('<span>Reopened last on ' + h(fmtDate(p.last_reopened, true)) + '</span>');
+      var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
+        (p.categories.length > 3 ? '<li class="more">+' + (p.categories.length - 3) + '</li>' : '');
+      var quoteText = p.closes_text && (!p.closes_at || p.status !== 'open') && !p.rolling ? p.closes_text : null;
+      return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' +
+        '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        (meta ? '<p class="meta">' + h(meta) + '</p>' : '') +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + ' · ' + h(levelLabel(p)) + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
-        (p.categories.length ? '<ul class="chips" aria-label="Categories">' + p.categories.map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') + '</ul>' : '') +
-        '<span class="arrow" aria-hidden="true">›</span></article>';
+        (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
+        (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
+        '</article>';
     }
+
+    // ---- the four groups ----
     var resultsEl = el('results');
     resultsEl.tabIndex = -1;
-    function renderResults() {
-      var rows = P.filter(function (p) { return matches(p, null); }).sort(SORTS[st.sort] || SORTS.closing);
-      el('count').textContent = 'Showing ' + rows.length + ' of ' + P.length;
-      if (!rows.length) {
-        resultsEl.innerHTML = '<div class="empty"><b>Nothing matches.</b><br>Try fewer filters, or include the <b>possible</b> tier.</div>';
-        return;
-      }
-      resultsEl.innerHTML = rows.map(card).join('');
+    el('g-state-t').textContent = S.name + ' programs open or announced';
+    el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
+    el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
+      ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
+    function groupHtml(rows, empty) { return rows.length ? rows.map(card).join('') : '<p class="empty">' + empty + '</p>'; }
+    function renderGroups() {
+      var sort = SORTS[st.sort] || SORTS.closing;
+      var rs = PS.filter(function (p) { return matches(p, null); }).sort(sort);
+      var rf = PF.filter(function (p) { return matches(p, null); }).sort(sort);
+      var ru = U.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      var rb = B.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      el('g-state-n').textContent = rs.length;
+      el('g-federal-n').textContent = rf.length;
+      el('g-unstated-n').textContent = ru.length;
+      el('g-between-n').textContent = rb.length;
+
+      var stateEmpty;
+      if (!cov.state) stateEmpty = 'No ' + h(S.name) + ' agency sources are connected yet, so this page lists federal notices only.';
+      else if (!PS.length) stateEmpty = 'No ' + h(S.name) + ' programs are open or announced right now.' +
+        (ru.length || rb.length ? ' ' + [ru.length ? ru.length + (ru.length === 1 ? ' has' : ' have') + ' no status on the agency\'s page' : '', rb.length ? rb.length + ' closed recently' : ''].filter(Boolean).join(' and ') + ': see below.' : '');
+      else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
+      el('list-state').innerHTML = groupHtml(rs, stateEmpty);
+      el('g-state-d').hidden = true;
+      el('list-federal').innerHTML = groupHtml(rf, 'No federal notices match these filters.');
+
+      el('g-unstated').hidden = !ru.length;
+      el('g-between').hidden = !rb.length;
+      el('list-unstated').innerHTML = ru.map(card).join('');
+      el('list-between').innerHTML = rb.map(card).join('');
+      [['unstated', 'unstated-toggle', 'list-unstated', ru.length], ['between', 'between-toggle', 'list-between', rb.length]].forEach(function (g) {
+        var open = st[g[0]], t = el(g[1]);
+        t.setAttribute('aria-expanded', String(open));
+        t.textContent = open ? 'Hide' : 'Show ' + g[3];
+        el(g[2]).hidden = !open;
+      });
+      renderActive(rs.length + rf.length + ru.length + rb.length);
     }
+    el('unstated-toggle').addEventListener('click', function () { st.unstated = !st.unstated; render(); });
+    el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
     resultsEl.addEventListener('click', function (e) {
       if (e.target.closest('a')) return;
       var c = e.target.closest('.card');
-      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
-    });
-
-    // ---- between rounds: closed or past-deadline state programs, collapsed by default ----
-    // Nothing here forecasts: the last deadline is what the source stated, the cycle text is the source's own
-    // wording, and "reopened last on" is an observation from the change log (absent until it has happened).
-    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
-    function betweenCard(p) {
-      var meta = [p.agency || p.agency_code, p.number].filter(Boolean).join(' · ');
-      var facts = [];
-      if (p.closes_at) facts.push('<span><span class="k">Last deadline</span> <b>' + h(fmtDate(p.closes_at)) + '</b>' + (p.days_since_deadline != null ? ' · ' + h(agoDays(p.days_since_deadline)) : '') + '</span>');
-      else facts.push('<span class="k">No deadline date stated</span>');
-      if (p.last_reopened) facts.push('<span><span class="k">Reopened last on</span> <b>' + h(fmtDate(p.last_reopened, true)) + '</b></span>');
-      if (p.amount_max != null) facts.push('<span><span class="k">Max award</span> <b class="num">' + money(p.amount_max) + '</b></span>');
-      if (p.match_required != null) facts.push('<span><span class="k">Match</span> <b>' + (p.match_required ? 'required' : 'not required') + '</b></span>');
-      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span class="k">' + h(words(p.funding_type)) + '</span>');
-      return '<article class="card between-card" data-id="' + p.id + '">' +
-        '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        (meta ? '<p class="meta">' + h(meta) + '</p>' : '') +
-        '<div class="facts">' + facts.join('') + '</div>' +
-        (p.closes_text ? '<p class="cycle"><span class="k">As written by the source:</span> ' + h(p.closes_text) + '</p>' : '') +
-        (p.categories.length ? '<ul class="chips" aria-label="Categories">' + p.categories.map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') + '</ul>' : '') +
-        '<span class="arrow" aria-hidden="true">›</span></article>';
-    }
-    var betweenEl = el('between'), betweenList = el('between-list'), betweenToggle = el('between-toggle');
-    el('n-between').textContent = B.length;
-    el('between-d').textContent = (cov.state ? S.name + ' programs' : 'State programs') +
-      ' for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) +
-      ' months of that deadline, with the last deadline and the agency\'s own wording about its cycle. Nothing here forecasts the next round; the change log shows the day one reopens.';
-    betweenList.innerHTML = B.map(betweenCard).join('');
-    if (!B.length) betweenEl.hidden = true;
-    betweenToggle.addEventListener('click', function () { st.between = !st.between; render(); });
-    betweenList.addEventListener('click', function (e) {
-      if (e.target.closest('a')) return;
-      var c = e.target.closest('.card');
-      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
+      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
     });
 
     // ---- pulse, tabs, feed ----
@@ -439,42 +522,54 @@
       if (b) openDetail(byId[b.getAttribute('data-open')], b);
     });
 
-    // ---- detail dialog ----
+    // ---- detail dialog: five answers first, then the source's own words ----
     var dlg = el('detail'), lastFocus = null, current = null;
     function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
     function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
+    function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
+    var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
     function detailHtml(p) {
       var listingName = {};
       p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
-      var amount = p.amount_min != null && p.amount_max != null ? money(p.amount_min) + ' to ' + money(p.amount_max)
-        : p.amount_max != null ? 'up to ' + money(p.amount_max) : p.amount_min != null ? 'from ' + money(p.amount_min) : null;
-      var closes = p.closes_at ? h(fmtDate(p.closes_at)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>' : null;
+      var amount = amountText(p);
+      var closes;
+      if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
+      else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
+      else if (p.rolling) closes = 'Rolling deadline';
+      else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
+      else if (p.closes_text) closes = 'In the source\'s words, below';
+      else closes = NOT_PUBLISHED;
+      var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
+      var answers =
+        '<dl class="answers">' +
+        '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+        '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
+        '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
+        '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
+        '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
+        '</dl>';
       var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
       var facts =
-        fact('Status', h(cap(p.status))) +
-        fact('Closes', closes, isSoon(p) ? 'soon' : '') +
-        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at)) : null) +
-        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
-        fact('Deadline, as written', p.closes_text && p.closes_text.length <= 80 ? h(p.closes_text) : null) +
-        fact('Rolling', p.rolling == null ? null : (p.rolling ? 'Yes, applications accepted year-round' : 'No')) +
-        fact('Award', amount ? h(amount) : null) +
+        fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
         fact('Match required', match ? h(match) : null) +
+        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
+        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
         fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
-        fact('Funding source', p.funding_source ? h(p.funding_source === 'pass_through' ? 'Pass-through' : 'Direct') : null) +
-        fact('Agency', p.agency ? h(p.agency) + (p.agency_code ? ' <span class="muted small">' + h(p.agency_code) + '</span>' : '') : (p.agency_code ? h(p.agency_code) : null)) +
+        fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
+        fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
         fact('Number', p.number ? h(p.number) : null);
       var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
         return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
       }).join('') + '</ul>' : '';
       var trail = 'First seen ' + fmtDate(p.first_seen, true) +
         (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
-        ' · read by the ' + (DATA.coverage.federal.sources.concat(DATA.coverage.state ? DATA.coverage.state.sources : []).filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label + ' connector';
-      return '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
-        '<div class="sect"><div class="facts">' + facts + '</div></div>' +
-        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 80 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
-        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        ' · read from ' + (sources.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
+      return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
+        answers +
+        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
         sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
-        sect('Who can apply (tags read from the text)', p.applicant_types.length ? '<ul class="chips">' + p.applicant_types.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
+        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        sect('More details', '<div class="facts">' + facts + '</div>') +
         sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
         sect('Assistance Listings this notice cites', alns) +
         '<p class="trail">' + h(trail) + '</p>';
@@ -550,10 +645,7 @@
       el('sort').value = st.sort;
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();
-      renderResults();
-      betweenToggle.setAttribute('aria-expanded', String(st.between));
-      betweenToggle.textContent = st.between ? 'Hide' : 'Show ' + B.length;
-      betweenList.hidden = !st.between;
+      renderGroups();
       renderFeed(feedEl, feedRows(), function (c) {
         return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
           : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
@@ -566,9 +658,9 @@
     syncFacetsVisibility();
     render();
     renderFooter(
-      '<p><b>Tier</b> is a rule-based reading of the record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>possible</i> means local governments are eligible but the signal is weaker. ' +
+      '<p><b>Likely fit</b> and <b>May fit</b> are rule-based readings of each record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>may fit</i> means local governments are eligible but the signal is weaker. ' +
       DATA.excluded_unlikely + ' further open records that list local governments as eligible are left off this page as unlikely (research notices, requests for information, foreign-facing programs).</p>' +
-      '<p><b>Between rounds</b> lists state programs for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) + ' months of it, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
+      '<p><b>Announced</b> is what Grants.gov and state portals call forecasted: the agency has said the program is coming. <b>Status not confirmed</b> means the agency\'s page states no status and no date; the page is listed, not judged. <b>Closed recently</b> lists state programs for local governments that closed within ' + (R.between_months || 15) + ' months, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
     );
     if (slug && bySlug[slug]) openDetail(bySlug[slug], null, true);
   }
@@ -584,11 +676,11 @@
       '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
       '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
       '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' between rounds</span></div>';
+      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open or announced for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' closed recently</span></div>';
 
     function covText(s) {
       return s.programs > 0
-        ? s.name + ': ' + s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open for local governments' + (s.between ? ', ' + s.between + ' between rounds' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. Plus ' + F.open + ' federal notices.'
+        ? s.name + ': ' + s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open or announced for local governments' + (s.unstated ? ', ' + s.unstated + ' with no status stated' : '') + (s.between ? ', ' + s.between + ' closed recently' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. Plus ' + F.open + ' federal notices.'
         : s.name + ': no state sources yet. ' + F.open + ' federal notices.';
     }
     var map = el('map');

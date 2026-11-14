@@ -19,8 +19,7 @@
   <div class="wrap">
     <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
     <span class="spacer"></span>
-    <label>State <select id="state-switch" aria-label="Switch state"></select></label>
-    <span class="gen">Built {{GENERATED}}</span>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
   </div>
 </header>
 
@@ -28,19 +27,19 @@
   <section class="hero">
     <h1 id="title"></h1>
     <p class="lede" id="lede"></p>
-    <div class="coverage" id="coverage" aria-label="Coverage"></div>
-    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON.</p></noscript>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built {{GENERATED}}.</p></noscript>
   </section>
 
   <section class="pulse" aria-label="What changed">
     <button class="tile new" id="tile-new" aria-pressed="false" data-quick="new">
-      <span class="k">New this week</span><span class="v num" id="n-new">0</span><span class="d">first seen by the registry in the last 7 days</span>
+      <span class="k">New this week</span><span class="v num" id="n-new">0</span><span class="d">first seen in the last 7 days</span>
     </button>
     <button class="tile closing" id="tile-closing" aria-pressed="false" data-quick="closing">
-      <span class="k">Closing within 30 days</span><span class="v num" id="n-closing">0</span><span class="d">deadline between today and 30 days out</span>
+      <span class="k">Closing soon</span><span class="v num" id="n-closing">0</span><span class="d">deadline in the next 30 days</span>
     </button>
     <button class="tile changed" id="tile-changed" aria-pressed="false" data-quick="changed">
-      <span class="k">Status changed</span><span class="v num" id="n-changed">0</span><span class="d">open, forecasted or closed flipped in the last 7 days</span>
+      <span class="k">Status changed</span><span class="v num" id="n-changed">0</span><span class="d">opened, closed or announced in the last 7 days</span>
     </button>
   </section>
 
@@ -54,7 +53,7 @@
     <div class="toolbar">
       <div class="search">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="search" id="q" placeholder="Search name, agency, number, summary" aria-label="Search programs" autocomplete="off">
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
       </div>
       <label class="sort">Sort <select id="sort">
         <option value="closing">Closing soonest</option>
@@ -63,19 +62,36 @@
         <option value="amount">Largest award</option>
         <option value="name">Name A to Z</option>
       </select></label>
-      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filters <span class="n num" id="filters-n" hidden>0</span></button>
-      <span class="count num" id="count" role="status" aria-live="polite"></span>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
     </div>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
     <div class="layout">
       <aside class="facets" id="facets" aria-label="Filters"><a class="skip inside" href="#results">Skip filters, go to results</a><div id="facet-list"></div></aside>
-      <div class="results" id="results"></div>
+      <div class="results" id="results">
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
     </div>
-    <section class="between" id="between" aria-labelledby="between-h">
-      <h2 id="between-h">Between rounds <span class="n num" id="n-between">0</span></h2>
-      <p class="d" id="between-d"></p>
-      <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="between-list">Show</button>
-      <div class="between-list" id="between-list" hidden></div>
-    </section>
   </section>
 
   <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
@@ -98,7 +114,7 @@
     </header>
     <div class="body" id="detail-body"></div>
     <footer>
-      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Open the source page</a>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
       <button class="btn" id="detail-copy">Copy link</button>
       <span class="copied" id="detail-copied" hidden>Copied</span>
     </footer>
