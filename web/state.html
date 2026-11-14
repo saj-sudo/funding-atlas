@@ -9,6 +9,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
 <link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
 <style>
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("{{ROOT}}fonts/source-serif-4-latin.woff2") format("woff2"); }
 {{CSS}}
 </style>
 </head>
@@ -19,8 +21,8 @@
   <div class="wrap">
     <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
     <span class="spacer"></span>
-    <label>State <select id="state-switch" aria-label="Switch state"></select></label>
-    <span class="gen">Built {{GENERATED}}</span>
+    <a class="navlink" href="{{ROOT}}about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
   </div>
 </header>
 
@@ -28,25 +30,25 @@
   <section class="hero">
     <h1 id="title"></h1>
     <p class="lede" id="lede"></p>
-    <div class="coverage" id="coverage" aria-label="Coverage"></div>
-    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON.</p></noscript>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built {{GENERATED}}.</p></noscript>
   </section>
 
-  <section class="pulse" aria-label="What changed">
-    <button class="tile new" id="tile-new" aria-pressed="false" data-quick="new">
-      <span class="k">New this week</span><span class="v num" id="n-new">0</span><span class="d">first seen by the registry in the last 7 days</span>
-    </button>
-    <button class="tile closing" id="tile-closing" aria-pressed="false" data-quick="closing">
-      <span class="k">Closing within 30 days</span><span class="v num" id="n-closing">0</span><span class="d">deadline between today and 30 days out</span>
-    </button>
-    <button class="tile changed" id="tile-changed" aria-pressed="false" data-quick="changed">
-      <span class="k">Status changed</span><span class="v num" id="n-changed">0</span><span class="d">open, forecasted or closed flipped in the last 7 days</span>
-    </button>
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+    <details class="ahead" id="ahead">
+      <summary>Deadlines over the next 26 weeks</summary>
+      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st" id="ahead-st"></i><span id="ahead-st-l">State</span></span></div>
+      <div class="chart-scroll"><svg id="ahead-svg" role="img" aria-label="Deadlines per week, next 26 weeks"></svg></div>
+      <p class="muted small" id="ahead-note"></p>
+    </details>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Views">
     <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
     <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
   </div>
 
   <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
@@ -54,28 +56,78 @@
     <div class="toolbar">
       <div class="search">
         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="search" id="q" placeholder="Search name, agency, number, summary" aria-label="Search programs" autocomplete="off">
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
       </div>
-      <label class="sort">Sort <select id="sort">
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
         <option value="closing">Closing soonest</option>
         <option value="newest">Newest first</option>
         <option value="changed">Recently changed</option>
         <option value="amount">Largest award</option>
         <option value="name">Name A to Z</option>
       </select></label>
-      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filters <span class="n num" id="filters-n" hidden>0</span></button>
-      <span class="count num" id="count" role="status" aria-live="polite"></span>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
     </div>
-    <div class="layout">
-      <aside class="facets" id="facets" aria-label="Filters"><a class="skip inside" href="#results">Skip filters, go to results</a><div id="facet-list"></div></aside>
-      <div class="results" id="results"></div>
-    </div>
-    <section class="between" id="between" aria-labelledby="between-h">
-      <h2 id="between-h">Between rounds <span class="n num" id="n-between">0</span></h2>
-      <p class="d" id="between-d"></p>
-      <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="between-list">Show</button>
-      <div class="between-list" id="between-list" hidden></div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
     </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <p class="topic-key" id="topic-key"></p>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
   </section>
 
   <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
@@ -88,6 +140,19 @@
     </div>
     <ol class="feed" id="feed"></ol>
   </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
 </main>
 
 <dialog class="detail" id="detail" aria-labelledby="detail-title">
@@ -98,7 +163,8 @@
     </header>
     <div class="body" id="detail-body"></div>
     <footer>
-      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Open the source page</a>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
       <button class="btn" id="detail-copy">Copy link</button>
       <span class="copied" id="detail-copied" hidden>Copied</span>
     </footer>
@@ -110,6 +176,7 @@
 </footer>
 
 <script type="application/json" id="data">{{DATA}}</script>
+<script src="{{ROOT}}federal.js?v={{GENERATED}}"></script>
 <script>
 {{JS}}
 </script>

@@ -61,6 +61,11 @@ FIRST_RUN = [
          administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
          status="closed", closes_at=(NOW - timedelta(days=700)).date()),
     prog("10", "Old Notice", status="closed", closes_at=(NOW - timedelta(days=30)).date(), eligibility_text="local governments"),
+    # status not confirmed: a state page that states no status and no date (listed, migration 0008), and a federal
+    # Assistance Listing in the same state of knowledge (never listed: federal rows stay off the group)
+    prog("11", "Main Street Facades", source_connector="md_dhcd", level="state", jurisdiction="MD",
+         administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+         status="unknown", closes_at=None, closes_at_text="Applications are accepted each spring."),
 ]
 SECOND_RUN = [
     prog("4", "Will Close Later", source_connector="md_dhcd", level="state", jurisdiction="MD",
@@ -111,7 +116,7 @@ def test_navigator_change_keeps_the_closed_flip(conn):
 
 def test_navigator_coverage(conn):
     cov = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_navigator_coverage")}
-    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 4 and cov["MD"]["n_open_municipal"] == 1
+    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 5 and cov["MD"]["n_open_municipal"] == 1
     assert cov["MD"]["n_between_rounds"] == 2 and cov["MD"]["last_ok"] == T2
     assert cov["VA"]["n_programs"] == 1 and cov["VA"]["n_between_rounds"] == 0 and cov["VA"]["last_ok"] is None
     assert "US" not in cov
@@ -128,6 +133,18 @@ def test_navigator_between_lists_recent_closed_state_rounds_only(conn):
     assert rows[1]["closes_at"] is None and rows[1]["days_since_deadline"] is None
     on_page = {r["id"] for r in conn.execute("SELECT id FROM v_navigator_program")}
     assert not on_page & {r["id"] for r in rows}
+
+
+def test_navigator_unstated_lists_state_rows_with_no_status_and_no_date(conn):
+    rows = [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
+    assert [r["name"] for r in rows] == ["Main Street Facades"]
+    assert rows[0]["closes_at_text"] == "Applications are accepted each spring." and rows[0]["state"] == "MD"
+    # the three state views partition what they list: no row in two of them
+    groups = [{r["id"] for r in conn.execute(f"SELECT id FROM {v} WHERE state IS NOT NULL")}
+              for v in ("v_navigator_program", "v_navigator_between", "v_navigator_unstated")]
+    assert sum(len(g) for g in groups) == len(set().union(*groups))
+    cov = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_navigator_coverage")}
+    assert cov["MD"]["n_unstated"] == 1 and cov["VA"]["n_unstated"] == 0
 
 
 # ---------- shaping ----------
@@ -150,6 +167,8 @@ def test_build_shapes_programs_and_rules(conn):
     assert md["coverage"]["state"]["agencies"] == 2 and md["coverage"]["state"]["open"] == 1
     assert md["coverage"]["state"]["between"] == 2 and md["rules"]["between_months"] == build_site.BETWEEN_MONTHS
     assert [p["name"] for p in md["between"]] == ["Spring Round", "Will Close Later"]
+    assert [p["name"] for p in md["unstated"]] == ["Main Street Facades"] and md["coverage"]["state"]["unstated"] == 1
+    assert md["unstated"][0]["status"] == "unknown" and md["unstated"][0]["closes_text"].startswith("Applications are")
     spring = md["between"][0]
     assert spring["days_since_deadline"] == 90 and spring["days_to_close"] == -90 and spring["last_reopened"] is None
     assert spring["closes_text"] == "application closed: three months ago" and spring["status"] == "closed"
@@ -160,9 +179,49 @@ def test_build_shapes_programs_and_rules(conn):
     va = site["states"]["VA"]
     assert {p["name"] for p in va["programs"]} == {"Wildlife Crossings Pilot", "<script>alert(1)</script> Resilience", "Brand New Notice", "Virginia Towns Fund"}
     assert va["coverage"]["state"]["last_ok"] is None and va["coverage"]["state"]["programs"] == 1
-    assert va["between"] == [] and va["coverage"]["state"]["between"] == 0
+    assert va["between"] == [] and va["coverage"]["state"]["between"] == 0 and va["unstated"] == []
     assert site["states"]["WY"]["coverage"]["state"] is None
     assert len(site["states"]["WY"]["programs"]) == 3 and site["states"]["WY"]["between"] == []
+
+
+def test_history_is_the_programs_own_log(conn):
+    site = build_site.build(conn, generated_at=GEN)
+    md = site["states"]["MD"]
+    closed = next(p for p in md["between"] if p["name"] == "Will Close Later")
+    # no code_release rows in the test database, so every cause is 'unknown' (migration 0010)
+    assert closed["history"] == [[T1[:10], "added", None, None, "unknown"], [T2[:10], "status", "open", "closed", "unknown"]]
+    brand_new = next(p for p in md["programs"] if p["name"] == "Brand New Notice")
+    assert brand_new["history"] == [[T2[:10], "added", None, None, "unknown"]]
+    assert all("history" in p for p in md["programs"] + md["between"] + md["unstated"])
+
+
+def test_change_cause_follows_code_releases(conn):
+    rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+    assert set(rows.values()) == {"unknown"}                       # no git history recorded yet
+    flip = conn.execute("SELECT c.id FROM program_change c JOIN program p ON p.id = c.program_id"
+                        " WHERE p.name = 'Will Close Later' AND c.change_type = 'changed'").fetchone()[0]
+    first = conn.execute("SELECT c.id FROM program_change c JOIN program p ON p.id = c.program_id"
+                         " WHERE p.name = 'Will Close Later' AND c.change_type = 'added'").fetchone()[0]
+    mid = (datetime.strptime(T1, "%Y-%m-%dT%H:%M:%SZ") + timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    try:
+        # the fixture logs every change under the grants_gov runs (run ids 1 and 5), so the release names that connector
+        conn.execute("INSERT INTO code_release VALUES ('grants_gov', 'abc', ?)", (mid,))
+        rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+        assert rows[first] == "first_read" and rows[flip] == "code"
+        conn.execute("UPDATE code_release SET released_at = ?", ((NOW + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),))
+        rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+        assert rows[flip] == "source"                                 # a release after the run does not count
+    finally:
+        conn.execute("DELETE FROM code_release")
+
+
+def test_reading_files_follow_the_imports():
+    from pipeline.code_release import reading_files
+    from pipeline.run import CONNECTORS
+    files = reading_files(CONNECTORS["vt_accd"])
+    assert "connectors/vt_accd.py" in files and "connectors/vermont_drupal.py" in files
+    assert "pipeline/upsert.py" in files and "pipeline/run.py" not in files
+    assert "connectors/ca_grants.py" not in files
 
 
 def test_build_shapes_changes(conn):
@@ -174,7 +233,7 @@ def test_build_shapes_changes(conn):
     added = next(c for c in md["changes"] if c["name"] == "Brand New Notice")
     assert added["type"] == "added" and added["listed"] is True and added["fields"] == []
     assert all(c["state"] in (None, "MD") for c in md["changes"])
-    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 5    # four added + the flip, never starved by federal rows
+    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 6    # five added + the flip, never starved by federal rows
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
@@ -186,12 +245,45 @@ def test_index_states_and_tile_grid(conn):
     assert len(states) == 51 and len({s["code"] for s in states}) == 51
     assert len({(s["row"], s["col"]) for s in states}) == 51          # no two tiles on one cell
     md = next(s for s in states if s["code"] == "MD")
-    assert md["programs"] == 4 and md["open"] == 1 and md["agencies"] == 2 and md["between"] == 2
+    assert md["programs"] == 5 and md["open"] == 1 and md["agencies"] == 2 and md["between"] == 2
+    assert md["unstated"] == 1
     wy = next(s for s in states if s["code"] == "WY")
     assert wy["programs"] == 0 and wy["between"] == 0
 
 
 # ---------- rendering ----------
+
+def test_coverage_kind_follows_the_connectors():
+    con = {"MD": ["md_dhcd"], "CA": ["ca_grants"], "ND": ["webgrants", "nd_dot"], "NC": ["nc_grants"]}
+    assert build_site.coverage_kind("MD", con) == ("agencies", None)
+    assert build_site.coverage_kind("CA", con) == ("portal", None)
+    assert build_site.coverage_kind("ND", con) == ("portal_agencies", None)
+    assert build_site.coverage_kind("NC", con) == ("directory", None)
+    assert build_site.coverage_kind("AK", con)[0] == "blocked" and build_site.coverage_kind("AK", con)[1]
+    assert build_site.coverage_kind("AR", con) == ("federal", None)
+    # a blocked state that gains a connector stops being called blocked
+    assert build_site.coverage_kind("AK", {"AK": ["ak_test"]}) == ("agencies", None)
+
+
+def test_stats_views_count_what_the_pages_list(conn):
+    stated = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_stats_stated")}
+    md = stated["MD"]
+    assert md["n"] == 5 and md["status_stated"] == 4          # Main Street Facades states no status
+    assert stated["US"]["n"] == conn.execute("SELECT COUNT(*) FROM v_navigator_program WHERE state IS NULL").fetchone()[0]
+    flips = [dict(r) for r in conn.execute("SELECT * FROM v_stats_status_flips")]
+    assert {(f["old_status"], f["new_status"], f["cause"]): f["n"] for f in flips} == {("open", "closed", "unknown"): 1}
+    months = list(conn.execute("SELECT state, month, n FROM v_stats_deadline_month"))
+    assert all(1 <= m <= 12 for _, m, _ in months) and {st for st, _, _ in months} <= {"MD", "VA"}
+
+
+def test_about_page_is_written_and_self_contained(conn, tmp_path):
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert 'data-page="about"' in page and 'url("../fonts/public-sans-latin.woff2")' in page
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert {"deadlines", "awards", "months", "stated", "flips", "open"} <= set(data)
+    assert "<script src" not in page and "cdn" not in page
+
 
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
@@ -207,15 +299,26 @@ def test_write_site(conn, tmp_path):
     assert page.startswith("<!doctype html>")
     assert "<script>alert(1)</script>" not in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
-    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) == 4 and len(data["between"]) == 2
-    assert 'id="between-list"' in page and 'id="between-toggle"' in page
-    assert "&lt;may&gt;" in json.dumps(data) or "<may>" in json.dumps(data)   # verbatim text survives round trip
+    federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
+    # the page carries Maryland's own rows; the federal ones come once from federal.js (13.16)
+    assert all(p["state"] == "MD" for p in data["programs"]) and all(p["state"] is None for p in federal["programs"])
+    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) + len(federal["programs"]) == 4
+    assert len(data["between"]) == 2
+    assert 'id="list-between"' in page and 'id="between-toggle"' in page and len(data["unstated"]) == 1
+    # the state's own groups come before the federal notices (13.1, decision 2026-11-14)
+    order = [page.index(f'id="g-{g}"') for g in ("state", "unstated", "between", "federal")]
+    assert order == sorted(order)
+    assert "<may>" in json.dumps(federal)                                # verbatim text survives the round trip
+    assert "</script" not in (out / "federal.js").read_text(encoding="utf-8")
     # self-contained: nothing loaded from anywhere
-    body = page.replace("https://x/", "")
+    body = page.replace("https://x/", "").replace('<script src="../federal.js?v=' + GEN[:10] + '">', "")
     assert "<script src" not in body and "<link rel=\"stylesheet\"" not in body and "@import" not in body
     assert "url(http" not in body and "cdn" not in body
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'data-page="index"' in index and "Funding Atlas" in index
+    # web fonts are served from the site itself, with their licences, and referenced relative to each page
+    assert (out / "fonts" / "public-sans-latin.woff2").exists() and (out / "fonts" / "OFL-SourceSerif4.txt").exists()
+    assert 'url("../fonts/source-serif-4-latin.woff2")' in page and 'url("fonts/public-sans-latin.woff2")' in index
     # rebuilding wipes stale files
     (out / "stale.txt").write_text("x")
     build_site.write(conn, out, generated_at=GEN)
@@ -271,6 +374,24 @@ def test_feed_files_exist_for_root_and_every_state(conn, tmp_path):
     assert '<link rel="alternate" type="application/atom+xml"' in (out / "index.html").read_text(encoding="utf-8")
 
 
+def test_every_listed_program_has_its_own_feed(conn, tmp_path):
+    import xml.etree.ElementTree as ET
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    site = build_site.build(conn, generated_at=GEN)
+    listed = {p["slug"] for d in site["states"].values() for p in d["programs"] + d["between"] + d["unstated"]}
+    files = {f.name for f in (out / "p").iterdir()}
+    logged = {r["slug"] for r in conn.execute("SELECT DISTINCT slug FROM v_navigator_change")}
+    assert files == {build_site.program_feed_path(sl)[2:] for sl in listed | logged}
+    # a program that left every page keeps its feed: Long Dead Credit closed two years ago and is listed nowhere
+    gone = conn.execute("SELECT slug FROM program WHERE name = 'Long Dead Credit'").fetchone()[0]
+    assert gone not in listed and build_site.program_feed_path(gone)[2:] in files
+    closed = next(p for p in site["states"]["MD"]["between"] if p["name"] == "Will Close Later")
+    root = ET.parse(out / build_site.program_feed_path(closed["slug"])).getroot()
+    ns = {"a": build_site.ATOM_NS}
+    assert root.find("a:title", ns).text.endswith(": Will Close Later")
+    assert sorted(e.find("a:title", ns).text for e in root.findall("a:entry", ns)) == ["added: Will Close Later", "changed: Will Close Later"]
+
+
 def test_atom_parses_ids_unique_and_scoped_to_the_state(conn, tmp_path):
     import xml.etree.ElementTree as ET
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
@@ -304,6 +425,8 @@ def test_changes_json_equals_the_pages_embedded_changes(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
     embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))["changes"]
+    federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
+    embedded = sorted(embedded + federal["changes"], key=lambda c: (c["at"], c["id"]), reverse=True)
     data = json.loads((out / "md" / "changes.json").read_text(encoding="utf-8"))
     assert data["state"] == "MD" and data["generated_at"] == GEN and data["feed"]["atom"].endswith("/md/feed.xml")
     assert [c["id"] for c in data["changes"]] == [c["id"] for c in embedded]

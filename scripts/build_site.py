@@ -109,6 +109,56 @@ CONNECTOR_LABEL = {
     "ne_dwee": "Nebraska Department of Water, Energy, and Environment",
     "ne_dot": "Nebraska Department of Transportation",
 }
+# What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
+# status, or agency pages. A connector missing here counts as agency pages.
+CONNECTOR_KIND = {
+    "pa_grants": "portal", "wv_grants": "portal", "ca_grants": "portal", "il_csfa": "portal", "webgrants": "portal",
+    "tx_egrants": "portal", "nj_dca_sage": "portal", "ny_sfs": "portal", "ky_dlg": "portal",
+    "nc_grants": "directory", "wa_fund_directory": "directory",
+}
+# States with no state source read, and why, in one plain sentence each. From docs/surveys/state_portals.md and
+# the roadmap's decisions (12.0, 12.5); a state that gains a connector drops out of this table by itself.
+STATE_NOTE: dict[str, tuple[str, str]] = {
+    "AK": ("blocked", "Alaska's community grants pages refuse automated readers (a bot wall answers every request)."),
+    "CO": ("blocked", "Colorado's local funding guide refuses automated readers."),
+    "ID": ("blocked", "Idaho Commerce's grants pages sit behind a bot challenge."),
+    "KS": ("blocked", "The Kansas Infrastructure Hub refuses automated readers."),
+    "ME": ("blocked", "Maine's community funding finder refuses automated readers."),
+    "MI": ("blocked", "Michigan's grants pages refuse automated readers."),
+    "RI": ("blocked", "Rhode Island's funding opportunities page sits behind a bot challenge."),
+    "OK": ("login", "Oklahoma's Grant Exchange is login only and asks crawlers not to read it."),
+    "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
+    "AL": ("blocked", "Alabama's grants office asks this registry's crawler not to read its pages; the registry respects that."),
+    "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
+    "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
+    "GA": ("none", "No public state list of grants for local governments was found."),
+    "HI": ("none", "No public state list of grants for local governments was found."),
+    "LA": ("none", "No public state list of grants for local governments was found."),
+    "MS": ("none", "No public state list of grants for local governments was found."),
+    "OH": ("none", "Ohio's grants site answered nothing when surveyed."),
+    "SC": ("none", "No public state list of grants for local governments was found."),
+    "WI": ("none", "No public state list of grants for local governments was found."),
+    "DC": ("none", "The District is out of scope for now: it has no towns or counties under it."),
+}
+
+
+def coverage_kind(code: str, connectors: dict[str, list[str]]) -> tuple[str, str | None]:
+    """How a state is read, for the index map: portal, agencies, portal_agencies, directory, or a STATE_NOTE kind,
+    else 'federal' (nothing built yet). Derived from the connectors that hold records for the state."""
+    kinds = {CONNECTOR_KIND.get(c, "agencies") for c in connectors.get(code, [])}
+    if "portal" in kinds and "agencies" in kinds:
+        return "portal_agencies", None
+    if "portal" in kinds:
+        return "portal", None
+    if "agencies" in kinds:
+        return "agencies", None
+    if "directory" in kinds:
+        return "directory", None
+    if code in STATE_NOTE:
+        return STATE_NOTE[code]
+    return "federal", None
+
+
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
     "Which rows should not be here, and why?",
@@ -164,8 +214,61 @@ def load_between(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_between")]
 
 
+def load_unstated(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    """State programs a town could apply to whose source states no status and no date (migration 0008)."""
+    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
+
+
+HISTORY_FIELDS = ("status", "closes_at", "opens_at")
+
+
+def load_history(conn: sqlite3.Connection, ids: set[int]) -> dict[int, list[list[Any]]]:
+    """Each listed program's own change log, compacted for the detail panel's history strip (13.7).
+
+    Every event is [date, kind, old, new, cause]: kind 'added' or 'missing' (old and new null), a field name for status,
+    closes_at and opens_at, or 'edit' for a change that touched only other fields (old = how many). cause is the
+    change's label from v_change_cause (source, code, first_read, unknown). Oldest first.
+    Nothing is inferred: these are the rows program_change holds, in their own order."""
+    out: dict[int, list[list[Any]]] = {}
+    if not ids:
+        return out
+    marks = ",".join("?" * len(ids))
+    rows = conn.execute(
+        f"SELECT c.program_id, c.changed_at, c.change_type, c.changed_fields, v.cause FROM program_change c "
+        f"LEFT JOIN v_change_cause v ON v.change_id = c.id WHERE c.program_id IN ({marks}) ORDER BY c.changed_at, c.id",
+        sorted(ids),
+    )
+    for pid, at, kind, fields, cause in rows:
+        day = at[:10]
+        events = out.setdefault(pid, [])
+        if kind in ("added", "missing"):
+            events.append([day, kind, None, None, cause])
+            continue
+        raw = json.loads(fields) if fields else {}
+        hit = [f for f in HISTORY_FIELDS if f in raw]
+        for f in hit:
+            events.append([day, f, raw[f].get("old"), raw[f].get("new"), cause])
+        if not hit and raw:
+            events.append([day, "edit", len(raw), None, cause])
+    return out
+
+
+def load_stats(conn: sqlite3.Connection) -> dict[str, Any]:
+    """The three chart views of migration 0009, as plain rows."""
+    months: dict[str, list[int]] = {}
+    for r in conn.execute("SELECT state, month, n FROM v_stats_deadline_month"):
+        months.setdefault(r["state"], [0] * 12)[r["month"] - 1] = r["n"]
+    stated = [dict(r) for r in conn.execute("SELECT * FROM v_stats_stated ORDER BY n DESC, state")]
+    flips = [dict(r) for r in conn.execute("SELECT * FROM v_stats_status_flips")]
+    return {"months": months, "stated": stated, "flips": flips}
+
+
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_change")]
+    """The change feed, each row with its cause (migration 0010: source, code, first_read or unknown)."""
+    return [dict(r) for r in conn.execute(
+        "SELECT n.*, v.cause FROM v_navigator_change n LEFT JOIN v_change_cause v ON v.change_id = n.change_id"
+        " ORDER BY n.changed_at DESC, n.change_id DESC"
+    )]
 
 
 def load_coverage(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
@@ -283,7 +386,7 @@ def shape_program(row: dict[str, Any], run_info: dict[str, dict[str, str | None]
         # A stated date more than PLACEHOLDER_YEARS out is kept as the source states it but shown as "no deadline
         # stated": pa.gov writes 2035-12-31 and 2999-07-01 on recurring programs and loans.
         "deadline_placeholder": is_placeholder(row["closes_at"], today),
-        # v_navigator_between only: days since the last stated deadline, and the last time the change log saw
+        # v_navigator_between and v_navigator_unstated only: days since the last stated deadline, and the last time the change log saw
         # the record flip to open or forecasted (null until observed; never computed from a calendar).
         "days_since_deadline": row.get("days_since_deadline"),
         "last_reopened": row.get("last_reopened"),
@@ -310,6 +413,7 @@ def shape_change(row: dict[str, Any], listed_ids: set[int]) -> dict[str, Any]:
         "tier": row["municipal_tier"],
         "fields": fields,
         "status_flip": "status" in raw,
+        "cause": row.get("cause"),
         "listed": row["program_id"] in listed_ids,
     }
 
@@ -381,11 +485,12 @@ def _text(value: Any) -> str:
     return _CONTROL_RE.sub("", str(value if value is not None else ""))
 
 
-def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: str, alternate_url: str, updated: str) -> str:
+def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: str, alternate_url: str, updated: str,
+                title: str | None = None) -> str:
     """An Atom feed of the change entries. Built with the standard library; the library escapes the text."""
     feed = ET.Element("feed", xmlns=ATOM_NS)
     where = f"{STATE_NAME[state]} and federal" if state else "every source"
-    ET.SubElement(feed, "title").text = f"{FEED_TITLE} ({where})"
+    ET.SubElement(feed, "title").text = _text(title or f"{FEED_TITLE} ({where})")
     ET.SubElement(feed, "subtitle").text = "Programs a local government could apply to: added, changed or no longer listed, as read from each source."
     ET.SubElement(feed, "id").text = self_url
     ET.SubElement(feed, "updated").text = updated
@@ -400,7 +505,8 @@ def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: s
         ET.SubElement(e, "link", rel="alternate", href=feed_link(c, state), type="text/html")
         ET.SubElement(e, "category", term=c.get("state") or "federal")
         ET.SubElement(ET.SubElement(e, "author"), "name").text = _text(c.get("agency") or CONNECTOR_LABEL.get(c.get("connector"), c.get("connector")))
-        ET.SubElement(e, "summary", type="text").text = _text(f"{describe_change(c)} · {_who(c)}")
+        note = " · after a change to how this source is read" if c.get("cause") == "code" else ""
+        ET.SubElement(e, "summary", type="text").text = _text(f"{describe_change(c)} · {_who(c)}{note}")
     return '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(feed, encoding="unicode")
 
 
@@ -427,16 +533,19 @@ def state_payload(
     *,
     programs: list[dict[str, Any]],
     between: list[dict[str, Any]],
+    unstated: list[dict[str, Any]],
     changes: list[dict[str, Any]],
     coverage: dict[str, dict[str, Any]],
     connectors: dict[str, list[str]],
     run_info: dict[str, dict[str, str | None]],
     excluded: int,
     generated_at: str,
+    stats: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     rows = [p for p in programs if p["state"] is None or p["state"] == code]
     between_rows = [p for p in between if p["state"] == code]          # state rows only, by construction
-    listed = {p["id"] for p in rows} | {p["id"] for p in between_rows}
+    unstated_rows = [p for p in unstated if p["state"] == code]        # state rows only, by construction
+    listed = {p["id"] for p in rows} | {p["id"] for p in between_rows} | {p["id"] for p in unstated_rows}
     # Newest N federal plus newest N state rows, merged: a day of 1,000 federal changes must not push the
     # state's own log off its page.
     fed = [c for c in changes if c["state"] is None][:FEED_N]
@@ -463,6 +572,7 @@ def state_payload(
                 "programs": cov["n_programs"],
                 "open": cov["n_open_municipal"],
                 "between": cov["n_between_rounds"],
+                "unstated": cov["n_unstated"],
                 "last_ok": cov["last_ok"],
                 "sources": sources_for(connectors.get(code, []), run_info),
             },
@@ -471,6 +581,8 @@ def state_payload(
         "questions": list(READER_QUESTIONS),
         "programs": rows,
         "between": between_rows,
+        "unstated": unstated_rows,
+        "season": (stats or {}).get("months", {}).get(code),
         "changes": feed,
     }
 
@@ -494,7 +606,10 @@ def index_payload(
             "programs": cov["n_programs"] if cov else 0,
             "open": cov["n_open_municipal"] if cov else 0,
             "between": cov["n_between_rounds"] if cov else 0,
+            "unstated": cov["n_unstated"] if cov else 0,
             "last_ok": cov["last_ok"] if cov else None,
+            "kind": coverage_kind(code, connectors)[0],
+            "note": coverage_kind(code, connectors)[1],
         })
     return {
         "generated_at": generated_at,
@@ -530,7 +645,27 @@ def fill(template: str, **slots: str) -> str:
     return template
 
 
+FEDERAL_JS = "federal.js"
+
+
+def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """A state payload without its federal rows, and those rows (13.16). Federal notices and their changes are the
+    same on all 51 pages, so they ship once in federal.js on the same origin and every state page loads it from the
+    browser cache: the pages drop from 600KB to 900KB to the state's own weight. app.js merges them back."""
+    page = dict(data,
+                programs=[p for p in data["programs"] if p["state"]],
+                changes=[c for c in data["changes"] if c["state"]])
+    federal = {"programs": [p for p in data["programs"] if not p["state"]],
+               "changes": [c for c in data["changes"] if not c["state"]]}
+    return page, federal
+
+
+def render_federal(federal: dict[str, Any]) -> str:
+    return "window.FA_FEDERAL = " + embed_json(federal) + ";\n"
+
+
 def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
+    data = split_federal(data)[0]
     name = data["state"]["name"]
     return fill(
         template,
@@ -564,16 +699,21 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     run_info = runs(conn)
     programs = [shape_program(r, run_info, today) for r in load_programs(conn)]
     between = [shape_program(r, run_info, today) for r in load_between(conn)]
+    unstated = [shape_program(r, run_info, today) for r in load_unstated(conn)]
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
+    history = load_history(conn, {p["id"] for p in programs + between + unstated})
+    stats = load_stats(conn)
+    for p in programs + between + unstated:
+        p["history"] = history.get(p["id"], [])
     unknown = sorted({p["state"] for p in programs if p["state"] and p["state"] not in STATE_NAME})
     if unknown:
         typer.echo(f"warning: records with a jurisdiction that is not a state page: {', '.join(unknown)}", err=True)
     states = {
         code: state_payload(
-            code, programs=programs, between=between, changes=changes, coverage=coverage, connectors=connectors,
-            run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at,
+            code, programs=programs, between=between, unstated=unstated, changes=changes, coverage=coverage, connectors=connectors,
+            run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at, stats=stats,
         )
         for code, _, _, _ in STATES
     }
@@ -582,9 +722,57 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         run_info=run_info, generated_at=generated_at,
     )
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
-    listed_all = {p["id"] for p in programs} | {p["id"] for p in between}
+    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
-    return {"index": index, "states": states, "feed": feed}
+    # One feed per program (13.9, widened in 13.15): every program a local government could apply to that is listed
+    # on a page or has ever had a change logged, so a starred program keeps its feed after it leaves every page and
+    # the feed carries the change that took it off.
+    own: dict[int, list[dict[str, Any]]] = {}
+    meta: dict[int, dict[str, Any]] = {}
+    for c in changes:
+        own.setdefault(c["program_id"], []).append(shape_change(c, listed_all))
+        meta.setdefault(c["program_id"], {"slug": c["slug"], "name": c["name"], "state": c["state"], "source_url": c["source_url"]})
+    for p in programs + between + unstated:
+        meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
+    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
+    about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
+    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about}
+
+
+def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str) -> dict[str, Any]:
+    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else."""
+    return {
+        "generated_at": generated_at,
+        "site_url": SITE_URL,
+        "repo_url": REPO_URL,
+        "rules": {"new_days": NEW_DAYS, "closing_days": CLOSING_DAYS},
+        "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
+        "deadlines": [[p["state"], p["closes_at"], p["deadline_placeholder"]] for p in programs if p["closes_at"]],
+        "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
+        "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},
+        "months": stats["months"],
+        "stated": stats["stated"],
+        "flips": stats["flips"],
+        "questions": list(READER_QUESTIONS),
+    }
+
+
+def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
+    return fill(
+        template,
+        TITLE="About the data · Funding Atlas",
+        DESCRIPTION="What the Funding Atlas registry reads, what its sources state, and what the change log has seen, in five charts.",
+        ROOT="../",
+        CSS=css,
+        JS=js,
+        DATA=embed_json(data),
+        GENERATED=data["generated_at"][:10],
+    )
+
+
+def program_feed_path(slug: str) -> str:
+    """Where a program's own feed lives, relative to the site root (p/<slug>.xml); app.js builds the same path."""
+    return "p/" + re.sub(r"[^a-z0-9-]+", "-", (slug or "").lower()) + ".xml"
 
 
 def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
@@ -600,12 +788,17 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         shutil.rmtree(out)
     out.mkdir(parents=True)
     (out / ".nojekyll").write_text("")
+    # The two web fonts (SIL Open Font License, the licence files go with them): same origin, so the pages still
+    # make no request to anyone else. The @font-face rules are in the templates, where {{ROOT}} is filled.
+    shutil.copytree(WEB / "fonts", out / "fonts")
     (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
     generated_at = site["index"]["generated_at"]
     (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",
                                               alternate_url=SITE_URL, updated=generated_at), encoding="utf-8")
     (out / "changes.json").write_text(changes_json(site["feed"], state=None, generated_at=generated_at, base=SITE_URL), encoding="utf-8")
     counts: dict[str, int] = {}
+    # federal rows once, for every state page (split_federal); any state's payload carries the same federal rows
+    (out / FEDERAL_JS).write_text(render_federal(split_federal(site["states"]["MD"])[1]), encoding="utf-8")
     for code, data in site["states"].items():
         d = out / code.lower()
         d.mkdir()
@@ -615,6 +808,16 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         counts[code] = len(data["programs"])
+    about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
+    (out / "about").mkdir()
+    (out / "about" / "index.html").write_text(render_about(site["about"], css, js, about_tpl), encoding="utf-8")
+    (out / "p").mkdir()
+    for pf in site["program_feeds"]:
+        path = program_feed_path(pf["slug"])
+        alt = (f"{SITE_URL}{pf['state'].lower()}/#p={quote(pf['slug'])}" if pf["state"] and pf["listed"]
+               else (pf["source_url"] or SITE_URL))
+        (out / path).write_text(render_atom(pf["entries"], state=pf["state"], self_url=SITE_URL + path, alternate_url=alt,
+                                            updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
     return out, counts
 
 

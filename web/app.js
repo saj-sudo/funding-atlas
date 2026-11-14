@@ -7,8 +7,14 @@
 
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var PAGE = document.body.getAttribute('data-page');
-  var ROOT = PAGE === 'state' ? '../' : '';
+  var ROOT = PAGE === 'state' || PAGE === 'about' ? '../' : '';
   var TODAY = DATA.generated_at.slice(0, 10);
+  // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
+  var FEDERAL_LOADED = !!window.FA_FEDERAL;
+  if (PAGE === 'state' && FEDERAL_LOADED) {
+    DATA.programs = DATA.programs.concat(window.FA_FEDERAL.programs);
+    DATA.changes = DATA.changes.concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+  }
 
   // ---------- helpers ----------
 
@@ -44,13 +50,77 @@
     return s ? s.name : code;
   }
   function el(id) { return document.getElementById(id); }
-  function pill(cls, text) { return '<span class="pill ' + cls + '">' + h(text) + '</span>'; }
-  function tierPill(t) { return pill('tier-' + t, t === 'likely' ? 'Likely' : 'Possible'); }
-  function statusPill(s) { return pill('st-' + s, cap(s)); }
-  function levelPill(p) { return pill('lvl', p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level))); }
-  function badges(p) { return (p.is_new ? pill('new', 'New') : '') + (p.is_updated ? pill('upd', 'Updated') : ''); }
+
+  // Plain words for the stored values. The data keeps its own vocabulary (forecasted, unknown, between rounds);
+  // these are only the labels a reader sees (decision 2026-11-14, docs/design/ux_review_2026-11.md).
+  var STATUS_LABEL = {
+    open: 'Open', forecasted: 'Announced', unknown: 'Status not confirmed', closed: 'Closed',
+    paused: 'Paused', exhausted: 'Funds used up'
+  };
+  var STATUS_GLOSS = {
+    open: 'The source says applications are open.',
+    forecasted: 'The agency has announced it. Applications may not be open yet.',
+    unknown: 'The agency\'s page does not say whether it is open. Check the page before planning around it.',
+    closed: 'The source says this round is closed.',
+    paused: 'The source says this program is paused.',
+    exhausted: 'The source says the money for this round is used up.'
+  };
+  var TIER_LABEL = { likely: 'Likely fit', possible: 'May fit' };
+  var TIER_LONG = {
+    likely: 'Likely fits local governments: the source names towns, cities or counties as eligible.',
+    possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
+  };
+  function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
+  // Topic lines (13.17, borrowed from Wayfinding): the eleven categories folded into three, each with a letter so the
+  // colour never carries the meaning alone. A program in several shows the first line that matches, in this order.
+  var TOPIC_LINES = [
+    { key: 'env', letter: 'E', name: 'Environment: water, energy, parks', cats: ['water', 'energy', 'parks'] },
+    { key: 'inf', letter: 'I', name: 'Infrastructure: transportation, infrastructure, broadband', cats: ['transportation', 'infrastructure', 'broadband'] },
+    { key: 'com', letter: 'C', name: 'Community: housing, health, workforce, public safety', cats: ['housing', 'health', 'workforce', 'public_safety'] }
+  ];
+  var TOPIC_OTHER = { key: 'oth', letter: 'O', name: 'Other or not stated', cats: [] };
+  function topicLine(p) {
+    for (var i = 0; i < TOPIC_LINES.length; i++) {
+      if ((p.categories || []).some(function (c) { return TOPIC_LINES[i].cats.indexOf(c) >= 0; })) return TOPIC_LINES[i];
+    }
+    return TOPIC_OTHER;
+  }
+  function topicKey() {
+    return '<span class="tkey-l">Topics:</span>' + TOPIC_LINES.concat([TOPIC_OTHER]).map(function (t) {
+      return '<span class="tkey"><span class="topic t-' + t.key + '" aria-hidden="true"><b>' + t.letter + '</b></span>' + h(t.name.split(':')[0]) + '</span>';
+    }).join('');
+  }
+  function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
+  function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
+  function badges(p) { return (p.is_new ? '<span class="tag new">New</span>' : '') + (p.is_updated ? '<span class="tag upd">Updated</span>' : ''); }
   function sourceLine(src) {
     return h(src.label) + (src.last_ok ? ' read ' + fmtDate(src.last_ok) : ' (no successful read yet)');
+  }
+
+  // Display only: an agency name the source writes in capitals reads as shouting, and a leading office code
+  // ("69A345 Office of ...") is a portal key, not a name. Nothing is invented; the stored value is unchanged.
+  var KEEP_UPPER = { US: 1, USA: 1, USDA: 1, HUD: 1, EPA: 1, FEMA: 1, NASA: 1, NOAA: 1, NIH: 1, NSF: 1, DOE: 1, DOJ: 1,
+    DOI: 1, DOT: 1, HHS: 1, ACF: 1, OJP: 1, BJA: 1, NEA: 1, NEH: 1, IMLS: 1, CDC: 1, FAA: 1, FTA: 1, FHWA: 1, NPS: 1,
+    BLM: 1, ARC: 1, EDA: 1, SBA: 1, DHS: 1, II: 1, III: 1 };
+  var SMALL = { OF: 1, THE: 1, AND: 1, FOR: 1, TO: 1, IN: 1, ON: 1, AT: 1, BY: 1, A: 1, AN: 1, OR: 1 };
+  function agencyName(p) {
+    var s = p.agency || p.agency_code || '';
+    s = s.replace(/^(?=\S*\d)\S+\s+(?=\S)/, '');
+    if (/[a-z]/.test(s)) return s;
+    var first = true;
+    return s.replace(/[A-Z][A-Z']*/g, function (w) {
+      var out = KEEP_UPPER[w] ? w : (SMALL[w] && !first) ? w.toLowerCase() : w.charAt(0) + w.slice(1).toLowerCase();
+      first = false;
+      return out;
+    });
+  }
+  function amountText(p) {
+    var lo = p.amount_min, hi = p.amount_max;
+    if (lo === 0) lo = null;   // "$0 to $500,000" is a form default, not a floor
+    if (lo != null && hi != null && lo !== hi) return money(lo) + ' to ' + money(hi);
+    if (hi != null) return 'Up to ' + money(hi);
+    if (lo != null) return 'From ' + money(lo);
+    return null;
   }
 
   // Wording of a change's field diff, for the feed.
@@ -85,6 +155,37 @@
     return out || 'changed';
   }
 
+  // ---- what changed, in words (13.12): a word-level diff of the wording fields the change log stores in full ----
+  var TEXT_FIELDS = { closes_at_text: 'Deadline wording', eligibility_text: 'Eligibility', summary: 'Summary', name: 'Name' };
+  function wordDiff(a, b) {
+    var x = String(a || '').split(/(\s+)/), y = String(b || '').split(/(\s+)/);
+    if (x.length * y.length > 360000) return null;    // too long to diff in the browser: show both in full instead
+    var n = x.length, m = y.length, L = [], i, j;
+    for (i = 0; i <= n; i++) { L.push(new Uint16Array(m + 1)); }
+    for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) L[i][j] = x[i] === y[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    var out = '', del = '', ins = '';
+    function flush() { if (del) out += '<del>' + h(del) + '</del>'; if (ins) out += '<ins>' + h(ins) + '</ins>'; del = ins = ''; }
+    i = 0; j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { flush(); out += h(x[i]); i++; j++; }
+      else if (L[i + 1][j] >= L[i][j + 1]) { del += x[i++]; }
+      else { ins += y[j++]; }
+    }
+    while (i < n) del += x[i++];
+    while (j < m) ins += y[j++];
+    flush();
+    return out;
+  }
+  function diffHtml(c) {
+    var parts = c.fields.filter(function (f) { return TEXT_FIELDS[f.field] && (f.old || f.new); }).map(function (f) {
+      var d = wordDiff(f.old, f.new);
+      return '<div class="diff-f"><span class="diff-k">' + TEXT_FIELDS[f.field] + '</span>' +
+        (d != null ? '<p class="diff-t">' + d + '</p>'
+          : '<p class="diff-t"><span class="muted small">Before:</span> <del>' + h(f.old || '(blank)') + '</del></p><p class="diff-t"><span class="muted small">After:</span> <ins>' + h(f.new || '(blank)') + '</ins></p>') + '</div>';
+    });
+    return parts.length ? '<details class="diff"><summary>Show what changed in the wording</summary>' + parts.join('') + '</details>' : '';
+  }
+
   // Build-and-forget list of the feed, grouped by day. `link(c)` returns the HTML for the program name.
   function renderFeed(list, changes, link) {
     if (!changes.length) {
@@ -101,10 +202,12 @@
       var ago = daysBetween(d, TODAY);
       var label = fmtDate(d) + (ago === 0 ? ' (today)' : ago === 1 ? ' (yesterday)' : ago < 14 ? ' (' + ago + ' days ago)' : '');
       return '<li class="day"><h3>' + h(label) + '</h3><ul>' + byDay[d].map(function (c) {
-        var who = (c.agency || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
+        var who = (agencyName({ agency: c.agency }) || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
         return '<li class="ev"><span class="type ' + h(c.type) + '">' + h(c.type) + '</span><div>' +
           '<div class="name">' + link(c) + '</div>' +
           '<div class="what">' + describe(c) + '</div>' +
+          (c.cause === 'code' ? '<div class="cause">After a change to how the registry reads this source: the agency may not have changed anything.</div>' : '') +
+          (c.type === 'changed' ? diffHtml(c) : '') +
           '<div class="who">' + h(who) + '</div></div></li>';
       }).join('') + '</ul></li>';
     }).join('');
@@ -122,10 +225,192 @@
       '<div><h2>What I would like to know from you</h2><ol>' + q + '</ol></div>' +
       '<div><h2>Data and code</h2>' +
       '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db.gz">atlas.db.gz</a> (SQLite, gzipped: every record, every raw payload and every logged change).</p>' +
-      '<p>Subscribe to this page\'s change log: <a href="feed.xml" type="application/atom+xml">Atom feed</a> · <a href="changes.json" type="application/json">JSON</a>' +
+      (PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
+      '<p>Subscribe to this page\'s change log: <a href="feed.xml" type="application/atom+xml">Atom feed</a> · <a href="changes.json" type="application/json">JSON</a>') +
       (PAGE === 'state' ? ' · <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">every state (Atom)</a>' : '') +
       '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' +
-      '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a></p></div>';
+      '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a> · <a href="' + h(ROOT) + 'about/">About the data</a></p></div>';
+  }
+
+  // =====================================================================================
+  // Charts (13.14): plain SVG, one shared tooltip. Colours come from the theme tokens (--s-fed, --s-state,
+  // --s3, the --q ramp); every chart has a legend or direct labels, and the stated-fields chart a table.
+  // =====================================================================================
+
+  var tipEl = null;
+  function tip(e, html) {
+    if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'ctip'; tipEl.setAttribute('role', 'tooltip'); document.body.appendChild(tipEl); }
+    if (!html) { tipEl.hidden = true; return; }
+    tipEl.innerHTML = html; tipEl.hidden = false;
+    var x = Math.min(e.clientX + 14, window.innerWidth - tipEl.offsetWidth - 8), y = e.clientY + 14;
+    if (y + tipEl.offsetHeight > window.innerHeight) y = e.clientY - tipEl.offsetHeight - 10;
+    tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+  }
+  function wireTips(svgEl) {
+    svgEl.addEventListener('mousemove', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); });
+    svgEl.addEventListener('mouseleave', function () { tip(null, null); });
+  }
+  function drawSvg(svgEl, w, hh, inner) {
+    svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w);
+    svgEl.innerHTML = inner; wireTips(svgEl);
+  }
+  function barPath(x, y, w, hh, roundTop) {      // 4px rounded data end, anchored to the baseline
+    if (hh <= 0) return '';
+    var r = Math.min(4, w / 2, hh);
+    return roundTop ? 'M' + x + ',' + (y + hh) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + (y + hh) + 'Z'
+                    : 'M' + x + ',' + y + 'H' + (x + w) + 'V' + (y + hh) + 'H' + x + 'Z';
+  }
+  function shortMoney(n) { return n >= 1e9 ? '$' + (n / 1e9) + 'B' : n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M' : n >= 1e3 ? '$' + Math.round(n / 1e3) + 'K' : '$' + n; }
+  function isoAdd(iso, n) { return new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10) + n)).toISOString().slice(0, 10); }
+
+  // deadlines: [[state|null, closes_at, placeholder], ...] -> weekly stacked bars, federal below state
+  function chartRunway(svgEl, deadlines, weeks, compact) {
+    var W = [], i;
+    for (i = 0; i < weeks; i++) W.push({ start: isoAdd(TODAY, 7 * i), f: 0, s: 0 });
+    var later = 0;
+    deadlines.forEach(function (d) {
+      if (!d[1] || d[2]) return;
+      var k = Math.floor(daysBetween(TODAY, d[1].slice(0, 10)) / 7);
+      if (k < 0) return;
+      if (k >= weeks) { later++; return; }
+      if (d[0]) W[k].s++; else W[k].f++;
+    });
+    var w = compact ? 760 : 900, hh = compact ? 150 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
+    W.forEach(function (x) { max = Math.max(max, x.f + x.s); });
+    var step = max > 20 ? 10 : 5, top = Math.ceil(max / step) * step, y = function (v) { return T + (hh - T - B) * (1 - v / top); }, g = '';
+    for (var v = 0; v <= top; v += step) g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="ctext" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+    W.forEach(function (x, j) {
+      var x0 = L + j * bw + 1.5, bwi = Math.max(2, bw - 3), base = y(0), hf = base - y(x.f), hs = base - y(x.s);
+      var t = 'Week of ' + fmtDate(x.start) + ': ' + (x.f + x.s) + ' deadlines (' + x.s + ' state, ' + x.f + ' federal)';
+      g += '<g data-tip="' + h(t) + '"><rect x="' + (L + j * bw) + '" y="' + T + '" width="' + bw + '" height="' + (hh - T - B) + '" fill="transparent"/>';
+      if (x.f) g += '<path class="m-fed" d="' + barPath(x0, base - hf, bwi, hf, !x.s) + '"/>';
+      if (x.s) g += '<path class="m-st" d="' + barPath(x0, base - hf - hs - (x.f ? 2 : 0), bwi, hs, true) + '"/>';
+      g += '</g>';
+      if (j % 4 === 0) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
+    });
+    g += '<line class="caxis" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
+    drawSvg(svgEl, w, hh, g);
+    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s };
+  }
+
+  // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
+  var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
+  function chartSeason(svgEl, rows, compact) {
+    var w = compact ? 760 : 900, L = compact ? 10 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
+    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + m + '</text>'; });
+    rows.forEach(function (r, ri) {
+      var tot = r[1].reduce(function (a, b) { return a + b; }, 0), yy = T + ri * (ch + 2);
+      if (!compact) g += '<text class="ctext clab" x="' + (L - 10) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="end">' + h(r[0]) + '</text>';
+      r[1].forEach(function (v, i) {
+        var share = tot ? v / tot : 0, k = v ? Math.min(6, Math.floor(share / 0.3 * 7)) : -1;
+        g += '<rect data-tip="' + h(r[0] + ', ' + MONTHS[i] + ': ' + v + ' of ' + tot + ' deadlines (' + Math.round(share * 100) + '%)') + '" x="' + (L + i * cw + 1) + '" y="' + yy + '" width="' + (cw - 2) + '" height="' + ch + '" rx="3" fill="' + (k < 0 ? 'var(--soft)' : RAMP[k]) + '"/>';
+        if (compact && v) g += '<text class="ctext cval' + (k >= 4 ? ' inv' : '') + '" x="' + (L + i * cw + cw / 2) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="middle">' + v + '</text>';
+      });
+    });
+    drawSvg(svgEl, w, hh, g);
+  }
+  function seasonLegend() {
+    return '<span><i class="sw" style="background:var(--soft)"></i>none</span><span>small share</span>' + RAMP.map(function (c) { return '<i class="sw" style="background:' + c + ';margin:0 1px"></i>'; }).join('') + '<span>26% or more of the row</span>';
+  }
+
+  function chartStated(svgEl, tableEl, rows) {
+    var w = 900, L = 150, R = 30, T = 24, rh = 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
+    [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
+    var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
+    rows.forEach(function (r, i) {
+      var yy = T + i * rh + rh / 2, name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
+      g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
+      ser.forEach(function (sr, j) {
+        var v = r.n ? r[sr[0]] / r.n : 0;
+        g += '<circle class="' + sr[1] + ' cdot" data-tip="' + h(name + ': ' + Math.round(v * 100) + '% state ' + sr[2] + ' (' + r[sr[0]] + ' of ' + r.n + ')') + '" cx="' + x(v) + '" cy="' + (yy + (j - 1) * 8) + '" r="6"/>';
+      });
+    });
+    drawSvg(svgEl, w, hh, g);
+    if (tableEl) tableEl.innerHTML = '<table class="ctable"><thead><tr><th>Source</th><th>Programs</th><th>States a status</th><th>States a deadline</th><th>States an amount</th></tr></thead><tbody>' +
+      rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
+        return '<tr><td>' + h(r.state === 'US' ? 'Federal, open now' : stateName(r.state)) + '</td><td>' + r.n + '</td><td>' + p('status_stated') + '</td><td>' + p('date_stated') + '</td><td>' + p('amount_stated') + '</td></tr>'; }).join('') + '</tbody></table>';
+  }
+
+  // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
+  function chartFlips(svgEl, flips) {
+    var pairs = {}, order = [];
+    flips.forEach(function (f) {
+      var k = (f.old_status || 'unknown') + '>' + (f.new_status || 'unknown');
+      if (!pairs[k]) { pairs[k] = { o: f.old_status || 'unknown', n: f.new_status || 'unknown', src: 0, code: 0, other: 0, a: f.first_at, b: f.last_at }; order.push(k); }
+      var p = pairs[k];
+      if (f.cause === 'code') p.code += f.n; else if (f.cause === 'source') p.src += f.n; else p.other += f.n;
+      if (f.first_at < p.a) p.a = f.first_at; if (f.last_at > p.b) p.b = f.last_at;
+    });
+    var rows = order.map(function (k) { return pairs[k]; }).sort(function (a, b) { return (b.src + b.code + b.other) - (a.src + a.code + a.other); });
+    var w = 900, L = 250, R = 60, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
+    rows.forEach(function (r) { max = Math.max(max, r.src + r.code + r.other); });
+    var x = function (v) { return L + (w - L - R) * v / max; };
+    rows.forEach(function (r, i) {
+      var yy = i * rh + 3, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
+      var reopen = (r.o === 'closed' || r.o === 'exhausted') && (r.n === 'open' || r.n === 'forecasted');
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
+      var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
+      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>';
+      var x0 = L;
+      [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
+        var v = r[seg[0]]; if (!v) return;
+        var x1 = x0 + (x(v) - L), last = x1 >= x(tot) - 0.5;
+        g += '<path class="' + seg[1] + '" d="' + (last ? 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 4) + 'Q' + x1 + ',' + (yy + 4) + ' ' + x1 + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x1 + ',' + (yy + 20) + ' ' + (x1 - 4) + ',' + (yy + 20) + 'H' + x0 + 'Z'
+          : 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 2) + 'V' + (yy + 20) + 'H' + x0 + 'Z') + '"/>';
+        x0 = x1;
+      });
+      g += '</g><text class="ctext" x="' + (x(tot) + 8) + '" y="' + (yy + 17) + '">' + tot + '</text>';
+    });
+    g += '<line class="caxis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + hh + '"/>';
+    drawSvg(svgEl, w, hh, g);
+    return rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+  }
+
+  // awards: [[state|null, amount, name], ...]
+  function chartAwards(svgEl, awards) {
+    var w = 900, L = 80, R = 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
+    var x = function (v) { return L + (w - L - R) * (Math.log10(v) - lo) / (hi - lo); };
+    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/><text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>';
+    [['fed', 'Federal', 'm-fed'], ['st', 'State', 'm-st']].forEach(function (grp, gi) {
+      var pts = awards.filter(function (a) { return (grp[0] === 'st') === !!a[0] && a[1] >= 1000 && a[1] <= 1e9; }).map(function (a) { return a; });
+      var vals = pts.map(function (a) { return a[1]; }).sort(function (a, b) { return a - b; });
+      var m = vals.length ? (vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2) : null;
+      med[grp[0]] = { n: vals.length, m: m };
+      var yy = T + gi * rh + rh / 2, seed = 11;
+      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + grp[1] + '</text>';
+      pts.forEach(function (a) { seed = (seed * 9301 + 49297) % 233280; var j = (seed / 233280 - 0.5) * (rh - 26);
+        g += '<circle class="' + grp[2] + ' cdot" data-tip="' + h(a[2] + ': up to $' + Number(a[1]).toLocaleString('en-US')) + '" cx="' + x(a[1]) + '" cy="' + (yy + j) + '" r="4.5"/>'; });
+      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '">median ' + shortMoney(m) + '</text>';
+    });
+    drawSvg(svgEl, w, hh, g);
+    return med;
+  }
+
+  // =====================================================================================
+  // About the data page
+  // =====================================================================================
+
+  function aboutPage() {
+    var A = DATA;
+    var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
+    el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
+    var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
+      .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
+      .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
+      .map(function (r) { return [stateName(r[0]), r[1]]; });
+    var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
+    chartSeason(el('c2'), rows.concat([['All states', all]]), false);
+    el('c2-leg').innerHTML = seasonLegend();
+    chartStated(el('c3'), el('c3-table'), A.stated.filter(function (r) { return r.n >= 7; }));
+    var fc = chartFlips(el('c4'), A.flips);
+    var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
+    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
+      fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
+    var med = chartAwards(el('c5'), A.awards);
+    el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+    renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
   }
 
   // =====================================================================================
@@ -133,31 +418,37 @@
   // =====================================================================================
 
   function statePage() {
-    var P = DATA.programs, B = DATA.between || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
-    P.forEach(function (p) {
-      p._text = [p.name, p.agency, p.agency_code, p.number, p.summary].join(' ').toLowerCase();
+    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var cov = DATA.coverage;
+    P.concat(B, U).forEach(function (p) {
+      p._text = [p.name, p.agency, agencyName(p), p.agency_code, p.number, p.summary].join(' ').toLowerCase();
     });
     var byId = {}, bySlug = {};
-    P.concat(B).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
+    P.concat(B, U).forEach(function (p) { byId[p.id] = p; bySlug[p.slug] = p; });
 
     var FACETS = [
-      { key: 'tier', label: 'Relevance to a municipality', get: function (p) { return [p.tier]; },
-        lab: function (v) { return v === 'likely' ? 'Likely' : 'Possible'; }, order: ['likely', 'possible'], open: true },
-      { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: cap, open: true },
-      { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: cap, open: true },
+      { key: 'tier', label: 'Fit for a local government', get: function (p) { return [p.tier]; },
+        lab: function (v) { return v === 'likely' ? 'Likely fit' : 'May fit: check eligibility'; }, chip: function (v) { return TIER_LABEL[v]; },
+        order: ['likely', 'possible'], open: true },
+      { key: 'level', label: 'Level', get: function (p) { return [p.level]; }, lab: function (v) { return v === 'state' ? S.name : cap(v); }, open: true },
+      { key: 'status', label: 'Status', get: function (p) { return [p.status]; }, lab: statusLabel, open: true, openOnly: true },
       { key: 'deadline', label: 'Deadline', get: function (p) { return [p.closes_at && !p.deadline_placeholder ? 'dated' : p.rolling ? 'rolling' : p.closes_text ? 'text' : 'none']; },
         lab: function (v) { return { dated: 'Has a date', rolling: 'Rolling or year-round', text: 'Described in words', none: 'Not stated' }[v]; },
-        order: ['dated', 'rolling', 'text', 'none'], open: true },
+        order: ['dated', 'rolling', 'text', 'none'], open: true, openOnly: true },
       { key: 'category', label: 'Category', get: function (p) { return p.categories.length ? p.categories : ['none']; },
         lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: true },
+      { key: 'applicant', label: 'Who can apply (read from the text)', get: function (p) { return p.applicant_types.length ? p.applicant_types : ['none']; },
+        lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: false },
+      { key: 'match', label: 'Matching share', get: function (p) { return [p.match_required == null ? 'unknown' : p.match_required ? 'yes' : 'no']; },
+        lab: function (v) { return { yes: 'Match required', no: 'No match required', unknown: 'Not stated' }[v]; }, order: ['no', 'unknown', 'yes'], open: false },
       { key: 'funding_type', label: 'Funding type', get: function (p) { return [p.funding_type || 'none']; },
         lab: function (v) { return v === 'none' ? 'Not stated' : words(v); }, open: false },
-      { key: 'agency', label: 'Agency', get: function (p) { return [p.agency || p.agency_code || 'Not stated']; },
+      { key: 'agency', label: 'Agency', get: function (p) { return [agencyName(p) || 'Not stated']; },
         lab: function (v) { return v; }, open: false, long: true }
     ];
     var DEFAULT_SEL = { tier: ['likely'] };
 
-    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false };
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, view: 'list' };
     function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
     resetSel();
 
@@ -175,10 +466,12 @@
       var hsh = parseHash();
       if (hsh.q !== undefined) st.q = hsh.q;
       if (hsh.sort) st.sort = hsh.sort;
-      if (hsh.tab === 'changes') st.tab = 'changes';
+      if (hsh.tab === 'changes' || hsh.tab === 'digest') st.tab = hsh.tab;
       if (hsh.feed) st.feed = hsh.feed;
       if (hsh.quick) st.quick = hsh.quick;
       if (hsh.between === '1') st.between = true;
+      if (hsh.unstated === '1') st.unstated = true;
+      if (hsh.view === 'timeline') st.view = 'timeline';
       var any = false;
       FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
       if (hsh.all === '1' && !any) st.sel = {};
@@ -189,9 +482,11 @@
       if (st.q) parts.push('q=' + encodeURIComponent(st.q));
       if (st.sort !== 'closing') parts.push('sort=' + st.sort);
       if (st.quick) parts.push('quick=' + st.quick);
-      if (st.tab === 'changes') parts.push('tab=changes');
+      if (st.tab !== 'programs') parts.push('tab=' + st.tab);
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
       if (st.between) parts.push('between=1');
+      if (st.unstated) parts.push('unstated=1');
+      if (st.view !== 'list') parts.push('view=' + st.view);
       var same = true;
       FACETS.forEach(function (f) {
         var cur = (st.sel[f.key] || []).slice().sort().join(','), def = (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
@@ -206,15 +501,19 @@
     }
 
     // ---- matching ----
+    // `skip` leaves one facet out (for its own counts). `folded` marks the closed and status-not-confirmed groups:
+    // the status and deadline facets describe open rows, so they do not filter those groups.
     function termsOf(q) { return q.toLowerCase().split(/\s+/).filter(Boolean); }
-    function matches(p, skip) {
+    function matches(p, skip, folded) {
       if (st.quick === 'new' && !p.is_new) return false;
       if (st.quick === 'closing' && !isSoon(p)) return false;
+      if (st.quick === 'week' && !inWeek(p)) return false;
+      if (st.quick === 'starred' && !watched[p.slug]) return false;
       var terms = termsOf(st.q);
       for (var i = 0; i < terms.length; i++) if (p._text.indexOf(terms[i]) < 0) return false;
       for (var j = 0; j < FACETS.length; j++) {
         var f = FACETS[j];
-        if (f.key === skip) continue;
+        if (f.key === skip || (folded && f.openOnly)) continue;
         var sel = st.sel[f.key];
         if (!sel || !sel.length) continue;
         var vals = f.get(p), ok = false;
@@ -235,43 +534,60 @@
     };
 
     // ---- header ----
-    el('title').textContent = S.name + ': open funding for local governments';
-    var cov = DATA.coverage, nState = cov.state ? cov.state.open : 0;
-    el('lede').textContent = P.length + ' program' + (P.length === 1 ? '' : 's') + ' a town, city or county in ' + S.name +
-      ' can apply to now or soon: ' + cov.federal.open + ' federal' + (cov.state ? ' and ' + nState + ' from ' + S.name + ' agencies' : '') +
-      '. Sorted by deadline. Open a card for the source\'s own eligibility wording.';
-    var covHtml = '<span class="cov"><b>Federal:</b> ' + cov.federal.open + ' open notices' +
-      (cov.federal.sources.length ? ' · ' + cov.federal.sources.map(sourceLine).join(' · ') : ' · no sources read yet') + '</span>';
-    if (cov.state) {
-      covHtml += '<span class="cov"><b>' + h(S.name) + ':</b> ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
-        ' · ' + cov.state.programs + ' programs read · ' + cov.state.open + ' open for local governments' +
-        (cov.state.between ? ' · ' + cov.state.between + ' between rounds' : '') +
-        (cov.state.last_ok ? ' · read ' + fmtDate(cov.state.last_ok) : '') + '</span>';
-    } else {
-      covHtml += '<span class="cov none"><b>' + h(S.name) + ':</b> no state sources yet. Federal notices only.</span>';
-    }
-    el('coverage').innerHTML = covHtml;
+    var PS = P.filter(function (p) { return p.state; }), PF = P.filter(function (p) { return !p.state; });
+    el('title').innerHTML = h(S.name) + '<span class="h1-sub">Funding for local governments</span>';
+    el('lede').textContent = cov.state
+      ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
+      : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
+    var sources = cov.federal.sources.concat(cov.state ? cov.state.sources : []);
+    var lastRead = sources.map(function (s) { return s.last_ok || ''; }).sort().pop();
+    el('coverage-sum').innerHTML = (cov.state
+      ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
+      : 'Read daily from Grants.gov') +
+      '<span class="cov-when">' + (lastRead ? ' · last read ' + h(fmtDate(lastRead)) : '') + ' · built ' + h(fmtDate(DATA.generated_at)) + '</span>';
+    el('coverage-body').innerHTML =
+      '<p><b>Federal:</b> ' + cov.federal.open + ' open or announced notices · ' +
+      (cov.federal.sources.length ? cov.federal.sources.map(sourceLine).join(' · ') : 'no sources read yet') + '</p>' +
+      (cov.state
+        ? '<p><b>' + h(S.name) + ':</b> ' + cov.state.programs + ' programs read from ' + cov.state.agencies + (cov.state.agencies === 1 ? ' agency' : ' agencies') +
+          '; ' + cov.state.open + ' open or announced for local governments, ' + (cov.state.unstated || 0) + ' with no status stated, ' +
+          cov.state.between + ' closed recently.</p><ul class="srcs">' + cov.state.sources.map(function (s) { return '<li>' + sourceLine(s) + '</li>'; }).join('') + '</ul>'
+        : '<p><b>' + h(S.name) + ':</b> no state agency sources yet. Federal notices only.</p>');
 
     var sw = el('state-switch');
     sw.innerHTML = DATA.states.map(function (s) { return '<option value="' + h(s.code) + '"' + (s.code === S.code ? ' selected' : '') + '>' + h(s.name) + '</option>'; }).join('');
     sw.addEventListener('change', function () { location.href = ROOT + sw.value.toLowerCase() + '/'; });
 
-    // ---- pulse tiles ----
+    // ---- the briefing: three or four sentences that each filter the page (13.6). Every number is a count of rows
+    // already on the page; a sentence with nothing to say is left out, except the first.
+    function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+    function inWeek(p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= 7; }
+    var nWeekState = PS.filter(inWeek).length, nWeekFed = PF.filter(inWeek).length;
     var nNew = P.filter(function (p) { return p.is_new; }).length;
     var nClosing = P.filter(isSoon).length;
     var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
-    el('n-new').textContent = nNew; el('n-closing').textContent = nClosing; el('n-changed').textContent = flips.length;
-    el('tile-new').querySelector('.d').textContent = 'first seen by the registry in the last ' + R.new_days + ' days';
-    el('tile-closing').querySelector('.d').textContent = 'deadline between today and ' + R.closing_days + ' days out';
-    el('tile-changed').querySelector('.d').textContent = 'status flipped in the last ' + R.new_days + ' days';
-    if (!nNew) el('tile-new').disabled = true;
-    if (!nClosing) el('tile-closing').disabled = true;
-    if (!flips.length) el('tile-changed').disabled = true;
+    var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
+    var brief = [];
+    if (nWeekState + nWeekFed) {
+      brief.push(['week', (cov.state ? plural(nWeekState, S.name + ' program', S.name + ' programs') + ' and ' : '') + plural(nWeekFed, 'federal notice', 'federal notices') + ' close in the next 7 days.']);
+    } else {
+      brief.push([nClosing ? 'closing' : null, 'Nothing on this page closes in the next 7 days' + (nClosing ? '; ' + nClosing + ' close within ' + R.closing_days + '.' : '.')]);
+    }
+    if (opened.length) brief.push(['opened', plural(opened.length, 'program', 'programs') + ' opened or were announced in the last ' + R.new_days + ' days.']);
+    if (nNew) brief.push(['new', plural(nNew, 'program is', 'programs are') + ' new to the registry this week.']);
+    if (U.length) brief.push(['unstated', plural(U.length, S.name + ' program has', S.name + ' programs have') + ' no status on the agency\'s page.']);
+    el('brief').innerHTML = brief.map(function (b) {
+      return '<li>' + (b[0] ? '<button type="button" class="brief-link" data-act="' + b[0] + '">' + h(b[1]) + '</button>' : h(b[1])) + '</li>';
+    }).join('') + (brief.length > 1 ? '<li class="brief-more"><button type="button" class="btn quiet small" id="brief-more" aria-expanded="false">' + (brief.length - 1) + ' more this week</button></li>' : '');
+    if (el('brief-more')) el('brief-more').addEventListener('click', function () {
+      var open = el('brief').classList.toggle('all');
+      this.setAttribute('aria-expanded', String(open)); this.textContent = open ? 'Fewer' : (brief.length - 1) + ' more this week';
+    });
     el('tab-n-changes').textContent = C.length;
-    el('tab-n-programs').textContent = P.length;
+    el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
 
-    // ---- facets (built once; counts updated in place) ----
+    // ---- facets (built once over the open rows; counts updated in place) ----
     var facetsEl = el('facets'), facetList = el('facet-list');
     function buildFacets() {
       facetList.innerHTML = FACETS.map(function (f) {
@@ -287,7 +603,7 @@
             return '<li data-v="' + h(v) + '"><label for="' + id + '"><input type="checkbox" id="' + id + '" name="' + h(f.key) + '" value="' + h(v) + '">' +
               '<span class="lbl">' + h(f.lab(v)) + '</span><span class="cnt" aria-label="count"></span></label></li>';
           }).join('') + '</ul></details>';
-      }).join('') + '<button class="btn quiet clear" id="clear" type="button">Clear filters</button>';
+      }).join('') + '<p class="facet-note">Counts are open and announced programs.</p>';
       facetsEl.addEventListener('change', function (e) {
         var cb = e.target;
         if (cb.type !== 'checkbox') return;
@@ -297,7 +613,6 @@
         if (!cb.checked && i >= 0) sel.splice(i, 1);
         render();
       });
-      el('clear').addEventListener('click', function () { st.sel = {}; st.q = ''; st.quick = null; el('q').value = ''; render(); el('q').focus(); });
     }
     function updateFacets() {
       var active = 0;
@@ -316,113 +631,272 @@
       });
       var fn = el('filters-n');
       fn.hidden = !active; fn.textContent = active;
-      el('clear').hidden = !active && !st.q && !st.quick;
     }
 
-    // ---- results ----
-    function closesHtml(p) {
-      if (p.closes_at && p.deadline_placeholder) {
-        // The source states a far-off date (2035, 2999) as its way of saying "no deadline"; show that, keep the date.
-        return '<span><b>' + (p.rolling ? 'Rolling' : 'No deadline stated') + '</b> · source lists ' + h(fmtDate(p.closes_at)) + '</span>';
-      }
-      if (p.closes_at) {
-        var soon = isSoon(p);
-        return '<span class="' + (soon ? 'soon' : '') + '"><b>' + h(relDays(p.days_to_close)) + '</b> · ' + h(fmtDate(p.closes_at)) + '</span>';
-      }
-      if (p.closes_text) return '<span><span class="k">Deadline</span> ' + h(p.closes_text) + '</span>';
-      if (p.rolling) return '<span><b>Rolling</b> · applications accepted year-round</span>';
-      return '<span class="k">No deadline stated</span>';
+    // ---- fit check (13.11): three questions that set the facets above; nothing hidden, every answer a chip ----
+    (function () {
+      var who = {}, topics = {};
+      P.concat(U, B).forEach(function (p) { p.applicant_types.forEach(function (t) { who[t] = 1; }); p.categories.forEach(function (c) { topics[c] = 1; }); });
+      var WHO = ['municipality', 'county', 'special_district', 'housing_authority', 'tribe', 'school'].filter(function (t) { return who[t]; });
+      var WHO_LAB = { municipality: 'town or city', county: 'county', special_district: 'special district or authority', housing_authority: 'housing authority', tribe: 'tribal government', school: 'school district or school' };
+      el('fit-who').innerHTML += WHO.map(function (t) { return '<option value="' + t + '">' + h(WHO_LAB[t]) + '</option>'; }).join('');
+      el('fit-topic').innerHTML += Object.keys(topics).sort().map(function (c) { return '<option value="' + h(c) + '">' + h(words(c)) + '</option>'; }).join('');
+      function set(key, val) { if (val) st.sel[key] = val; else delete st.sel[key]; render(); }
+      el('fit-who').addEventListener('change', function () { set('applicant', this.value ? [this.value] : null); });
+      el('fit-topic').addEventListener('change', function () { set('category', this.value ? [this.value] : null); });
+      el('fit-match').addEventListener('change', function () { set('match', this.value === 'no' ? ['no', 'unknown'] : null); });
+    })();
+    function syncFit() {
+      var a = st.sel.applicant || [], c = st.sel.category || [], m = st.sel.match || [];
+      el('fit-who').value = a.length === 1 && el('fit-who').querySelector('option[value="' + a[0] + '"]') ? a[0] : '';
+      el('fit-topic').value = c.length === 1 ? c[0] : '';
+      el('fit-match').value = m.length === 2 && m.indexOf('no') >= 0 && m.indexOf('unknown') >= 0 ? 'no' : '';
     }
+
+    // ---- the active filters, always visible: the default "Likely fit" is a choice the reader can see and undo ----
+    var activeEl = el('active');
+    function renderActive(shown) {
+      var chips = [];
+      var QUICK = { 'new': 'New this week', closing: 'Closing within ' + R.closing_days + ' days', week: 'Closing within 7 days', starred: 'Starred' };
+      if (st.quick) chips.push('<button class="fchip" data-clear="quick" aria-label="Remove filter: ' + h(QUICK[st.quick] || st.quick) + '">' + h(QUICK[st.quick] || st.quick) + ' <span aria-hidden="true">×</span></button>');
+      if (st.q) chips.push('<button class="fchip" data-clear="q" aria-label="Clear the search">“' + h(st.q) + '” <span aria-hidden="true">×</span></button>');
+      FACETS.forEach(function (f) {
+        (st.sel[f.key] || []).forEach(function (v) {
+          var t = f.chip ? f.chip(v) : f.lab(v);
+          chips.push('<button class="fchip" data-facet="' + f.key + '" data-v="' + h(v) + '" aria-label="Remove filter: ' + h(t) + '">' + h(t) + ' <span aria-hidden="true">×</span></button>');
+        });
+      });
+      var total = P.length + B.length + U.length;
+      var isDefault = !st.q && !st.quick && FACETS.every(function (f) {
+        return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+      });
+      activeEl.innerHTML = '<span class="count num">Showing ' + shown + ' of ' + total + '</span>' +
+        (chips.length ? '<span class="lbl">Filtered to</span>' + chips.join('') : '') +
+        (chips.length ? '<button class="btn quiet" data-clear="all">' + (isDefault ? 'Show all ' + total : 'Clear all') + '</button>' : '');
+    }
+    activeEl.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      var c = b.getAttribute('data-clear'), fk = b.getAttribute('data-facet');
+      if (c === 'all') { st.sel = {}; st.q = ''; st.quick = null; }
+      else if (c === 'q') st.q = '';
+      else if (c === 'quick') st.quick = null;
+      else if (fk) { var sel = st.sel[fk] || []; sel.splice(sel.indexOf(b.getAttribute('data-v')), 1); }
+      render();
+      el('q').focus();
+    });
+
+    // ---- cards: one layout everywhere, status and deadline first, then name, agency, money ----
+    function deadlineHtml(p) {
+      if (p.closes_at && p.deadline_placeholder) return '<span>' + (p.rolling ? 'Rolling deadline' : 'No deadline stated') + '</span>';
+      if (p.closes_at && p.days_to_close != null && p.days_to_close >= 0) {
+        // within 7 days: the caution panel (13.17, borrowed from Wayfinding); the words carry it, the yellow repeats it
+        if (p.days_to_close <= 7) return '<span class="caution">' + h(cap(relDays(p.days_to_close))) + '</span><span class="sr-only">, ' + h(fmtDate(p.closes_at, true)) + '</span>';
+        return '<span class="' + (isSoon(p) ? 'soon' : '') + '">' + h(cap(relDays(p.days_to_close))) + ', ' + h(fmtDate(p.closes_at)) + '</span>';
+      }
+      if (p.closes_at) return '<span>Last deadline ' + h(fmtDate(p.closes_at, true)) + (p.days_since_deadline != null ? ' (' + h(agoDays(p.days_since_deadline)) + ')' : '') + '</span>';
+      if (p.rolling) return '<span>Rolling deadline</span>';
+      if (p.closes_text) return '<span>Deadline in the source\'s words below</span>';
+      return '<span class="muted">No deadline stated</span>';
+    }
+    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     function card(p) {
-      var meta = [p.agency || p.agency_code, p.number].filter(Boolean).join(' · ');
-      var facts = [closesHtml(p)];
-      if (p.amount_max != null) facts.push('<span><span class="k">Max award</span> <b class="num">' + money(p.amount_max) + '</b></span>');
-      else if (p.amount_min != null) facts.push('<span><span class="k">From</span> <b class="num">' + money(p.amount_min) + '</b></span>');
-      if (p.match_required != null) facts.push('<span><span class="k">Match</span> <b>' + (p.match_required ? 'required' : 'not required') + '</b></span>');
-      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span class="k">' + h(words(p.funding_type)) + '</span>');
-      return '<article class="card" data-id="' + p.id + '">' +
-        '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
+      var amount = amountText(p);
+      var facts = [
+        '<span>' + (amount ? '<b class="num">' + h(amount) + '</b>' : '<span class="muted">Amount not published</span>') + '</span>'
+      ];
+      if (p.match_required != null) facts.push('<span>' + (p.match_required ? 'Match required' : 'No match required') + '</span>');
+      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span>' + h(words(p.funding_type)) + '</span>');
+      if (p.last_reopened) facts.push('<span>Reopened last on ' + h(fmtDate(p.last_reopened, true)) + '</span>');
+      var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
+        (p.categories.length > 3 ? '<li class="more">+' + (p.categories.length - 3) + '</li>' : '');
+      var quoteText = p.closes_text && (!p.closes_at || p.status !== 'open') && !p.rolling ? p.closes_text : null;
+      return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
+        '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
+        '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        (meta ? '<p class="meta">' + h(meta) + '</p>' : '') +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
-        (p.categories.length ? '<ul class="chips" aria-label="Categories">' + p.categories.map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') + '</ul>' : '') +
-        '<span class="arrow" aria-hidden="true">›</span></article>';
+        (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
+        (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
+        '</div></article>';
     }
+    // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
+    // Decorative for screen readers: the same date is in words on the card's first line.
+    function dateCol(p) {
+      var dated = p.closes_at && !p.deadline_placeholder, L = topicLine(p);
+      var badge = '<span class="topic t-' + L.key + '" title="' + h(L.name) + '"><b>' + L.letter + '</b></span><span class="sr-only">Topic: ' + h(L.name) + '. </span>';
+      if (dated) {
+        var past = p.days_to_close != null && p.days_to_close < 0;
+        return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
+          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + badge + '</div>';
+      }
+      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span>' + badge + '</div>';
+    }
+    // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
+    var BUCKETS = [
+      ['Closes within 7 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close >= 0 && p.days_to_close <= 7; }],
+      ['Closes within 30 days', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > 7 && p.days_to_close <= R.closing_days; }],
+      ['Closes later', function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close > R.closing_days; }],
+      ['No fixed date', function (p) { return !p.closes_at || p.deadline_placeholder; }]
+    ];
+    function bucketed(rows) {
+      if (st.sort !== 'closing') return rows.map(card).join('');
+      return BUCKETS.map(function (b) {
+        var r = rows.filter(b[1]);
+        return r.length ? '<p class="bucket" role="heading" aria-level="3">' + h(b[0]) + ' · ' + r.length + '</p>' + r.map(card).join('') : '';
+      }).join('');
+    }
+
+    el('topic-key').innerHTML = topicKey();
+
+    // ---- the four groups ----
     var resultsEl = el('results');
     resultsEl.tabIndex = -1;
-    function renderResults() {
-      var rows = P.filter(function (p) { return matches(p, null); }).sort(SORTS[st.sort] || SORTS.closing);
-      el('count').textContent = 'Showing ' + rows.length + ' of ' + P.length;
-      if (!rows.length) {
-        resultsEl.innerHTML = '<div class="empty"><b>Nothing matches.</b><br>Try fewer filters, or include the <b>possible</b> tier.</div>';
-        return;
+    el('g-state-t').textContent = S.name + ' programs open or announced';
+    el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
+    el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
+      ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
+    // Paging (13.16): 30 cards a group until the reader asks for all; filters and search still see every row.
+    var PAGE_N = 30, more = {};
+    function paged(rows, key) {
+      if (more[key] || rows.length <= PAGE_N + 5) return { rows: rows, button: '' };
+      return { rows: rows.slice(0, PAGE_N), button: '<button class="btn more" type="button" data-more="' + key + '">Show all ' + rows.length + '</button>' };
+    }
+    function groupHtml(rows, empty, key) {
+      if (!rows.length) return '<p class="empty">' + empty + '</p>';
+      var pg = paged(rows, key);
+      return bucketed(pg.rows) + pg.button;
+    }
+    function renderGroups() {
+      var sort = SORTS[st.sort] || SORTS.closing;
+      var rs = PS.filter(function (p) { return matches(p, null); }).sort(sort);
+      var rf = PF.filter(function (p) { return matches(p, null); }).sort(sort);
+      var ru = U.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      var rb = B.filter(function (p) { return matches(p, null, true); }).sort(st.sort === 'closing' ? function () { return 0; } : sort);
+      el('g-state-n').textContent = rs.length;
+      el('g-federal-n').textContent = rf.length;
+      el('g-unstated-n').textContent = ru.length;
+      el('g-between-n').textContent = rb.length;
+
+      var stateEmpty;
+      if (!cov.state) stateEmpty = 'No ' + h(S.name) + ' agency sources are connected yet, so this page lists federal notices only.';
+      else if (!PS.length) stateEmpty = 'No ' + h(S.name) + ' programs are open or announced right now.' +
+        (ru.length || rb.length ? ' ' + [ru.length ? ru.length + (ru.length === 1 ? ' has' : ' have') + ' no status on the agency\'s page' : '', rb.length ? rb.length + ' closed recently' : ''].filter(Boolean).join(' and ') + ': see below.' : '');
+      else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
+      el('list-state').innerHTML = groupHtml(rs, stateEmpty, 'state');
+      el('g-state-d').hidden = true;
+      el('list-federal').innerHTML = FEDERAL_LOADED ? groupHtml(rf, 'No federal notices match these filters.', 'federal')
+        : '<p class="empty">The federal notices did not load (federal.js). Reload the page, or see them on <a href="https://simpler.grants.gov/search">Grants.gov</a>.</p>';
+
+      el('g-unstated').hidden = !ru.length;
+      el('g-between').hidden = !rb.length;
+      var pu = paged(ru, 'unstated'), pb = paged(rb, 'between');
+      el('list-unstated').innerHTML = pu.rows.map(card).join('') + pu.button;
+      el('list-between').innerHTML = pb.rows.map(card).join('') + pb.button;
+      [['unstated', 'unstated-toggle', 'list-unstated', ru.length], ['between', 'between-toggle', 'list-between', rb.length]].forEach(function (g) {
+        var open = st[g[0]], t = el(g[1]);
+        t.setAttribute('aria-expanded', String(open));
+        t.textContent = open ? 'Hide' : 'Show ' + g[3];
+        el(g[2]).hidden = !open;
+      });
+      renderActive(rs.length + rf.length + ru.length + rb.length);
+      el('tray-done').textContent = 'Show ' + (rs.length + rf.length + ru.length + rb.length) + ' results';
+      var tl = st.view === 'timeline';
+      ['g-state', 'g-unstated', 'g-between', 'g-federal'].forEach(function (id) { if (tl) el(id).hidden = true; });
+      if (!tl) { el('g-state').hidden = false; el('g-federal').hidden = false; }
+      el('g-timeline').hidden = !tl;
+      if (tl) renderTimeline(rs.concat(rf));
+      Array.prototype.forEach.call(document.querySelectorAll('.segb'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === st.view)); });
+    }
+
+    // ---- the open-window timeline (13.10): a bar from the stated opening date to the stated deadline; a dot at the
+    // deadline when no opening date is stated. Nothing is drawn that the source did not state.
+    var NS_SVG = 'http://www.w3.org/2000/svg';
+    function addDays(iso, n) { return new Date(Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10) + n)).toISOString().slice(0, 10); }
+    function renderTimeline(rows) {
+      var start = addDays(TODAY, -30), end = addDays(TODAY, 180), span = daysBetween(start, end);
+      var inWin = rows.filter(function (p) { return p.closes_at && !p.deadline_placeholder && p.closes_at.slice(0, 10) >= TODAY && p.closes_at.slice(0, 10) <= end; })
+        .sort(function (a, b) { return a.closes_at.localeCompare(b.closes_at) || a.name.localeCompare(b.name); });
+      el('g-timeline-n').textContent = inWin.length;
+      el('tl-state-l').textContent = S.name;
+      el('g-timeline-d').textContent = (rows.length - inWin.length) + ' of the ' + rows.length + ' programs matching your filters have no stated deadline in this window and are not drawn. Select a row for its details.';
+      var w = 980, L = 320, R = 16, T = 28, rh = 24, hh = T + inWin.length * rh + 8;
+      var x = function (iso) { return L + (w - L - R) * Math.max(0, Math.min(span, daysBetween(start, iso))) / span; };
+      var g = '';
+      for (var m = 0; m < 8; m++) {
+        var d = new Date(Date.UTC(+start.slice(0, 4), +start.slice(5, 7) - 1 + m, 1)).toISOString().slice(0, 10);
+        if (d < start || d > end) continue;
+        g += '<line class="tl-grid" x1="' + x(d) + '" x2="' + x(d) + '" y1="' + (T - 8) + '" y2="' + hh + '"/><text class="tl-t" x="' + (x(d) + 4) + '" y="14">' + MONTHS[+d.slice(5, 7) - 1] + '</text>';
       }
-      resultsEl.innerHTML = rows.map(card).join('');
+      g += '<line class="tl-today" x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="' + (T - 10) + '" y2="' + hh + '"/><text class="tl-t tl-today-t" x="' + (x(TODAY) + 4) + '" y="' + (T - 12) + '">today</text>';
+      inWin.forEach(function (p, i) {
+        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', nm = p.name.length > 48 ? p.name.slice(0, 47) + '…' : p.name;
+        var label = p.name + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
+        g += '<g class="tl-row" data-id="' + p.id + '" tabindex="0" role="button" aria-label="' + h(label) + '"><rect class="tl-hit" x="0" y="' + yy + '" width="' + w + '" height="' + rh + '"/>' +
+          '<text class="tl-n" x="' + (L - 10) + '" y="' + (yy + 16) + '" text-anchor="end">' + h(nm) + '</text>';
+        if (p.opens_at) { var x0 = x(p.opens_at.slice(0, 10)), x1 = x(c); g += '<rect class="tl-bar ' + cls + '" x="' + x0 + '" y="' + (yy + 7) + '" width="' + Math.max(4, x1 - x0) + '" height="10" rx="4"/>'; }
+        else g += '<circle class="tl-dot ' + cls + '" cx="' + x(c) + '" cy="' + (yy + 12) + '" r="5.5"/>';
+        g += '<title>' + h(label) + '</title></g>';
+      });
+      var svgEl = el('tl-svg');
+      svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w); svgEl.innerHTML = g;
     }
+    el('tl-svg').addEventListener('click', function (e) { var r = e.target.closest('.tl-row'); if (r) openDetail(byId[r.getAttribute('data-id')], r); });
+    el('tl-svg').addEventListener('keydown', function (e) { if (e.key !== 'Enter' && e.key !== ' ') return; var r = e.target.closest('.tl-row'); if (r) { e.preventDefault(); openDetail(byId[r.getAttribute('data-id')], r); } });
+    Array.prototype.forEach.call(document.querySelectorAll('.segb'), function (b) {
+      b.addEventListener('click', function () { st.view = b.getAttribute('data-view'); render(); });
+    });
+    el('unstated-toggle').addEventListener('click', function () { st.unstated = !st.unstated; render(); });
+    el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
     resultsEl.addEventListener('click', function (e) {
+      var mb = e.target.closest('button[data-more]');
+      if (mb) { more[mb.getAttribute('data-more')] = true; render(); return; }
+      var sb = e.target.closest('button[data-star]');
+      if (sb) { toggleStar(byId[sb.closest('.card').getAttribute('data-id')]); return; }
       if (e.target.closest('a')) return;
       var c = e.target.closest('.card');
-      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
+      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
     });
 
-    // ---- between rounds: closed or past-deadline state programs, collapsed by default ----
-    // Nothing here forecasts: the last deadline is what the source stated, the cycle text is the source's own
-    // wording, and "reopened last on" is an observation from the change log (absent until it has happened).
-    function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
-    function betweenCard(p) {
-      var meta = [p.agency || p.agency_code, p.number].filter(Boolean).join(' · ');
-      var facts = [];
-      if (p.closes_at) facts.push('<span><span class="k">Last deadline</span> <b>' + h(fmtDate(p.closes_at)) + '</b>' + (p.days_since_deadline != null ? ' · ' + h(agoDays(p.days_since_deadline)) : '') + '</span>');
-      else facts.push('<span class="k">No deadline date stated</span>');
-      if (p.last_reopened) facts.push('<span><span class="k">Reopened last on</span> <b>' + h(fmtDate(p.last_reopened, true)) + '</b></span>');
-      if (p.amount_max != null) facts.push('<span><span class="k">Max award</span> <b class="num">' + money(p.amount_max) + '</b></span>');
-      if (p.match_required != null) facts.push('<span><span class="k">Match</span> <b>' + (p.match_required ? 'required' : 'not required') + '</b></span>');
-      if (p.funding_type && p.funding_type !== 'grant') facts.push('<span class="k">' + h(words(p.funding_type)) + '</span>');
-      return '<article class="card between-card" data-id="' + p.id + '">' +
-        '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        (meta ? '<p class="meta">' + h(meta) + '</p>' : '') +
-        '<div class="facts">' + facts.join('') + '</div>' +
-        (p.closes_text ? '<p class="cycle"><span class="k">As written by the source:</span> ' + h(p.closes_text) + '</p>' : '') +
-        (p.categories.length ? '<ul class="chips" aria-label="Categories">' + p.categories.map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') + '</ul>' : '') +
-        '<span class="arrow" aria-hidden="true">›</span></article>';
+    // ---- the two state-page charts (13.14): deadlines ahead, and when this state's deadlines have fallen ----
+    el('ahead-st-l').textContent = S.name;
+    var aheadDone = false;
+    el('ahead').addEventListener('toggle', function () {
+      if (!el('ahead').open || aheadDone) return;
+      aheadDone = true;
+      var r = chartRunway(el('ahead-svg'), P.map(function (p) { return [p.state, p.closes_at, p.deadline_placeholder]; }), 26, true);
+      el('ahead-note').textContent = r.total + ' deadlines in the next 26 weeks on this page, before filters; ' + r.later + ' later. Hover a week for its count.';
+    });
+    var SEA = DATA.season, seaTot = SEA ? SEA.reduce(function (a, b) { return a + b; }, 0) : 0;
+    if (seaTot >= 8) {
+      el('season').hidden = false;
+      el('season-h').textContent = 'When ' + S.name + '\'s deadlines have fallen:';
+      el('season-d').textContent = seaTot + ' stated deadlines of programs open to local governments, two years either side of today, by month. A pattern, not a forecast.';
+      chartSeason(el('season-svg'), [[S.name, SEA]], true);
     }
-    var betweenEl = el('between'), betweenList = el('between-list'), betweenToggle = el('between-toggle');
-    el('n-between').textContent = B.length;
-    el('between-d').textContent = (cov.state ? S.name + ' programs' : 'State programs') +
-      ' for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) +
-      ' months of that deadline, with the last deadline and the agency\'s own wording about its cycle. Nothing here forecasts the next round; the change log shows the day one reopens.';
-    betweenList.innerHTML = B.map(betweenCard).join('');
-    if (!B.length) betweenEl.hidden = true;
-    betweenToggle.addEventListener('click', function () { st.between = !st.between; render(); });
-    betweenList.addEventListener('click', function (e) {
-      if (e.target.closest('a')) return;
-      var c = e.target.closest('.card');
-      if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('button'));
-    });
 
-    // ---- pulse, tabs, feed ----
-    Array.prototype.forEach.call(document.querySelectorAll('.tile'), function (t) {
-      t.addEventListener('click', function () {
-        var k = t.getAttribute('data-quick');
-        if (k === 'changed') {
-          if (st.tab === 'changes' && st.feed === 'status') { st.feed = 'all'; } else { st.tab = 'changes'; st.feed = 'status'; }
-        } else if (st.quick === k) {
-          st.quick = null; resetSel();
-        } else {
-          st.quick = k; st.sel = {}; st.q = ''; el('q').value = ''; st.tab = 'programs';
-        }
-        render();
-      });
+    // ---- briefing, tabs, feed ----
+    el('brief').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-act]');
+      if (!b) return;
+      var k = b.getAttribute('data-act');
+      if (k === 'opened') { st.tab = 'changes'; st.feed = 'status'; }
+      else if (k === 'unstated') { st.tab = 'programs'; st.unstated = true; }
+      else if (st.quick === k) { st.quick = null; resetSel(); }
+      else { st.quick = k; st.sel = {}; st.q = ''; el('q').value = ''; st.tab = 'programs'; }
+      render();
+      var target = k === 'opened' ? el('panel-changes') : k === 'unstated' ? el('g-unstated') : el('panel-programs');
+      if (target && target.scrollIntoView) target.scrollIntoView({ block: 'start' });
     });
-    var tabs = [el('tab-programs'), el('tab-changes')];
+    var TABS = ['programs', 'changes', 'digest'], tabs = TABS.map(function (k) { return el('tab-' + k); });
     tabs.forEach(function (t, i) {
-      t.addEventListener('click', function () { st.tab = i ? 'changes' : 'programs'; render(); });
+      t.addEventListener('click', function () { st.tab = TABS[i]; render(); });
       t.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + 1) % 2]; n.focus(); n.click(); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); }
       });
     });
-    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) {
+    Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) {
       c.addEventListener('click', function () { st.feed = c.getAttribute('data-feed'); render(); });
     });
     function feedRows() {
@@ -439,49 +913,111 @@
       if (b) openDetail(byId[b.getAttribute('data-open')], b);
     });
 
-    // ---- detail dialog ----
+    // ---- detail dialog: five answers first, then the source's own words ----
     var dlg = el('detail'), lastFocus = null, current = null;
     function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
     function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
+    function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
+    var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
     function detailHtml(p) {
       var listingName = {};
       p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
-      var amount = p.amount_min != null && p.amount_max != null ? money(p.amount_min) + ' to ' + money(p.amount_max)
-        : p.amount_max != null ? 'up to ' + money(p.amount_max) : p.amount_min != null ? 'from ' + money(p.amount_min) : null;
-      var closes = p.closes_at ? h(fmtDate(p.closes_at)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>' : null;
+      var amount = amountText(p);
+      var closes;
+      if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
+      else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
+      else if (p.rolling) closes = 'Rolling deadline';
+      else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
+      else if (p.closes_text) closes = 'In the source\'s words, below';
+      else closes = NOT_PUBLISHED;
+      var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
+      var answers =
+        '<dl class="answers">' +
+        '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+        '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
+        '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
+        '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
+        '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
+        '</dl>';
       var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
       var facts =
-        fact('Status', h(cap(p.status))) +
-        fact('Closes', closes, isSoon(p) ? 'soon' : '') +
-        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at)) : null) +
-        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
-        fact('Deadline, as written', p.closes_text && p.closes_text.length <= 80 ? h(p.closes_text) : null) +
-        fact('Rolling', p.rolling == null ? null : (p.rolling ? 'Yes, applications accepted year-round' : 'No')) +
-        fact('Award', amount ? h(amount) : null) +
+        fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
         fact('Match required', match ? h(match) : null) +
+        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
+        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
         fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
-        fact('Funding source', p.funding_source ? h(p.funding_source === 'pass_through' ? 'Pass-through' : 'Direct') : null) +
-        fact('Agency', p.agency ? h(p.agency) + (p.agency_code ? ' <span class="muted small">' + h(p.agency_code) + '</span>' : '') : (p.agency_code ? h(p.agency_code) : null)) +
+        fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
+        fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
         fact('Number', p.number ? h(p.number) : null);
       var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
         return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
       }).join('') + '</ul>' : '';
       var trail = 'First seen ' + fmtDate(p.first_seen, true) +
         (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
-        ' · read by the ' + (DATA.coverage.federal.sources.concat(DATA.coverage.state ? DATA.coverage.state.sources : []).filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label + ' connector';
-      return '<div class="row">' + tierPill(p.tier) + statusPill(p.status) + levelPill(p) + badges(p) + '</div>' +
-        '<div class="sect"><div class="facts">' + facts + '</div></div>' +
-        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 80 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
-        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        ' · read from ' + (sources.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
+      return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
+        answers +
+        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
         sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
-        sect('Who can apply (tags read from the text)', p.applicant_types.length ? '<ul class="chips">' + p.applicant_types.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
+        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        sect('History, as the registry saw it', historyHtml(p)) +
+        sect('More details', '<div class="facts">' + facts + '</div>') +
         sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
         sect('Assistance Listings this notice cites', alns) +
         '<p class="trail">' + h(trail) + '</p>';
     }
+    // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
+    function histWords(e) {
+      var k = e[1];
+      if (k === 'added') return 'First seen by the registry';
+      if (k === 'missing') return 'No longer listed by the source';
+      if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
+      if (k === 'status') {
+        var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
+        return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
+      }
+      var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
+      return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
+    }
+    function histKind(e) {
+      if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
+      if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
+      return e[1];
+    }
+    function historyHtml(p) {
+      var ev = p.history || [];
+      if (!ev.length) return '';
+      var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
+      if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
+      var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
+      var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
+      var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+      g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
+      if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+      ev.forEach(function (e) {
+        var k = histKind(e), cx = x(e[0]);
+        if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
+        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
+      });
+      g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+      var list = ev.slice().reverse().map(function (e) {
+        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
+          (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
+      }).join('');
+      return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+        '<ol class="hist-list">' + list + '</ol>' +
+        '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+    }
+
+    function syncDetailStar() {
+      var b = el('detail-star'), on = !!(current && watched[current.slug]);
+      b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '★ Starred' : '☆ Star';
+    }
+    el('detail-star').addEventListener('click', function () { toggleStar(current); });
     function openDetail(p, trigger, viaHistory) {
       if (!p) return;
       current = p;
+      syncDetailStar();
       lastFocus = trigger || document.activeElement;
       el('detail-title').textContent = p.name;
       el('detail-body').innerHTML = detailHtml(p);
@@ -522,38 +1058,135 @@
       qTimer = setTimeout(function () { st.q = qEl.value.trim(); render(); }, 120);
     });
     el('sort').addEventListener('change', function () { st.sort = el('sort').value; render(); });
-    var ft = el('filters-toggle');
-    ft.addEventListener('click', function () {
-      var open = ft.getAttribute('aria-expanded') === 'true';
-      ft.setAttribute('aria-expanded', String(!open));
-      facetsEl.hidden = open;
-    });
+    // On phones the filters are a tray over the results (13.16, NN/g): the result count stays on its button.
+    var ft = el('filters-toggle'), backdrop = el('tray-backdrop');
+    function setTray(open) {
+      ft.setAttribute('aria-expanded', String(open));
+      facetsEl.hidden = !open && !window.matchMedia('(min-width: 900px)').matches;
+      backdrop.hidden = !open || window.matchMedia('(min-width: 900px)').matches;
+      document.body.classList.toggle('tray-open', open && !window.matchMedia('(min-width: 900px)').matches);
+      if (open) { var first = facetsEl.querySelector('summary, input, select'); if (first) first.focus(); } else ft.focus();
+    }
+    ft.addEventListener('click', function () { setTray(ft.getAttribute('aria-expanded') !== 'true'); });
+    el('tray-done').addEventListener('click', function () { setTray(false); });
+    backdrop.addEventListener('click', function () { setTray(false); });
+    facetsEl.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ft.getAttribute('aria-expanded') === 'true') setTray(false); });
     function syncFacetsVisibility() {
       var wide = window.matchMedia('(min-width: 900px)').matches;
       facetsEl.hidden = !wide && ft.getAttribute('aria-expanded') !== 'true';
     }
     window.addEventListener('resize', syncFacetsVisibility);
 
+    // ---- stars and the watchlist (13.9): kept in this browser; each program has its own feed at p/<slug>.xml ----
+    var WKEY = 'fa-watch', watched = {};
+    try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
+    function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
+    function saveWatch() { try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: stars last for this visit */ } }
+    function toggleStar(p) {
+      if (!p) return;
+      if (watched[p.slug]) delete watched[p.slug];
+      else watched[p.slug] = { n: p.name, s: p.state || S.code, f: p.state ? p.state : null };
+      saveWatch(); render();
+      if (current && current.slug === p.slug) syncDetailStar();
+    }
+    function renderWatch() {
+      var keys = Object.keys(watched);
+      el('watch-n').textContent = keys.length;
+      el('watch-list').innerHTML = keys.length ? keys.map(function (k) {
+        var w = watched[k], page = ROOT + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k);
+        return '<li><a href="' + h(page) + '">' + h(w.n) + '</a> <span class="muted small">' + h(w.f ? stateName(w.f) : 'Federal') + '</span>' +
+          ' · <a class="small" href="' + h(ROOT + feedPath(k)) + '" type="application/atom+xml">feed</a>' +
+          ' <button type="button" class="btn quiet small" data-unstar="' + h(k) + '" aria-label="Remove ' + h(w.n) + '">Remove</button></li>';
+      }).join('') : '<li class="muted">Nothing starred yet. Use the ☆ on any program.</li>';
+      el('watch-only').disabled = el('watch-opml').disabled = !keys.length;
+    }
+    el('watch-btn').addEventListener('click', function () {
+      var w = el('watch'), open = w.hidden; w.hidden = !open; el('watch-btn').setAttribute('aria-expanded', String(open));
+    });
+    el('watch-list').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-unstar]'); if (!b) return;
+      delete watched[b.getAttribute('data-unstar')]; saveWatch(); render();
+    });
+    el('watch-only').addEventListener('click', function () { st.quick = st.quick === 'starred' ? null : 'starred'; st.tab = 'programs'; render(); });
+    el('watch-opml').addEventListener('click', function () {
+      var base = DATA.site_url;
+      var xml = '<?xml version="1.0" encoding="utf-8"?>\n<opml version="2.0"><head><title>Funding Atlas: starred programs</title></head><body>\n' +
+        Object.keys(watched).map(function (k) { var w = watched[k];
+          return '  <outline type="rss" text="' + h(w.n) + '" title="' + h(w.n) + '" xmlUrl="' + h(base + feedPath(k)) + '" htmlUrl="' + h(base + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k)) + '"/>'; }).join('\n') +
+        '\n</body></opml>\n';
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([xml], { type: 'text/x-opml' }));
+      a.download = 'funding-atlas-starred.opml';
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    });
+
+    // ---- the digest (13.8): plain text a regional planner can paste into a newsletter. Real rows, their own words
+    // and links; the only choices are which rows. Kept out of the URL: it is a tool, not a view to share.
+    var dg = { cats: {}, win: 60 };
+    (function () {
+      var seen = {};
+      P.forEach(function (p) { p.categories.forEach(function (c) { seen[c] = (seen[c] || 0) + 1; }); });
+      el('dg-cats').innerHTML = Object.keys(seen).sort(function (a, b) { return seen[b] - seen[a]; }).map(function (c) {
+        return '<button class="chip" type="button" data-c="' + h(c) + '" aria-pressed="false">' + h(words(c)) + '</button>';
+      }).join('');
+      el('dg-d').textContent = 'Text to paste into a newsletter or an email to member towns: ' + (cov.state ? S.name + ' programs first, then federal notices' : 'federal notices') +
+        ', each with its agency, deadline, amount where stated, and link. Check each agency page before you send.';
+      el('dg-cats').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var c = b.getAttribute('data-c'); dg.cats[c] = !dg.cats[c]; b.setAttribute('aria-pressed', String(!!dg.cats[c])); renderDigest(); });
+      el('dg-win').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; dg.win = +b.getAttribute('data-w');
+        Array.prototype.forEach.call(el('dg-win').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderDigest(); });
+      el('dg-fed').addEventListener('change', renderDigest);
+      el('dg-nodate').addEventListener('change', renderDigest);
+      if (!cov.state) el('dg-nodate').closest('label').hidden = true;
+      el('dg-copy').addEventListener('click', function () {
+        var ta = el('dg-out'), msg = el('dg-msg');
+        var ok = function () { msg.textContent = 'Copied.'; }, fail = function () { ta.focus(); ta.select(); msg.textContent = 'Selected: press Ctrl+C or Cmd+C.'; };
+        try { navigator.clipboard.writeText(ta.value).then(ok, fail); } catch (er) { fail(); }
+      });
+    })();
+    function renderDigest() {
+      var on = Object.keys(dg.cats).filter(function (k) { return dg.cats[k]; });
+      var topic = function (p) { return !on.length || p.categories.some(function (c) { return on.indexOf(c) >= 0; }); };
+      var dated = function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= dg.win; };
+      var sortD = function (a, b) { return closeKey(a).localeCompare(closeKey(b)) || a.name.localeCompare(b.name); };
+      var st1 = PS.filter(function (p) { return topic(p) && dated(p); }).sort(sortD);
+      var st2 = el('dg-nodate').checked ? PS.filter(function (p) { return topic(p) && (!p.closes_at || p.deadline_placeholder); }).sort(sortD) : [];
+      var fd = el('dg-fed').checked ? PF.filter(function (p) { return topic(p) && dated(p) && p.tier === 'likely'; }).sort(sortD) : [];
+      function line(p) {
+        var when = p.closes_at && !p.deadline_placeholder ? 'Closes ' + fmtDate(p.closes_at, true) + '.' : p.rolling ? 'Rolling deadline.' : p.closes_text ? 'Deadline, in the agency\'s words: "' + (p.closes_text.length > 140 ? p.closes_text.slice(0, 139) + '…' : p.closes_text) + '"' : 'No deadline stated.';
+        var amt = amountText(p);
+        return '- ' + p.name + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
+      }
+      var head = 'Funding open to ' + S.name + ' local governments, closing in the next ' + dg.win + ' days' + (on.length ? ' (' + on.map(words).join(', ') + ')' : '') +
+        '\nFrom Funding Atlas, built ' + fmtDate(DATA.generated_at, true) + '. Status and dates are what each agency\'s page said that day.\n';
+      var out = head;
+      if (cov.state) out += '\n' + S.name.toUpperCase() + ' PROGRAMS\n' + (st1.length ? st1.map(line).join('\n') : '(none closing in this window)') + '\n';
+      if (st2.length) out += '\n' + S.name.toUpperCase() + ' PROGRAMS WITH NO FIXED DATE\n' + st2.map(line).join('\n') + '\n';
+      if (el('dg-fed').checked) out += '\nFEDERAL NOTICES\n' + (fd.length ? fd.map(line).join('\n') : '(none closing in this window)') + '\n';
+      out += '\nEverything, with filters and a change feed: ' + DATA.site_url + S.code.toLowerCase() + '/';
+      el('dg-out').value = out;
+      el('dg-msg').textContent = (st1.length + st2.length + fd.length) + ' programs in this digest.';
+    }
+
     // ---- render everything from state ----
     function render() {
       tabs.forEach(function (t, i) {
-        var on = (i === 1) === (st.tab === 'changes');
+        var on = TABS[i] === st.tab;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
       });
-      el('panel-programs').hidden = st.tab === 'changes';
-      el('panel-changes').hidden = st.tab !== 'changes';
-      el('tile-new').setAttribute('aria-pressed', String(st.quick === 'new'));
-      el('tile-closing').setAttribute('aria-pressed', String(st.quick === 'closing'));
-      el('tile-changed').setAttribute('aria-pressed', String(st.tab === 'changes' && st.feed === 'status'));
-      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
+      TABS.forEach(function (k) { el('panel-' + k).hidden = st.tab !== k; });
+      if (st.tab === 'digest') renderDigest();
+      Array.prototype.forEach.call(el('brief').querySelectorAll('button[data-act]'), function (b) {
+        var k = b.getAttribute('data-act');
+        b.setAttribute('aria-pressed', String(k === 'opened' ? st.tab === 'changes' && st.feed === 'status' : k === 'unstated' ? false : st.quick === k));
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
       el('sort').value = st.sort;
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();
-      renderResults();
-      betweenToggle.setAttribute('aria-expanded', String(st.between));
-      betweenToggle.textContent = st.between ? 'Hide' : 'Show ' + B.length;
-      betweenList.hidden = !st.between;
+      renderGroups();
+      renderWatch();
+      syncFit();
       renderFeed(feedEl, feedRows(), function (c) {
         return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
           : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
@@ -566,9 +1199,9 @@
     syncFacetsVisibility();
     render();
     renderFooter(
-      '<p><b>Tier</b> is a rule-based reading of the record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>possible</i> means local governments are eligible but the signal is weaker. ' +
+      '<p><b>Likely fit</b> and <b>May fit</b> are rule-based readings of each record, not program data: <i>likely</i> means the source text names local governments or the notice carries a municipal category and a targeted eligibility list; <i>may fit</i> means local governments are eligible but the signal is weaker. ' +
       DATA.excluded_unlikely + ' further open records that list local governments as eligible are left off this page as unlikely (research notices, requests for information, foreign-facing programs).</p>' +
-      '<p><b>Between rounds</b> lists state programs for local governments that are closed or past their stated deadline, within ' + (R.between_months || 15) + ' months of it, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
+      '<p><b>Announced</b> is what Grants.gov and state portals call forecasted: the agency has said the program is coming. <b>Status not confirmed</b> means the agency\'s page states no status and no date; the page is listed, not judged. <b>Closed recently</b> lists state programs for local governments that closed within ' + (R.between_months || 15) + ' months, so a town can prepare for the next round. The last deadline and the cycle wording are the source\'s; a reopening date appears only once the registry has seen the record reopen. Federal notices are not listed there: a closed notice is a one-off number, not a recurring program.</p>'
     );
     if (slug && bySlug[slug]) openDetail(bySlug[slug], null, true);
   }
@@ -584,16 +1217,27 @@
       '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
       '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
       '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' between rounds</span></div>';
+      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open or announced for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' closed recently</span></div>';
 
+    var KIND_TEXT = {
+      portal: 'state grants portal read', agencies: 'agency pages read', portal_agencies: 'state portal and agency pages read',
+      directory: 'a state directory read (it lists programs but states no status or dates)', blocked: 'state sources blocked',
+      login: 'state sources login only', stopped: 'state source needs a browser script; not read', none: 'no state list found', federal: 'no state sources read yet'
+    };
+    function kindClass(k) { return k === 'portal_agencies' ? 'portal' : (k === 'login' || k === 'stopped') ? 'blocked' : k === 'none' ? 'federal' : k; }
     function covText(s) {
-      return s.programs > 0
-        ? s.name + ': ' + s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open for local governments' + (s.between ? ', ' + s.between + ' between rounds' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. Plus ' + F.open + ' federal notices.'
-        : s.name + ': no state sources yet. ' + F.open + ' federal notices.';
+      var head = s.name + ': ' + KIND_TEXT[s.kind] + '. ';
+      var body = s.programs > 0
+        ? s.agencies + (s.agencies === 1 ? ' agency' : ' agencies') + ', ' + s.programs + ' programs read, ' + s.open + ' open or announced for local governments' + (s.unstated ? ', ' + s.unstated + ' with no status stated' : '') + (s.between ? ', ' + s.between + ' closed recently' : '') + (s.last_ok ? ', read ' + fmtDate(s.last_ok) : '') + '. '
+        : (s.note ? s.note + ' ' : '');
+      return head + body + 'Plus ' + F.open + ' federal notices.';
     }
     var map = el('map');
     map.innerHTML = S.map(function (s) {
-      return '<a class="t' + (s.programs > 0 ? ' src' : '') + (s.open > 0 ? ' open' : '') + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' + s.code + '<span class="sr-only">, ' + h(covText(s)) + '</span></a>';
+      var k = kindClass(s.kind);
+      return '<a class="t k-' + k + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
+        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + s.open + '</span>' : '') +
+        '<span class="sr-only">, ' + h(covText(s)) + '</span></a>';
     }).join('');
     var hover = el('hover');
     function show(e) {
@@ -618,5 +1262,5 @@
     renderFooter('<p>Each state page carries every federal notice plus that state\'s agency programs where connectors exist. Coverage is stated on the page; a state with no sources yet says so.</p>');
   }
 
-  if (PAGE === 'state') statePage(); else indexPage();
+  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
 })();

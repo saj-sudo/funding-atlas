@@ -52,6 +52,9 @@ The navigator UI should lead with 1 and 3. A plain table shows only 4.
   stated per state), a landing strip of new / closing soon / status changes, faceted filters with counts, a detail
   panel, a change feed. GitHub Pages, rebuilt daily. Between rounds (2026-10-16): a collapsed group of closed or
   past-deadline state programs with their last deadline and cycle wording, so a town can prepare for the next round.
+  Navigator redesign (2026-11-14, milestone 13): the state's own programs lead, federal notices follow as their own
+  section; eligible state programs whose source states no status and no date are listed as "Status not confirmed"
+  (`v_navigator_unstated`); the review and its research are in `docs/design/ux_review_2026-11.md`.
 - Maryland depth (shipped 2026-10-16 and 2026-11-03): MEA, DNR, MDEM and MDE on a shared SharePoint base, MDOT as a
   hand list; eight agencies. GOCPP blocks crawlers in robots.txt (surveyed, stopped). A change feed (Atom + JSON)
   beside every state page (2026-11-03).
