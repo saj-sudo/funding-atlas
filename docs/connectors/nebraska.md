@@ -13,8 +13,8 @@ agency state. Agencies are built one at a time, each its own commit; this doc gr
 | Water, Energy and Environment (DWEE, the merged NDEE and DNR) | `dwee.nebraska.gov` (`dee.nebraska.gov` and `dnr.nebraska.gov` redirect to it; `dee.ne.gov` fails TLS name check and is not used) | Drupal 10 | stock Drupal file: blocks `/search/`, `/admin/`, `/node/add/`, user pages | **build**: the same Drupal 10 shape as Missouri's agencies, so probably a small reader |
 | Transportation (NDOT) | `dot.nebraska.gov` | Umbraco | no `robots.txt` (404) | **build**: Transportation Alternatives, HSIP, Off-System Bridge, County Bridge Match and the other local programs each have a page |
 | Emergency Management (NEMA) | `nema.nebraska.gov` | not a CMS generator I can name: `.php` pages, Bootstrap, no generator tag | no `robots.txt` (404) | **defer**: its grants page links FEMA's own pages (EMPG, HSGP) and the Hazard Mitigation page is a program overview with a Notice of Interest form, not a round; revisit when the 2024/2025 BRIC round text is read |
-| Game and Parks | `outdoornebraska.gov` | not surveyed further | `*` allows everything, but **`ClaudeBot` is `Disallow: /`** (with a list of AI crawlers) | **Saj's call**, the ADECA precedent (decision 2026-10-18): not read until decided |
-| NIFA (housing finance) | `www.nifa.org` | not surveyed further | **`ClaudeBot` is `Disallow: /`**; `*` blocks `/archive/*` | **Saj's call**, same rule; mostly developer tax credits |
+| Game and Parks | `outdoornebraska.gov` | not surveyed further | `*` allows everything, but **`ClaudeBot` is `Disallow: /`** (with a list of AI crawlers) | **not read** (Saj, 2026-11-14: recommendation accepted), the ADECA precedent (decision 2026-10-18); reopen if outreach names a town that needs it |
+| NIFA (housing finance) | `www.nifa.org` | not surveyed further | **`ClaudeBot` is `Disallow: /`**; `*` blocks `/archive/*` | **not read**, same rule (Saj, 2026-11-14); mostly developer tax credits |
 | Natural Resources (DNR) | now `dwee.nebraska.gov` | | | covered by DWEE |
 
 Four agencies, three or four platforms: there is no Nebraska base, each agency's reader is its own (the third-case rule
@@ -227,7 +227,7 @@ A candidate tagger rule was measured and **not kept**: `local public agencies` a
 word for a city, county or other political subdivision, HSIP's only applicant wording). On the stored database it moved **34 tag
 records and 17 other hashes, all California portal records** (Urban Streams Restoration, Baldwin Hills Conservancy, Water Recycling,
 CalHome, Supervised Visitation, and others), each gaining county and municipality. Whether California means a city or county by it
-is a judgment about 34 records outside this session, so it is **Saj's call**; HSIP stays untagged until then. The yearless-sentence
+is a judgment about 34 records outside this session; **decided 2026-11-14 (Saj: recommendation accepted): not kept**, HSIP stays untagged, reopen only with a decision on what California means by it. The yearless-sentence
 handling is the same module-local override DED has (a third module that needs it would move it into the agency-page table).
 
 ### Scope calls (Saj to overrule; each is one line in `PAGES`)
@@ -258,6 +258,7 @@ handling is the same module-local override DED has (a third module that needs it
 2. **CDBG's one page is six records** through `SPLITS` (the 2026-11-11 split rule), the same as Kentucky's EEC index.
 3. **Designations, tax credits and statutes are not programs that take applications** (CDAA, Enterprise Zones, EDCC, LCC,
    LB840): left out, as Connecticut's formula entitlements were.
-4. **Game and Parks and NIFA** wait for Saj (`ClaudeBot` disallow, see the table).
+4. **Game and Parks and NIFA** are not read (`ClaudeBot` disallow, see the table); Saj accepted the recommendation on 2026-11-14.
 5. **Crawl delay**: DED's robots ask for 3 s; the DED module sets its delay to 3 s (the base default is 0.3 s) and reads no
    URL with a query string.
+6. **The no-year rule stays** (Saj, 2026-11-14, recommendation accepted). Its cost is NDOT's Section 5310 window, which would be open today if it is this year's; reopen the rule if a reader finds an open round the registry missed.
