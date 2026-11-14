@@ -61,6 +61,11 @@ FIRST_RUN = [
          administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
          status="closed", closes_at=(NOW - timedelta(days=700)).date()),
     prog("10", "Old Notice", status="closed", closes_at=(NOW - timedelta(days=30)).date(), eligibility_text="local governments"),
+    # status not confirmed: a state page that states no status and no date (listed, migration 0008), and a federal
+    # Assistance Listing in the same state of knowledge (never listed: federal rows stay off the group)
+    prog("11", "Main Street Facades", source_connector="md_dhcd", level="state", jurisdiction="MD",
+         administering_agency="Maryland DHCD", agency_code="MD-DHCD", eligibility_text="local governments",
+         status="unknown", closes_at=None, closes_at_text="Applications are accepted each spring."),
 ]
 SECOND_RUN = [
     prog("4", "Will Close Later", source_connector="md_dhcd", level="state", jurisdiction="MD",
@@ -111,7 +116,7 @@ def test_navigator_change_keeps_the_closed_flip(conn):
 
 def test_navigator_coverage(conn):
     cov = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_navigator_coverage")}
-    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 4 and cov["MD"]["n_open_municipal"] == 1
+    assert cov["MD"]["n_agencies"] == 2 and cov["MD"]["n_programs"] == 5 and cov["MD"]["n_open_municipal"] == 1
     assert cov["MD"]["n_between_rounds"] == 2 and cov["MD"]["last_ok"] == T2
     assert cov["VA"]["n_programs"] == 1 and cov["VA"]["n_between_rounds"] == 0 and cov["VA"]["last_ok"] is None
     assert "US" not in cov
@@ -128,6 +133,18 @@ def test_navigator_between_lists_recent_closed_state_rounds_only(conn):
     assert rows[1]["closes_at"] is None and rows[1]["days_since_deadline"] is None
     on_page = {r["id"] for r in conn.execute("SELECT id FROM v_navigator_program")}
     assert not on_page & {r["id"] for r in rows}
+
+
+def test_navigator_unstated_lists_state_rows_with_no_status_and_no_date(conn):
+    rows = [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
+    assert [r["name"] for r in rows] == ["Main Street Facades"]
+    assert rows[0]["closes_at_text"] == "Applications are accepted each spring." and rows[0]["state"] == "MD"
+    # the three state views partition what they list: no row in two of them
+    groups = [{r["id"] for r in conn.execute(f"SELECT id FROM {v} WHERE state IS NOT NULL")}
+              for v in ("v_navigator_program", "v_navigator_between", "v_navigator_unstated")]
+    assert sum(len(g) for g in groups) == len(set().union(*groups))
+    cov = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_navigator_coverage")}
+    assert cov["MD"]["n_unstated"] == 1 and cov["VA"]["n_unstated"] == 0
 
 
 # ---------- shaping ----------
@@ -150,6 +167,8 @@ def test_build_shapes_programs_and_rules(conn):
     assert md["coverage"]["state"]["agencies"] == 2 and md["coverage"]["state"]["open"] == 1
     assert md["coverage"]["state"]["between"] == 2 and md["rules"]["between_months"] == build_site.BETWEEN_MONTHS
     assert [p["name"] for p in md["between"]] == ["Spring Round", "Will Close Later"]
+    assert [p["name"] for p in md["unstated"]] == ["Main Street Facades"] and md["coverage"]["state"]["unstated"] == 1
+    assert md["unstated"][0]["status"] == "unknown" and md["unstated"][0]["closes_text"].startswith("Applications are")
     spring = md["between"][0]
     assert spring["days_since_deadline"] == 90 and spring["days_to_close"] == -90 and spring["last_reopened"] is None
     assert spring["closes_text"] == "application closed: three months ago" and spring["status"] == "closed"
@@ -160,7 +179,7 @@ def test_build_shapes_programs_and_rules(conn):
     va = site["states"]["VA"]
     assert {p["name"] for p in va["programs"]} == {"Wildlife Crossings Pilot", "<script>alert(1)</script> Resilience", "Brand New Notice", "Virginia Towns Fund"}
     assert va["coverage"]["state"]["last_ok"] is None and va["coverage"]["state"]["programs"] == 1
-    assert va["between"] == [] and va["coverage"]["state"]["between"] == 0
+    assert va["between"] == [] and va["coverage"]["state"]["between"] == 0 and va["unstated"] == []
     assert site["states"]["WY"]["coverage"]["state"] is None
     assert len(site["states"]["WY"]["programs"]) == 3 and site["states"]["WY"]["between"] == []
 
@@ -174,7 +193,7 @@ def test_build_shapes_changes(conn):
     added = next(c for c in md["changes"] if c["name"] == "Brand New Notice")
     assert added["type"] == "added" and added["listed"] is True and added["fields"] == []
     assert all(c["state"] in (None, "MD") for c in md["changes"])
-    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 5    # four added + the flip, never starved by federal rows
+    assert sum(1 for c in md["changes"] if c["state"] == "MD") == 6    # five added + the flip, never starved by federal rows
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
@@ -186,7 +205,8 @@ def test_index_states_and_tile_grid(conn):
     assert len(states) == 51 and len({s["code"] for s in states}) == 51
     assert len({(s["row"], s["col"]) for s in states}) == 51          # no two tiles on one cell
     md = next(s for s in states if s["code"] == "MD")
-    assert md["programs"] == 4 and md["open"] == 1 and md["agencies"] == 2 and md["between"] == 2
+    assert md["programs"] == 5 and md["open"] == 1 and md["agencies"] == 2 and md["between"] == 2
+    assert md["unstated"] == 1
     wy = next(s for s in states if s["code"] == "WY")
     assert wy["programs"] == 0 and wy["between"] == 0
 
@@ -208,7 +228,10 @@ def test_write_site(conn, tmp_path):
     assert "<script>alert(1)</script>" not in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
     assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) == 4 and len(data["between"]) == 2
-    assert 'id="between-list"' in page and 'id="between-toggle"' in page
+    assert 'id="list-between"' in page and 'id="between-toggle"' in page and len(data["unstated"]) == 1
+    # the state's own groups come before the federal notices (13.1, decision 2026-11-14)
+    order = [page.index(f'id="g-{g}"') for g in ("state", "unstated", "between", "federal")]
+    assert order == sorted(order)
     assert "&lt;may&gt;" in json.dumps(data) or "<may>" in json.dumps(data)   # verbatim text survives round trip
     # self-contained: nothing loaded from anywhere
     body = page.replace("https://x/", "")

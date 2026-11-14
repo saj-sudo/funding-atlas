@@ -164,6 +164,11 @@ def load_between(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_between")]
 
 
+def load_unstated(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    """State programs a town could apply to whose source states no status and no date (migration 0008)."""
+    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
+
+
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_change")]
 
@@ -283,7 +288,7 @@ def shape_program(row: dict[str, Any], run_info: dict[str, dict[str, str | None]
         # A stated date more than PLACEHOLDER_YEARS out is kept as the source states it but shown as "no deadline
         # stated": pa.gov writes 2035-12-31 and 2999-07-01 on recurring programs and loans.
         "deadline_placeholder": is_placeholder(row["closes_at"], today),
-        # v_navigator_between only: days since the last stated deadline, and the last time the change log saw
+        # v_navigator_between and v_navigator_unstated only: days since the last stated deadline, and the last time the change log saw
         # the record flip to open or forecasted (null until observed; never computed from a calendar).
         "days_since_deadline": row.get("days_since_deadline"),
         "last_reopened": row.get("last_reopened"),
@@ -427,6 +432,7 @@ def state_payload(
     *,
     programs: list[dict[str, Any]],
     between: list[dict[str, Any]],
+    unstated: list[dict[str, Any]],
     changes: list[dict[str, Any]],
     coverage: dict[str, dict[str, Any]],
     connectors: dict[str, list[str]],
@@ -436,7 +442,8 @@ def state_payload(
 ) -> dict[str, Any]:
     rows = [p for p in programs if p["state"] is None or p["state"] == code]
     between_rows = [p for p in between if p["state"] == code]          # state rows only, by construction
-    listed = {p["id"] for p in rows} | {p["id"] for p in between_rows}
+    unstated_rows = [p for p in unstated if p["state"] == code]        # state rows only, by construction
+    listed = {p["id"] for p in rows} | {p["id"] for p in between_rows} | {p["id"] for p in unstated_rows}
     # Newest N federal plus newest N state rows, merged: a day of 1,000 federal changes must not push the
     # state's own log off its page.
     fed = [c for c in changes if c["state"] is None][:FEED_N]
@@ -463,6 +470,7 @@ def state_payload(
                 "programs": cov["n_programs"],
                 "open": cov["n_open_municipal"],
                 "between": cov["n_between_rounds"],
+                "unstated": cov["n_unstated"],
                 "last_ok": cov["last_ok"],
                 "sources": sources_for(connectors.get(code, []), run_info),
             },
@@ -471,6 +479,7 @@ def state_payload(
         "questions": list(READER_QUESTIONS),
         "programs": rows,
         "between": between_rows,
+        "unstated": unstated_rows,
         "changes": feed,
     }
 
@@ -494,6 +503,7 @@ def index_payload(
             "programs": cov["n_programs"] if cov else 0,
             "open": cov["n_open_municipal"] if cov else 0,
             "between": cov["n_between_rounds"] if cov else 0,
+            "unstated": cov["n_unstated"] if cov else 0,
             "last_ok": cov["last_ok"] if cov else None,
         })
     return {
@@ -564,6 +574,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     run_info = runs(conn)
     programs = [shape_program(r, run_info, today) for r in load_programs(conn)]
     between = [shape_program(r, run_info, today) for r in load_between(conn)]
+    unstated = [shape_program(r, run_info, today) for r in load_unstated(conn)]
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
@@ -572,7 +583,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         typer.echo(f"warning: records with a jurisdiction that is not a state page: {', '.join(unknown)}", err=True)
     states = {
         code: state_payload(
-            code, programs=programs, between=between, changes=changes, coverage=coverage, connectors=connectors,
+            code, programs=programs, between=between, unstated=unstated, changes=changes, coverage=coverage, connectors=connectors,
             run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at,
         )
         for code, _, _, _ in STATES
@@ -582,7 +593,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         run_info=run_info, generated_at=generated_at,
     )
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
-    listed_all = {p["id"] for p in programs} | {p["id"] for p in between}
+    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
     return {"index": index, "states": states, "feed": feed}
 
