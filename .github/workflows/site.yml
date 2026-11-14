@@ -57,7 +57,7 @@ jobs:
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_connectors)
         run: |
           failed=""
-          for c in md_dhcd md_commerce md_mht md_mea md_dnr md_mdem md_mdot md_mde pa_grants wv_grants ca_grants il_csfa webgrants tx_egrants nj_dca_sage ny_sfs va_dcjs va_dhcd va_dcr va_vdot de_dnrec de_dema de_deldot de_dsha ma_onestop or_biz nc_grants wa_fund_directory ky_dlg vt_accd vt_vtrans vt_fpr vt_vem ct_doh ct_dot ct_deep ct_demhs nd_commerce nd_dot nd_des nd_parks ky_dlgfed ky_tc ky_eec ky_kia mo_ded mo_dnr mo_modot mo_sema mo_parks ne_ded ne_dwee grants_gov sam_assistance_listings; do
+          for c in md_dhcd md_commerce md_mht md_mea md_dnr md_mdem md_mdot md_mde pa_grants wv_grants ca_grants il_csfa webgrants tx_egrants nj_dca_sage ny_sfs va_dcjs va_dhcd va_dcr va_vdot de_dnrec de_dema de_deldot de_dsha ma_onestop or_biz nc_grants wa_fund_directory ky_dlg vt_accd vt_vtrans vt_fpr vt_vem ct_doh ct_dot ct_deep ct_demhs nd_commerce nd_dot nd_des nd_parks ky_dlgfed ky_tc ky_eec ky_kia mo_ded mo_dnr mo_modot mo_sema mo_parks ne_ded ne_dwee ne_dot grants_gov sam_assistance_listings; do
             echo "::group::$c"
             if ! uv run python cli.py run "$c"; then
               failed="$failed $c"

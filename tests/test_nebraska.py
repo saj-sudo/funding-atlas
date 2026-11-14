@@ -1,4 +1,4 @@
-"""Nebraska's agency connectors (ne_ded, ne_dwee) against saved pages, and the shared rules Nebraska added."""
+"""Nebraska's agency connectors (ne_ded, ne_dwee, ne_dot) against saved pages, and the shared rules Nebraska added."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from pipeline.models import RawRecord
 
 FIX = Path(__file__).parent / "fixtures"
 TODAY = date(2026, 11, 14)
-AGENCIES = ["ne_ded", "ne_dwee"]
+AGENCIES = ["ne_ded", "ne_dwee", "ne_dot"]
 
 
 def mod(name: str):
@@ -277,6 +277,71 @@ def test_the_shared_phrasings_nebraska_dwee_added():
     assert hl.APPLICANT_SENTENCE_RE.search("Nebraska K-12 public schools can now apply for low-interest loans through the program.")
     # an amount limit is not an eligibility statement (Missouri DED, Kentucky CMAQ: "the amount any applicant can apply for")
     assert not hl.APPLICANT_SENTENCE_RE.search("The maximum amount any applicant can apply for is $500,000 or $5,000 per household.")
+
+
+# ---------- Transportation ----------
+
+
+def test_dot_reader_takes_the_title_from_the_title_tag_and_both_templates_body():
+    assert page("ne_dot", "ta")["title"] == "Transportation Alternatives"                 # no `h1` on these pages; " - NDOT" is cut
+    assert page("ne_dot", "county-bridge-match")["title"] == "County Bridge Match Program"
+    for slug in mod("ne_dot").PAGES:                         # `div.mainContent` (TA, HSIP) and `div#main` (the rest) both read
+        t = text("ne_dot", slug)
+        assert len(t) > 150, slug
+        assert "CONTACT NDOT HEADQUARTERS" not in t and "1500 Nebraska Parkway" not in t, slug
+
+
+def test_dot_transit_is_one_record_per_program():
+    got = programs("ne_dot", "transit")
+    assert list(got) == ["transit", "transit#5311f", "transit#5310", "transit#5339"]
+    assert got["transit#5310"].name.startswith("Section 5310 Enhanced Mobility")
+    assert {p.funding_source for p in got.values()} == {"pass_through"}                 # "Provides federal funding ..."
+
+
+def test_dot_statuses_a_closed_round_says_so_and_a_yearless_window_is_not_a_date():
+    assert program("ne_dot", "county-bridge-match").status == "closed"                  # "Applications for the 2025 funding round are closed ."
+    assert {p.status for sid in ("ta", "hsip", "economic-opportunity") for p in programs("ne_dot", sid).values()} == {"unknown"}
+    p = program("ne_dot", "transit#5310")
+    assert p.status == "unknown" and p.closes_at is None
+    assert p.closes_at_text == "Applications accepted Oct. 31 to Nov. 30"                 # kept for the reader, not guessed into a year
+    assert program("ne_dot", "hsip").closes_at_text.startswith("HSIP applications received by January 31 st each year")
+    assert program("ne_dot", "transit").closes_at_text is None                            # a page-wide sentence of another program does not leak
+
+
+def test_dot_applicants_are_only_what_the_page_says():
+    assert tags("ne_dot", "county-bridge-match") == {"county"}
+    # TA, HSIP ("local public agencies"), the Economic Opportunity Program and the transit pages name no applicant the shared
+    # tagger reads; "local public agencies" is a candidate rule left to Saj (it moved 34 California records), so none is tagged
+    for sid in ("ta", "hsip", "economic-opportunity", "transit", "transit#5311f", "transit#5310", "transit#5339"):
+        assert tags("ne_dot", sid) == set(), sid
+
+
+def test_dot_funding_source_and_category():
+    assert program("ne_dot", "county-bridge-match").funding_source == "direct"          # a state program (TIA): no federal source named
+    assert program("ne_dot", "economic-opportunity").funding_source == "direct"
+    assert {program("ne_dot", s).funding_source for s in ("ta", "hsip")} == {"pass_through"}
+    assert all([c.value for c in p.categories] == ["transportation"] for slug in mod("ne_dot").PAGES for p in programs("ne_dot", slug).values())
+
+
+def test_dot_fetch_and_fallback(monkeypatch):
+    m = mod("ne_dot")
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+
+    def site(client, url, broken=()):
+        if url in broken:
+            raise httpx.ConnectError("down")
+        slug = next(s for s, p in m.PAGES.items() if url == m.BASE + p)
+        return (FIX / "ne_dot" / f"{slug}.html").read_text(encoding="utf-8")
+
+    monkeypatch.setattr(hl, "get", site)
+    records = m.fetch()
+    assert [r.source_id for r in records] == ["ta", "hsip", "county-bridge-match", "economic-opportunity",
+                                              "transit", "transit#5311f", "transit#5310", "transit#5339"]
+    prior = {r.source_id: r.payload for r in records}
+    monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["transit"],)))
+    again = {r.source_id: r.payload for r in m.fetch(prior=prior)}
+    assert all(again[sid] == prior[sid] for sid in prior if sid.startswith("transit"))      # `transit` and `transit#...` all kept
+    assert m.resolve_missing("hsip") == {"status": "unknown"}
 
 @pytest.mark.parametrize("name", AGENCIES)
 def test_module_contract(name):

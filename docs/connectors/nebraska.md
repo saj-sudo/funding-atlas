@@ -200,6 +200,54 @@ applicant can apply for is $500,000 or $5,000 per household" is an amount limit,
 - EECBG's `closes_at` is the first deadline sentence on the page (the 2023 formula award); the later rounds, to 2026-04-15, are in the
   text. Status is `unknown` either way.
 
+## Implemented, NDOT (2026-11-14)
+
+`connectors/ne_dot.py` (Umbraco, its own reader in the module; no `robots.txt`, so one GET a second) follows this section.
+First live run on a database that held DED and DWEE: **8 added, 0 errors**; second run **0 changed**. Umbraco pages here have no
+`h1`: the title is the `<title>` without " - NDOT". The text is `div#main` on the newer template and `div.mainContent` on the two
+older pages (TA, HSIP); the contact block and resources sit in the footer. The transit funding page holds four programs, so it is
+one record per program (`SPLITS`, the 2026-11-11 split rule).
+
+| Record | Status on 2026-11-14 | Applicants tagged | Source |
+|---|---|---|---|
+| Transportation Alternatives | `unknown`: the page is the 2023 call ("Applications must be received by April 30th, 2023"), never updated | none: the page names no applicant | pass_through ("$47 million of federal TAP funds") |
+| Highway Safety Improvement Program | `unknown`: "HSIP applications received by January 31 st each year" has no year; the sentence is kept | none: "local public agencies (LPA)" is not a tag (below) | pass_through ("This program provides Federal funding") |
+| County Bridge Match Program | **closed**: "Applications for the 2025 funding round are closed." (it opens "every September") | county | direct |
+| Economic Opportunity Program | `unknown`: awards "as it is received", no round | none | direct |
+| Section 5311 Rural Public Transportation, 5311(f) Intercity Bus, 5339 Bus and Bus Facilities | `unknown` | none | pass_through ("Provides federal funding ...", "A federal grant program ...") |
+| Section 5310 Enhanced Mobility | `unknown`: "Applications accepted Oct. 31 to Nov. 30", no year; the sentence is kept | none | pass_through |
+
+**Read this one before relying on the page:** the 5310 window ("Oct. 31 to Nov. 30") would be open today (2026-11-14) if it is this
+year's, and the page does not say which year. The yearless rule shows it as `unknown` with the sentence kept. That is the cost of
+the rule (the same one that holds CDBG's "Sept. 15" rows).
+
+### Shared changes: none kept
+
+A candidate tagger rule was measured and **not kept**: `local public agencies` as municipality and county (the federal-aid highway
+word for a city, county or other political subdivision, HSIP's only applicant wording). On the stored database it moved **34 tag
+records and 17 other hashes, all California portal records** (Urban Streams Restoration, Baldwin Hills Conservancy, Water Recycling,
+CalHome, Supervised Visitation, and others), each gaining county and municipality. Whether California means a city or county by it
+is a judgment about 34 records outside this session, so it is **Saj's call**; HSIP stays untagged until then. The yearless-sentence
+handling is the same module-local override DED has (a third module that needs it would move it into the agency-page table).
+
+### Scope calls (Saj to overrule; each is one line in `PAGES`)
+
+- **In (five pages, eight records):** the programs that take applications, from NDOT's local assistance pages and its transit funding page.
+- **Out, no application:** the Federal Funds Purchase Program (an exchange of federal funds for state cash), County Soft Match (a list
+  of monthly balances), the Accelerated Capital Improvement Program (NDOT's own expressway construction).
+- **Out, the page carries no program text:** the Off-System Bridge Program (it announces a selection and links documents) and the State
+  Recreation Road Fund (it links guidelines). The County Bridge Match page is the readable one of NDOT's bridge programs.
+- **Not read this session:** the Surface Transportation Program book (`/projects/program-book-2027/`) and the other pages the
+  `/projects/` index links. Read them before deciding whether any takes applications.
+
+### Gaps
+
+- TA's page is the 2023 call. When NDOT posts a new call, the page text changes and the status follows with no code change.
+- Five of eight records name no applicant the shared tagger reads (above); they will not show on a "local governments" filter until
+  the pages or the tagger do.
+- NEMA is not built (deferred in the survey table): its grants page links FEMA's own pages and its Hazard Mitigation page is an
+  overview with a Notice of Interest form.
+
 ## Decisions on the way in
 
 1. **"Sept. 15" has no year.** Four of CDBG's six opportunities state a deadline with no year. The status rule is "what the source

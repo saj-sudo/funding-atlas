@@ -1,6 +1,6 @@
 """One-off probe for Nebraska's agencies: read every page in each module's `PAGES` once, save them as fixtures, and
 print what the connectors see (one line per record, a page that holds several programs prints each).
-  uv run python scripts/probe_nebraska.py [ne_ded ne_dwee]
+  uv run python scripts/probe_nebraska.py [ne_ded ne_dwee ne_dot]
 Writes tests/fixtures/<connector>/<slug>.html with scripts, styles, menus and the page chrome removed."""
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from pipeline.models import RawRecord  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 GONE = "script, style, svg, noscript, iframe, link, meta, header, footer, nav"
-ALL = ["ne_ded", "ne_dwee"]
+ALL = ["ne_ded", "ne_dwee", "ne_dot"]
 
 
 def scrub(page_html: str) -> str:
