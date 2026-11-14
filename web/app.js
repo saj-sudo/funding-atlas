@@ -9,6 +9,12 @@
   var PAGE = document.body.getAttribute('data-page');
   var ROOT = PAGE === 'state' || PAGE === 'about' ? '../' : '';
   var TODAY = DATA.generated_at.slice(0, 10);
+  // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
+  var FEDERAL_LOADED = !!window.FA_FEDERAL;
+  if (PAGE === 'state' && FEDERAL_LOADED) {
+    DATA.programs = DATA.programs.concat(window.FA_FEDERAL.programs);
+    DATA.changes = DATA.changes.concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+  }
 
   // ---------- helpers ----------
 
@@ -180,7 +186,9 @@
         var who = (agencyName({ agency: c.agency }) || c.connector) + ' · ' + (c.level === 'federal' ? 'federal' : (c.state ? stateName(c.state) : c.level));
         return '<li class="ev"><span class="type ' + h(c.type) + '">' + h(c.type) + '</span><div>' +
           '<div class="name">' + link(c) + '</div>' +
-          '<div class="what">' + describe(c) + '</div>' + (c.type === 'changed' ? diffHtml(c) : '') +
+          '<div class="what">' + describe(c) + '</div>' +
+          (c.cause === 'code' ? '<div class="cause">After a change to how the registry reads this source: the agency may not have changed anything.</div>' : '') +
+          (c.type === 'changed' ? diffHtml(c) : '') +
           '<div class="who">' + h(who) + '</div></div></li>';
       }).join('') + '</ul></li>';
     }).join('');
@@ -305,20 +313,39 @@
         return '<tr><td>' + h(r.state === 'US' ? 'Federal, open now' : stateName(r.state)) + '</td><td>' + r.n + '</td><td>' + p('status_stated') + '</td><td>' + p('date_stated') + '</td><td>' + p('amount_stated') + '</td></tr>'; }).join('') + '</tbody></table>';
   }
 
+  // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
   function chartFlips(svgEl, flips) {
-    var rows = flips.slice().sort(function (a, b) { return b.n - a.n; }), w = 900, L = 250, R = 50, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
-    rows.forEach(function (r) { max = Math.max(max, r.n); });
+    var pairs = {}, order = [];
+    flips.forEach(function (f) {
+      var k = (f.old_status || 'unknown') + '>' + (f.new_status || 'unknown');
+      if (!pairs[k]) { pairs[k] = { o: f.old_status || 'unknown', n: f.new_status || 'unknown', src: 0, code: 0, other: 0, a: f.first_at, b: f.last_at }; order.push(k); }
+      var p = pairs[k];
+      if (f.cause === 'code') p.code += f.n; else if (f.cause === 'source') p.src += f.n; else p.other += f.n;
+      if (f.first_at < p.a) p.a = f.first_at; if (f.last_at > p.b) p.b = f.last_at;
+    });
+    var rows = order.map(function (k) { return pairs[k]; }).sort(function (a, b) { return (b.src + b.code + b.other) - (a.src + a.code + a.other); });
+    var w = 900, L = 250, R = 60, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
+    rows.forEach(function (r) { max = Math.max(max, r.src + r.code + r.other); });
     var x = function (v) { return L + (w - L - R) * v / max; };
     rows.forEach(function (r, i) {
-      var yy = i * rh + 3, lab = statusLabel(r.old_status || 'unknown') + ' → ' + statusLabel(r.new_status || 'unknown');
-      var reopen = (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted');
+      var yy = i * rh + 3, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
+      var reopen = (r.o === 'closed' || r.o === 'exhausted') && (r.n === 'open' || r.n === 'forecasted');
       g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
-      g += '<g data-tip="' + h(lab + ': ' + r.n + ' (' + fmtDate(r.first_at, true) + ' to ' + fmtDate(r.last_at, true) + ')') + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>' +
-        '<path class="m-fed" d="M' + L + ',' + (yy + 4) + 'H' + (x(r.n) - 4) + 'Q' + x(r.n) + ',' + (yy + 4) + ' ' + x(r.n) + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x(r.n) + ',' + (yy + 20) + ' ' + (x(r.n) - 4) + ',' + (yy + 20) + 'H' + L + 'Z"/></g>';
-      g += '<text class="ctext" x="' + (x(r.n) + 8) + '" y="' + (yy + 17) + '">' + r.n + '</text>';
+      var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
+      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>';
+      var x0 = L;
+      [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
+        var v = r[seg[0]]; if (!v) return;
+        var x1 = x0 + (x(v) - L), last = x1 >= x(tot) - 0.5;
+        g += '<path class="' + seg[1] + '" d="' + (last ? 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 4) + 'Q' + x1 + ',' + (yy + 4) + ' ' + x1 + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x1 + ',' + (yy + 20) + ' ' + (x1 - 4) + ',' + (yy + 20) + 'H' + x0 + 'Z'
+          : 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 2) + 'V' + (yy + 20) + 'H' + x0 + 'Z') + '"/>';
+        x0 = x1;
+      });
+      g += '</g><text class="ctext" x="' + (x(tot) + 8) + '" y="' + (yy + 17) + '">' + tot + '</text>';
     });
     g += '<line class="caxis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + hh + '"/>';
     drawSvg(svgEl, w, hh, g);
+    return rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
   }
 
   // awards: [[state|null, amount, name], ...]
@@ -358,9 +385,10 @@
     chartSeason(el('c2'), rows.concat([['All states', all]]), false);
     el('c2-leg').innerHTML = seasonLegend();
     chartStated(el('c3'), el('c3-table'), A.stated.filter(function (r) { return r.n >= 7; }));
-    chartFlips(el('c4'), A.flips);
-    var tot = A.flips.reduce(function (a, r) { return a + r.n; }, 0), re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
-    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again.';
+    var fc = chartFlips(el('c4'), A.flips);
+    var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
+    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
+      fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
     var med = chartAwards(el('c5'), A.awards);
     el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
     renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
@@ -488,7 +516,7 @@
 
     // ---- header ----
     var PS = P.filter(function (p) { return p.state; }), PF = P.filter(function (p) { return !p.state; });
-    el('title').textContent = S.name + ': funding for local governments';
+    el('title').innerHTML = h(S.name) + '<span class="h1-sub">Funding for local governments</span>';
     el('lede').textContent = cov.state
       ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
       : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
@@ -497,7 +525,7 @@
     el('coverage-sum').innerHTML = (cov.state
       ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
       : 'Read daily from Grants.gov') +
-      (lastRead ? ' · last read ' + h(fmtDate(lastRead)) : '') + ' · built ' + h(fmtDate(DATA.generated_at));
+      '<span class="cov-when">' + (lastRead ? ' · last read ' + h(fmtDate(lastRead)) : '') + ' · built ' + h(fmtDate(DATA.generated_at)) + '</span>';
     el('coverage-body').innerHTML =
       '<p><b>Federal:</b> ' + cov.federal.open + ' open or announced notices · ' +
       (cov.federal.sources.length ? cov.federal.sources.map(sourceLine).join(' · ') : 'no sources read yet') + '</p>' +
@@ -531,7 +559,11 @@
     if (U.length) brief.push(['unstated', plural(U.length, S.name + ' program has', S.name + ' programs have') + ' no status on the agency\'s page.']);
     el('brief').innerHTML = brief.map(function (b) {
       return '<li>' + (b[0] ? '<button type="button" class="brief-link" data-act="' + b[0] + '">' + h(b[1]) + '</button>' : h(b[1])) + '</li>';
-    }).join('');
+    }).join('') + (brief.length > 1 ? '<li class="brief-more"><button type="button" class="btn quiet small" id="brief-more" aria-expanded="false">' + (brief.length - 1) + ' more this week</button></li>' : '');
+    if (el('brief-more')) el('brief-more').addEventListener('click', function () {
+      var open = el('brief').classList.toggle('all');
+      this.setAttribute('aria-expanded', String(open)); this.textContent = open ? 'Fewer' : (brief.length - 1) + ' more this week';
+    });
     el('tab-n-changes').textContent = C.length;
     el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
@@ -701,7 +733,17 @@
     el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
-    function groupHtml(rows, empty) { return rows.length ? bucketed(rows) : '<p class="empty">' + empty + '</p>'; }
+    // Paging (13.16): 30 cards a group until the reader asks for all; filters and search still see every row.
+    var PAGE_N = 30, more = {};
+    function paged(rows, key) {
+      if (more[key] || rows.length <= PAGE_N + 5) return { rows: rows, button: '' };
+      return { rows: rows.slice(0, PAGE_N), button: '<button class="btn more" type="button" data-more="' + key + '">Show all ' + rows.length + '</button>' };
+    }
+    function groupHtml(rows, empty, key) {
+      if (!rows.length) return '<p class="empty">' + empty + '</p>';
+      var pg = paged(rows, key);
+      return bucketed(pg.rows) + pg.button;
+    }
     function renderGroups() {
       var sort = SORTS[st.sort] || SORTS.closing;
       var rs = PS.filter(function (p) { return matches(p, null); }).sort(sort);
@@ -718,14 +760,16 @@
       else if (!PS.length) stateEmpty = 'No ' + h(S.name) + ' programs are open or announced right now.' +
         (ru.length || rb.length ? ' ' + [ru.length ? ru.length + (ru.length === 1 ? ' has' : ' have') + ' no status on the agency\'s page' : '', rb.length ? rb.length + ' closed recently' : ''].filter(Boolean).join(' and ') + ': see below.' : '');
       else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
-      el('list-state').innerHTML = groupHtml(rs, stateEmpty);
+      el('list-state').innerHTML = groupHtml(rs, stateEmpty, 'state');
       el('g-state-d').hidden = true;
-      el('list-federal').innerHTML = groupHtml(rf, 'No federal notices match these filters.');
+      el('list-federal').innerHTML = FEDERAL_LOADED ? groupHtml(rf, 'No federal notices match these filters.', 'federal')
+        : '<p class="empty">The federal notices did not load (federal.js). Reload the page, or see them on <a href="https://simpler.grants.gov/search">Grants.gov</a>.</p>';
 
       el('g-unstated').hidden = !ru.length;
       el('g-between').hidden = !rb.length;
-      el('list-unstated').innerHTML = ru.map(card).join('');
-      el('list-between').innerHTML = rb.map(card).join('');
+      var pu = paged(ru, 'unstated'), pb = paged(rb, 'between');
+      el('list-unstated').innerHTML = pu.rows.map(card).join('') + pu.button;
+      el('list-between').innerHTML = pb.rows.map(card).join('') + pb.button;
       [['unstated', 'unstated-toggle', 'list-unstated', ru.length], ['between', 'between-toggle', 'list-between', rb.length]].forEach(function (g) {
         var open = st[g[0]], t = el(g[1]);
         t.setAttribute('aria-expanded', String(open));
@@ -733,6 +777,7 @@
         el(g[2]).hidden = !open;
       });
       renderActive(rs.length + rf.length + ru.length + rb.length);
+      el('tray-done').textContent = 'Show ' + (rs.length + rf.length + ru.length + rb.length) + ' results';
       var tl = st.view === 'timeline';
       ['g-state', 'g-unstated', 'g-between', 'g-federal'].forEach(function (id) { if (tl) el(id).hidden = true; });
       if (!tl) { el('g-state').hidden = false; el('g-federal').hidden = false; }
@@ -781,6 +826,8 @@
     el('unstated-toggle').addEventListener('click', function () { st.unstated = !st.unstated; render(); });
     el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
     resultsEl.addEventListener('click', function (e) {
+      var mb = e.target.closest('button[data-more]');
+      if (mb) { more[mb.getAttribute('data-more')] = true; render(); return; }
       var sb = e.target.closest('button[data-star]');
       if (sb) { toggleStar(byId[sb.closest('.card').getAttribute('data-id')]); return; }
       if (e.target.closest('a')) return;
@@ -926,11 +973,12 @@
       ev.forEach(function (e) {
         var k = histKind(e), cx = x(e[0]);
         if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
-        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + '"/>';
+        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
       });
       g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
       var list = ev.slice().reverse().map(function (e) {
-        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) + '</span></li>';
+        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
+          (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
       }).join('');
       return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
         '<ol class="hist-list">' + list + '</ol>' +
@@ -986,12 +1034,19 @@
       qTimer = setTimeout(function () { st.q = qEl.value.trim(); render(); }, 120);
     });
     el('sort').addEventListener('change', function () { st.sort = el('sort').value; render(); });
-    var ft = el('filters-toggle');
-    ft.addEventListener('click', function () {
-      var open = ft.getAttribute('aria-expanded') === 'true';
-      ft.setAttribute('aria-expanded', String(!open));
-      facetsEl.hidden = open;
-    });
+    // On phones the filters are a tray over the results (13.16, NN/g): the result count stays on its button.
+    var ft = el('filters-toggle'), backdrop = el('tray-backdrop');
+    function setTray(open) {
+      ft.setAttribute('aria-expanded', String(open));
+      facetsEl.hidden = !open && !window.matchMedia('(min-width: 900px)').matches;
+      backdrop.hidden = !open || window.matchMedia('(min-width: 900px)').matches;
+      document.body.classList.toggle('tray-open', open && !window.matchMedia('(min-width: 900px)').matches);
+      if (open) { var first = facetsEl.querySelector('summary, input, select'); if (first) first.focus(); } else ft.focus();
+    }
+    ft.addEventListener('click', function () { setTray(ft.getAttribute('aria-expanded') !== 'true'); });
+    el('tray-done').addEventListener('click', function () { setTray(false); });
+    backdrop.addEventListener('click', function () { setTray(false); });
+    facetsEl.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ft.getAttribute('aria-expanded') === 'true') setTray(false); });
     function syncFacetsVisibility() {
       var wide = window.matchMedia('(min-width: 900px)').matches;
       facetsEl.hidden = !wide && ft.getAttribute('aria-expanded') !== 'true';

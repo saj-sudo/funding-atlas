@@ -59,8 +59,9 @@
   <figure class="chart">
     <h2>Status changes the registry has logged</h2>
     <p class="sub" id="c4-sub"></p>
+    <div class="legend"><span><i class="sw fed"></i>The source changed</span><span><i class="sw code"></i>First read after a change to the registry's code</span></div>
     <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
-    <p class="src"><code>v_stats_status_flips</code>: programs a local government could apply to, every source. Some changes come from connector fixes rather than agencies; the log does not tell the two apart.</p>
+    <p class="src"><code>v_stats_status_flips</code> with <code>v_change_cause</code>: programs a local government could apply to, every source. A change is marked when a commit touching that connector's reading code reached main between its run and the run before (from git history); it may still be the agency's.</p>
   </figure>
 
   <figure class="chart">

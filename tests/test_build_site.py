@@ -188,10 +188,40 @@ def test_history_is_the_programs_own_log(conn):
     site = build_site.build(conn, generated_at=GEN)
     md = site["states"]["MD"]
     closed = next(p for p in md["between"] if p["name"] == "Will Close Later")
-    assert closed["history"] == [[T1[:10], "added"], [T2[:10], "status", "open", "closed"]]
+    # no code_release rows in the test database, so every cause is 'unknown' (migration 0010)
+    assert closed["history"] == [[T1[:10], "added", None, None, "unknown"], [T2[:10], "status", "open", "closed", "unknown"]]
     brand_new = next(p for p in md["programs"] if p["name"] == "Brand New Notice")
-    assert brand_new["history"] == [[T2[:10], "added"]]
+    assert brand_new["history"] == [[T2[:10], "added", None, None, "unknown"]]
     assert all("history" in p for p in md["programs"] + md["between"] + md["unstated"])
+
+
+def test_change_cause_follows_code_releases(conn):
+    rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+    assert set(rows.values()) == {"unknown"}                       # no git history recorded yet
+    flip = conn.execute("SELECT c.id FROM program_change c JOIN program p ON p.id = c.program_id"
+                        " WHERE p.name = 'Will Close Later' AND c.change_type = 'changed'").fetchone()[0]
+    first = conn.execute("SELECT c.id FROM program_change c JOIN program p ON p.id = c.program_id"
+                         " WHERE p.name = 'Will Close Later' AND c.change_type = 'added'").fetchone()[0]
+    mid = (datetime.strptime(T1, "%Y-%m-%dT%H:%M:%SZ") + timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    try:
+        # the fixture logs every change under the grants_gov runs (run ids 1 and 5), so the release names that connector
+        conn.execute("INSERT INTO code_release VALUES ('grants_gov', 'abc', ?)", (mid,))
+        rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+        assert rows[first] == "first_read" and rows[flip] == "code"
+        conn.execute("UPDATE code_release SET released_at = ?", ((NOW + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),))
+        rows = {r["change_id"]: r["cause"] for r in conn.execute("SELECT * FROM v_change_cause")}
+        assert rows[flip] == "source"                                 # a release after the run does not count
+    finally:
+        conn.execute("DELETE FROM code_release")
+
+
+def test_reading_files_follow_the_imports():
+    from pipeline.code_release import reading_files
+    from pipeline.run import CONNECTORS
+    files = reading_files(CONNECTORS["vt_accd"])
+    assert "connectors/vt_accd.py" in files and "connectors/vermont_drupal.py" in files
+    assert "pipeline/upsert.py" in files and "pipeline/run.py" not in files
+    assert "connectors/ca_grants.py" not in files
 
 
 def test_build_shapes_changes(conn):
@@ -241,7 +271,7 @@ def test_stats_views_count_what_the_pages_list(conn):
     assert md["n"] == 5 and md["status_stated"] == 4          # Main Street Facades states no status
     assert stated["US"]["n"] == conn.execute("SELECT COUNT(*) FROM v_navigator_program WHERE state IS NULL").fetchone()[0]
     flips = [dict(r) for r in conn.execute("SELECT * FROM v_stats_status_flips")]
-    assert {(f["old_status"], f["new_status"]): f["n"] for f in flips} == {("open", "closed"): 1}
+    assert {(f["old_status"], f["new_status"], f["cause"]): f["n"] for f in flips} == {("open", "closed", "unknown"): 1}
     months = list(conn.execute("SELECT state, month, n FROM v_stats_deadline_month"))
     assert all(1 <= m <= 12 for _, m, _ in months) and {st for st, _, _ in months} <= {"MD", "VA"}
 
@@ -269,14 +299,19 @@ def test_write_site(conn, tmp_path):
     assert page.startswith("<!doctype html>")
     assert "<script>alert(1)</script>" not in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
-    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) == 4 and len(data["between"]) == 2
+    federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
+    # the page carries Maryland's own rows; the federal ones come once from federal.js (13.16)
+    assert all(p["state"] == "MD" for p in data["programs"]) and all(p["state"] is None for p in federal["programs"])
+    assert data["state"] == {"code": "MD", "name": "Maryland"} and len(data["programs"]) + len(federal["programs"]) == 4
+    assert len(data["between"]) == 2
     assert 'id="list-between"' in page and 'id="between-toggle"' in page and len(data["unstated"]) == 1
     # the state's own groups come before the federal notices (13.1, decision 2026-11-14)
     order = [page.index(f'id="g-{g}"') for g in ("state", "unstated", "between", "federal")]
     assert order == sorted(order)
-    assert "&lt;may&gt;" in json.dumps(data) or "<may>" in json.dumps(data)   # verbatim text survives round trip
+    assert "<may>" in json.dumps(federal)                                # verbatim text survives the round trip
+    assert "</script" not in (out / "federal.js").read_text(encoding="utf-8")
     # self-contained: nothing loaded from anywhere
-    body = page.replace("https://x/", "")
+    body = page.replace("https://x/", "").replace('<script src="../federal.js?v=' + GEN[:10] + '">', "")
     assert "<script src" not in body and "<link rel=\"stylesheet\"" not in body and "@import" not in body
     assert "url(http" not in body and "cdn" not in body
     index = (out / "index.html").read_text(encoding="utf-8")
@@ -345,7 +380,11 @@ def test_every_listed_program_has_its_own_feed(conn, tmp_path):
     site = build_site.build(conn, generated_at=GEN)
     listed = {p["slug"] for d in site["states"].values() for p in d["programs"] + d["between"] + d["unstated"]}
     files = {f.name for f in (out / "p").iterdir()}
-    assert len(files) == len(listed) and all(build_site.program_feed_path(sl)[2:] in files for sl in listed)
+    logged = {r["slug"] for r in conn.execute("SELECT DISTINCT slug FROM v_navigator_change")}
+    assert files == {build_site.program_feed_path(sl)[2:] for sl in listed | logged}
+    # a program that left every page keeps its feed: Long Dead Credit closed two years ago and is listed nowhere
+    gone = conn.execute("SELECT slug FROM program WHERE name = 'Long Dead Credit'").fetchone()[0]
+    assert gone not in listed and build_site.program_feed_path(gone)[2:] in files
     closed = next(p for p in site["states"]["MD"]["between"] if p["name"] == "Will Close Later")
     root = ET.parse(out / build_site.program_feed_path(closed["slug"])).getroot()
     ns = {"a": build_site.ATOM_NS}
@@ -386,6 +425,8 @@ def test_changes_json_equals_the_pages_embedded_changes(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
     embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))["changes"]
+    federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
+    embedded = sorted(embedded + federal["changes"], key=lambda c: (c["at"], c["id"]), reverse=True)
     data = json.loads((out / "md" / "changes.json").read_text(encoding="utf-8"))
     assert data["state"] == "MD" and data["generated_at"] == GEN and data["feed"]["atom"].endswith("/md/feed.xml")
     assert [c["id"] for c in data["changes"]] == [c["id"] for c in embedded]

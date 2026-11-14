@@ -225,30 +225,31 @@ HISTORY_FIELDS = ("status", "closes_at", "opens_at")
 def load_history(conn: sqlite3.Connection, ids: set[int]) -> dict[int, list[list[Any]]]:
     """Each listed program's own change log, compacted for the detail panel's history strip (13.7).
 
-    One event per fact: [date, 'added'], [date, 'missing'], [date, field, old, new] for status, closes_at and
-    opens_at, and [date, 'edit', n] for a change that touched only other fields (n of them). Oldest first.
+    Every event is [date, kind, old, new, cause]: kind 'added' or 'missing' (old and new null), a field name for status,
+    closes_at and opens_at, or 'edit' for a change that touched only other fields (old = how many). cause is the
+    change's label from v_change_cause (source, code, first_read, unknown). Oldest first.
     Nothing is inferred: these are the rows program_change holds, in their own order."""
     out: dict[int, list[list[Any]]] = {}
     if not ids:
         return out
     marks = ",".join("?" * len(ids))
     rows = conn.execute(
-        f"SELECT program_id, changed_at, change_type, changed_fields FROM program_change "
-        f"WHERE program_id IN ({marks}) ORDER BY changed_at, id",
+        f"SELECT c.program_id, c.changed_at, c.change_type, c.changed_fields, v.cause FROM program_change c "
+        f"LEFT JOIN v_change_cause v ON v.change_id = c.id WHERE c.program_id IN ({marks}) ORDER BY c.changed_at, c.id",
         sorted(ids),
     )
-    for pid, at, kind, fields in rows:
+    for pid, at, kind, fields, cause in rows:
         day = at[:10]
         events = out.setdefault(pid, [])
         if kind in ("added", "missing"):
-            events.append([day, kind])
+            events.append([day, kind, None, None, cause])
             continue
         raw = json.loads(fields) if fields else {}
         hit = [f for f in HISTORY_FIELDS if f in raw]
         for f in hit:
-            events.append([day, f, raw[f].get("old"), raw[f].get("new")])
+            events.append([day, f, raw[f].get("old"), raw[f].get("new"), cause])
         if not hit and raw:
-            events.append([day, "edit", len(raw)])
+            events.append([day, "edit", len(raw), None, cause])
     return out
 
 
@@ -263,7 +264,11 @@ def load_stats(conn: sqlite3.Connection) -> dict[str, Any]:
 
 
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
-    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_change")]
+    """The change feed, each row with its cause (migration 0010: source, code, first_read or unknown)."""
+    return [dict(r) for r in conn.execute(
+        "SELECT n.*, v.cause FROM v_navigator_change n LEFT JOIN v_change_cause v ON v.change_id = n.change_id"
+        " ORDER BY n.changed_at DESC, n.change_id DESC"
+    )]
 
 
 def load_coverage(conn: sqlite3.Connection) -> dict[str, dict[str, Any]]:
@@ -408,6 +413,7 @@ def shape_change(row: dict[str, Any], listed_ids: set[int]) -> dict[str, Any]:
         "tier": row["municipal_tier"],
         "fields": fields,
         "status_flip": "status" in raw,
+        "cause": row.get("cause"),
         "listed": row["program_id"] in listed_ids,
     }
 
@@ -499,7 +505,8 @@ def render_atom(entries: list[dict[str, Any]], *, state: str | None, self_url: s
         ET.SubElement(e, "link", rel="alternate", href=feed_link(c, state), type="text/html")
         ET.SubElement(e, "category", term=c.get("state") or "federal")
         ET.SubElement(ET.SubElement(e, "author"), "name").text = _text(c.get("agency") or CONNECTOR_LABEL.get(c.get("connector"), c.get("connector")))
-        ET.SubElement(e, "summary", type="text").text = _text(f"{describe_change(c)} · {_who(c)}")
+        note = " · after a change to how this source is read" if c.get("cause") == "code" else ""
+        ET.SubElement(e, "summary", type="text").text = _text(f"{describe_change(c)} · {_who(c)}{note}")
     return '<?xml version="1.0" encoding="utf-8"?>\n' + ET.tostring(feed, encoding="unicode")
 
 
@@ -638,7 +645,27 @@ def fill(template: str, **slots: str) -> str:
     return template
 
 
+FEDERAL_JS = "federal.js"
+
+
+def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """A state payload without its federal rows, and those rows (13.16). Federal notices and their changes are the
+    same on all 51 pages, so they ship once in federal.js on the same origin and every state page loads it from the
+    browser cache: the pages drop from 600KB to 900KB to the state's own weight. app.js merges them back."""
+    page = dict(data,
+                programs=[p for p in data["programs"] if p["state"]],
+                changes=[c for c in data["changes"] if c["state"]])
+    federal = {"programs": [p for p in data["programs"] if not p["state"]],
+               "changes": [c for c in data["changes"] if not c["state"]]}
+    return page, federal
+
+
+def render_federal(federal: dict[str, Any]) -> str:
+    return "window.FA_FEDERAL = " + embed_json(federal) + ";\n"
+
+
 def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
+    data = split_federal(data)[0]
     name = data["state"]["name"]
     return fill(
         template,
@@ -697,16 +724,17 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
     listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
-    # One feed per listed program (13.9): its whole change log, for the watchlist. A program's feed exists while
-    # the program is listed on some page; the watchlist says so.
+    # One feed per program (13.9, widened in 13.15): every program a local government could apply to that is listed
+    # on a page or has ever had a change logged, so a starred program keeps its feed after it leaves every page and
+    # the feed carries the change that took it off.
     own: dict[int, list[dict[str, Any]]] = {}
+    meta: dict[int, dict[str, Any]] = {}
     for c in changes:
-        if c["program_id"] in listed_all:
-            own.setdefault(c["program_id"], []).append(shape_change(c, listed_all))
-    program_feeds = [
-        {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"], "entries": own.get(p["id"], [])}
-        for p in {p["id"]: p for p in programs + between + unstated}.values()
-    ]
+        own.setdefault(c["program_id"], []).append(shape_change(c, listed_all))
+        meta.setdefault(c["program_id"], {"slug": c["slug"], "name": c["name"], "state": c["state"], "source_url": c["source_url"]})
+    for p in programs + between + unstated:
+        meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
+    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
     about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
     return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about}
 
@@ -769,6 +797,8 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                               alternate_url=SITE_URL, updated=generated_at), encoding="utf-8")
     (out / "changes.json").write_text(changes_json(site["feed"], state=None, generated_at=generated_at, base=SITE_URL), encoding="utf-8")
     counts: dict[str, int] = {}
+    # federal rows once, for every state page (split_federal); any state's payload carries the same federal rows
+    (out / FEDERAL_JS).write_text(render_federal(split_federal(site["states"]["MD"])[1]), encoding="utf-8")
     for code, data in site["states"].items():
         d = out / code.lower()
         d.mkdir()
@@ -784,7 +814,8 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])
-        alt = f"{SITE_URL}{pf['state'].lower()}/#p={quote(pf['slug'])}" if pf["state"] else (pf["source_url"] or SITE_URL)
+        alt = (f"{SITE_URL}{pf['state'].lower()}/#p={quote(pf['slug'])}" if pf["state"] and pf["listed"]
+               else (pf["source_url"] or SITE_URL))
         (out / path).write_text(render_atom(pf["entries"], state=pf["state"], self_url=SITE_URL + path, alternate_url=alt,
                                             updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
     return out, counts
