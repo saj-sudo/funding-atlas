@@ -17,7 +17,7 @@ gives every card one layout with status and deadline first, makes the default "L
 removable, and opens the detail panel with five plain answers. A mockup with three visual directions is published
 for Saj to pick from (13.2): https://claude.ai/artifact/TD8a8dMrft9jA4rRkmHG7e (private until shared).
 
-What is left, in order: 13.2 the visual direction, 13.3 page weight and the phone filter tray, 13.4 a change feed
+Saj picked direction A, "Civic", the same day; it shipped as 13.2. What is left, in order: 13.3 page weight and the phone filter tray, 13.4 a change feed
 for humans, 13.5 the index page. Each is one session (roadmap, milestone 13).
 
 ## Who the page is for (from SPEC.md)
@@ -189,8 +189,8 @@ external requests" rule. Decide that with the direction.
 
 ## Open questions for Saj
 
-1. Which direction (A, B, C, or a mix)?
-2. Web fonts: self-host in `web/` (keeps the no-external-requests rule) or stay on system fonts?
+1. ~~Which direction?~~ **A, "Civic"** (Saj, 2026-11-14), built as 13.2 with C's deadline headings.
+2. ~~Web fonts?~~ Self-hosted in `web/fonts/` (my call on 2026-11-14, so the no-external-requests rule holds).
 3. Stale "status not confirmed" rows (WV "Spring 2023", "No further solicitations expected"): list them as the source
    says, or drop rows whose page has not changed in, say, two years? Today they are listed; dropping is a rule on
    `last_changed`, not a guess.
