@@ -15,6 +15,10 @@ Beside every page sits its change log as a feed: `feed.xml` (Atom) and `changes.
 Changes tab shows (the newest FEED_N federal plus the newest FEED_N of that state), and at the site root the newest
 FEED_N across every source. An entry's id is a tag URI over the change-log row id, so it never changes; its summary
 is the same wording web/app.js renders (FIELD_LABEL is kept in both places and a test holds them equal).
+
+Each state also gets `summary.json`: the counts another site needs to say "N programs are open to towns in
+this state" and link here, without parsing the page (docs/summary_json.md). It is counts and the next few
+deadlines over the same rows the page lists, nothing new.
 """
 
 from __future__ import annotations
@@ -46,6 +50,7 @@ UPDATED_DAYS = 7       # source changed within this many days -> "updated"
 CLOSING_DAYS = 30      # closes within this many days -> "closing soon"
 FEED_N = 200           # change-feed rows per state page: the newest N federal plus the newest N of that state
 INDEX_FEED_N = 20      # change-feed rows on the index
+SUMMARY_SOON_N = 5     # nearest stated deadlines listed in each state's summary.json
 BETWEEN_MONTHS = 15    # mirrors v_navigator_between (migration 0006): last deadline within this many months
 ATOM_NS = "http://www.w3.org/2005/Atom"
 FEED_ID_PREFIX = "tag:saj-sudo.github.io,2026:funding-atlas/change/"   # a permanent id per change-log row
@@ -521,6 +526,51 @@ def changes_json(entries: list[dict[str, Any]], *, state: str | None, generated_
     }, ensure_ascii=False, separators=(",", ":"))
 
 
+def summary_json(data: dict[str, Any]) -> str:
+    """One state's page as a small machine-readable summary (docs/summary_json.md).
+
+    Built from the state payload the page itself embeds, so the two cannot disagree. Counts and deadlines are
+    over the state's own rows; federal rows are one number, because they are the same on every state page.
+    A deadline is listed only when the source states a real one: no placeholder dates, nothing already past.
+    """
+    code = data["state"]["code"]
+    page = f"{SITE_URL}{code.lower()}/"
+    rows = data["programs"]
+    own = [p for p in rows if p["state"] is not None]
+    by_category: dict[str, int] = {}
+    for p in own:
+        for c in p["categories"]:
+            by_category[c] = by_category.get(c, 0) + 1
+    dated = [
+        p for p in own
+        if p["days_to_close"] is not None and p["days_to_close"] >= 0 and not p["deadline_placeholder"]
+    ]
+    dated.sort(key=lambda p: (p["days_to_close"], p["name"]))
+    return json.dumps({
+        "generated_at": data["generated_at"],
+        "state": data["state"],
+        "page": page,
+        # What "open" means here, so a reader of the file does not have to guess: the page's own rule.
+        "audience": "local governments",
+        "license": {"records": "ODbL-1.0", "attribution": "Funding Atlas", "source": REPO_URL},
+        "open": {"state": len(own), "federal": len(rows) - len(own)},
+        "by_category": [
+            {"category": c, "open": n}
+            for c, n in sorted(by_category.items(), key=lambda kv: (-kv[1], kv[0]))
+        ],
+        "closing_soon": [
+            {
+                "name": p["name"],
+                "agency": p["agency"],
+                "closes_at": p["closes_at"],
+                "days_to_close": p["days_to_close"],
+                "link": f"{page}#p={quote(p['slug'] or '')}",
+            }
+            for p in dated[:SUMMARY_SOON_N]
+        ],
+    }, ensure_ascii=False, indent=1)
+
+
 def sources_for(codes: list[str], run_info: dict[str, dict[str, str | None]]) -> list[dict[str, Any]]:
     return [
         {"connector": c, "label": CONNECTOR_LABEL.get(c, c), "last_ok": (run_info.get(c) or {}).get("last_ok")}
@@ -807,6 +857,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         (d / "feed.xml").write_text(render_atom(data["changes"], state=code, self_url=base + "feed.xml",
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
+        (d / "summary.json").write_text(summary_json(data), encoding="utf-8")
         counts[code] = len(data["programs"])
     about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
     (out / "about").mkdir()

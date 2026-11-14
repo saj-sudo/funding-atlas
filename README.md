@@ -89,6 +89,9 @@ and `/md/changes.json` for each state, `/feed.xml` and `/changes.json` for every
 (added, changed, no longer listed) on a program a local government could apply to, with the same wording as the
 page's Changes tab; entry ids are permanent, so a reader never re-announces one.
 
+Each state also has `/md/summary.json`: how many programs are open, by category, and the nearest stated deadlines,
+for another site to read without parsing the page (`docs/summary_json.md`).
+
 The database behind the live site is downloadable at `/atlas.db.gz` on the site (SQLite; about 84 MB unpacked today, most of it the raw payloads that let warm runs skip unchanged records).
 
 ## Licenses
