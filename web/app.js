@@ -222,7 +222,7 @@
       var hsh = parseHash();
       if (hsh.q !== undefined) st.q = hsh.q;
       if (hsh.sort) st.sort = hsh.sort;
-      if (hsh.tab === 'changes') st.tab = 'changes';
+      if (hsh.tab === 'changes' || hsh.tab === 'digest') st.tab = hsh.tab;
       if (hsh.feed) st.feed = hsh.feed;
       if (hsh.quick) st.quick = hsh.quick;
       if (hsh.between === '1') st.between = true;
@@ -237,7 +237,7 @@
       if (st.q) parts.push('q=' + encodeURIComponent(st.q));
       if (st.sort !== 'closing') parts.push('sort=' + st.sort);
       if (st.quick) parts.push('quick=' + st.quick);
-      if (st.tab === 'changes') parts.push('tab=changes');
+      if (st.tab !== 'programs') parts.push('tab=' + st.tab);
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
       if (st.between) parts.push('between=1');
       if (st.unstated) parts.push('unstated=1');
@@ -261,6 +261,7 @@
     function matches(p, skip, folded) {
       if (st.quick === 'new' && !p.is_new) return false;
       if (st.quick === 'closing' && !isSoon(p)) return false;
+      if (st.quick === 'week' && !inWeek(p)) return false;
       var terms = termsOf(st.q);
       for (var i = 0; i < terms.length; i++) if (p._text.indexOf(terms[i]) < 0) return false;
       for (var j = 0; j < FACETS.length; j++) {
@@ -310,17 +311,27 @@
     sw.innerHTML = DATA.states.map(function (s) { return '<option value="' + h(s.code) + '"' + (s.code === S.code ? ' selected' : '') + '>' + h(s.name) + '</option>'; }).join('');
     sw.addEventListener('change', function () { location.href = ROOT + sw.value.toLowerCase() + '/'; });
 
-    // ---- pulse tiles ----
+    // ---- the briefing: three or four sentences that each filter the page (13.6). Every number is a count of rows
+    // already on the page; a sentence with nothing to say is left out, except the first.
+    function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+    function inWeek(p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= 7; }
+    var nWeekState = PS.filter(inWeek).length, nWeekFed = PF.filter(inWeek).length;
     var nNew = P.filter(function (p) { return p.is_new; }).length;
     var nClosing = P.filter(isSoon).length;
     var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
-    el('n-new').textContent = nNew; el('n-closing').textContent = nClosing; el('n-changed').textContent = flips.length;
-    el('tile-new').querySelector('.d').textContent = 'first seen in the last ' + R.new_days + ' days';
-    el('tile-closing').querySelector('.d').textContent = 'deadline in the next ' + R.closing_days + ' days';
-    el('tile-changed').querySelector('.d').textContent = 'opened, closed or announced in the last ' + R.new_days + ' days';
-    if (!nNew) el('tile-new').disabled = true;
-    if (!nClosing) el('tile-closing').disabled = true;
-    if (!flips.length) el('tile-changed').disabled = true;
+    var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
+    var brief = [];
+    if (nWeekState + nWeekFed) {
+      brief.push(['week', (cov.state ? plural(nWeekState, S.name + ' program', S.name + ' programs') + ' and ' : '') + plural(nWeekFed, 'federal notice', 'federal notices') + ' close in the next 7 days.']);
+    } else {
+      brief.push([nClosing ? 'closing' : null, 'Nothing on this page closes in the next 7 days' + (nClosing ? '; ' + nClosing + ' close within ' + R.closing_days + '.' : '.')]);
+    }
+    if (opened.length) brief.push(['opened', plural(opened.length, 'program', 'programs') + ' opened or were announced in the last ' + R.new_days + ' days.']);
+    if (nNew) brief.push(['new', plural(nNew, 'program is', 'programs are') + ' new to the registry this week.']);
+    if (U.length) brief.push(['unstated', plural(U.length, S.name + ' program has', S.name + ' programs have') + ' no status on the agency\'s page.']);
+    el('brief').innerHTML = brief.map(function (b) {
+      return '<li>' + (b[0] ? '<button type="button" class="brief-link" data-act="' + b[0] + '">' + h(b[1]) + '</button>' : h(b[1])) + '</li>';
+    }).join('');
     el('tab-n-changes').textContent = C.length;
     el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
@@ -375,7 +386,8 @@
     var activeEl = el('active');
     function renderActive(shown) {
       var chips = [];
-      if (st.quick) chips.push('<button class="fchip" data-clear="quick" aria-label="Remove filter: ' + (st.quick === 'new' ? 'new this week' : 'closing soon') + '">' + (st.quick === 'new' ? 'New this week' : 'Closing soon') + ' <span aria-hidden="true">×</span></button>');
+      var QUICK = { 'new': 'New this week', closing: 'Closing within ' + R.closing_days + ' days', week: 'Closing within 7 days', starred: 'Starred' };
+      if (st.quick) chips.push('<button class="fchip" data-clear="quick" aria-label="Remove filter: ' + h(QUICK[st.quick] || st.quick) + '">' + h(QUICK[st.quick] || st.quick) + ' <span aria-hidden="true">×</span></button>');
       if (st.q) chips.push('<button class="fchip" data-clear="q" aria-label="Clear the search">“' + h(st.q) + '” <span aria-hidden="true">×</span></button>');
       FACETS.forEach(function (f) {
         (st.sel[f.key] || []).forEach(function (v) {
@@ -509,28 +521,27 @@
       if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
     });
 
-    // ---- pulse, tabs, feed ----
-    Array.prototype.forEach.call(document.querySelectorAll('.tile'), function (t) {
-      t.addEventListener('click', function () {
-        var k = t.getAttribute('data-quick');
-        if (k === 'changed') {
-          if (st.tab === 'changes' && st.feed === 'status') { st.feed = 'all'; } else { st.tab = 'changes'; st.feed = 'status'; }
-        } else if (st.quick === k) {
-          st.quick = null; resetSel();
-        } else {
-          st.quick = k; st.sel = {}; st.q = ''; el('q').value = ''; st.tab = 'programs';
-        }
-        render();
-      });
+    // ---- briefing, tabs, feed ----
+    el('brief').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-act]');
+      if (!b) return;
+      var k = b.getAttribute('data-act');
+      if (k === 'opened') { st.tab = 'changes'; st.feed = 'status'; }
+      else if (k === 'unstated') { st.tab = 'programs'; st.unstated = true; }
+      else if (st.quick === k) { st.quick = null; resetSel(); }
+      else { st.quick = k; st.sel = {}; st.q = ''; el('q').value = ''; st.tab = 'programs'; }
+      render();
+      var target = k === 'opened' ? el('panel-changes') : k === 'unstated' ? el('g-unstated') : el('panel-programs');
+      if (target && target.scrollIntoView) target.scrollIntoView({ block: 'start' });
     });
-    var tabs = [el('tab-programs'), el('tab-changes')];
+    var TABS = ['programs', 'changes', 'digest'], tabs = TABS.map(function (k) { return el('tab-' + k); });
     tabs.forEach(function (t, i) {
-      t.addEventListener('click', function () { st.tab = i ? 'changes' : 'programs'; render(); });
+      t.addEventListener('click', function () { st.tab = TABS[i]; render(); });
       t.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + 1) % 2]; n.focus(); n.click(); }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); }
       });
     });
-    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) {
+    Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) {
       c.addEventListener('click', function () { st.feed = c.getAttribute('data-feed'); render(); });
     });
     function feedRows() {
@@ -594,11 +605,54 @@
         sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
         sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
         sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+        sect('History, as the registry saw it', historyHtml(p)) +
         sect('More details', '<div class="facts">' + facts + '</div>') +
         sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
         sect('Assistance Listings this notice cites', alns) +
         '<p class="trail">' + h(trail) + '</p>';
     }
+    // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
+    function histWords(e) {
+      var k = e[1];
+      if (k === 'added') return 'First seen by the registry';
+      if (k === 'missing') return 'No longer listed by the source';
+      if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
+      if (k === 'status') {
+        var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
+        return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
+      }
+      var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
+      return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
+    }
+    function histKind(e) {
+      if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
+      if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
+      return e[1];
+    }
+    function historyHtml(p) {
+      var ev = p.history || [];
+      if (!ev.length) return '';
+      var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
+      if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
+      var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
+      var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
+      var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+      g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
+      if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+      ev.forEach(function (e) {
+        var k = histKind(e), cx = x(e[0]);
+        if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
+        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + '"/>';
+      });
+      g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+      var list = ev.slice().reverse().map(function (e) {
+        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) + '</span></li>';
+      }).join('');
+      return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+        '<ol class="hist-list">' + list + '</ol>' +
+        '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+    }
+
     function openDetail(p, trigger, viaHistory) {
       if (!p) return;
       current = p;
@@ -654,19 +708,67 @@
     }
     window.addEventListener('resize', syncFacetsVisibility);
 
+    // ---- the digest (13.8): plain text a regional planner can paste into a newsletter. Real rows, their own words
+    // and links; the only choices are which rows. Kept out of the URL: it is a tool, not a view to share.
+    var dg = { cats: {}, win: 60 };
+    (function () {
+      var seen = {};
+      P.forEach(function (p) { p.categories.forEach(function (c) { seen[c] = (seen[c] || 0) + 1; }); });
+      el('dg-cats').innerHTML = Object.keys(seen).sort(function (a, b) { return seen[b] - seen[a]; }).map(function (c) {
+        return '<button class="chip" type="button" data-c="' + h(c) + '" aria-pressed="false">' + h(words(c)) + '</button>';
+      }).join('');
+      el('dg-d').textContent = 'Text to paste into a newsletter or an email to member towns: ' + (cov.state ? S.name + ' programs first, then federal notices' : 'federal notices') +
+        ', each with its agency, deadline, amount where stated, and link. Check each agency page before you send.';
+      el('dg-cats').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var c = b.getAttribute('data-c'); dg.cats[c] = !dg.cats[c]; b.setAttribute('aria-pressed', String(!!dg.cats[c])); renderDigest(); });
+      el('dg-win').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; dg.win = +b.getAttribute('data-w');
+        Array.prototype.forEach.call(el('dg-win').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); renderDigest(); });
+      el('dg-fed').addEventListener('change', renderDigest);
+      el('dg-nodate').addEventListener('change', renderDigest);
+      if (!cov.state) el('dg-nodate').closest('label').hidden = true;
+      el('dg-copy').addEventListener('click', function () {
+        var ta = el('dg-out'), msg = el('dg-msg');
+        var ok = function () { msg.textContent = 'Copied.'; }, fail = function () { ta.focus(); ta.select(); msg.textContent = 'Selected: press Ctrl+C or Cmd+C.'; };
+        try { navigator.clipboard.writeText(ta.value).then(ok, fail); } catch (er) { fail(); }
+      });
+    })();
+    function renderDigest() {
+      var on = Object.keys(dg.cats).filter(function (k) { return dg.cats[k]; });
+      var topic = function (p) { return !on.length || p.categories.some(function (c) { return on.indexOf(c) >= 0; }); };
+      var dated = function (p) { return p.closes_at && !p.deadline_placeholder && p.days_to_close != null && p.days_to_close >= 0 && p.days_to_close <= dg.win; };
+      var sortD = function (a, b) { return closeKey(a).localeCompare(closeKey(b)) || a.name.localeCompare(b.name); };
+      var st1 = PS.filter(function (p) { return topic(p) && dated(p); }).sort(sortD);
+      var st2 = el('dg-nodate').checked ? PS.filter(function (p) { return topic(p) && (!p.closes_at || p.deadline_placeholder); }).sort(sortD) : [];
+      var fd = el('dg-fed').checked ? PF.filter(function (p) { return topic(p) && dated(p) && p.tier === 'likely'; }).sort(sortD) : [];
+      function line(p) {
+        var when = p.closes_at && !p.deadline_placeholder ? 'Closes ' + fmtDate(p.closes_at, true) + '.' : p.rolling ? 'Rolling deadline.' : p.closes_text ? 'Deadline, in the agency\'s words: "' + (p.closes_text.length > 140 ? p.closes_text.slice(0, 139) + '…' : p.closes_text) + '"' : 'No deadline stated.';
+        var amt = amountText(p);
+        return '- ' + p.name + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
+      }
+      var head = 'Funding open to ' + S.name + ' local governments, closing in the next ' + dg.win + ' days' + (on.length ? ' (' + on.map(words).join(', ') + ')' : '') +
+        '\nFrom Funding Atlas, built ' + fmtDate(DATA.generated_at, true) + '. Status and dates are what each agency\'s page said that day.\n';
+      var out = head;
+      if (cov.state) out += '\n' + S.name.toUpperCase() + ' PROGRAMS\n' + (st1.length ? st1.map(line).join('\n') : '(none closing in this window)') + '\n';
+      if (st2.length) out += '\n' + S.name.toUpperCase() + ' PROGRAMS WITH NO FIXED DATE\n' + st2.map(line).join('\n') + '\n';
+      if (el('dg-fed').checked) out += '\nFEDERAL NOTICES\n' + (fd.length ? fd.map(line).join('\n') : '(none closing in this window)') + '\n';
+      out += '\nEverything, with filters and a change feed: ' + DATA.site_url + S.code.toLowerCase() + '/';
+      el('dg-out').value = out;
+      el('dg-msg').textContent = (st1.length + st2.length + fd.length) + ' programs in this digest.';
+    }
+
     // ---- render everything from state ----
     function render() {
       tabs.forEach(function (t, i) {
-        var on = (i === 1) === (st.tab === 'changes');
+        var on = TABS[i] === st.tab;
         t.setAttribute('aria-selected', String(on));
         t.tabIndex = on ? 0 : -1;
       });
-      el('panel-programs').hidden = st.tab === 'changes';
-      el('panel-changes').hidden = st.tab !== 'changes';
-      el('tile-new').setAttribute('aria-pressed', String(st.quick === 'new'));
-      el('tile-closing').setAttribute('aria-pressed', String(st.quick === 'closing'));
-      el('tile-changed').setAttribute('aria-pressed', String(st.tab === 'changes' && st.feed === 'status'));
-      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
+      TABS.forEach(function (k) { el('panel-' + k).hidden = st.tab !== k; });
+      if (st.tab === 'digest') renderDigest();
+      Array.prototype.forEach.call(el('brief').querySelectorAll('button[data-act]'), function (b) {
+        var k = b.getAttribute('data-act');
+        b.setAttribute('aria-pressed', String(k === 'opened' ? st.tab === 'changes' && st.feed === 'status' : k === 'unstated' ? false : st.quick === k));
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
       el('sort').value = st.sort;
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();

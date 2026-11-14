@@ -184,6 +184,16 @@ def test_build_shapes_programs_and_rules(conn):
     assert len(site["states"]["WY"]["programs"]) == 3 and site["states"]["WY"]["between"] == []
 
 
+def test_history_is_the_programs_own_log(conn):
+    site = build_site.build(conn, generated_at=GEN)
+    md = site["states"]["MD"]
+    closed = next(p for p in md["between"] if p["name"] == "Will Close Later")
+    assert closed["history"] == [[T1[:10], "added"], [T2[:10], "status", "open", "closed"]]
+    brand_new = next(p for p in md["programs"] if p["name"] == "Brand New Notice")
+    assert brand_new["history"] == [[T2[:10], "added"]]
+    assert all("history" in p for p in md["programs"] + md["between"] + md["unstated"])
+
+
 def test_build_shapes_changes(conn):
     site = build_site.build(conn, generated_at=GEN)
     md = site["states"]["MD"]

@@ -33,21 +33,15 @@
     <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built {{GENERATED}}.</p></noscript>
   </section>
 
-  <section class="pulse" aria-label="What changed">
-    <button class="tile new" id="tile-new" aria-pressed="false" data-quick="new">
-      <span class="k">New this week</span><span class="v num" id="n-new">0</span><span class="d">first seen in the last 7 days</span>
-    </button>
-    <button class="tile closing" id="tile-closing" aria-pressed="false" data-quick="closing">
-      <span class="k">Closing soon</span><span class="v num" id="n-closing">0</span><span class="d">deadline in the next 30 days</span>
-    </button>
-    <button class="tile changed" id="tile-changed" aria-pressed="false" data-quick="changed">
-      <span class="k">Status changed</span><span class="v num" id="n-changed">0</span><span class="d">opened, closed or announced in the last 7 days</span>
-    </button>
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Views">
     <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
     <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
   </div>
 
   <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
@@ -105,6 +99,19 @@
       <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
     </div>
     <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
   </section>
 </main>
 

@@ -169,6 +169,39 @@ def load_unstated(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
 
 
+HISTORY_FIELDS = ("status", "closes_at", "opens_at")
+
+
+def load_history(conn: sqlite3.Connection, ids: set[int]) -> dict[int, list[list[Any]]]:
+    """Each listed program's own change log, compacted for the detail panel's history strip (13.7).
+
+    One event per fact: [date, 'added'], [date, 'missing'], [date, field, old, new] for status, closes_at and
+    opens_at, and [date, 'edit', n] for a change that touched only other fields (n of them). Oldest first.
+    Nothing is inferred: these are the rows program_change holds, in their own order."""
+    out: dict[int, list[list[Any]]] = {}
+    if not ids:
+        return out
+    marks = ",".join("?" * len(ids))
+    rows = conn.execute(
+        f"SELECT program_id, changed_at, change_type, changed_fields FROM program_change "
+        f"WHERE program_id IN ({marks}) ORDER BY changed_at, id",
+        sorted(ids),
+    )
+    for pid, at, kind, fields in rows:
+        day = at[:10]
+        events = out.setdefault(pid, [])
+        if kind in ("added", "missing"):
+            events.append([day, kind])
+            continue
+        raw = json.loads(fields) if fields else {}
+        hit = [f for f in HISTORY_FIELDS if f in raw]
+        for f in hit:
+            events.append([day, f, raw[f].get("old"), raw[f].get("new")])
+        if not hit and raw:
+            events.append([day, "edit", len(raw)])
+    return out
+
+
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_change")]
 
@@ -578,6 +611,9 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
+    history = load_history(conn, {p["id"] for p in programs + between + unstated})
+    for p in programs + between + unstated:
+        p["history"] = history.get(p["id"], [])
     unknown = sorted({p["state"] for p in programs if p["state"] and p["state"] not in STATE_NAME})
     if unknown:
         typer.echo(f"warning: records with a jurisdiction that is not a state page: {', '.join(unknown)}", err=True)
