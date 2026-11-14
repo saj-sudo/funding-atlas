@@ -21,6 +21,7 @@
   <div class="wrap">
     <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
     <span class="spacer"></span>
+    <a class="navlink" href="{{ROOT}}about/">About the data</a>
     <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
   </div>
 </header>
@@ -36,6 +37,12 @@
   <section class="briefing" aria-labelledby="brief-h">
     <h2 id="brief-h">This week</h2>
     <ul id="brief"></ul>
+    <details class="ahead" id="ahead">
+      <summary>Deadlines over the next 26 weeks</summary>
+      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st" id="ahead-st"></i><span id="ahead-st-l">State</span></span></div>
+      <div class="chart-scroll"><svg id="ahead-svg" role="img" aria-label="Deadlines per week, next 26 weeks"></svg></div>
+      <p class="muted small" id="ahead-note"></p>
+    </details>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Views">
@@ -101,6 +108,10 @@
         <section class="group fold" id="g-between" aria-labelledby="g-between-h">
           <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
           <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
           <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
           <div class="list" id="list-between" hidden></div>
         </section>

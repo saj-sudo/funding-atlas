@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<style>
+@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("{{ROOT}}fonts/source-serif-4-latin.woff2") format("woff2"); }
+{{CSS}}
+</style>
+</head>
+<body data-page="about">
+<a class="skip" href="#main">Skip to the charts</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="{{ROOT}}">All states</a>
+  </div>
+</header>
+
+<main id="main" class="wrap about">
+  <section class="index-hero">
+    <h1>About the data</h1>
+    <p class="lede">What the registry reads, what its sources say and leave out, and what the change log has seen. Every chart is a count from the published database; nothing here estimates or forecasts. Built {{GENERATED}}.</p>
+  </section>
+
+  <figure class="chart">
+    <h2>Deadlines over the next 26 weeks</h2>
+    <p class="sub" id="c1-sub"></p>
+    <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span></div>
+    <div class="chart-scroll"><svg id="c1" role="img" aria-labelledby="c1-sub"></svg></div>
+    <p class="src">Programs open or announced to local governments with a stated deadline (<code>v_navigator_program</code>). Weeks start today.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>When state deadlines have fallen</h2>
+    <p class="sub">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. Darker is a larger share of that row. It describes the past; it predicts nothing.</p>
+    <div class="chart-scroll"><svg id="c2" role="img" aria-label="Deadline months by state"></svg></div>
+    <div class="legend" id="c2-leg"></div>
+    <p class="src"><code>v_stats_deadline_month</code>. States with 8 or more such deadlines have their own row; all states are in the last row.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>What sources state</h2>
+    <p class="sub">Share of state programs open to local governments whose source states a status, a deadline (or rolling), and an amount, by state; federal notices open now for comparison. Structured portals state the basics; agency pages often do not.</p>
+    <div class="legend"><span><i class="sw s1"></i>States a status</span><span><i class="sw s2"></i>States a deadline</span><span><i class="sw s3"></i>States an amount</span></div>
+    <div class="chart-scroll"><svg id="c3" role="img" aria-label="Share of programs stating status, deadline and amount"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c3-table"></div></details>
+    <p class="src"><code>v_stats_stated</code>. States with 7 or more such programs.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>Status changes the registry has logged</h2>
+    <p class="sub" id="c4-sub"></p>
+    <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
+    <p class="src"><code>v_stats_status_flips</code>: programs a local government could apply to, every source. Some changes come from connector fixes rather than agencies; the log does not tell the two apart.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>Maximum awards, where published</h2>
+    <p class="sub" id="c5-sub"></p>
+    <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span><span>Line: median</span></div>
+    <div class="chart-scroll"><svg id="c5" role="img" aria-labelledby="c5-sub"></svg></div>
+    <p class="src">Open or announced programs with a stated maximum of $1,000 or more. Log scale: each gridline is ten times the last.</p>
+  </figure>
+</main>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{{DATA}}</script>
+<script>
+{{JS}}
+</script>
+</body>
+</html>

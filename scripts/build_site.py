@@ -109,6 +109,56 @@ CONNECTOR_LABEL = {
     "ne_dwee": "Nebraska Department of Water, Energy, and Environment",
     "ne_dot": "Nebraska Department of Transportation",
 }
+# What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
+# status, or agency pages. A connector missing here counts as agency pages.
+CONNECTOR_KIND = {
+    "pa_grants": "portal", "wv_grants": "portal", "ca_grants": "portal", "il_csfa": "portal", "webgrants": "portal",
+    "tx_egrants": "portal", "nj_dca_sage": "portal", "ny_sfs": "portal", "ky_dlg": "portal",
+    "nc_grants": "directory", "wa_fund_directory": "directory",
+}
+# States with no state source read, and why, in one plain sentence each. From docs/surveys/state_portals.md and
+# the roadmap's decisions (12.0, 12.5); a state that gains a connector drops out of this table by itself.
+STATE_NOTE: dict[str, tuple[str, str]] = {
+    "AK": ("blocked", "Alaska's community grants pages refuse automated readers (a bot wall answers every request)."),
+    "CO": ("blocked", "Colorado's local funding guide refuses automated readers."),
+    "ID": ("blocked", "Idaho Commerce's grants pages sit behind a bot challenge."),
+    "KS": ("blocked", "The Kansas Infrastructure Hub refuses automated readers."),
+    "ME": ("blocked", "Maine's community funding finder refuses automated readers."),
+    "MI": ("blocked", "Michigan's grants pages refuse automated readers."),
+    "RI": ("blocked", "Rhode Island's funding opportunities page sits behind a bot challenge."),
+    "OK": ("login", "Oklahoma's Grant Exchange is login only and asks crawlers not to read it."),
+    "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
+    "AL": ("blocked", "Alabama's grants office asks this registry's crawler not to read its pages; the registry respects that."),
+    "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
+    "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
+    "GA": ("none", "No public state list of grants for local governments was found."),
+    "HI": ("none", "No public state list of grants for local governments was found."),
+    "LA": ("none", "No public state list of grants for local governments was found."),
+    "MS": ("none", "No public state list of grants for local governments was found."),
+    "OH": ("none", "Ohio's grants site answered nothing when surveyed."),
+    "SC": ("none", "No public state list of grants for local governments was found."),
+    "WI": ("none", "No public state list of grants for local governments was found."),
+    "DC": ("none", "The District is out of scope for now: it has no towns or counties under it."),
+}
+
+
+def coverage_kind(code: str, connectors: dict[str, list[str]]) -> tuple[str, str | None]:
+    """How a state is read, for the index map: portal, agencies, portal_agencies, directory, or a STATE_NOTE kind,
+    else 'federal' (nothing built yet). Derived from the connectors that hold records for the state."""
+    kinds = {CONNECTOR_KIND.get(c, "agencies") for c in connectors.get(code, [])}
+    if "portal" in kinds and "agencies" in kinds:
+        return "portal_agencies", None
+    if "portal" in kinds:
+        return "portal", None
+    if "agencies" in kinds:
+        return "agencies", None
+    if "directory" in kinds:
+        return "directory", None
+    if code in STATE_NOTE:
+        return STATE_NOTE[code]
+    return "federal", None
+
+
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
     "Which rows should not be here, and why?",
@@ -200,6 +250,16 @@ def load_history(conn: sqlite3.Connection, ids: set[int]) -> dict[int, list[list
         if not hit and raw:
             events.append([day, "edit", len(raw)])
     return out
+
+
+def load_stats(conn: sqlite3.Connection) -> dict[str, Any]:
+    """The three chart views of migration 0009, as plain rows."""
+    months: dict[str, list[int]] = {}
+    for r in conn.execute("SELECT state, month, n FROM v_stats_deadline_month"):
+        months.setdefault(r["state"], [0] * 12)[r["month"] - 1] = r["n"]
+    stated = [dict(r) for r in conn.execute("SELECT * FROM v_stats_stated ORDER BY n DESC, state")]
+    flips = [dict(r) for r in conn.execute("SELECT * FROM v_stats_status_flips")]
+    return {"months": months, "stated": stated, "flips": flips}
 
 
 def load_changes(conn: sqlite3.Connection) -> list[dict[str, Any]]:
@@ -473,6 +533,7 @@ def state_payload(
     run_info: dict[str, dict[str, str | None]],
     excluded: int,
     generated_at: str,
+    stats: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     rows = [p for p in programs if p["state"] is None or p["state"] == code]
     between_rows = [p for p in between if p["state"] == code]          # state rows only, by construction
@@ -514,6 +575,7 @@ def state_payload(
         "programs": rows,
         "between": between_rows,
         "unstated": unstated_rows,
+        "season": (stats or {}).get("months", {}).get(code),
         "changes": feed,
     }
 
@@ -539,6 +601,8 @@ def index_payload(
             "between": cov["n_between_rounds"] if cov else 0,
             "unstated": cov["n_unstated"] if cov else 0,
             "last_ok": cov["last_ok"] if cov else None,
+            "kind": coverage_kind(code, connectors)[0],
+            "note": coverage_kind(code, connectors)[1],
         })
     return {
         "generated_at": generated_at,
@@ -613,6 +677,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
     history = load_history(conn, {p["id"] for p in programs + between + unstated})
+    stats = load_stats(conn)
     for p in programs + between + unstated:
         p["history"] = history.get(p["id"], [])
     unknown = sorted({p["state"] for p in programs if p["state"] and p["state"] not in STATE_NAME})
@@ -621,7 +686,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     states = {
         code: state_payload(
             code, programs=programs, between=between, unstated=unstated, changes=changes, coverage=coverage, connectors=connectors,
-            run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at,
+            run_info=run_info, excluded=excluded_unlikely(conn, code), generated_at=generated_at, stats=stats,
         )
         for code, _, _, _ in STATES
     }
@@ -642,7 +707,39 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"], "entries": own.get(p["id"], [])}
         for p in {p["id"]: p for p in programs + between + unstated}.values()
     ]
-    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds}
+    about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
+    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about}
+
+
+def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str) -> dict[str, Any]:
+    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else."""
+    return {
+        "generated_at": generated_at,
+        "site_url": SITE_URL,
+        "repo_url": REPO_URL,
+        "rules": {"new_days": NEW_DAYS, "closing_days": CLOSING_DAYS},
+        "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
+        "deadlines": [[p["state"], p["closes_at"], p["deadline_placeholder"]] for p in programs if p["closes_at"]],
+        "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
+        "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},
+        "months": stats["months"],
+        "stated": stats["stated"],
+        "flips": stats["flips"],
+        "questions": list(READER_QUESTIONS),
+    }
+
+
+def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
+    return fill(
+        template,
+        TITLE="About the data · Funding Atlas",
+        DESCRIPTION="What the Funding Atlas registry reads, what its sources state, and what the change log has seen, in five charts.",
+        ROOT="../",
+        CSS=css,
+        JS=js,
+        DATA=embed_json(data),
+        GENERATED=data["generated_at"][:10],
+    )
 
 
 def program_feed_path(slug: str) -> str:
@@ -681,6 +778,9 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         counts[code] = len(data["programs"])
+    about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
+    (out / "about").mkdir()
+    (out / "about" / "index.html").write_text(render_about(site["about"], css, js, about_tpl), encoding="utf-8")
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])

@@ -223,6 +223,38 @@ def test_index_states_and_tile_grid(conn):
 
 # ---------- rendering ----------
 
+def test_coverage_kind_follows_the_connectors():
+    con = {"MD": ["md_dhcd"], "CA": ["ca_grants"], "ND": ["webgrants", "nd_dot"], "NC": ["nc_grants"]}
+    assert build_site.coverage_kind("MD", con) == ("agencies", None)
+    assert build_site.coverage_kind("CA", con) == ("portal", None)
+    assert build_site.coverage_kind("ND", con) == ("portal_agencies", None)
+    assert build_site.coverage_kind("NC", con) == ("directory", None)
+    assert build_site.coverage_kind("AK", con)[0] == "blocked" and build_site.coverage_kind("AK", con)[1]
+    assert build_site.coverage_kind("AR", con) == ("federal", None)
+    # a blocked state that gains a connector stops being called blocked
+    assert build_site.coverage_kind("AK", {"AK": ["ak_test"]}) == ("agencies", None)
+
+
+def test_stats_views_count_what_the_pages_list(conn):
+    stated = {r["state"]: dict(r) for r in conn.execute("SELECT * FROM v_stats_stated")}
+    md = stated["MD"]
+    assert md["n"] == 5 and md["status_stated"] == 4          # Main Street Facades states no status
+    assert stated["US"]["n"] == conn.execute("SELECT COUNT(*) FROM v_navigator_program WHERE state IS NULL").fetchone()[0]
+    flips = [dict(r) for r in conn.execute("SELECT * FROM v_stats_status_flips")]
+    assert {(f["old_status"], f["new_status"]): f["n"] for f in flips} == {("open", "closed"): 1}
+    months = list(conn.execute("SELECT state, month, n FROM v_stats_deadline_month"))
+    assert all(1 <= m <= 12 for _, m, _ in months) and {st for st, _, _ in months} <= {"MD", "VA"}
+
+
+def test_about_page_is_written_and_self_contained(conn, tmp_path):
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert 'data-page="about"' in page and 'url("../fonts/public-sans-latin.woff2")' in page
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert {"deadlines", "awards", "months", "stated", "flips", "open"} <= set(data)
+    assert "<script src" not in page and "cdn" not in page
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text
