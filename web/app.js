@@ -71,6 +71,25 @@
     possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
   };
   function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
+  // Topic lines (13.17, borrowed from Wayfinding): the eleven categories folded into three, each with a letter so the
+  // colour never carries the meaning alone. A program in several shows the first line that matches, in this order.
+  var TOPIC_LINES = [
+    { key: 'env', letter: 'E', name: 'Environment: water, energy, parks', cats: ['water', 'energy', 'parks'] },
+    { key: 'inf', letter: 'I', name: 'Infrastructure: transportation, infrastructure, broadband', cats: ['transportation', 'infrastructure', 'broadband'] },
+    { key: 'com', letter: 'C', name: 'Community: housing, health, workforce, public safety', cats: ['housing', 'health', 'workforce', 'public_safety'] }
+  ];
+  var TOPIC_OTHER = { key: 'oth', letter: 'O', name: 'Other or not stated', cats: [] };
+  function topicLine(p) {
+    for (var i = 0; i < TOPIC_LINES.length; i++) {
+      if ((p.categories || []).some(function (c) { return TOPIC_LINES[i].cats.indexOf(c) >= 0; })) return TOPIC_LINES[i];
+    }
+    return TOPIC_OTHER;
+  }
+  function topicKey() {
+    return '<span class="tkey-l">Topics:</span>' + TOPIC_LINES.concat([TOPIC_OTHER]).map(function (t) {
+      return '<span class="tkey"><span class="topic t-' + t.key + '" aria-hidden="true"><b>' + t.letter + '</b></span>' + h(t.name.split(':')[0]) + '</span>';
+    }).join('');
+  }
   function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
   function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
   function badges(p) { return (p.is_new ? '<span class="tag new">New</span>' : '') + (p.is_updated ? '<span class="tag upd">Updated</span>' : ''); }
@@ -671,6 +690,8 @@
     function deadlineHtml(p) {
       if (p.closes_at && p.deadline_placeholder) return '<span>' + (p.rolling ? 'Rolling deadline' : 'No deadline stated') + '</span>';
       if (p.closes_at && p.days_to_close != null && p.days_to_close >= 0) {
+        // within 7 days: the caution panel (13.17, borrowed from Wayfinding); the words carry it, the yellow repeats it
+        if (p.days_to_close <= 7) return '<span class="caution">' + h(cap(relDays(p.days_to_close))) + '</span><span class="sr-only">, ' + h(fmtDate(p.closes_at, true)) + '</span>';
         return '<span class="' + (isSoon(p) ? 'soon' : '') + '">' + h(cap(relDays(p.days_to_close))) + ', ' + h(fmtDate(p.closes_at)) + '</span>';
       }
       if (p.closes_at) return '<span>Last deadline ' + h(fmtDate(p.closes_at, true)) + (p.days_since_deadline != null ? ' (' + h(agoDays(p.days_since_deadline)) + ')' : '') + '</span>';
@@ -703,13 +724,14 @@
     // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
     // Decorative for screen readers: the same date is in words on the card's first line.
     function dateCol(p) {
-      var dated = p.closes_at && !p.deadline_placeholder;
+      var dated = p.closes_at && !p.deadline_placeholder, L = topicLine(p);
+      var badge = '<span class="topic t-' + L.key + '" title="' + h(L.name) + '"><b>' + L.letter + '</b></span><span class="sr-only">Topic: ' + h(L.name) + '. </span>';
       if (dated) {
         var past = p.days_to_close != null && p.days_to_close < 0;
-        return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '" aria-hidden="true"><span class="m">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
-          '</span><span class="dd">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd">closed</span>' : '') + '</div>';
+        return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
+          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + badge + '</div>';
       }
-      return '<div class="date" aria-hidden="true"><span class="nd">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
+      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span>' + badge + '</div>';
     }
     // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
     var BUCKETS = [
@@ -725,6 +747,8 @@
         return r.length ? '<p class="bucket" role="heading" aria-level="3">' + h(b[0]) + ' · ' + r.length + '</p>' + r.map(card).join('') : '';
       }).join('');
     }
+
+    el('topic-key').innerHTML = topicKey();
 
     // ---- the four groups ----
     var resultsEl = el('results');

@@ -24,6 +24,8 @@
   --s-fed: #2a78d6;
   --s-state: #eb6834;
   --s3: #1baf7a;
+  --caution: #ffcd00;
+  --caution-ink: #0b0d10;
   --q-ink: #ffffff;
   --q1: #cde2fb; --q2: #9ec5f4; --q3: #6da7ec; --q4: #3987e5; --q5: #256abf; --q6: #184f95; --q7: #0d366b;
   --shadow: 0 1px 2px rgba(20, 33, 61, .06), 0 8px 24px rgba(20, 33, 61, .08);
@@ -55,6 +57,8 @@
     --s-fed: #3987e5;
     --s-state: #d95926;
     --s3: #199e70;
+    --caution: #ffd23a;
+    --caution-ink: #0b0d10;
     --q-ink: #0d1733;
     --q1: #1b2a44; --q2: #1d3a66; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #b7d3f6;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
@@ -184,8 +188,17 @@ ul, ol { margin: 0; padding: 0; }
 .card .cbody { display: grid; gap: 4px; min-width: 0; align-content: start; }
 /* the date column: the deadline is the first thing the eye lands on */
 .card .date { display: grid; align-content: start; justify-items: center; text-align: center; padding-right: 12px; border-right: 1px solid var(--line); }
-.card .date .m { font-size: .72rem; font-weight: 650; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-.card .date .dd { font: 700 1.65rem/1.05 var(--f-display); font-variant-numeric: tabular-nums; }
+.card .date .m { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
+.card .date .dd { font: 700 2rem/1 var(--f-display); font-variant-numeric: tabular-nums; color: var(--ink); }
+/* caution panel and topic badges (13.17, borrowed from Wayfinding) */
+.caution { background: var(--caution); color: var(--caution-ink); border-radius: 4px; padding: 0 8px; font-weight: 800; line-height: 1.6; }
+.topic { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--muted); background: var(--surface); margin-top: 8px; flex: none; }
+.topic b { font: 800 .74rem/1 var(--f-body); color: var(--ink); }
+.topic.t-env { border-color: var(--s-fed); } .topic.t-inf { border-color: var(--s-state); } .topic.t-com { border-color: var(--s3); } .topic.t-oth { border-color: var(--muted); border-style: dotted; }
+.topic-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: .85rem; color: var(--muted); margin: -6px 0 14px; }
+.topic-key .topic { margin: 0 6px 0 0; width: 22px; height: 22px; border-width: 2.5px; }
+.tkey { display: inline-flex; align-items: center; }
+.tkey-l { font-weight: 650; }
 .card .date.soon .dd, .card .date.soon .m { color: var(--closing); }
 .card .date .nd { font-size: .78rem; line-height: 1.25; color: var(--muted); padding-top: 2px; }
 .card .date.past .dd { color: var(--muted); }
@@ -505,7 +518,7 @@ footer.site b { color: var(--ink); }
 }
 @media (max-width: 480px) {
   .hero .lede { display: none; }
-  .cov-when, .wlbl, .slbl, .ahead, .briefing h2 { display: none; }
+  .cov-when, .wlbl, .slbl, .ahead, .briefing h2, .topic-key { display: none; }
   .hero { padding-top: 10px; }
   .briefing { margin-top: 8px; }
   .tabs { margin: 10px 0 8px; }
@@ -524,7 +537,7 @@ footer.site b { color: var(--ink); }
   .group.fold { padding: 12px; }
   .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
   .card .date { padding-right: 8px; }
-  .card .date .dd { font-size: 1.4rem; }
+  .card .date .dd { font-size: 1.6rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -540,6 +553,7 @@ footer.site b { color: var(--ink); }
   .layout { grid-template-columns: 1fr; }
   .card { break-inside: avoid; box-shadow: none; }
   .card .date.soon .dd, .card .date.soon .m { color: #000; }
+  .caution { border: 1px solid #000; }
   .card:focus-within { outline: none; }
   .card h3 button::after { content: " (" attr(data-url) ")"; font-weight: 400; font-size: .8rem; color: #333; }
   #panel-changes[hidden] { display: block !important; }
