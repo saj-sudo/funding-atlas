@@ -319,7 +319,9 @@ DUE_RE = re.compile(r"\b(?:due|deadline|submitted by|postmarked)\b|\bsubmitted\s
 NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant term|implementation period|reimbursement)\b", re.I)
 OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b"
                      # Nebraska DED (12.6g): "Pre-Application Period Opens: 1/1/2027", "Open Date: 10/27/2025"
-                     r"|\bperiod\s+opens?\b|\bopen date\b", re.I)
+                     r"|\bperiod\s+opens?\b|\bopen date\b"
+                     # Arkansas Outdoor Recreation (12.6h): "Opens: May 1, 2026 Due: August 28, 2026"
+                     r"|\bopens\s*:", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
                             r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
                             r"|\b(?:is|are)\s+currently\s+open\b"   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
@@ -328,10 +330,14 @@ AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\b
                             r"|\bstatus:\s*(?:program\s+)?open\b", re.I)
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+|currently\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b"
                               # Missouri State Parks (12.6f): "We are not accepting applications for ... grants at this time."
-                              r"|\bnot\s+(?:currently\s+)?accepting\s+applications\b", re.I)
+                              r"|\bnot\s+(?:currently\s+)?accepting\s+"
+                              # Arkansas HSGP (12.6h): "At this time, the AR HSGP is not accepting additional applications."
+                              r"(?:(?:additional|new)\s+)?applications\b", re.I)
 # "submitted by" is a deadline only in a sentence about applications: NDDOT's TA page has "final plans, permits,
 # certifications, etc., need to be completed and submitted by January 1, 2028" (a construction milestone, 12.6c).
-APPLICATION_RE = re.compile(r"\bapplications?\b", re.I)
+# Arkansas ADEM (12.6h): the state's Hazard Mitigation Grant Program takes "Notices of Intent (NOI's) May 26, 2026 through
+# June 15, 2026", its application stage.
+APPLICATION_RE = re.compile(r"\bapplications?\b|\bnotices?\s+of\s+intent\b", re.I)
 # A deadline's date sits next to its word; a date further off in the sentence is another fact.
 NEAR_CHARS = 40
 
@@ -377,8 +383,25 @@ APPLICANT_SENTENCE_RE = re.compile(
     r"|\b(?:governments?|municipalit(?:y|ies)|cities|towns|villages|count(?:y|ies))\b[^.]*\b(?:is|are) eligible\s*\.?\s*$"
     # Nebraska DWEE (12.6g): Section 319's "Funding is distributed to local governments, educational institutions, ..." and
     # the school energy loans' "K-12 public schools can now apply for low-interest loans".
-    r"|\b(?:funds?|funding|grants?)\b[^.]*\bdistributed to\b|\bcan now apply\b", re.I)
+    r"|\b(?:funds?|funding|grants?)\b[^.]*\bdistributed to\b|\bcan now apply\b"
+    # Arkansas ADEM (12.6h): "All NOI's must be submitted by local governments or non-profit organizations."
+    r"|\bsubmitted by\s+(?:[\w-]+\s+){0,2}(?:local governments?|municipal\w*|cities|towns|count(?:y|ies)|political subdivisions)\b"
+    # Arkansas Rural Services (12.6h): "Applicants from incorporated towns of less than 3,000 in population and unincorporated
+    # rural areas are eligible for up to $15,000 in matching funds"
+    r"|^applicants from\s+(?:[\w-]+\s+){0,2}(?:towns?|cities|municipal\w*|count(?:y|ies)|communities)\b"
+    # South Dakota DOT (12.6i): "The Industrial Park grants will be made to any local unit of government ..."
+    r"|\b(?:grants?|funds?|loans?)\s+(?:will|shall|may|are)\s+be\s+(?:made|awarded|given)\s+to\b"
+    # South Dakota GOED (12.6i): "Local governments interested in funding through this program should work with ..."
+    r"|^(?:local governments?|municipalities|cities|towns|counties)\s+interested in\b"
+    # South Dakota DOT (12.6i): "Community Access Grants are state funds for towns less than 5,000 in population"
+    r"|\b(?:funds?|grants?)\s+for\s+(?:towns?|cities|municipalities|counties)\b"
+    # South Dakota DOT (12.6i): "in order to be eligible for a BIG grant, a county must impose a wheel tax"
+    r"|\bto be eligible\b[^.]*,\s*(?:a|the|each)\s+(?:county|city|town|township|municipality)\s+must\b"
+    # South Dakota DANR (12.6i): "Be sponsored by one of the following entities: a special purpose district ...; a
+    # municipality, county, or township; ..."
+    r"|\bsponsored by one of the following\b", re.I)
 SHORT_ITEM = 160
+YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
     r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
@@ -401,6 +424,16 @@ OTHER_THAN_STATE_RE = re.compile(r"\bother than (?:the )?state\b[^.;,]*", re.I)
 # apply" (Nebraska DED, 12.6g): the carve-out defines the applicants and its "not" would drop the whole line. Cut
 # before tagging; the stored text keeps it.
 NOT_DESIGNATED_RE = re.compile(r"\bnot designated as\b[^.;]*?(?=\s+(?:is|are)\b|[.;]|$)", re.I)
+# "cities and counties may apply for projects that will benefit non-profit groups, for-profit companies, or LMI persons"
+# (Arkansas CDBG, 12.6h): who a project benefits does not apply. Cut before tagging; the stored text keeps it.
+BENEFITS_RE = re.compile(r"\bprojects?\s+(?:that|which)\s+(?:will\s+)?benefit\b[^.;]*", re.I)
+# "grants will be made to any local unit of government for the development of new or expanded agri-business industries",
+# "state funds for towns ... and are for the construction or reconstruction of major streets ... schools, hospitals"
+# (South Dakota DOT, 12.6i): what the money builds is not who applies. Cut before tagging; the stored text keeps it.
+# "The Agri-Business grants will be made to any local unit of government" (South Dakota DOT, 12.6i): the program's name as
+# the subject is not an applicant. Cut before tagging.
+SUBJECT_NAME_RE = re.compile(r"^the\s+(?:[\w-]+\s+){1,3}?grants?\s+(?=(?:will|shall|may|are|is)\s+(?:be\s+)?(?:made|awarded|given|available)\b)", re.I)
+PURPOSE_RE = re.compile(r"\b(?:(?:and\s+)?(?:are|is)\s+)?for\s+the\s+(?:development|construction|reconstruction|purchase|renovation)(?:\s+or\s+\w+)?\s+of\b[^.;]*", re.I)
 # "Non-profits and private sector entities may partner with an eligible applicant" (Kentucky CMAQ): a partner, not an
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
@@ -410,6 +443,7 @@ MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
 
 def clause_cut(line: str) -> str:
     """The line with the clauses that name a beneficiary, or define an applicant by what it is not, cut before tagging."""
+    line = SUBJECT_NAME_RE.sub("", PURPOSE_RE.sub("", BENEFITS_RE.sub("", line)))
     return NOT_DESIGNATED_RE.sub("", OTHER_THAN_STATE_RE.sub("", BENEFICIARY_RE.sub("", NOT_FEDERAL_RE.sub("", ON_BEHALF_RE.sub("", line)))))
 
 
@@ -445,11 +479,30 @@ def application_range(sents: list[str]) -> tuple[str, date, date] | None:
     return None
 
 
-def deadline(sents: list[str]) -> tuple[str | None, date | None]:
-    """The first sentence with a deadline word and a date next to it (not a closeout, report or grant-term date)."""
+# "Fiscal Year 2027 Deadlines are: Cycle I - August 13, 2026 Cycle II - March 11, 2027" (Arkansas Rural Services, 12.6h):
+# a plural deadline word over a list of cycles. The cycle still ahead is the deadline; once every cycle has passed, the last.
+CYCLES_RE = re.compile(r"\bdeadlines\s+(?:are|is)?\s*:?", re.I)
+
+
+def cycle_deadline(s: str, today: date | None) -> date | None:
+    m = CYCLES_RE.search(s)
+    if not m or today is None:
+        return None
+    dates = [d for d in (_date(x.group(0)) for x in AGENCY_DATE_RE.finditer(s, m.end())) if d]
+    if len(dates) < 2:
+        return None
+    return next((d for d in dates if d >= today), dates[-1])
+
+
+def deadline(sents: list[str], today: date | None = None) -> tuple[str | None, date | None]:
+    """The first sentence with a deadline word and a date next to it (not a closeout, report or grant-term date); a
+    sentence that lists cycles under "Deadlines are:" gives the cycle still ahead (`cycle_deadline`)."""
     for s in sents:
         if NOT_DEADLINE_RE.search(s):
             continue
+        cycle = cycle_deadline(s, today)
+        if cycle:
+            return s, cycle
         for due in DUE_RE.finditer(s):
             if due.group(0).lower().startswith("submitted") and not APPLICATION_RE.search(s):
                 continue
@@ -485,7 +538,7 @@ def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
     """status, opens_at, closes_at, closes_at_text: a deadline still ahead (forecasted while the opening is ahead),
     then closed wording, then a past deadline (unknown: it outranks a stale "now open"), then undated open wording."""
     sents = all_sentences(blocks)
-    due_s, due = deadline(sents)
+    due_s, due = deadline(sents, today)
     opens = opening(sents)
     closed_s = next((s for s in sents if AGENCY_CLOSED_RE.search(s)), None)
     open_s = next((s for s in sents if AGENCY_OPEN_RE.search(s) and not NEGATION_RE.search(s)), None)
@@ -595,6 +648,11 @@ class AgencyPageConnector(HandListConnector):
     # source_id -> "direct" | "pass_through" where the page mentions a federal agency without being federally funded.
     FUNDING_SOURCES: dict[str, str] = {}
     CATEGORY_LABELS: dict[str, str] = {}
+    # A round stated with a month and a day and no year ("Applications are due April 15, July 15, or October 15") is not a
+    # date: the status stays `unknown` and `closes_at` null, but the first sentence this matches (and that names no year)
+    # is kept as `closes_at_text`. Off by default; Nebraska's DED and NDOT carry their own copies (12.6g), South Dakota's
+    # agencies (12.6i) set this.
+    YEARLESS_RE: re.Pattern[str] | None = None
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         page = pages[0]
@@ -628,5 +686,12 @@ class AgencyPageConnector(HandListConnector):
             eligibility_structured=None,
             applicant_types=applicant_tags([clause_cut(line) for line in lines if not PARTNER_LINE_RE.search(line)]),
             categories=[CategoryTag(value=v, source_code=label) for v in portal_categories(label)],
-            **round_for(blocks, today),
+            **self.round_with_yearless(blocks, today),
         )
+
+    def round_with_yearless(self, blocks: Blocks, today: date) -> dict[str, Any]:
+        out = round_for(blocks, today)
+        if self.YEARLESS_RE is not None and out["status"] == "unknown" and not out["closes_at_text"]:
+            out["closes_at_text"] = next((s for s in all_sentences(blocks)
+                                          if self.YEARLESS_RE.search(s) and not YEAR_RE.search(s)), None)
+        return out
