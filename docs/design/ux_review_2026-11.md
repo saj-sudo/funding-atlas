@@ -175,6 +175,17 @@ https://claude.ai/artifact/TD8a8dMrft9jA4rRkmHG7e
 the site's first external request; the alternative is to self-host them in `web/` (same origin), which keeps the "no
 external requests" rule. Decide that with the direction.
 
+## Second round: the explorations, built (2026-11-14)
+
+Saj asked for more options and for visualizations; the explorations page
+(https://claude.ai/artifact/R57XFje7appX5jo6FUhya4, private) carried eight interface ideas and five charts on real
+data, and Saj asked for all of it to be built. It is: the This week briefing, the program history strip, the Digest
+tab, per-program feeds with stars and an OPML bundle, the List/Timeline switch, fit check, wording diffs in the
+change feed, the coverage map, and an About the data page with the five charts (two of them also on each state
+page). The roadmap's Done table has the detail (13.6 to 13.14). Not built, because the data cannot carry it yet: the
+pass-through flow from federal programs to the state programs they fund (6 of 956 eligible state programs cite a
+federal listing).
+
 ## The rest of milestone 13 (one session each)
 
 - **13.2 Visual direction.** Apply Saj's pick: type scale, palette tokens, card layout, the date column if A; dark mode
