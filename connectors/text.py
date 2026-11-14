@@ -28,6 +28,8 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # "political subdivisions" is the statutory word for a state's local governments (North Dakota's FIND and its
     # revolving funds: "loans to political subdivisions"); the same two tags as "local governments".
     (r"\bpolitical subdivisions?\b", ("municipality", "county")),
+    # Nebraska DED (12.6g): NAHTF's applicant list item "Local and Governmental Subdivisions".
+    (r"\blocal and governmental subdivisions?\b", ("municipality", "county")),
     # Not "the local jurisdiction": that is a specific counterparty ("takes the letter to the local jurisdiction to
     # apply for the credit"), not the applicant.
     (r"(?<!the )local jurisdictions?", ("municipality", "county")),

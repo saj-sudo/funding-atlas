@@ -71,7 +71,73 @@ Applicants are one paragraph above that heading: "Every Nebraska county or incor
 Entitlement Community is eligible to apply for funding through DED" (the entitlement cities are named in the next sentence
 and must not be tagged: the shared negation guard has to be checked on it).
 
-## Decisions to make while building (nothing built yet)
+## Implemented, DED (2026-11-14)
+
+`connectors/ne_ded.py` (its own WordPress reader in the module: no second Nebraska agency on WordPress, so no base) follows
+this section. First live run on an empty database: **10 added, 0 errors**, 13 seconds (three seconds between GETs, the robots
+file's `Crawl-delay: 3`); second run **0 changed**. The reader takes `div.entry-content`, the body's first `h1` (CCCFF's
+photo captions are `h1`s too), drops the breadcrumb line, stops at "Program Resources", "Grant Management Resources" and
+"Press Releases" (their dates would read as rounds) and treats a short paragraph ending in a colon as a label (NAHTF's "Who is
+eligible to apply? Eligible applicants include:").
+
+| Record | Status on 2026-11-14 | Applicants tagged | Source |
+|---|---|---|---|
+| CDBG Economic Development | open, 2026-07-01 to 2027-06-30 | municipality, county | pass_through |
+| CDBG Tourism Development | open, 2026-07-01 to 2027-06-30 | municipality, county | pass_through |
+| CDBG Public Works - Infrastructure, Planning, Public Works - Facilities, Downtown Revitalization | `unknown`: "Application Deadline: Sept. 15", no year | municipality, county | pass_through |
+| Civic and Community Center Financing Fund | `forecasted`, opens 2027-01-01, pre-application due 2027-01-15 (the full application closes 2027-02-15, in the text) | municipality, tribe | direct |
+| Nebraska Affordable Housing Trust Fund | `unknown`: the application dates sit in AmpliFund "Apply Now" buttons, not in the page's text | municipality, county, housing authority | direct |
+| Rural Community Recovery Program | `unknown`: "Application Period:" is empty on the page | municipality, county | pass_through (ARPA) |
+| Site and Building Development Fund | `unknown`: "Deadlines depend on funding availability" | municipality, county, nonprofit | direct |
+
+The "Sept. 15" rows keep that sentence in `closes_at_text` and store no date: a month and day with no year is not a date,
+and the page does not say which year. The window rule reads "July 1, 2026 to June 30, 2027" as open to its end.
+
+### Shared changes (`connectors/hand_list.py`, `connectors/text.py`)
+
+Each change was measured on its own: the database restored from `gh-pages` (7,734 stored records) re-normalized through
+`scripts/measure_tagger.py` before and after, and the 116 fixture records of every other agency-page connector (Vermont,
+Connecticut, North Dakota, Kentucky, Missouri) compared by `record_hash`. **Every change: 0 tag moves, 0 hash moves, 116 of
+116 fixtures identical.**
+
+- `DELAY_S` is a class attribute (read as `self.DELAY_S` in `fetch`), so an agency whose robots ask for a longer delay sets
+  its own (DED: 3 s). Default unchanged.
+- `NOT_DESIGNATED_RE`, cut before tagging: CDBG's "Every Nebraska county or incorporated municipality not designated as a
+  CDBG Entitlement Community is eligible to apply" lost the whole sentence to the negation guard. The stored text keeps the
+  carve-out; the four entitlement cities (Lincoln, Omaha, Bellevue, Grand Island) are named in the next sentence and are not
+  tagged.
+- `APPLICANT_SENTENCE_RE`: a sentence that names a kind of local government and ends on "are eligible" (SBDF's "Local
+  governments and Nebraska nonprofits are eligible.").
+- `text.py`: "local and governmental subdivisions" tags municipality and county (NAHTF's first applicant), beside "political
+  subdivisions".
+- `DUE_RE` reads "Closes:" and "Close Date:", `OPENS_RE` reads "Period Opens" and "Open Date", and `opening()` takes the date
+  between the opening word and the deadline word when one sentence holds both ("Opens: 1/1/2027 ... Closes: 1/15/2027").
+- `deadline()` tries a date after the deadline word before one before it. Without it CCCFF's closing date was its opening
+  date (the opening comes first in the sentence).
+
+### Scope calls (Saj to overrule; each is one line in `PAGES`)
+
+- **In (five pages, ten records):** the pages that name local governments as applicants: CDBG, CCCFF, NAHTF, RCRP, SBDF.
+- **Out, applicants are nonprofits, developers or CHDOs:** HOME, the Housing Trust Fund, the Rural Workforce Housing Fund and
+  the Middle Income Workforce Housing Fund. The Housing Trust Fund also lists public housing authorities; with NIFA's
+  `ClaudeBot` disallow (above) its CRANE category is NIFA's to describe.
+- **Out, not a program that takes applications:** the Municipal Inland Port Authority Act (a statute that lets towns create
+  authorities; its money is an SBDF subaccount, already read through SBDF), CDAA, Enterprise Zones, EDCC, LCC, LB840.
+- **Out, one-time ARPA pages that accept "public and private entities" with no local government named:** Multi-Purpose
+  Community Facilities (closed 2023-12-22), QCT Recovery, EDA Tourism, RDI (nonprofits and community colleges). RCRP is in
+  because it names political subdivisions.
+- **RCRP is `pass_through`:** its page says it is established "pursuant to the American Rescue Plan Act of 2021 (ARPA)".
+
+### Gaps
+
+- NAHTF's and RCRP's application windows are not in the page text (AmpliFund buttons and an empty paragraph), and AmpliFund has
+  no public list (12.2): both stay `unknown` until DED prints dates.
+- CDBG's "Application Deadline: Sept. 15" rows stay `unknown` year-round by this rule. If Saj prefers "the next September 15",
+  that is one rule, and a guess.
+- The CDBG page's "Announcements" and "Recent Updates" blocks follow every CDBG record as shared text; none carries a date the
+  reader takes, checked on the 2026-11-14 page.
+
+## Decisions on the way in
 
 1. **"Sept. 15" has no year.** Four of CDBG's six opportunities state a deadline with no year. The status rule is "what the source
    says on the run date": a date with no year is not a date, so those rows are `unknown` with the sentence kept, not a guess
