@@ -113,6 +113,10 @@ CONNECTOR_LABEL = {
     "ne_ded": "Nebraska Department of Economic Development",
     "ne_dwee": "Nebraska Department of Water, Energy, and Environment",
     "ne_dot": "Nebraska Department of Transportation",
+    "ar_anrd": "Arkansas Department of Agriculture (Natural Resources Division)",
+    "ar_adem": "Arkansas Division of Emergency Management",
+    "ar_ooo": "Arkansas Office of Outdoor Recreation",
+    "ar_aedc": "Arkansas Economic Development Commission",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
