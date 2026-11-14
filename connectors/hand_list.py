@@ -185,6 +185,8 @@ class HandListConnector:
     AGENCY_CODE: str
     JURISDICTION: str
     PAGES: dict[str, Any] = {}
+    # Seconds between GETs; an agency whose robots.txt asks for a longer `Crawl-delay` (Nebraska DED: 3) sets its own.
+    DELAY_S: float = DELAY_S
 
     # The default status table (MDOT's): a round sentence is picked in this order and judged by these.
     OPEN_RE = re.compile(r"\b(?:now )?accepting\b[^.]*\bapplications\b|\bapplications?\b[^.]*\b(?:are|is|will be|now) (?:open|accepted)\b", re.I)
@@ -229,7 +231,7 @@ class HandListConnector:
                 try:
                     for url in self.urls_for(slug, spec):
                         if not first:
-                            time.sleep(DELAY_S)
+                            time.sleep(self.DELAY_S)
                         first = False
                         pages.append(self.parse_page(get(c, url)))
                 except httpx.HTTPError:
@@ -311,13 +313,19 @@ _ABBR_RE = re.compile(r"\b(Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec)\.?(
 # ("Through December 4, 2026, the Department is currently accepting applications"), never a grant term's "through".
 # Missouri State Parks (12.6f): "must be postmarked on or before Nov. 13, 2026" and "must be submitted to the Division ... by
 # June 30, 2027" (the second needs an application in its sentence, like "submitted by").
-DUE_RE = re.compile(r"\b(?:due|deadline|submitted by|postmarked)\b|\bsubmitted\s+to\b[^.]{0,80}?\bby\b|\bthrough\b(?=[^.]*\baccepting\b)", re.I)
+DUE_RE = re.compile(r"\b(?:due|deadline|submitted by|postmarked)\b|\bsubmitted\s+to\b[^.]{0,80}?\bby\b|\bthrough\b(?=[^.]*\baccepting\b)"
+                    # Nebraska DED (12.6g): CCCFF's "Pre-Application Period Closes: 1/15/2027", HOME's "Close Date: 6/1/2026"
+                    r"|\bcloses?\s*:|\bclose date\b", re.I)
 NOT_DEADLINE_RE = re.compile(r"\b(?:closeout|close-out|report(?:s|ing)?|grant term|implementation period|reimbursement)\b", re.I)
-OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b", re.I)
+OPENS_RE = re.compile(r"\bapplications?\s+opens?\b|\bpre-applications?\s+open\b|\bopen(?:s)?\s+(?:on|by)\b"
+                     # Nebraska DED (12.6g): "Pre-Application Period Opens: 1/1/2027", "Open Date: 10/27/2025"
+                     r"|\bperiod\s+opens?\b|\bopen date\b", re.I)
 AGENCY_OPEN_RE = re.compile(r"\b(?:is|are)\s+now\s+open\b|\bnow\s+accepting\b|\baccepting\s+applications\b"
                             r"|\b(?:is|are)\s+(?:now\s+)?being\s+accepted\b"   # Kentucky ARC: "Pre-applications ... are being accepted"
                             r"|\b(?:is|are)\s+currently\s+open\b"   # Missouri DED (12.6e): "The Emergency Cycle is currently open."
-                            r"|\bapplication period is open\b", re.I)   # Missouri DNR's banner heading on every program page
+                            r"|\bapplication period is open\b"   # Missouri DNR's banner heading on every program page
+                            # Nebraska DWEE (12.6g): the energy pages' labelled status line, "Status: Program open."
+                            r"|\bstatus:\s*(?:program\s+)?open\b", re.I)
 AGENCY_CLOSED_RE = re.compile(r"\b(?:is|are)\s+(?:now\s+|currently\s+)?closed\b|\bclosed\s+for\s+applications\b|\bno\s+longer\s+accepting\b"
                               # Missouri State Parks (12.6f): "We are not accepting applications for ... grants at this time."
                               r"|\bnot\s+(?:currently\s+)?accepting\s+applications\b", re.I)
@@ -335,7 +343,10 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   # Kentucky (12.6d): KIA's bare "Eligibility:" label over the loan fund's conditions.
                                   r"|^eligibility:?$"
                                   # Missouri (12.6e): DED's "Do I Qualify?" tab is its eligibility section.
-                                  r"|^do i qualify\??$", re.I)
+                                  r"|^do i qualify\??$"
+                                  # Nebraska DWEE (12.6g): "Who's Eligible" heads the waste pages' answer, "What communities are
+                                  # considered for these grants?" the drinking water planning grants'.
+                                  r"|\bwho['\u2019]s eligible\b|\bwhat communities are considered\b", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to (?:apply|submit)\b"
@@ -360,7 +371,13 @@ APPLICANT_SENTENCE_RE = re.compile(
     # Missouri State Parks (12.6f): LWCF's "Grants can be awarded to any local government, city, county or public school district."
     r"|\bgrants?\s+can be awarded to\b"
     # Missouri (12.6e): DNR's "Eligible recipients include the following:" over the list of who may apply (EECBG, Energy Loans).
-    r"|\beligible recipients\b", re.I)
+    r"|\beligible recipients\b"
+    # Nebraska DED (12.6g): SBDF's "Local governments and Nebraska nonprofits are eligible." (a sentence that names a kind of
+    # local government and ends on "are eligible", no "to apply" after it).
+    r"|\b(?:governments?|municipalit(?:y|ies)|cities|towns|villages|count(?:y|ies))\b[^.]*\b(?:is|are) eligible\s*\.?\s*$"
+    # Nebraska DWEE (12.6g): Section 319's "Funding is distributed to local governments, educational institutions, ..." and
+    # the school energy loans' "K-12 public schools can now apply for low-interest loans".
+    r"|\b(?:funds?|funding|grants?)\b[^.]*\bdistributed to\b|\bcan now apply\b", re.I)
 SHORT_ITEM = 160
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
@@ -380,6 +397,10 @@ BENEFICIARY_RE = re.compile(r"\bprovide\b[^.;]*?\bto (?:a group of )?(?:househol
 # "governmental organizations other than state agencies are eligible" (Missouri scrap tire grants) excludes the state; it
 # does not name it.
 OTHER_THAN_STATE_RE = re.compile(r"\bother than (?:the )?state\b[^.;,]*", re.I)
+# "Every Nebraska county or incorporated municipality not designated as a CDBG Entitlement Community is eligible to
+# apply" (Nebraska DED, 12.6g): the carve-out defines the applicants and its "not" would drop the whole line. Cut
+# before tagging; the stored text keeps it.
+NOT_DESIGNATED_RE = re.compile(r"\bnot designated as\b[^.;]*?(?=\s+(?:is|are)\b|[.;]|$)", re.I)
 # "Non-profits and private sector entities may partner with an eligible applicant" (Kentucky CMAQ): a partner, not an
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
@@ -389,7 +410,7 @@ MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
 
 def clause_cut(line: str) -> str:
     """The line with the clauses that name a beneficiary, or define an applicant by what it is not, cut before tagging."""
-    return OTHER_THAN_STATE_RE.sub("", BENEFICIARY_RE.sub("", NOT_FEDERAL_RE.sub("", ON_BEHALF_RE.sub("", line))))
+    return NOT_DESIGNATED_RE.sub("", OTHER_THAN_STATE_RE.sub("", BENEFICIARY_RE.sub("", NOT_FEDERAL_RE.sub("", ON_BEHALF_RE.sub("", line)))))
 
 
 def all_sentences(blocks: Blocks) -> list[str]:
@@ -432,7 +453,9 @@ def deadline(sents: list[str]) -> tuple[str | None, date | None]:
         for due in DUE_RE.finditer(s):
             if due.group(0).lower().startswith("submitted") and not APPLICATION_RE.search(s):
                 continue
-            for m in AGENCY_DATE_RE.finditer(s):
+            # a date after the word first ("Opens: 1/1/2027 ... Closes: 1/15/2027" is due the 15th), then one before it
+            dates = sorted(AGENCY_DATE_RE.finditer(s), key=lambda m: m.start() < due.end())
+            for m in dates:
                 gap = m.start() - due.end() if m.start() >= due.end() else due.start() - m.end()
                 d = _date(m.group(0)) if gap <= NEAR_CHARS else None
                 if d:
@@ -443,10 +466,17 @@ def deadline(sents: list[str]) -> tuple[str | None, date | None]:
 
 def opening(sents: list[str]) -> date | None:
     for s in sents:
-        if OPENS_RE.search(s) and not DUE_RE.search(s):
+        m = OPENS_RE.search(s)
+        if not m:
+            continue
+        if not DUE_RE.search(s):
             d = first_date(s)
-            if d:
-                return d
+        else:
+            # one sentence that gives both ("Opens: 1/1/2027 8:00 AM (CST) Closes: 1/15/2027"): the date between the two words
+            due = DUE_RE.search(s, m.end())
+            d = first_date(s[m.end(): due.start() if due else len(s)])
+        if d:
+            return d
     window = application_range(sents)
     return window[1] if window else None
 
