@@ -27,7 +27,9 @@ storefront is walled. So every record would be `unknown` ("Status not confirmed"
 
 ## Scope (Saj, 2026-11-17: build State Parks), one record per program page
 
-Each a line in `connectors/az_parks.py`'s `PAGES`: LWCF (`/lwcf-grants`), Competitive LWCF, ORLP/RARI
+Surveyed: eight program pages. Built: five. **Left out while they state "Available Funds: $0 (Arizona State Parks and Trails
+did not receive any additional FY27 ... funds ...)"**: SLIF and both Heritage Fund pages (the Missouri funds-exhausted rule;
+commented lines in `PAGES`, restored when the FY28 pages name an amount). The eight: LWCF (`/lwcf-grants`), Competitive LWCF, ORLP/RARI
 (`/competitive-LWCF-grants`; NPS's national competition, in as Missouri's ORLP is), OHV (`/off-highway-vehicle-fund-grants`),
 RTP (`/recreational-trails-program-grants`), SLIF (`/state-lake-improvement-fund-grants`), the Heritage Fund
 (`/heritage-fund-grants`), Historic Preservation Heritage Grants (`/heritage-fund-historic-preservation-grants`) and the
@@ -61,3 +63,32 @@ li  <b>Eligible Projects:</b> Trail construction/maintenance, trail facilities (
 p   Have questions about eligibility or the application process? Consult this helpful FAQ document ...   (dropped)
 h2  Start Here Before You Apply   (the read stops)
 ```
+
+## Implemented (2026-11-17)
+
+`connectors/az_parks.py`, the reader of its own (title from the page's last `h1`, since two pages open with a question as
+their first `h2`; the read also stops at Route 66's "Frequently Asked Questions"). `scripts/probe_arizona.py` saved the
+fixtures. First live run on a copy of the restored database: **5 added, 0 errors**; second run **0 changed**.
+
+| Record | Status on 2026-11-17 | Applicants tagged | Source |
+|---|---|---|---|
+| LWCF Grants | unknown (no round stated) | municipality, county, tribe | pass_through (the hub's sentence) |
+| Competitive LWCF Grants (ORLP/RARI) | unknown: "typically in June and closing in October" (kept, no year) | municipality, county, tribe, state, special district | pass_through (NPS) |
+| Off Highway Vehicle Fund Grants | unknown | municipality, county, state, nonprofit | direct (the state OHV fund) |
+| Recreational Trails Program (RTP) Grants | unknown | municipality, county, state, tribe, nonprofit | pass_through (FHWA) |
+| Route 66 Historic Revitalization Grant | unknown: "Pre-Application due Friday, November 6, 2026" (past; final applications due 2026-11-23, but only after a pre-application) | municipality, county, tribe, nonprofit, business | pass_through (NPS's Paul Bruhn grant) |
+
+The Arizona page: 0 open, 4 under "Status not confirmed", Route 66 under "Closed recently". No script errors, no sideways
+scroll at 390px, light and dark.
+
+**Shared rule** (`connectors/text.py`): "Local" inside a list that ends in "Governments" tags municipality and county (RTP's
+"Federal, State, Local, County, and Tribal Governments"). Measured: 17 tag moves of 7,796 stored records, all closed
+California CDFA rounds that say "local, state, and federal government entities" (correct readings), 0 other hash moves; 1 of
+212 fixture records (RTP). Kept at Saj's word.
+
+### Gaps and follow-ups
+
+- SLIF and both Heritage Fund pages: restore their `PAGES` lines when the FY28 pages name an amount.
+- Round dates live in the WebGrants storefront (walled): a page that never dates its round stays `unknown`.
+- Housing (CDBG), ADOT (TA, safety), DEMA (mitigation) and Commerce are Arizona's municipal core and are all walled; WIFA
+  disallows `ClaudeBot`. Reopen only if a runner probe gets through or the state gives permission.
