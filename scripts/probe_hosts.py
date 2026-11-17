@@ -57,6 +57,11 @@ HOSTS: dict[str, tuple[str, str]] = {
     "AZ-DEMA": ("Emergency and Military Affairs (Cloudflare challenge)", "https://dema.az.gov/"),
     "AZ-ACA": ("Commerce Authority (Cloudflare challenge)", "https://www.azcommerce.com/"),
     "AZ-PARKS": ("State Parks' WebGrants storefront (Cloudflare challenge)", "https://www.azparkgrants.com/storefrontFOList.do"),
+    # 12.8 (2026-11-17), the pages the first MN/NM probe pointed at: Minnesota's listing (the find section links it; a
+    # second mn.gov request answered the Radware captcha on the runner too), DFA's Grant Search Dashboard and LGD's page
+    "MN-FIND": ("Find a Grant Opportunity (the listing)", "https://mn.gov/grants/find/find-grants.jsp"),
+    "NM-GS": ("DFA Grant Search Dashboard", "https://platform.dfa.nm.gov/grant-search.html"),
+    "NM-LGD": ("DFA Local Government Division grants page", "https://www.nmdfa.state.nm.us/local-government/grants/"),
 }
 
 # state -> further URLs on the same host, probed after the first
