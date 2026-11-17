@@ -47,6 +47,12 @@ HOSTS: dict[str, tuple[str, str]] = {
     "FL": ("FloridaCommerce (Azure WAF 403)", "https://floridajobs.org/"),
     "VT": ("eGrants (reset through the proxy)", "https://egrants.vermont.gov/"),
     "TN": ("tn.gov agency pages (AWS ELB 403 on some requests, 12.6j)", "https://www.tn.gov/ecd/grants.html"),
+    # Arizona's agencies (12.6j, 2026-11-17): Cloudflare challenges through the development proxy, robots included
+    "AZ-ADOH": ("Department of Housing (Cloudflare challenge)", "https://housing.az.gov/"),
+    "AZ-ADOT": ("ADOT (Cloudflare challenge)", "https://azdot.gov/"),
+    "AZ-DEMA": ("Emergency and Military Affairs (Cloudflare challenge)", "https://dema.az.gov/"),
+    "AZ-ACA": ("Commerce Authority (Cloudflare challenge)", "https://www.azcommerce.com/"),
+    "AZ-PARKS": ("State Parks' WebGrants storefront (Cloudflare challenge)", "https://www.azparkgrants.com/storefrontFOList.do"),
 }
 
 # state -> further URLs on the same host, probed after the first
