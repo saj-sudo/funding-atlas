@@ -64,6 +64,11 @@ HOSTS: dict[str, tuple[str, str]] = {
     "NM-LGD": ("DFA Local Government Division grants page", "https://www.nmdfa.state.nm.us/local-government/grants/"),
     # the dashboard is a Kendo grid filled by script: where its data comes from, and whether it needs the CAPS session
     "NM-GSJS": ("DFA Grant Search Dashboard's script", "https://platform.dfa.nm.gov/js/grant-search.js"),
+    # the JSON the public dashboard reads (session.js lists grant-search and grant-profile as public pages; no token is
+    # sent when none is stored): one search page as the grid asks for it, and the form's metadata
+    "NM-API": ("DFA Grant Search Dashboard's data",
+               "https://platform.dfa.nm.gov/api/CAPS/SearchFundingOpportunities?page=1&pageSize=50"
+               "&sortField=lastUpdatedDate&sortDir=desc&excludeClosed=1"),
 }
 
 # state -> further URLs on the same host, probed after the first
@@ -73,6 +78,7 @@ EXTRA: dict[str, list[str]] = {
     "MN": ["https://mn.gov/grants/"],
     "NM": ["https://www.nmdfa.state.nm.us/wp-sitemap.xml", "https://www.nmdfa.state.nm.us/sitemap_index.xml"],
     "NM-GSJS": ["https://platform.dfa.nm.gov/js/session.js", "https://platform.dfa.nm.gov/js/utils.js"],
+    "NM-API": ["https://platform.dfa.nm.gov/api/CAPS/GetFundingNavigationFormMeta"],
     "TN": [
         "https://www.tn.gov/ecd/rural-development/cdbg.html",
         "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
