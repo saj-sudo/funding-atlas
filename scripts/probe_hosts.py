@@ -69,6 +69,9 @@ HOSTS: dict[str, tuple[str, str]] = {
     "NM-API": ("DFA Grant Search Dashboard's data",
                "https://platform.dfa.nm.gov/api/CAPS/SearchFundingOpportunities?page=1&pageSize=50"
                "&sortField=lastUpdatedDate&sortDir=desc&excludeClosed=1"),
+    "NM-ALL": ("DFA Grant Search Dashboard's data, every open row",
+               "https://platform.dfa.nm.gov/api/CAPS/SearchFundingOpportunities?page=1&pageSize=2000"
+               "&sortField=lastUpdatedDate&sortDir=desc&excludeClosed=1"),
 }
 
 # state -> further URLs on the same host, probed after the first
@@ -79,6 +82,9 @@ EXTRA: dict[str, list[str]] = {
     "NM": ["https://www.nmdfa.state.nm.us/wp-sitemap.xml", "https://www.nmdfa.state.nm.us/sitemap_index.xml"],
     "NM-GSJS": ["https://platform.dfa.nm.gov/js/session.js", "https://platform.dfa.nm.gov/js/utils.js"],
     "NM-API": ["https://platform.dfa.nm.gov/api/CAPS/GetFundingNavigationFormMeta"],
+    # the whole open set in one request (the grid's own call, a larger page), to count the rows New Mexico's agencies
+    # post (`agencyId`, a `source` other than grants.gov), and the featured list
+    "NM-ALL": ["https://platform.dfa.nm.gov/api/CAPS/GetFeaturedOpportunities"],
     "TN": [
         "https://www.tn.gov/ecd/rural-development/cdbg.html",
         "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
