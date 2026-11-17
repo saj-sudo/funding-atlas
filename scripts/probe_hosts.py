@@ -5,16 +5,19 @@ and ten hosts answered a 403, a bot challenge or a connection reset. The daily r
 range is the one that matters for a connector, so `.github/workflows/probe_hosts.yml` runs this script there on demand.
 Each URL and its host's robots.txt is fetched once with the connectors' own User-Agent; the script prints the status,
 the server header, the final URL after redirects and the first 300 bytes of the body, and never fails. It writes
-nothing. Results are read by a person and recorded in the census: a 200 moves the state to 12.8, a wall is blocked for
+nothing unless asked (`--save`). Results are read by a person and recorded in the census: a 200 moves the state to 12.8, a wall is blocked for
 good (the GOCPP rule).
 
 A state can carry further URLs (`EXTRA`), and `--tries N` fetches each URL N times, for a host that walls some requests
 and not others (Tennessee, 12.6j: an AWS load balancer answered 403 to about half the development proxy's requests).
-Each try prints the HTTP version beside the status.
+Each try prints the HTTP version beside the status. `--save DIR` also writes every body to `DIR/<state>-<n>.html` (and
+`<state>-robots.txt`), which the workflow uploads as an artifact, for a page whose markup decides a build (12.8: is
+Minnesota's search server-rendered, where does New Mexico DFA list grants).
 
   uv run python scripts/probe_hosts.py            # every host
   uv run python scripts/probe_hosts.py CO ME      # a few
   uv run python scripts/probe_hosts.py --tries 5 TN
+  uv run python scripts/probe_hosts.py --save probe-out MN NM
 """
 
 from __future__ import annotations
@@ -22,6 +25,7 @@ from __future__ import annotations
 import re
 import sys
 import time
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import httpx
@@ -57,6 +61,10 @@ HOSTS: dict[str, tuple[str, str]] = {
 
 # state -> further URLs on the same host, probed after the first
 EXTRA: dict[str, list[str]] = {
+    # 12.8 (2026-11-17): the landing page and the find page's markup; DFA's sitemap (WordPress core or Yoast), to find
+    # where it lists grants. Under a dozen requests a host (the Tennessee lesson).
+    "MN": ["https://mn.gov/grants/"],
+    "NM": ["https://www.nmdfa.state.nm.us/wp-sitemap.xml", "https://www.nmdfa.state.nm.us/sitemap_index.xml"],
     "TN": [
         "https://www.tn.gov/ecd/rural-development/cdbg.html",
         "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
@@ -87,28 +95,33 @@ def robots_url(url: str) -> str:
     return f"{parts.scheme}://{parts.netloc}/robots.txt"
 
 
-def describe(client: httpx.Client, url: str) -> str:
+def describe(client: httpx.Client, url: str, save: Path | None = None) -> str:
     try:
         resp = client.get(url)
     except httpx.HTTPError as e:
         return f"{type(e).__name__}: {str(e)[:120]}"
+    if save is not None:
+        save.parent.mkdir(parents=True, exist_ok=True)
+        save.write_text(resp.text, encoding="utf-8")
     body = re.sub(r"\s+", " ", resp.text[:4000]).strip()[:BODY_CHARS]
     server = resp.headers.get("server", "-")
     final = str(resp.url) if str(resp.url) != url else "-"
     return f"{resp.status_code} | {resp.http_version} | server={server} | final={final} | {body}"
 
 
-def parse_args(argv: list[str]) -> tuple[int, list[str]]:
-    tries, states, rest = 1, [], iter(argv)
+def parse_args(argv: list[str]) -> tuple[int, Path | None, list[str]]:
+    tries, save, states, rest = 1, None, [], iter(argv)
     for arg in rest:
         if arg == "--tries":
             tries = max(1, int(next(rest, "1")))
+        elif arg == "--save":
+            save = Path(next(rest, "probe-out"))
         else:
             states.append(arg.upper())
-    return tries, states
+    return tries, save, states
 
 
-def main(states: list[str], tries: int = 1) -> None:
+def main(states: list[str], tries: int = 1, save: Path | None = None) -> None:
     chosen = {s: HOSTS[s] for s in (states or HOSTS) if s in HOSTS}
     unknown = [s for s in states if s not in HOSTS]
     if unknown:
@@ -118,14 +131,14 @@ def main(states: list[str], tries: int = 1) -> None:
             if i:
                 time.sleep(DELAY_S)
             print(f"\n== {state}: {label}")
-            print(f"   robots: {describe(client, robots_url(url))}")
-            for page in [url, *EXTRA.get(state, [])]:
+            print(f"   robots: {describe(client, robots_url(url), save and save / f'{state}-robots.txt')}")
+            for k, page in enumerate([url, *EXTRA.get(state, [])]):
                 print(f"   {page}")
                 for n in range(tries):
                     time.sleep(DELAY_S)
-                    print(f"   page {n + 1}: {describe(client, page)}")
+                    print(f"   page {n + 1}: {describe(client, page, save and save / f'{state}-{k}-{n + 1}.html')}")
 
 
 if __name__ == "__main__":
-    tries, states = parse_args(sys.argv[1:])
-    main(states, tries)
+    tries, save, states = parse_args(sys.argv[1:])
+    main(states, tries, save)
