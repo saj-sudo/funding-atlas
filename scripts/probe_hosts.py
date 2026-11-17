@@ -116,8 +116,7 @@ def main(states: list[str], tries: int = 1) -> None:
             for page in [url, *EXTRA.get(state, [])]:
                 print(f"   {page}")
                 for n in range(tries):
-                    if n:
-                        time.sleep(DELAY_S)
+                    time.sleep(DELAY_S)
                     print(f"   page {n + 1}: {describe(client, page)}")
 
 
