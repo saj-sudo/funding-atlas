@@ -28,7 +28,7 @@ import httpx
 
 USER_AGENT = "funding-atlas/0.1 (+https://github.com/saj-sudo/funding-atlas)"
 TIMEOUT_S = 30.0
-DELAY_S = 1.0
+DELAY_S = 3.0  # the connectors' own pace on a host that may rate-limit (12.6j)
 BODY_CHARS = 300
 
 # state -> (what the census calls it, the index URL recorded there)
@@ -57,6 +57,21 @@ EXTRA: dict[str, list[str]] = {
         "https://www.tn.gov/tdot.html",
         "https://www.tn.gov/environment.html",
         "https://www.tn.gov/tema.html",
+        # the program pages a connector would read (all 403 through the development proxy after ~30 requests)
+        "https://www.tn.gov/ecd/community-development-block-grant/cdbg/cdbg-community-development-regular-round.html",
+        "https://www.tn.gov/ecd/rural-development/site-development.html",
+        "https://www.tn.gov/ecd/rural-development/threestar.html",
+        "https://www.tn.gov/ecd/rural-development/tennessee-main-street/downtown-improvement-grant-program.html",
+        "https://www.tn.gov/ecd/rural-development/historic-development-grant-program.html",
+        "https://www.tn.gov/environment/about-tdec/grants/recreation.html",
+        "https://www.tn.gov/environment/about-tdec/grants/water.html",
+        "https://www.tn.gov/environment/about-tdec/grants/materials-management.html",
+        "https://www.tn.gov/environment/about-tdec/grants/remediation.html",
+        "https://www.tn.gov/tdot/local-programs-community-investments/local-programs/tap.html",
+        "https://www.tn.gov/tdot/local-programs-community-investments/local-programs/funding-options.html",
+        "https://www.tn.gov/tdot/local-programs-community-investments/community-investments-office/bicycle-and-pedestrian-program.html",
+        "https://www.tn.gov/tema/assistance/assistance-for-local-governments.html",
+        "https://www.tn.gov/tema/ready-communities/grants/governor-s-response-and-recovery-fund.html",
     ],
 }
 
