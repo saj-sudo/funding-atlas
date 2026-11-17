@@ -12,6 +12,7 @@ from connectors import (
     ar_aedc,
     ar_anrd,
     ar_ooo,
+    az_parks,
     ca_grants,
     ct_deep,
     ct_demhs,
@@ -136,6 +137,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "sd_goed": sd_goed,
     "sd_dot": sd_dot,
     "sd_danr": sd_danr,
+    "az_parks": az_parks,
 }
 
 
