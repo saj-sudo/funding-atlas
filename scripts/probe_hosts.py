@@ -8,8 +8,13 @@ the server header, the final URL after redirects and the first 300 bytes of the 
 nothing. Results are read by a person and recorded in the census: a 200 moves the state to 12.8, a wall is blocked for
 good (the GOCPP rule).
 
+A state can carry further URLs (`EXTRA`), and `--tries N` fetches each URL N times, for a host that walls some requests
+and not others (Tennessee, 12.6j: an AWS load balancer answered 403 to about half the development proxy's requests).
+Each try prints the HTTP version beside the status.
+
   uv run python scripts/probe_hosts.py            # every host
   uv run python scripts/probe_hosts.py CO ME      # a few
+  uv run python scripts/probe_hosts.py --tries 5 TN
 """
 
 from __future__ import annotations
@@ -41,6 +46,18 @@ HOSTS: dict[str, tuple[str, str]] = {
     "OK": ("OGX, Oklahoma Grant Exchange (reset through the proxy)", "https://ogx.ok.gov/"),
     "FL": ("FloridaCommerce (Azure WAF 403)", "https://floridajobs.org/"),
     "VT": ("eGrants (reset through the proxy)", "https://egrants.vermont.gov/"),
+    "TN": ("tn.gov agency pages (AWS ELB 403 on some requests, 12.6j)", "https://www.tn.gov/ecd/grants.html"),
+}
+
+# state -> further URLs on the same host, probed after the first
+EXTRA: dict[str, list[str]] = {
+    "TN": [
+        "https://www.tn.gov/ecd/rural-development/cdbg.html",
+        "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
+        "https://www.tn.gov/tdot.html",
+        "https://www.tn.gov/environment.html",
+        "https://www.tn.gov/tema.html",
+    ],
 }
 
 
@@ -57,10 +74,20 @@ def describe(client: httpx.Client, url: str) -> str:
     body = re.sub(r"\s+", " ", resp.text[:4000]).strip()[:BODY_CHARS]
     server = resp.headers.get("server", "-")
     final = str(resp.url) if str(resp.url) != url else "-"
-    return f"{resp.status_code} | server={server} | final={final} | {body}"
+    return f"{resp.status_code} | {resp.http_version} | server={server} | final={final} | {body}"
 
 
-def main(states: list[str]) -> None:
+def parse_args(argv: list[str]) -> tuple[int, list[str]]:
+    tries, states, rest = 1, [], iter(argv)
+    for arg in rest:
+        if arg == "--tries":
+            tries = max(1, int(next(rest, "1")))
+        else:
+            states.append(arg.upper())
+    return tries, states
+
+
+def main(states: list[str], tries: int = 1) -> None:
     chosen = {s: HOSTS[s] for s in (states or HOSTS) if s in HOSTS}
     unknown = [s for s in states if s not in HOSTS]
     if unknown:
@@ -70,10 +97,15 @@ def main(states: list[str]) -> None:
             if i:
                 time.sleep(DELAY_S)
             print(f"\n== {state}: {label}")
-            print(f"   {url}")
-            print(f"   page:   {describe(client, url)}")
             print(f"   robots: {describe(client, robots_url(url))}")
+            for page in [url, *EXTRA.get(state, [])]:
+                print(f"   {page}")
+                for n in range(tries):
+                    if n:
+                        time.sleep(DELAY_S)
+                    print(f"   page {n + 1}: {describe(client, page)}")
 
 
 if __name__ == "__main__":
-    main([s.upper() for s in sys.argv[1:]])
+    tries, states = parse_args(sys.argv[1:])
+    main(states, tries)
