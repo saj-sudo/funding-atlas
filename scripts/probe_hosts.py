@@ -62,6 +62,8 @@ HOSTS: dict[str, tuple[str, str]] = {
     "MN-FIND": ("Find a Grant Opportunity (the listing)", "https://mn.gov/grants/find/find-grants.jsp"),
     "NM-GS": ("DFA Grant Search Dashboard", "https://platform.dfa.nm.gov/grant-search.html"),
     "NM-LGD": ("DFA Local Government Division grants page", "https://www.nmdfa.state.nm.us/local-government/grants/"),
+    # the dashboard is a Kendo grid filled by script: where its data comes from, and whether it needs the CAPS session
+    "NM-GSJS": ("DFA Grant Search Dashboard's script", "https://platform.dfa.nm.gov/js/grant-search.js"),
 }
 
 # state -> further URLs on the same host, probed after the first
@@ -70,6 +72,7 @@ EXTRA: dict[str, list[str]] = {
     # where it lists grants. Under a dozen requests a host (the Tennessee lesson).
     "MN": ["https://mn.gov/grants/"],
     "NM": ["https://www.nmdfa.state.nm.us/wp-sitemap.xml", "https://www.nmdfa.state.nm.us/sitemap_index.xml"],
+    "NM-GSJS": ["https://platform.dfa.nm.gov/js/session.js", "https://platform.dfa.nm.gov/js/utils.js"],
     "TN": [
         "https://www.tn.gov/ecd/rural-development/cdbg.html",
         "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
