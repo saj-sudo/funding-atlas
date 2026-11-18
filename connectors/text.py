@@ -72,6 +72,10 @@ APPLICANT_KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     # local governments and ..." MDEM; "state, local, and Indian Tribal governments" Grants.gov). "State funds" and
     # "the State will" stay untagged: a comma and a government word must follow.
     (r"\bstate governments?\b|\bstate(?=,\s*(?:and\s+|or\s+)?(?:local|tribal|territorial|county|municipal)\b)", ("state",)),
+    # 12.6j: "Local" inside a list that ends in "Governments" ("Federal, State, Local, County, and Tribal Governments and
+    # Non-Profits", Arizona State Parks' RTP) is local governments; the same comma-and-government test as "State" above.
+    (r"\blocal(?=,\s*(?:and\s+|or\s+)?(?:county|tribal|state|municipal|territorial)\b[^.;:]{0,40}?\bgovernments?\b)",
+     ("municipality", "county")),
     # Special districts: the plain word, and Kentucky's statutory name for them (KRS 65A.010, "Special Purpose
     # Governmental Entities", written "SPGEs" on the DLG Portal).
     (r"\bspecial (?:purpose )?districts?\b", ("special_district",)),
