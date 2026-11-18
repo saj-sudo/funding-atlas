@@ -273,6 +273,12 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
 - **13.6 to 13.14** shipped 2026-11-14 (see Done). Follow-ups: tell connector-fix status changes from agency ones
   in the log (a `run` flag for a rules release), so the status-changes chart and the history strip can say which is
   which; per-program feeds for programs that leave every page (today a feed stops when the program is unlisted).
+- **13.18 Second review and redesign plan** (logged 2026-11-18, not scheduled): the live site read on a phone and a desktop
+  for structure and first screen (`docs/design/redesign_plan_2026-11.md`). "Civic" stays. Six sessions proposed, one
+  feature each: the brand surface (share image, icon, link-preview tags; needs no mockup), the index led by the state map
+  (takes in 13.5 and the index half of 13.4), the state page's controls in one row, topics as words, the about page for
+  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. **For Saj:** where these sit
+  against the connector queue.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -503,6 +509,7 @@ decide what gets built next.
 | 2026-11-17 | "Local" heading a list of governments tags municipality and county, kept although it moved 17 stored records (Saj) | Arizona RTP's "Federal, State, Local, County, and Tribal Governments"; the 17 are closed California CDFA rounds that say "local, state, and federal government entities", correct readings; 0 other hash moves, 1 fixture move | `connectors/text.py` |
 | 2026-11-17 | Minnesota stopped at 12.8: an agency state | `find-grants.jsp` holds no list in its HTML and lists grant-making agencies, not opportunities; a second request answered the Radware captcha on the runner; the New York stop rule | `docs/surveys/state_portals.md` |
 | 2026-11-17 | New Mexico's DFA Grant Search Dashboard is read through the JSON its public page calls, agency rows only | `session.js` names the search and profile pages public and sends no token without one; the Grants.gov copies (most of the 1,450 rows) are already read by `grants_gov`, so reading them again would double them | `docs/connectors/nm_dfa.md` |
+| 2026-11-18 | A second design review is recorded as a plan, not built: structure first, mockups before any change bigger than polish, "Civic" kept (Saj) | the first review fixed the phone fold; this one found the index does not direct a clerk and the state page puts about ten controls ahead of the first program; nothing ships until Saj picks from a mockup | `docs/design/redesign_plan_2026-11.md` |
 
 ## Open questions (do not resolve in code yet)
 
