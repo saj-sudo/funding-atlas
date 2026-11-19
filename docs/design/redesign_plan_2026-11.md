@@ -101,8 +101,10 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Stage | State | Link | Date |
 |---|---|---|---|
 | Second review of the live site | Done | this file | 2026-11-18 |
-| Mockup of sessions 2 to 5 | Not started. Funding Atlas is eighth in the order | | |
-| Saj picks, and slots the sessions against the connector queue | Waiting on the mockup | | |
+| Mockup of session 2, the index (one screen, today beside proposed, at Saj's word) | Done: map top on a phone 881px to 312px, page 7.0 to 3.3 phone screens; prototype only, `web/` unchanged | https://claude.ai/artifact/RyZbBVmhoV1ep7QFM8Rg64 | 2026-11-19 |
+| Saj picks session 2 (as shown, with changes, or keep today's; change log closed on the index or its own page; desktop side panel) | Waiting on Saj | | |
+| Mockup of sessions 3 to 5 (state page, topics, About) | Not started | | |
+| Saj slots the sessions against the connector queue | Waiting on the picks | | |
 | Session 1, brand surface (needs no mockup) | Not started | | |
 | Sessions 2 to 6 | Not started | | |
 
