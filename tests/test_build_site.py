@@ -268,6 +268,17 @@ def test_topics_are_words_with_their_own_colours(conn, tmp_path):
         assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
 
 
+def test_about_page_serves_the_clerk_first(conn, tmp_path):
+    """Redesign session 5 (13.22): the two clerk charts lead, the methods charts sit under their own heading, and the
+    captions are plain words: view names are in one Data and code note."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    at = [page.index(s) for s in ('id="c1"', 'id="c5"', "For researchers", 'id="c2"', 'id="c3"', 'id="c4"', "Data and code")]
+    assert at == sorted(at)
+    assert not [s for s in re.findall(r'<p class="src">(.*?)</p>', page, re.S) if "<code>v_" in s]
+    assert "<code>v_navigator_program</code>" in page
+
+
 def test_index_leads_with_the_map(conn, tmp_path):
     """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]

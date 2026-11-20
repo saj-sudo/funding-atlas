@@ -36,32 +36,7 @@
     <p class="sub" id="c1-sub"></p>
     <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span></div>
     <div class="chart-scroll"><svg id="c1" role="img" aria-labelledby="c1-sub"></svg></div>
-    <p class="src">Programs open or announced to local governments with a stated deadline (<code>v_navigator_program</code>). Weeks start today.</p>
-  </figure>
-
-  <figure class="chart">
-    <h2>When state deadlines have fallen</h2>
-    <p class="sub">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. Darker is a larger share of that row. It describes the past; it predicts nothing.</p>
-    <div class="chart-scroll"><svg id="c2" role="img" aria-label="Deadline months by state"></svg></div>
-    <div class="legend" id="c2-leg"></div>
-    <p class="src"><code>v_stats_deadline_month</code>. States with 8 or more such deadlines have their own row; all states are in the last row.</p>
-  </figure>
-
-  <figure class="chart">
-    <h2>What sources state</h2>
-    <p class="sub">Share of state programs open to local governments whose source states a status, a deadline (or rolling), and an amount, by state; federal notices open now for comparison. Structured portals state the basics; agency pages often do not.</p>
-    <div class="legend"><span><i class="sw s1"></i>States a status</span><span><i class="sw s2"></i>States a deadline</span><span><i class="sw s3"></i>States an amount</span></div>
-    <div class="chart-scroll"><svg id="c3" role="img" aria-label="Share of programs stating status, deadline and amount"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c3-table"></div></details>
-    <p class="src"><code>v_stats_stated</code>. States with 7 or more such programs.</p>
-  </figure>
-
-  <figure class="chart">
-    <h2>Status changes the registry has logged</h2>
-    <p class="sub" id="c4-sub"></p>
-    <div class="legend"><span><i class="sw fed"></i>The source changed</span><span><i class="sw code"></i>First read after a change to the registry's code</span></div>
-    <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
-    <p class="src"><code>v_stats_status_flips</code> with <code>v_change_cause</code>: programs a local government could apply to, every source. A change is marked when a commit touching that connector's reading code reached main between its run and the run before (from git history); it may still be the agency's.</p>
+    <p class="src">Programs open or announced to local governments with a stated deadline. Weeks start today.</p>
   </figure>
 
   <figure class="chart">
@@ -71,6 +46,46 @@
     <div class="chart-scroll"><svg id="c5" role="img" aria-labelledby="c5-sub"></svg></div>
     <p class="src">Open or announced programs with a stated maximum of $1,000 or more. Log scale: each gridline is ten times the last.</p>
   </figure>
+  <section class="for-research" aria-labelledby="research-h">
+    <h2 id="research-h">For researchers</h2>
+    <p class="muted">How the sources behave: when deadlines fall, what they state, and what the change log has seen.</p>
+  </section>
+
+  <figure class="chart">
+    <h2>When state deadlines have fallen</h2>
+    <p class="sub">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. Darker is a larger share of that row. It describes the past; it predicts nothing.</p>
+    <div class="chart-scroll"><svg id="c2" role="img" aria-label="Deadline months by state"></svg></div>
+    <div class="legend" id="c2-leg"></div>
+    <p class="src">States with 8 or more such deadlines have their own row; all states are in the last row.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>What sources state</h2>
+    <p class="sub">Share of state programs open to local governments whose source states a status, a deadline (or rolling), and an amount, by state; federal notices open now for comparison. Structured portals state the basics; agency pages often do not.</p>
+    <div class="legend"><span><i class="sw s1"></i>States a status</span><span><i class="sw s2"></i>States a deadline</span><span><i class="sw s3"></i>States an amount</span></div>
+    <div class="chart-scroll"><svg id="c3" role="img" aria-label="Share of programs stating status, deadline and amount"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c3-table"></div></details>
+    <p class="src">States with 7 or more such programs.</p>
+  </figure>
+
+  <figure class="chart">
+    <h2>Status changes the registry has logged</h2>
+    <p class="sub" id="c4-sub"></p>
+    <div class="legend"><span><i class="sw fed"></i>The source changed</span><span><i class="sw code"></i>First read after a change to the registry's code</span></div>
+    <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
+    <p class="src">Programs a local government could apply to, every source. A change is marked when the registry's own reading code for that source changed between its run and the run before (from git history); it may still be the agency's.</p>
+  </figure>
+
+  <section class="data-code" aria-labelledby="data-code-h">
+    <h2 id="data-code-h">Data and code</h2>
+    <p class="muted">Each chart is a count from one SQL view on the published database. The views are in <code>db/migrations/0009_navigator_stats.sql</code> and <code>0010</code> (change causes).</p>
+    <ul>
+      <li>Deadlines over the next 26 weeks, maximum awards: <code>v_navigator_program</code></li>
+      <li>When state deadlines have fallen: <code>v_stats_deadline_month</code></li>
+      <li>What sources state: <code>v_stats_stated</code></li>
+      <li>Status changes: <code>v_stats_status_flips</code> with <code>v_change_cause</code></li>
+    </ul>
+  </section>
 </main>
 
 <footer class="site">

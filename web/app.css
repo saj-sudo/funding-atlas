@@ -465,6 +465,11 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .numbers { margin-top: 32px; }
 .numbers ul { margin: 10px 0 0; padding-left: 1.1em; display: grid; gap: 6px; max-width: 70ch; }
 .numbers .num { font-weight: 700; color: var(--ink); }
+.for-research { margin: 48px 0 8px; display: grid; gap: 6px; }
+.for-research h2 { font: 700 1.6rem/1.2 var(--f-display); }
+.data-code { margin-top: 40px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: grid; gap: 8px; max-width: 80ch; font-size: .92rem; }
+.data-code h2 { font-size: 1.05rem; }
+.data-code ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }
 .index-about { margin-top: 32px; display: grid; gap: 8px; max-width: 75ch; }
 .changes-fold { margin-top: 32px; }
 .changes-fold summary { cursor: pointer; display: list-item; padding: 10px 0; font-weight: 700; font-size: 1.05rem; color: var(--accent); }

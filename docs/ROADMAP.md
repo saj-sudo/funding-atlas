@@ -72,13 +72,15 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 13.19 | The index leads with the map (redesign session 2, Saj's pick from the mockup) | 2026-11-20 | the headline, one instruction ("Pick your state. Your state's own programs come first.") and the state map; the four number cards as four sentences under it; the coverage box, legend, note and state list beside the map on desktop; the national change log folded behind one line that counts the last 7 days over every logged change (`changes_within`, 136 on the 2026-11-20 build; the fold lists the newest 20 and says so); the old lede moved unchanged into "What this is"; brand weight 750 to 700. Measured on the restored database: map top on a 390 by 844 phone 881px to 312px (the whole map by 571px), on a 1440 by 900 desktop 706px to 253px (whole map by 804px); the index 7.0 to 3.3 phone screens. Takes in 13.5 and the index half of 13.4. 1,143 tests | `docs/design/redesign_plan_2026-11.md` |
 | 13.20 | The state page reaches the first program sooner (redesign session 3, Saj's picks from the mockup) | 2026-11-20 | the week box as one sentence with "N more this week" after it, at every width; the default filter said once in words ("Likely fits only: 101 of 155. Show all 155") and "Likely fit" off each card while it is on ("May fit" still shows); on phones search, star and Filter in one row and Sort in the filter tray (kept in step with the toolbar's); the section heading "Open or announced in Maryland"; the 26-week deadline chart off the state page (About and the Timeline view carry it); star and close buttons 44px. Maryland on a 390 by 844 phone: first title 652px to 527px, the whole first card on the first screen (ends at 768px); desktop 807px to 635px. 1,144 tests | `docs/design/redesign_plan_2026-11.md` |
 | 13.21 | Topics as words, headings above card titles (redesign session 4, Saj's pick) | 2026-11-20 | the lettered circle under each date and the "Topics:" key row replaced by the word with a coloured dot on the card's agency line (Environment, Infrastructure, Community; "other or not stated" shows nothing); topic colours as their own tokens (`--topic-env`, `--topic-inf`, `--topic-com`, light and dark) so the chart series colours mean one thing; the "Closes within 7 days" label in 16px bold sentence case, not 12.5px grey capitals; section headings 21.6px on a phone (were 19.2px) against 18.2px card titles; the last 800 weights to 700. Maryland on a phone: first title 527px to 561px from the larger headings, the whole first card still on the first screen (ends at 802px); desktop 635px to 611px. 1,145 tests | `web/app.js` (`TOPIC_LINES`) |
+| 13.22 | About the data for two readers (redesign session 5, Saj's pick) | 2026-11-20 | the clerk's two charts first (deadlines over the next 26 weeks, maximum awards), then "For researchers" over when state deadlines have fallen, what sources state and status changes; chart captions in plain words, the view names moved to one "Data and code" note at the end. "Maximum awards" now starts at 781px on a desktop (was 2,852px). 1,146 tests | `web/about.html` |
 
 ## Next
 
 ### Start here (updated 2026-11-17, 12.6j and 12.8a)
 
-**13.19 on this branch (2026-11-20): the index leads with the map** (redesign session 2, Saj's pick from the mockup). The
-redesign track's next stage is the mockup of sessions 3 to 5 (state page, topics, About); the connector queue below is unchanged.
+**13.19 to 13.22 on this branch (2026-11-20): redesign sessions 2 to 5** (the index leads with the map; the state page reaches
+the first program sooner; topics as words; About for two readers), each Saj's pick from a mockup. Left on that track: session 1
+(brand surface, no mockup needed) and session 6 (theme switch). The connector queue below is unchanged.
 
 **12.6j on this branch (2026-11-17): Tennessee walled, Arizona State Parks built.** Tennessee: every `www.tn.gov` request
 answered 403 from an AWS load balancer on a fresh Actions runner after a survey of about sixty requests (the first runner
@@ -283,8 +285,9 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
   for structure and first screen (`docs/design/redesign_plan_2026-11.md`). "Civic" stays. Six sessions proposed, one
   feature each: the brand surface (share image, icon, link-preview tags; needs no mockup), the index led by the state map
   (takes in 13.5 and the index half of 13.4), the state page's controls in one row, topics as words, the about page for
-  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. Session 2 shipped as 13.19
-  (2026-11-20); the mockup of sessions 3 to 5 is next on this track. **For Saj:** where these sit against the connector queue.
+  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. Sessions 2 to 5 shipped as 13.19 to
+  13.22 (2026-11-20). Left: session 1, the brand surface (share image, icon, link-preview tags; needs no mockup), and
+  session 6, the theme switch. **For Saj:** where those two sit against the connector queue.
 
 ### 10. Data cleanup (small, rides any session)
 

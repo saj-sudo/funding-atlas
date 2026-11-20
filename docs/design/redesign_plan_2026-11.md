@@ -106,12 +106,13 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Saj picks session 2 | Done: as shown, the change log folded on the index, the desktop side panel | roadmap decisions log | 2026-11-20 |
 | Mockup of sessions 3 to 5 (state page, topics, About) | Done: Maryland's first title on a phone 652px to 544px (whole first card on screen; the 400px target not met, variant B 492px), desktop 807px to 580px; About's clerk charts first, no view names in captions; prototypes only, `web/` unchanged | https://claude.ai/artifact/PEQ57ogx9bL3fDErLFQVUA | 2026-11-20 |
 | Saj picks sessions 3 to 5 | Done: as mocked, not variant B; "Likely fit" off cards; "Other" shows nothing; deadlines ahead and maximum awards are the clerk's charts; the phone measure is the whole first card; all three built now, one commit each | roadmap decisions log | 2026-11-20 |
-| Saj slots sessions 3 to 6 against the connector queue | Waiting on the picks | | |
+| Saj slots sessions 1 and 6 against the connector queue | Waiting on Saj | | |
 | Session 1, brand surface (needs no mockup) | Not started | | |
 | Session 2, the index leads with the map | Done (13.19): map top on a phone 881px to 312px, desktop 706px to 253px, index 7.0 to 3.3 phone screens | roadmap Done, 13.19 | 2026-11-20 |
 | Session 3, the state page reaches the first program sooner | Done (13.20): first title on a phone 652px to 527px, whole first card on screen; desktop 807px to 635px | roadmap Done, 13.20 | 2026-11-20 |
 | Session 4, topics as words | Done (13.21): no lettered badge or key row, topic tokens of their own, headings 21.6px against 18.2px card titles on a phone | roadmap Done, 13.21 | 2026-11-20 |
-| Sessions 5 and 6 | Not started | | |
+| Session 5, About for two readers | Done (13.22): clerk charts first, "For researchers", plain captions, one "Data and code" note; "Maximum awards" at 781px (was 2,852px) | roadmap Done, 13.22 | 2026-11-20 |
+| Session 6, a theme switch | Not started | | |
 
 ## Starting a session on this work
 
