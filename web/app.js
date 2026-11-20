@@ -568,7 +568,12 @@
     var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
     var brief = [];
     if (nWeekState + nWeekFed) {
-      brief.push(['week', (cov.state ? plural(nWeekState, S.name + ' program', S.name + ' programs') + ' and ' : '') + plural(nWeekFed, 'federal notice', 'federal notices') + ' close in the next 7 days.']);
+      // Only the parts that are not zero, the verb agreeing with the total; a state with sources and none closing says so.
+      var weekParts = [];
+      if (cov.state && nWeekState) weekParts.push(plural(nWeekState, S.name + ' program', S.name + ' programs'));
+      if (nWeekFed) weekParts.push(plural(nWeekFed, 'federal notice', 'federal notices'));
+      brief.push(['week', weekParts.join(' and ') + (nWeekState + nWeekFed === 1 ? ' closes' : ' close') + ' in the next 7 days' +
+        (cov.state && !nWeekState ? '; no ' + S.name + ' program does.' : '.')]);
     } else {
       brief.push([nClosing ? 'closing' : null, 'Nothing on this page closes in the next 7 days' + (nClosing ? '; ' + nClosing + ' close within ' + R.closing_days + '.' : '.')]);
     }
