@@ -44,6 +44,15 @@ WEB = Path(__file__).resolve().parents[1] / "web"
 DEFAULT_OUT = Path("site")
 SITE_URL = "https://saj-sudo.github.io/funding-atlas/"
 REPO_URL = "https://github.com/saj-sudo/funding-atlas"
+SHARE_IMAGE = SITE_URL + "share.png"   # web/share.png, 1200 by 630, from docs/design/share_image.html (13.23)
+# The browser-tab icon is the brand's nine-square mark in the palette (accent, likely, possible), as .brand .mark draws
+# it; URL-encoded SVG, never base64, so the pages stay self-contained and readable.
+_MARK = ["#1f3f8f", "#17663a", "#1f3f8f", "#8a5a00", "#1f3f8f", "#17663a", "#17663a", "#8a5a00", "#1f3f8f"]
+ICON = "data:image/svg+xml," + quote(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
+    + "".join(f"<rect x='{2 + 10 * (i % 3)}' y='{2 + 10 * (i // 3)}' width='8' height='8' rx='2' fill='{c}'/>"
+              for i, c in enumerate(_MARK))
+    + "</svg>", safe=" /:=.'")
 
 NEW_DAYS = 7           # first seen (after the source's first full read) within this many days -> "new"
 UPDATED_DAYS = 7       # source changed within this many days -> "updated"
@@ -738,6 +747,9 @@ def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
         TITLE=f"{name}: open funding for local governments · Funding Atlas",
         DESCRIPTION=f"Federal and {name} public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.",
         ROOT="../",
+        URL=f"{SITE_URL}{data['state']['code'].lower()}/",
+        SHARE_IMAGE=SHARE_IMAGE,
+        ICON=ICON,
         CSS=css,
         JS=js,
         DATA=embed_json(data),
@@ -751,6 +763,9 @@ def render_index(data: dict[str, Any], css: str, js: str, template: str) -> str:
         TITLE="Funding Atlas: open public funding for local governments, by state",
         DESCRIPTION="A registry of federal and state funding programs open to towns, cities and counties, with change detection. Pick a state.",
         ROOT="",
+        URL=SITE_URL,
+        SHARE_IMAGE=SHARE_IMAGE,
+        ICON=ICON,
         CSS=css,
         JS=js,
         DATA=embed_json(data),
@@ -829,6 +844,9 @@ def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
         TITLE="About the data · Funding Atlas",
         DESCRIPTION="What the Funding Atlas registry reads, what its sources state, and what the change log has seen, in five charts.",
         ROOT="../",
+        URL=SITE_URL + "about/",
+        SHARE_IMAGE=SHARE_IMAGE,
+        ICON=ICON,
         CSS=css,
         JS=js,
         DATA=embed_json(data),
@@ -857,6 +875,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     # The two web fonts (SIL Open Font License, the licence files go with them): same origin, so the pages still
     # make no request to anyone else. The @font-face rules are in the templates, where {{ROOT}} is filled.
     shutil.copytree(WEB / "fonts", out / "fonts")
+    shutil.copy(WEB / "share.png", out / "share.png")     # the link-preview image every page names (13.23)
     (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
     generated_at = site["index"]["generated_at"]
     (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",

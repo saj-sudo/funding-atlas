@@ -279,6 +279,22 @@ def test_about_page_serves_the_clerk_first(conn, tmp_path):
     assert "<code>v_navigator_program</code>" in page
 
 
+def test_every_page_has_a_link_preview(conn, tmp_path):
+    """Redesign session 1 (13.23): a link pasted into a chat shows a title, a description and the share image."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    png = (out / "share.png").read_bytes()
+    assert png[:8] == b"\x89PNG\r\n\x1a\n" and int.from_bytes(png[16:20], "big") == 1200 and int.from_bytes(png[20:24], "big") == 630
+    for rel, url in (("index.html", build_site.SITE_URL), ("md/index.html", build_site.SITE_URL + "md/"),
+                     ("about/index.html", build_site.SITE_URL + "about/")):
+        page = (out / rel).read_text(encoding="utf-8")
+        meta = dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[a-z:_]+)" content="([^"]*)">', page))
+        assert meta["og:url"] == url and meta["og:image"] == build_site.SHARE_IMAGE, rel
+        assert meta["og:title"] and meta["og:description"] and meta["twitter:card"] == "summary_large_image", rel
+        assert f'<link rel="canonical" href="{url}">' in page and page.count('name="theme-color"') == 2, rel
+        assert not any(c in page for c in ("1d5bb8", "7fd09b", "f2c069")), rel    # the old off-palette favicon
+    assert 'href="../feed.xml"' in (out / "about" / "index.html").read_text(encoding="utf-8")
+
+
 def test_index_leads_with_the_map(conn, tmp_path):
     """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
