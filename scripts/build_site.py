@@ -686,8 +686,15 @@ def index_payload(
         },
         "states": states,
         "changes": [shape_change(c, listed) for c in changes[:INDEX_FEED_N]],
+        "changes_week": changes_within(changes, generated_at, NEW_DAYS),
         "questions": list(READER_QUESTIONS),
     }
+
+
+def changes_within(changes: list[dict[str, Any]], generated_at: str, days: int) -> int:
+    """How many logged changes fall in the `days` days up to the build date (every change, not the index's slice)."""
+    cutoff = date.fromordinal(date.fromisoformat(generated_at[:10]).toordinal() - days).isoformat()
+    return sum(1 for c in changes if (c["changed_at"] or "")[:10] > cutoff)
 
 
 # ---------- rendering ----------

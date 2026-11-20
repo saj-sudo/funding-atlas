@@ -69,10 +69,14 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 13.15 | Was a change the source's, or ours? | 2026-11-14 | migration 0010: `code_release`, refilled from git on every daily run (`cli.py code-releases`; the workflow now checks out full history), holds each first-parent commit on main touching a connector's reading code (its module, the repository modules it imports, `pipeline/upsert.py` and `pipeline/models.py`); `v_change_cause` labels every logged change `source`, `code` (a release landed between this run and the previous good one, so it may be ours), `first_read` or `unknown`. The change feed, the Atom summaries, the history strip and the status chart show it. On the Nov 13 data: 28 status changes on listable programs, 21 from the sources, 7 after a code change | migration 0010 header |
 | 13.16 | 13.3 done, the costs of 13.6 to 13.14 paid | 2026-11-14 | federal notices and their changes ship once in `federal.js` (same origin, cached; `split_federal`), so state pages drop to their own weight (Maryland 724KB to 268KB, California 904KB to 452KB, Alaska 600KB to 140KB; federal.js 476KB once); 30 cards a section with Show all; on phones a slide-in filter tray with a live "Show N results", fit check inside it, a one-row toolbar, and the briefing's first sentence with "N more this week": the first program card is back on an iPhone 13's first screen (y=611). Per-program feeds widened to every program with a logged change (2,006), so a starred program keeps its feed after it leaves every page. 1,115 tests | this file |
 | 13.17 | Civic kept, three things borrowed from Wayfinding (Saj) | 2026-11-14 | the yellow caution panel ("Closes in 4 days") on anything closing within 7 days, the words carrying it; a heavier date column (2rem numerals, bolder month); a lettered topic badge on every card, the eleven categories folded into three lines (E Environment: water, energy, parks; I Infrastructure: transportation, infrastructure, broadband; C Community: housing, health, workforce, public safety; O Other or not stated), the first line that matches wins, with a key above the results on wider screens and a spoken label on every badge. First card on an iPhone 13 stays at y=611 | `web/app.js` (`TOPIC_LINES`) |
+| 13.19 | The index leads with the map (redesign session 2, Saj's pick from the mockup) | 2026-11-20 | the headline, one instruction ("Pick your state. Your state's own programs come first.") and the state map; the four number cards as four sentences under it; the coverage box, legend, note and state list beside the map on desktop; the national change log folded behind one line that counts the last 7 days over every logged change (`changes_within`, 136 on the 2026-11-20 build; the fold lists the newest 20 and says so); the old lede moved unchanged into "What this is"; brand weight 750 to 700. Measured on the restored database: map top on a 390 by 844 phone 881px to 312px (the whole map by 571px), on a 1440 by 900 desktop 706px to 253px (whole map by 804px); the index 7.0 to 3.3 phone screens. Takes in 13.5 and the index half of 13.4. 1,143 tests | `docs/design/redesign_plan_2026-11.md` |
 
 ## Next
 
 ### Start here (updated 2026-11-17, 12.6j and 12.8a)
+
+**13.19 on this branch (2026-11-20): the index leads with the map** (redesign session 2, Saj's pick from the mockup). The
+redesign track's next stage is the mockup of sessions 3 to 5 (state page, topics, About); the connector queue below is unchanged.
 
 **12.6j on this branch (2026-11-17): Tennessee walled, Arizona State Parks built.** Tennessee: every `www.tn.gov` request
 answered 403 from an AWS load balancer on a fresh Actions runner after a survey of about sixty requests (the first runner
@@ -268,8 +272,8 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
   slide-in tray with an Apply button and a live count on phones.
 - **13.4 A change feed for humans**: housekeeping-only changes (agency code, URL, summary wording) behind "Show minor
   edits"; the index feed limited to new rows and status flips with one line per state; Atom unchanged. (The wording
-  diff, 13.12, shipped first.)
-- **13.5 The index page**: the coverage map shipped as 13.13; left: a start-here picker and the stats one sentence each.
+  diff, 13.12, shipped first. The index half, the feed off the first screens, shipped in 13.19 as a fold on the index.)
+- **13.5 The index page**: shipped in 13.19 (2026-11-20, see Done): the map first, the stats one sentence each.
 - **13.6 to 13.14** shipped 2026-11-14 (see Done). Follow-ups: tell connector-fix status changes from agency ones
   in the log (a `run` flag for a rules release), so the status-changes chart and the history strip can say which is
   which; per-program feeds for programs that leave every page (today a feed stops when the program is unlisted).
@@ -277,8 +281,8 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
   for structure and first screen (`docs/design/redesign_plan_2026-11.md`). "Civic" stays. Six sessions proposed, one
   feature each: the brand surface (share image, icon, link-preview tags; needs no mockup), the index led by the state map
   (takes in 13.5 and the index half of 13.4), the state page's controls in one row, topics as words, the about page for
-  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. **For Saj:** where these sit
-  against the connector queue.
+  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. Session 2 shipped as 13.19
+  (2026-11-20); the mockup of sessions 3 to 5 is next on this track. **For Saj:** where these sit against the connector queue.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -510,6 +514,7 @@ decide what gets built next.
 | 2026-11-17 | Minnesota stopped at 12.8: an agency state | `find-grants.jsp` holds no list in its HTML and lists grant-making agencies, not opportunities; a second request answered the Radware captcha on the runner; the New York stop rule | `docs/surveys/state_portals.md` |
 | 2026-11-17 | New Mexico's DFA Grant Search Dashboard is read through the JSON its public page calls, agency rows only | `session.js` names the search and profile pages public and sends no token without one; the Grants.gov copies (most of the 1,450 rows) are already read by `grants_gov`, so reading them again would double them | `docs/connectors/nm_dfa.md` |
 | 2026-11-18 | A second design review is recorded as a plan, not built: structure first, mockups before any change bigger than polish, "Civic" kept (Saj) | the first review fixed the phone fold; this one found the index does not direct a clerk and the state page puts about ten controls ahead of the first program; nothing ships until Saj picks from a mockup | `docs/design/redesign_plan_2026-11.md` |
+| 2026-11-20 | The index leads with the map; the national change log folded on the index rather than given its own page; the coverage box and state list beside the map on desktop (Saj, from the mockup) | the map sat at 881px on a phone, below the first screen, and the change log made the index 7 phone screens long; a fold keeps the log one tap away with no new page to build or test; the side panel is what fits the whole map on a laptop screen | `docs/design/redesign_plan_2026-11.md` |
 
 ## Open questions (do not resolve in code yet)
 

@@ -237,6 +237,26 @@ def test_build_shapes_changes(conn):
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
+    week = sum(1 for c in build_site.load_changes(conn) if c["changed_at"][:10] > (NOW - timedelta(days=build_site.NEW_DAYS)).strftime("%Y-%m-%d"))
+    assert site["index"]["changes_week"] == week > 0                     # the T2 run is two days ago, T1 three weeks
+
+
+def test_changes_within_counts_every_change_not_the_index_slice():
+    rows = [{"changed_at": "2026-11-19T06:00:00Z"}] * (build_site.INDEX_FEED_N + 5) + [
+        {"changed_at": "2026-11-14T00:00:01Z"},    # the first day of the 7 days to 2026-11-20 (14th to 20th)
+        {"changed_at": "2026-11-13T23:59:59Z"},    # the day before: outside
+        {"changed_at": None},
+    ]
+    assert build_site.changes_within(rows, "2026-11-20T02:00:00Z", 7) == build_site.INDEX_FEED_N + 6
+
+
+def test_index_leads_with_the_map(conn, tmp_path):
+    """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert 'id="stats"' not in index
+    assert index.index('id="map"') < index.index('id="numbers"') < index.index('<details class="changes-fold">') < index.index('id="feed"')
+    assert "Pick your state. Your state's own programs come first." in index
 
 
 def test_index_states_and_tile_grid(conn):

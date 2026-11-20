@@ -1213,11 +1213,16 @@
   function indexPage() {
     var S = DATA.states, F = DATA.federal;
     var withSources = S.filter(function (s) { return s.programs > 0; });
-    el('stats').innerHTML =
-      '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
-      '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open or announced for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' closed recently</span></div>';
+    function n(x) { return '<b class="num">' + x.toLocaleString('en-US') + '</b>'; }
+    function sum(k) { return withSources.reduce(function (a, s) { return a + (s[k] || 0); }, 0); }
+    el('numbers').innerHTML =
+      '<li>' + n(F.open) + ' federal notice' + (F.open === 1 ? ' is' : 's are') + ' open to local governments.</li>' +
+      '<li>' + n(F.closing_soon) + ' of them close' + (F.closing_soon === 1 ? 's' : '') + ' within ' + DATA.rules.closing_days + ' days.</li>' +
+      '<li>' + n(withSources.length) + ' state' + (withSources.length === 1 ? ' has' : 's have') + ' state agency sources connected.</li>' +
+      '<li>' + n(sum('programs')) + ' state programs are read: ' + n(sum('open')) + ' open or announced for local governments, ' + n(sum('between')) + ' closed recently.</li>';
+    var wk = DATA.changes_week || 0;
+    if (wk) el('feed-sum').textContent += ': ' + wk.toLocaleString('en-US') + ' logged in the last ' + DATA.rules.new_days + ' days';
+    if (wk > DATA.changes.length) el('feed-note').insertBefore(document.createTextNode('The newest ' + DATA.changes.length + ' are listed here. '), el('feed-note').firstChild);
 
     var KIND_TEXT = {
       portal: 'state grants portal read', agencies: 'agency pages read', portal_agencies: 'state portal and agency pages read',

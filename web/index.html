@@ -29,35 +29,44 @@
 <main id="main" class="wrap">
   <section class="index-hero">
     <h1>Open public funding for local governments, by state.</h1>
-    <p class="lede">Federal notices and state pass-through programs that name towns, cities and counties as eligible, read straight from the agencies that run them, with every change logged. Pick a state to see what is open, what is new and what closes soon.</p>
+    <p class="lede">Pick your state. Your state's own programs come first.</p>
     <noscript><p class="noscript">The state map needs JavaScript. Each state's page is a plain link: for example <a href="md/">md/</a> for Maryland.</p></noscript>
-    <div class="stats" id="stats"></div>
   </section>
 
   <section class="map-wrap" aria-labelledby="map-h">
-    <h2 id="map-h">Pick a state</h2>
-    <p class="muted small">Federal notices appear on every state page. The shading says how much of each state's own funding the registry can read, and the number is how many state programs are open or announced now.</p>
-    <nav class="map" id="map" aria-label="States" style="margin-top:12px"></nav>
-    <div class="legend" aria-hidden="true"><span><i class="k-portal"></i> state portal read</span><span><i class="k-agencies"></i> agency pages read</span><span><i class="k-directory"></i> directory only, no status</span><span><i class="k-blocked"></i> blocked or login only</span><span><i class="k-federal"></i> federal notices only</span></div>
-    <p class="hover" id="hover" aria-live="polite">Hover or focus a state for its coverage.</p>
-    <form class="goto" id="goto">
-      <label for="goto-select">Or choose from a list</label>
-      <select id="goto-select"></select>
-      <button class="btn primary" type="submit">Go</button>
-    </form>
+    <h2 id="map-h" class="sr-only">Pick a state</h2>
+    <div class="map-row">
+      <nav class="map" id="map" aria-label="States"></nav>
+      <div class="map-side">
+        <p class="hover" id="hover" aria-live="polite">Hover or focus a state for its coverage.</p>
+        <div class="legend" aria-hidden="true"><span><i class="k-portal"></i> state portal read</span><span><i class="k-agencies"></i> agency pages read</span><span><i class="k-directory"></i> directory only, no status</span><span><i class="k-blocked"></i> blocked or login only</span><span><i class="k-federal"></i> federal notices only</span></div>
+        <p class="muted small">The number on a state is how many of its own programs are open or announced now. Federal notices are on every state page.</p>
+        <form class="goto" id="goto">
+          <label for="goto-select">Or choose from a list</label>
+          <select id="goto-select"></select>
+          <button class="btn primary" type="submit">Go</button>
+        </form>
+      </div>
+    </div>
   </section>
 
-  <section class="index-feed two">
-    <div>
-      <h2>Latest changes across every source</h2>
-      <ol class="feed" id="feed"></ol>
-    </div>
-    <div>
-      <h2>What this is</h2>
-      <p class="muted">A registry, not advice. Each row is one program page or federal notice read by a connector; the status and dates are what that source said on the run date. Blank fields mean the source did not state the value. Nothing is inferred and nothing is guessed, which is why some states say "no state sources yet": the connectors for them have not been built.</p>
-      <p class="muted" style="margin-top:8px">The relevance tiers (likely, possible) are rule-based readings of each record, written as SQL you can audit. Argue with the rules, not the records.</p>
-    </div>
+  <section class="numbers" aria-labelledby="numbers-h">
+    <h2 id="numbers-h">In numbers, today</h2>
+    <ul id="numbers"></ul>
   </section>
+
+  <section class="index-about">
+    <h2>What this is</h2>
+    <p class="muted">Federal notices and state pass-through programs that name towns, cities and counties as eligible, read straight from the agencies that run them, with every change logged. Pick a state to see what is open, what is new and what closes soon.</p>
+    <p class="muted">A registry, not advice. Each row is one program page or federal notice read by a connector; the status and dates are what that source said on the run date. Blank fields mean the source did not state the value. Nothing is inferred and nothing is guessed, which is why some states say "no state sources yet": the connectors for them have not been built.</p>
+    <p class="muted">The relevance tiers (likely, possible) are rule-based readings of each record, written as SQL you can audit. Argue with the rules, not the records.</p>
+  </section>
+
+  <details class="changes-fold">
+    <summary id="feed-sum">Latest changes across every source</summary>
+    <ol class="feed" id="feed"></ol>
+    <p class="muted small" id="feed-note">Each state page's Changes tab has that state's log. The site-wide feed: <a href="feed.xml">Atom</a> · <a href="changes.json">JSON</a>.</p>
+  </details>
 </main>
 
 <footer class="site">
