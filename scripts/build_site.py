@@ -85,6 +85,7 @@ CONNECTOR_LABEL = {
     "tx_egrants": "Texas Office of the Governor eGrants",
     "nj_dca_sage": "New Jersey DCA SAGE (public RFP list)",
     "ny_sfs": "New York SFS Grant Opportunity Portal",
+    "nm_dfa": "New Mexico DFA Grant Search Dashboard (agency rows)",
     "va_dcjs": "Virginia Department of Criminal Justice Services",
     "va_dhcd": "Virginia Department of Housing and Community Development",
     "va_dcr": "Virginia Department of Conservation and Recreation",
@@ -135,7 +136,7 @@ CONNECTOR_LABEL = {
 # status, or agency pages. A connector missing here counts as agency pages.
 CONNECTOR_KIND = {
     "pa_grants": "portal", "wv_grants": "portal", "ca_grants": "portal", "il_csfa": "portal", "webgrants": "portal",
-    "tx_egrants": "portal", "nj_dca_sage": "portal", "ny_sfs": "portal", "ky_dlg": "portal",
+    "tx_egrants": "portal", "nj_dca_sage": "portal", "ny_sfs": "portal", "ky_dlg": "portal", "nm_dfa": "portal",
     "nc_grants": "directory", "wa_fund_directory": "directory",
 }
 # States with no state source read, and why, in one plain sentence each. From docs/surveys/state_portals.md and

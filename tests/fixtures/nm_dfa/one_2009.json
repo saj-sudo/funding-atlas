@@ -1,0 +1,51 @@
+{
+ "status": "ok",
+ "message": "",
+ "data": {
+  "fundingOpportunityId": 2009,
+  "agencyId": 201,
+  "source": "agency",
+  "externalId": null,
+  "sourceAgencyName": null,
+  "opportunityTitle": "Local Government Road Fund County Arterial Program (CAP)",
+  "description": "Purpose of Program:\nThe County Arterial Program was created to provide funds to Counties for projects where Local Entities take the lead in developing and contracting construction and maintenance projects.\n\nUse of Funds:\nFunding can be used for project development, construction, reconstruction, improvement, maintenance or repair of public highways, streets and public school parking lots, acquisition of right-of-way, and in-place material for construction or improvement.\n\nApplication Process:\nDeadline: March 15 yearly\n\nHow to Apply:\nLocal Entities shall submit a complete project proposal addressed to the District Engineer\ncontaining the following:\nLetter of intent from the governing body or agency head. Must list scope, termini estimated project cost.\nLocation of proposed project including route designation & termini  include a map showing the location.\nScope of work to be performed.\nProject estimate, including the amount of State participation requested.\nJustification for project construction.\nCertification that proposed work is on a public highway and necessary for the public good and convenience and to serve the public of the municipality, county and/or school district.\nThe expiration of these funds is 18 months from the fiscal year start.\n\nSelection Criteria and Decision Authority:\nEach District will review the project proposal assure that the project qualifies for the funding. When awarding funds they take into account past awards and proposed project cost.",
+  "postedDate": 1778694700121,
+  "lastUpdatedDate": 1783950757788,
+  "closeDate": "2027-03-15",
+  "isRollingOpportunity": 0,
+  "closeDateDescription": null,
+  "awardCeiling": 300000,
+  "awardFloor": 50000,
+  "estimatedTotalFunding": 5000000,
+  "expectedAwardCount": 0,
+  "fundingSource": "State",
+  "costSharingRequired": "No",
+  "isFeatured": 0,
+  "featuredDate": null,
+  "eligibleApplicants": "[\"Other\"]",
+  "eligibleApplicantsOther": "Counties",
+  "fundingInstrumentType": "Cooperative Agreement",
+  "fundingInstrumentOther": null,
+  "fundingActivitySubcategoryId": null,
+  "fundingActivitySubcategoryName": null,
+  "announcementUrl": "https://www.dot.nm.gov/business-support/project-oversight-division/",
+  "deleted": 0,
+  "agencyName": "Department of Transportation",
+  "fundingInstrumentTypes": [
+   "Cooperative Agreement"
+  ],
+  "fundingInstrumentTypeDisplay": "Cooperative Agreement",
+  "fundingActivityCategoryIds": [
+   18,
+   23
+  ],
+  "fundingActivityCategoryNames": [
+   "Roads & Bridges",
+   "Transportation"
+  ],
+  "fundingActivityCategoryNamesDisplay": "Roads & Bridges, Transportation",
+  "restrictedCounties": [],
+  "geographicRestrictionType": "Statewide",
+  "geographicRestrictionDisplay": "Statewide"
+ }
+}
