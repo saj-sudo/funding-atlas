@@ -290,8 +290,8 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
   (takes in 13.5 and the index half of 13.4), the state page's controls in one row, topics as words, the about page for
   two readers, a theme switch. Sessions two to five got a mockup first and Saj's pick. All six shipped 2026-11-20:
   sessions 2 to 5 as 13.19 to 13.22, session 1 as 13.23, session 6 as 13.24. Follow-ups: check a real chat preview once
-  `gh-pages` serves `share.png`; at 320px (the smallest phones) the state page's tab row and a file path in About's
-  footer still push the page sideways.
+  `gh-pages` serves `share.png`. The 320px follow-up (the tab row and a file path in About's footer pushed the smallest
+  phones sideways) was fixed the same day: tighter tabs under 400px, footer paths wrap.
 
 ### 10. Data cleanup (small, rides any session)
 

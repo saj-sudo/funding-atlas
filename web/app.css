@@ -548,6 +548,8 @@ footer.site h2 { font-size: 1rem; color: var(--ink); margin-bottom: 8px; }
 footer.site p + p { margin-top: 8px; }
 footer.site ol { padding-left: 20px; display: grid; gap: 4px; }
 footer.site b { color: var(--ink); }
+footer.site .cols > * { min-width: 0; }
+footer.site code { overflow-wrap: anywhere; }   /* file paths wrap on the smallest phones */
 .noscript { background: var(--possible-soft); color: var(--possible); padding: 12px 16px; border-radius: 8px; margin: 16px 0; }
 
 /* ---------- phone ---------- */
@@ -600,6 +602,13 @@ footer.site b { color: var(--ink); }
   .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
   .card .date { padding-right: 8px; }
   .card .date .dd { font-size: 1.6rem; }
+}
+
+/* the smallest phones (320px): the three tabs fit without pushing the page sideways */
+@media (max-width: 400px) {
+  .tabs { gap: 0; }
+  .tab { padding: 10px 5px; font-size: .9rem; }
+  .tab .n { margin-left: 3px; padding: 0 5px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
