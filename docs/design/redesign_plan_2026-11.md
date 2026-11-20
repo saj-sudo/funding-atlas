@@ -110,7 +110,8 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Session 1, brand surface (needs no mockup) | Not started | | |
 | Session 2, the index leads with the map | Done (13.19): map top on a phone 881px to 312px, desktop 706px to 253px, index 7.0 to 3.3 phone screens | roadmap Done, 13.19 | 2026-11-20 |
 | Session 3, the state page reaches the first program sooner | Done (13.20): first title on a phone 652px to 527px, whole first card on screen; desktop 807px to 635px | roadmap Done, 13.20 | 2026-11-20 |
-| Sessions 4 to 6 | Not started | | |
+| Session 4, topics as words | Done (13.21): no lettered badge or key row, topic tokens of their own, headings 21.6px against 18.2px card titles on a phone | roadmap Done, 13.21 | 2026-11-20 |
+| Sessions 5 and 6 | Not started | | |
 
 ## Starting a session on this work
 

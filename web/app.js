@@ -71,24 +71,23 @@
     possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
   };
   function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
-  // Topic lines (13.17, borrowed from Wayfinding): the eleven categories folded into three, each with a letter so the
-  // colour never carries the meaning alone. A program in several shows the first line that matches, in this order.
+  // Topic lines (13.17, as words since 13.21): the eleven categories folded into three. A card names its line in a
+  // word with a coloured dot, so the colour never carries the meaning alone; "other or not stated" shows nothing.
+  // A program in several shows the first line that matches, in this order.
   var TOPIC_LINES = [
-    { key: 'env', letter: 'E', name: 'Environment: water, energy, parks', cats: ['water', 'energy', 'parks'] },
-    { key: 'inf', letter: 'I', name: 'Infrastructure: transportation, infrastructure, broadband', cats: ['transportation', 'infrastructure', 'broadband'] },
-    { key: 'com', letter: 'C', name: 'Community: housing, health, workforce, public safety', cats: ['housing', 'health', 'workforce', 'public_safety'] }
+    { key: 'env', word: 'Environment', cats: ['water', 'energy', 'parks'] },
+    { key: 'inf', word: 'Infrastructure', cats: ['transportation', 'infrastructure', 'broadband'] },
+    { key: 'com', word: 'Community', cats: ['housing', 'health', 'workforce', 'public_safety'] }
   ];
-  var TOPIC_OTHER = { key: 'oth', letter: 'O', name: 'Other or not stated', cats: [] };
   function topicLine(p) {
     for (var i = 0; i < TOPIC_LINES.length; i++) {
       if ((p.categories || []).some(function (c) { return TOPIC_LINES[i].cats.indexOf(c) >= 0; })) return TOPIC_LINES[i];
     }
-    return TOPIC_OTHER;
+    return null;
   }
-  function topicKey() {
-    return '<span class="tkey-l">Topics:</span>' + TOPIC_LINES.concat([TOPIC_OTHER]).map(function (t) {
-      return '<span class="tkey"><span class="topic t-' + t.key + '" aria-hidden="true"><b>' + t.letter + '</b></span>' + h(t.name.split(':')[0]) + '</span>';
-    }).join('');
+  function topicWord(p) {
+    var L = topicLine(p);
+    return L ? ' · <span class="tw t-' + L.key + '"><i aria-hidden="true"></i>' + L.word + '</span>' : '';
   }
   function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
   function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
@@ -723,7 +722,7 @@
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + badges(p) + '</p>' +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
@@ -732,14 +731,13 @@
     // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
     // Decorative for screen readers: the same date is in words on the card's first line.
     function dateCol(p) {
-      var dated = p.closes_at && !p.deadline_placeholder, L = topicLine(p);
-      var badge = '<span class="topic t-' + L.key + '" title="' + h(L.name) + '"><b>' + L.letter + '</b></span><span class="sr-only">Topic: ' + h(L.name) + '. </span>';
+      var dated = p.closes_at && !p.deadline_placeholder;
       if (dated) {
         var past = p.days_to_close != null && p.days_to_close < 0;
         return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
-          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + badge + '</div>';
+          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + '</div>';
       }
-      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span>' + badge + '</div>';
+      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
     }
     // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
     var BUCKETS = [
@@ -755,8 +753,6 @@
         return r.length ? '<p class="bucket" role="heading" aria-level="3">' + h(b[0]) + ' · ' + r.length + '</p>' + r.map(card).join('') : '';
       }).join('');
     }
-
-    el('topic-key').innerHTML = topicKey();
 
     // ---- the four groups ----
     var resultsEl = el('results');

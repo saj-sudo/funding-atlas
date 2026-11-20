@@ -24,6 +24,9 @@
   --s-fed: #2a78d6;
   --s-state: #eb6834;
   --s3: #1baf7a;
+  --topic-env: #3d7a3a;
+  --topic-inf: #9a5b14;
+  --topic-com: #8b3a62;
   --caution: #ffcd00;
   --caution-ink: #0b0d10;
   --q-ink: #ffffff;
@@ -57,6 +60,9 @@
     --s-fed: #3987e5;
     --s-state: #d95926;
     --s3: #199e70;
+    --topic-env: #8fd18a;
+    --topic-inf: #f0b46a;
+    --topic-com: #e79cc4;
     --caution: #ffd23a;
     --caution-ink: #0b0d10;
     --q-ink: #0d1733;
@@ -192,21 +198,17 @@ ul, ol { margin: 0; padding: 0; }
 .card .cbody { display: grid; gap: 4px; min-width: 0; align-content: start; }
 /* the date column: the deadline is the first thing the eye lands on */
 .card .date { display: grid; align-content: start; justify-items: center; text-align: center; padding-right: 12px; border-right: 1px solid var(--line); }
-.card .date .m { font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
+.card .date .m { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink); }
 .card .date .dd { font: 700 2rem/1 var(--f-display); font-variant-numeric: tabular-nums; color: var(--ink); }
-/* caution panel and topic badges (13.17, borrowed from Wayfinding) */
-.caution { background: var(--caution); color: var(--caution-ink); border-radius: 4px; padding: 0 8px; font-weight: 800; line-height: 1.6; }
-.topic { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--muted); background: var(--surface); margin-top: 8px; flex: none; }
-.topic b { font: 800 .74rem/1 var(--f-body); color: var(--ink); }
-.topic.t-env { border-color: var(--s-fed); } .topic.t-inf { border-color: var(--s-state); } .topic.t-com { border-color: var(--s3); } .topic.t-oth { border-color: var(--muted); border-style: dotted; }
-.topic-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: .85rem; color: var(--muted); margin: -6px 0 14px; }
-.topic-key .topic { margin: 0 6px 0 0; width: 22px; height: 22px; border-width: 2.5px; }
-.tkey { display: inline-flex; align-items: center; }
-.tkey-l { font-weight: 650; }
+/* caution panel (13.17, borrowed from Wayfinding) and topic words (13.21: their own tokens, not the chart series') */
+.caution { background: var(--caution); color: var(--caution-ink); border-radius: 4px; padding: 0 8px; font-weight: 700; line-height: 1.6; }
+.tw { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.tw i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+.tw.t-env i { background: var(--topic-env); } .tw.t-inf i { background: var(--topic-inf); } .tw.t-com i { background: var(--topic-com); }
 .card .date.soon .dd, .card .date.soon .m { color: var(--closing); }
 .card .date .nd { font-size: .78rem; line-height: 1.25; color: var(--muted); padding-top: 2px; }
 .card .date.past .dd { color: var(--muted); }
-.list .bucket { margin: 8px 0 0; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.list .bucket { margin: 8px 0 0; font-size: 1rem; font-weight: 700; color: var(--ink); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
 .list .bucket:first-child { margin-top: 0; }
 .card:focus-within { outline: 3px solid var(--accent); outline-offset: 1px; }
 .card .when, dialog.detail .when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 650; font-size: .95rem; }
@@ -536,13 +538,13 @@ footer.site b { color: var(--ink); }
 }
 @media (max-width: 480px) {
   .hero .lede { display: none; }
-  .cov-when, .wlbl, .slbl, .topic-key { display: none; }
+  .cov-when, .wlbl, .slbl { display: none; }
   .hero { padding-top: 10px; }
   .tabs { margin: 10px 0 8px; }
   .toolbar { gap: 8px; }
   .coverage summary::after { content: ""; }
   .active { font-size: .85rem; }
-  .group h2 { font-size: 1.2rem; }
+  .group h2 { font-size: 1.35rem; }
   body[data-page="state"] .navlink { display: none; }
   .group.fold { padding: 12px; }
   .card { padding: 12px; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }

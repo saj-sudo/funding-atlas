@@ -258,6 +258,16 @@ def test_state_page_reaches_the_first_program_sooner(conn, tmp_path):
     assert page.count('<option value="closing">') == 2          # the toolbar's sort and the tray's offer the same orders
 
 
+def test_topics_are_words_with_their_own_colours(conn, tmp_path):
+    """Redesign session 4 (13.21): no lettered badge or key row; topic colours are tokens of their own in both themes."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    assert "topic-key" not in page and 'class="topic ' not in page
+    root, dark = page.split("@media (prefers-color-scheme: dark)", 1)
+    for token in ("--topic-env", "--topic-inf", "--topic-com"):
+        assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
+
+
 def test_index_leads_with_the_map(conn, tmp_path):
     """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
