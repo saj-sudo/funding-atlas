@@ -37,12 +37,6 @@
   <section class="briefing" aria-labelledby="brief-h">
     <h2 id="brief-h">This week</h2>
     <ul id="brief"></ul>
-    <details class="ahead" id="ahead">
-      <summary>Deadlines over the next 26 weeks</summary>
-      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st" id="ahead-st"></i><span id="ahead-st-l">State</span></span></div>
-      <div class="chart-scroll"><svg id="ahead-svg" role="img" aria-label="Deadlines per week, next 26 weeks"></svg></div>
-      <p class="muted small" id="ahead-note"></p>
-    </details>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Views">
@@ -80,6 +74,13 @@
     <div class="layout">
       <aside class="facets" id="facets" aria-label="Filters">
         <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
         <a class="skip inside" href="#results">Skip filters, go to results</a>
         <details class="fit" id="fit">
           <summary>Check fit in three questions</summary>

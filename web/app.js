@@ -670,9 +670,15 @@
       var isDefault = !st.q && !st.quick && FACETS.every(function (f) {
         return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
       });
+      // The default (likely fits only) is said once, in words, with the way out (13.20); any other filter is a chip.
+      if (isDefault) {
+        activeEl.innerHTML = '<span><span class="lbl">Likely fits only:</span> <b class="num">' + shown + ' of ' + total + '</b>.</span>' +
+          '<button class="btn quiet" data-clear="all">Show all ' + total + '</button>';
+        return;
+      }
       activeEl.innerHTML = '<span class="count num">Showing ' + shown + ' of ' + total + '</span>' +
         (chips.length ? '<span class="lbl">Filtered to</span>' + chips.join('') : '') +
-        (chips.length ? '<button class="btn quiet" data-clear="all">' + (isDefault ? 'Show all ' + total : 'Clear all') + '</button>' : '');
+        (chips.length ? '<button class="btn quiet" data-clear="all">Clear all</button>' : '');
     }
     activeEl.addEventListener('click', function (e) {
       var b = e.target.closest('button');
@@ -700,6 +706,8 @@
       return '<span class="muted">No deadline stated</span>';
     }
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
+    // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
+    function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
     function card(p) {
       var amount = amountText(p);
       var facts = [
@@ -715,7 +723,7 @@
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
@@ -753,7 +761,7 @@
     // ---- the four groups ----
     var resultsEl = el('results');
     resultsEl.tabIndex = -1;
-    el('g-state-t').textContent = S.name + ' programs open or announced';
+    el('g-state-t').textContent = 'Open or announced in ' + S.name;
     el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
@@ -859,15 +867,7 @@
       if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
     });
 
-    // ---- the two state-page charts (13.14): deadlines ahead, and when this state's deadlines have fallen ----
-    el('ahead-st-l').textContent = S.name;
-    var aheadDone = false;
-    el('ahead').addEventListener('toggle', function () {
-      if (!el('ahead').open || aheadDone) return;
-      aheadDone = true;
-      var r = chartRunway(el('ahead-svg'), P.map(function (p) { return [p.state, p.closes_at, p.deadline_placeholder]; }), 26, true);
-      el('ahead-note').textContent = r.total + ' deadlines in the next 26 weeks on this page, before filters; ' + r.later + ' later. Hover a week for its count.';
-    });
+    // ---- the state-page chart (13.14): when this state's deadlines have fallen (deadlines ahead moved to About in 13.20) ----
     var SEA = DATA.season, seaTot = SEA ? SEA.reduce(function (a, b) { return a + b; }, 0) : 0;
     if (seaTot >= 8) {
       el('season').hidden = false;
@@ -1057,7 +1057,10 @@
       clearTimeout(qTimer);
       qTimer = setTimeout(function () { st.q = qEl.value.trim(); render(); }, 120);
     });
-    el('sort').addEventListener('change', function () { st.sort = el('sort').value; render(); });
+    function setSort(v) { st.sort = v; el('sort').value = v; el('sort-tray').value = v; render(); }
+    el('sort').addEventListener('change', function () { setSort(el('sort').value); });
+    el('sort-tray').addEventListener('change', function () { setSort(el('sort-tray').value); });
+    if (window.matchMedia && matchMedia('(max-width: 480px)').matches) el('q').placeholder = 'Search';
     // On phones the filters are a tray over the results (13.16, NN/g): the result count stays on its button.
     var ft = el('filters-toggle'), backdrop = el('tray-backdrop');
     function setTray(open) {
@@ -1181,7 +1184,7 @@
         b.setAttribute('aria-pressed', String(k === 'opened' ? st.tab === 'changes' && st.feed === 'status' : k === 'unstated' ? false : st.quick === k));
       });
       Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
-      el('sort').value = st.sort;
+      el('sort').value = st.sort; el('sort-tray').value = st.sort;
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();
       renderGroups();

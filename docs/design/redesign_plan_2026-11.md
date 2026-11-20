@@ -87,7 +87,8 @@ and links that keep filters in the URL.
 ## Measures of success
 
 - Index: the state map inside the first screen on a 390 by 844 phone (about 759px down today).
-- State page: the first program title above 400px on a phone (652px today).
+- State page: the whole first program card on the first screen of a 390 by 844 phone (changed from "the first title
+  above 400px" by Saj on 2026-11-20: the title was already on screen at 652px; met in 13.20, the card ends at 768px).
 - A link to any page shows a title, a description and an image when pasted into a chat.
 - `uv run ruff check .` and `uv run pytest -q` pass.
 
@@ -104,11 +105,12 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Mockup of session 2, the index (one screen, today beside proposed, at Saj's word) | Done: map top on a phone 881px to 312px, page 7.0 to 3.3 phone screens; prototype only, `web/` unchanged | https://claude.ai/artifact/RyZbBVmhoV1ep7QFM8Rg64 | 2026-11-19 |
 | Saj picks session 2 | Done: as shown, the change log folded on the index, the desktop side panel | roadmap decisions log | 2026-11-20 |
 | Mockup of sessions 3 to 5 (state page, topics, About) | Done: Maryland's first title on a phone 652px to 544px (whole first card on screen; the 400px target not met, variant B 492px), desktop 807px to 580px; About's clerk charts first, no view names in captions; prototypes only, `web/` unchanged | https://claude.ai/artifact/PEQ57ogx9bL3fDErLFQVUA | 2026-11-20 |
-| Saj picks sessions 3 to 5 (A or B; "Likely fit" off cards; "Other" topic shown or not; which charts are the clerk's; the phone measure as "whole first card") | Waiting on Saj | | |
+| Saj picks sessions 3 to 5 | Done: as mocked, not variant B; "Likely fit" off cards; "Other" shows nothing; deadlines ahead and maximum awards are the clerk's charts; the phone measure is the whole first card; all three built now, one commit each | roadmap decisions log | 2026-11-20 |
 | Saj slots sessions 3 to 6 against the connector queue | Waiting on the picks | | |
 | Session 1, brand surface (needs no mockup) | Not started | | |
 | Session 2, the index leads with the map | Done (13.19): map top on a phone 881px to 312px, desktop 706px to 253px, index 7.0 to 3.3 phone screens | roadmap Done, 13.19 | 2026-11-20 |
-| Sessions 3 to 6 | Not started | | |
+| Session 3, the state page reaches the first program sooner | Done (13.20): first title on a phone 652px to 527px, whole first card on screen; desktop 807px to 635px | roadmap Done, 13.20 | 2026-11-20 |
+| Sessions 4 to 6 | Not started | | |
 
 ## Starting a session on this work
 

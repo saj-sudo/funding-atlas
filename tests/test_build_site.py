@@ -250,6 +250,14 @@ def test_changes_within_counts_every_change_not_the_index_slice():
     assert build_site.changes_within(rows, "2026-11-20T02:00:00Z", 7) == build_site.INDEX_FEED_N + 6
 
 
+def test_state_page_reaches_the_first_program_sooner(conn, tmp_path):
+    """Redesign session 3 (13.20): the 26-week chart left the state page; sort has a copy in the phone filter tray."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    assert 'id="ahead"' not in page and 'id="sort-tray"' in page
+    assert page.count('<option value="closing">') == 2          # the toolbar's sort and the tray's offer the same orders
+
+
 def test_index_leads_with_the_map(conn, tmp_path):
     """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
