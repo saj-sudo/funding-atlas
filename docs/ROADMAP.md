@@ -74,14 +74,16 @@ What is done, what is next, and why. One session per item. The spec is in `SPEC.
 | 13.21 | Topics as words, headings above card titles (redesign session 4, Saj's pick) | 2026-11-20 | the lettered circle under each date and the "Topics:" key row replaced by the word with a coloured dot on the card's agency line (Environment, Infrastructure, Community; "other or not stated" shows nothing); topic colours as their own tokens (`--topic-env`, `--topic-inf`, `--topic-com`, light and dark) so the chart series colours mean one thing; the "Closes within 7 days" label in 16px bold sentence case, not 12.5px grey capitals; section headings 21.6px on a phone (were 19.2px) against 18.2px card titles; the last 800 weights to 700. Maryland on a phone: first title 527px to 561px from the larger headings, the whole first card still on the first screen (ends at 802px); desktop 635px to 611px. 1,145 tests | `web/app.js` (`TOPIC_LINES`) |
 | 13.22 | About the data for two readers (redesign session 5, Saj's pick) | 2026-11-20 | the clerk's two charts first (deadlines over the next 26 weeks, maximum awards), then "For researchers" over when state deadlines have fallen, what sources state and status changes; chart captions in plain words, the view names moved to one "Data and code" note at the end. "Maximum awards" now starts at 781px on a desktop (was 2,852px). 1,146 tests | `web/about.html` |
 | 13.23 | The brand surface (redesign session 1) | 2026-11-20 | every page names a title, a description, its own canonical URL and a 1200 by 630 share image (`web/share.png`, copied to the site root; source `docs/design/share_image.html`, rendered once with Playwright) in Open Graph and Twitter tags, so a link pasted into a chat previews instead of showing blank; the share image carries the headline and the tile map in one tone and no counts; the browser-tab icon is now the brand's nine-square mark in the palette (one URL-encoded constant, `ICON`, in place of three copies of an off-palette icon); `theme-color` for light and dark; About's Atom link pointed at `about/feed.xml`, which never existed, and now points at `../feed.xml`. Confirmed locally (tags, image 200, no failed requests); a real chat preview can only be checked once `gh-pages` serves `share.png` after merge. 1,147 tests | `scripts/build_site.py` (`SHARE_IMAGE`, `ICON`) |
+| 13.24 | A theme switch (redesign session 6) | 2026-11-20 | a button in every page's top bar cycles automatic (the system's), dark and light, kept in this browser only (`fa-theme`, storage failures ignored) and applied by an inline script in `<head>` before the page paints; `:root[data-theme="dark"]` carries exactly the dark preference's tokens (a test compares the two blocks); charts colour with `var(--token)`, so they follow with no redraw; print stays light whatever the choice; `theme-color` follows the choice. Checked on the index, Maryland and About at 390 by 844 and 1440 by 900, OS light switched to dark and OS dark switched to light: colours, reload, no errors, no sideways scroll. The phone top bar keeps the brand on one line and gives the state picker the rest. Found on the way and fixed: About scrolled sideways on a 360px phone (the "What sources state" table and the 13.22 "Data and code" note); both now wrap or scroll inside themselves. 1,148 tests | `web/app.js` (`themeSwitch`) |
 
 ## Next
 
 ### Start here (updated 2026-11-17, 12.6j and 12.8a)
 
-**13.19 to 13.22 on this branch (2026-11-20): redesign sessions 2 to 5** (the index leads with the map; the state page reaches
-the first program sooner; topics as words; About for two readers), each Saj's pick from a mockup. Left on that track: session 1
-(brand surface, no mockup needed) and session 6 (theme switch). The connector queue below is unchanged.
+**13.19 to 13.24 on this branch (2026-11-20): the redesign plan is done** (`docs/design/redesign_plan_2026-11.md`, all six
+sessions: the index leads with the map, the state page reaches the first program sooner, topics as words, About for two readers,
+link previews and the icon, a theme switch). After merge: paste a link into a chat to check the preview. The connector queue
+below is unchanged and is next.
 
 **12.6j on this branch (2026-11-17): Tennessee walled, Arizona State Parks built.** Tennessee: every `www.tn.gov` request
 answered 403 from an AWS load balancer on a fresh Actions runner after a survey of about sixty requests (the first runner
@@ -286,9 +288,10 @@ phone before scrolling. 13.1 shipped 2026-11-14 (see Done). The rest, in order:
   for structure and first screen (`docs/design/redesign_plan_2026-11.md`). "Civic" stays. Six sessions proposed, one
   feature each: the brand surface (share image, icon, link-preview tags; needs no mockup), the index led by the state map
   (takes in 13.5 and the index half of 13.4), the state page's controls in one row, topics as words, the about page for
-  two readers, a theme switch. Sessions two to five get a mockup first and Saj's pick. Sessions 2 to 5 shipped as 13.19 to
-  13.22 (2026-11-20). Left: session 1, the brand surface (share image, icon, link-preview tags; needs no mockup), and
-  session 6, the theme switch. **For Saj:** where those two sit against the connector queue.
+  two readers, a theme switch. Sessions two to five got a mockup first and Saj's pick. All six shipped 2026-11-20:
+  sessions 2 to 5 as 13.19 to 13.22, session 1 as 13.23, session 6 as 13.24. Follow-ups: check a real chat preview once
+  `gh-pages` serves `share.png`; at 320px (the smallest phones) the state page's tab row and a file path in About's
+  footer still push the page sideways.
 
 ### 10. Data cleanup (small, rides any session)
 
@@ -523,6 +526,7 @@ decide what gets built next.
 | 2026-11-20 | The index leads with the map; the national change log folded on the index rather than given its own page; the coverage box and state list beside the map on desktop (Saj, from the mockup) | the map sat at 881px on a phone, below the first screen, and the change log made the index 7 phone screens long; a fold keeps the log one tap away with no new page to build or test; the side panel is what fits the whole map on a laptop screen | `docs/design/redesign_plan_2026-11.md` |
 | 2026-11-20 | Redesign sessions 3, 4 and 5 built in one sitting, one commit each (Saj); session 3 as mocked (not variant B), "Likely fit" off the cards under the default filter, the 26-week chart off the state page, the phone measure now "the whole first card on the first phone screen" | all three were picked from one mockup and are small; one commit each keeps each revertible. Today's first title was already on the first screen at 652px, so the 400px target measured the wrong thing; under 400px would push the tabs or search off the first screen | `docs/design/redesign_plan_2026-11.md` |
 | 2026-11-20 | Redesign sessions 1 and 6 built in one sitting, one commit each (Saj); the share image carries no counts | counts change every day and chat apps cache a preview image for weeks, so a number on it would be wrong soon after it was posted; the headline and the tile map do not go stale | `docs/design/share_image.html` |
+| 2026-11-20 | The theme choice is kept per browser, three states (automatic, dark, light), automatic by default | a reader's display preference is a convenience, not data anyone else needs; automatic keeps today's behaviour for everyone who never touches it | `web/app.js` (`themeSwitch`) |
 
 ## Open questions (do not resolve in code yet)
 

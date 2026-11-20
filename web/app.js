@@ -1266,5 +1266,37 @@
     renderFooter('<p>Each state page carries every federal notice plus that state\'s agency programs where connectors exist. Coverage is stated on the page; a state with no sources yet says so.</p>');
   }
 
+  // ---- the theme switch (13.24): automatic (the system's), dark, light, kept in this browser only. The pre-paint
+  // script in each page's <head> applies a stored choice before anything draws; charts colour with var(--token), so
+  // they follow without a redraw. ----
+  function themeSwitch() {
+    var btn = el('theme-btn');
+    if (!btn) return;
+    var root = document.documentElement, metas = document.querySelectorAll('meta[name="theme-color"]');
+    var orig = Array.prototype.map.call(metas, function (m) { return m.getAttribute('content'); });
+    var NEXT = { auto: 'dark', dark: 'light', light: 'auto' }, NAME = { auto: 'automatic', dark: 'dark', light: 'light' };
+    var ICONS = {
+      auto: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+      dark: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+      light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
+    };
+    function current() { var t = root.getAttribute('data-theme'); return t === 'dark' || t === 'light' ? t : 'auto'; }
+    function show() {
+      var t = current();
+      btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[t] + '</svg>';
+      btn.setAttribute('aria-label', 'Theme: ' + NAME[t] + '. Switch to ' + NAME[NEXT[t]] + '.');
+      btn.title = 'Theme: ' + NAME[t];
+      Array.prototype.forEach.call(metas, function (m, i) { m.setAttribute('content', t === 'auto' ? orig[i] : (t === 'dark' ? '#0f1420' : '#f7f8fa')); });
+    }
+    btn.addEventListener('click', function () {
+      var t = NEXT[current()];
+      if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+      try { if (t === 'auto') localStorage.removeItem('fa-theme'); else localStorage.setItem('fa-theme', t); } catch (e) { /* storage blocked: the choice lasts this visit */ }
+      show();
+    });
+    show();
+  }
+  themeSwitch();
+
   if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
 })();

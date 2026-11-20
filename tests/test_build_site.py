@@ -290,9 +290,25 @@ def test_every_page_has_a_link_preview(conn, tmp_path):
         meta = dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[a-z:_]+)" content="([^"]*)">', page))
         assert meta["og:url"] == url and meta["og:image"] == build_site.SHARE_IMAGE, rel
         assert meta["og:title"] and meta["og:description"] and meta["twitter:card"] == "summary_large_image", rel
-        assert f'<link rel="canonical" href="{url}">' in page and page.count('name="theme-color"') == 2, rel
+        assert f'<link rel="canonical" href="{url}">' in page and page.count('<meta name="theme-color"') == 2, rel
         assert not any(c in page for c in ("1d5bb8", "7fd09b", "f2c069")), rel    # the old off-palette favicon
     assert 'href="../feed.xml"' in (out / "about" / "index.html").read_text(encoding="utf-8")
+
+
+def test_theme_switch_matches_the_dark_preference(conn, tmp_path):
+    """Redesign session 6 (13.24): a dark choice gets exactly the dark preference's tokens; every page has the switch
+    and applies a stored choice before it paints."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    for rel in ("index.html", "md/index.html", "about/index.html"):
+        page = (out / rel).read_text(encoding="utf-8")
+        assert 'id="theme-btn"' in page and "localStorage.getItem('fa-theme')" in page, rel
+        assert page.index("localStorage.getItem('fa-theme')") < page.index("<style>"), rel
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    pref = re.search(r':root:not\(\[data-theme="light"\]\) \{(.*?)\}', page, re.S).group(1)
+    chosen = re.search(r':root\[data-theme="dark"\] \{(.*?)\}', page, re.S).group(1)
+    tokens = lambda block: dict(re.findall(r"(--[a-z0-9-]+|color-scheme):\s*([^;]+);", block))  # noqa: E731
+    assert tokens(pref) and tokens(pref) == tokens(chosen)
+    assert ":root, :root[data-theme] { --bg: #fff;" in page                 # print stays light whatever the choice
 
 
 def test_index_leads_with_the_map(conn, tmp_path):
