@@ -103,8 +103,9 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Second review of the live site | Done | this file | 2026-11-18 |
 | Mockup of session 2, the index (one screen, today beside proposed, at Saj's word) | Done: map top on a phone 881px to 312px, page 7.0 to 3.3 phone screens; prototype only, `web/` unchanged | https://claude.ai/artifact/RyZbBVmhoV1ep7QFM8Rg64 | 2026-11-19 |
 | Saj picks session 2 | Done: as shown, the change log folded on the index, the desktop side panel | roadmap decisions log | 2026-11-20 |
-| Mockup of sessions 3 to 5 (state page, topics, About) | Not started | | |
-| Saj slots sessions 3 to 6 against the connector queue | Waiting on the mockup of sessions 3 to 5 | | |
+| Mockup of sessions 3 to 5 (state page, topics, About) | Done: Maryland's first title on a phone 652px to 544px (whole first card on screen; the 400px target not met, variant B 492px), desktop 807px to 580px; About's clerk charts first, no view names in captions; prototypes only, `web/` unchanged | https://claude.ai/artifact/PEQ57ogx9bL3fDErLFQVUA | 2026-11-20 |
+| Saj picks sessions 3 to 5 (A or B; "Likely fit" off cards; "Other" topic shown or not; which charts are the clerk's; the phone measure as "whole first card") | Waiting on Saj | | |
+| Saj slots sessions 3 to 6 against the connector queue | Waiting on the picks | | |
 | Session 1, brand surface (needs no mockup) | Not started | | |
 | Session 2, the index leads with the map | Done (13.19): map top on a phone 881px to 312px, desktop 706px to 253px, index 7.0 to 3.3 phone screens | roadmap Done, 13.19 | 2026-11-20 |
 | Sessions 3 to 6 | Not started | | |
