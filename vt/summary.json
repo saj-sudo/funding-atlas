@@ -1,0 +1,44 @@
+{
+ "generated_at": "2026-11-21T03:05:10Z",
+ "state": {
+  "code": "VT",
+  "name": "Vermont"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/vt/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 3,
+  "federal": 112
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 2
+  },
+  {
+   "category": "parks",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Municipal Planning Grant",
+   "agency": "Agency of Commerce and Community Development, Department of Housing and Community Development",
+   "closes_at": "2026-12-02",
+   "days_to_close": 11,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=municipal-planning-grant-vt-accd-municipal-planning-grant"
+  },
+  {
+   "name": "VOREC Community Grant Program",
+   "agency": "Vermont Department of Forests, Parks and Recreation",
+   "closes_at": "2026-12-13",
+   "days_to_close": 22,
+   "link": "https://saj-sudo.github.io/funding-atlas/vt/#p=vorec-community-grant-program-vt-fpr-vorec"
+  }
+ ]
+}

@@ -1,0 +1,77 @@
+{
+ "generated_at": "2026-11-21T03:05:10Z",
+ "state": {
+  "code": "MD",
+  "name": "Maryland"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/md/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 17,
+  "federal": 112
+ },
+ "by_category": [
+  {
+   "category": "energy",
+   "open": 5
+  },
+  {
+   "category": "other",
+   "open": 5
+  },
+  {
+   "category": "water",
+   "open": 5
+  },
+  {
+   "category": "transportation",
+   "open": 2
+  },
+  {
+   "category": "parks",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Keep Maryland Beautiful Grant Program",
+   "agency": "Maryland Department of Natural Resources",
+   "closes_at": "2026-12-01",
+   "days_to_close": 10,
+   "link": "https://saj-sudo.github.io/funding-atlas/md/#p=keep-maryland-beautiful-grant-program-md-dnr-met/pages/grant_programs.aspx"
+  },
+  {
+   "name": "Energy Challenge",
+   "agency": "Maryland Energy Administration",
+   "closes_at": "2026-12-02",
+   "days_to_close": 11,
+   "link": "https://saj-sudo.github.io/funding-atlas/md/#p=energy-challenge-md-mea-pages/energychallenge.aspx"
+  },
+  {
+   "name": "Commercial & Community Buildings Grant Program",
+   "agency": "Maryland Energy Administration",
+   "closes_at": "2026-12-09",
+   "days_to_close": 18,
+   "link": "https://saj-sudo.github.io/funding-atlas/md/#p=commercial-community-buildings-grant-program-md-mea-pages/commercial%2526communitybuildingsgrantprogram.aspx"
+  },
+  {
+   "name": "Community Electric Vehicle Supply Equipment Grant Program",
+   "agency": "Maryland Energy Administration",
+   "closes_at": "2026-12-09",
+   "days_to_close": 18,
+   "link": "https://saj-sudo.github.io/funding-atlas/md/#p=community-electric-vehicle-supply-equipment-grant-program-md-mea-pages/communityevse.aspx"
+  },
+  {
+   "name": "Community Solar Grant Program",
+   "agency": "Maryland Energy Administration",
+   "closes_at": "2026-12-15",
+   "days_to_close": 24,
+   "link": "https://saj-sudo.github.io/funding-atlas/md/#p=community-solar-grant-program-md-mea-residential/pages/communitysolarlmi-ppa.aspx"
+  }
+ ]
+}
