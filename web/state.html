@@ -6,7 +6,21 @@
 <meta name="description" content="{{DESCRIPTION}}">
 <meta name="color-scheme" content="light dark">
 <title>{{TITLE}}</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d5bb8%27/%3E%3Crect x=%276%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3Crect x=%2718%27 y=%276%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%237fd09b%27/%3E%3Crect x=%276%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23f2c069%27/%3E%3Crect x=%2718%27 y=%2718%27 width=%278%27 height=%278%27 rx=%272%27 fill=%27%23fff%27/%3E%3C/svg%3E">
+<link rel="icon" href="{{ICON}}">
+<link rel="canonical" href="{{URL}}">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Funding Atlas">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:url" content="{{URL}}">
+<meta property="og:image" content="{{SHARE_IMAGE}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
+<meta name="twitter:card" content="summary_large_image">
+<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
 <link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
 <style>
 @font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
@@ -23,6 +37,7 @@
     <span class="spacer"></span>
     <a class="navlink" href="{{ROOT}}about/">About the data</a>
     <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
   </div>
 </header>
 
@@ -37,12 +52,6 @@
   <section class="briefing" aria-labelledby="brief-h">
     <h2 id="brief-h">This week</h2>
     <ul id="brief"></ul>
-    <details class="ahead" id="ahead">
-      <summary>Deadlines over the next 26 weeks</summary>
-      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st" id="ahead-st"></i><span id="ahead-st-l">State</span></span></div>
-      <div class="chart-scroll"><svg id="ahead-svg" role="img" aria-label="Deadlines per week, next 26 weeks"></svg></div>
-      <p class="muted small" id="ahead-note"></p>
-    </details>
   </section>
 
   <div class="tabs" role="tablist" aria-label="Views">
@@ -76,10 +85,16 @@
       <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
     </section>
     <div class="active" id="active" role="status" aria-live="polite"></div>
-    <p class="topic-key" id="topic-key"></p>
     <div class="layout">
       <aside class="facets" id="facets" aria-label="Filters">
         <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
         <a class="skip inside" href="#results">Skip filters, go to results</a>
         <details class="fit" id="fit">
           <summary>Check fit in three questions</summary>

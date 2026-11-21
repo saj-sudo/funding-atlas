@@ -71,24 +71,23 @@
     possible: 'May fit: local governments are eligible, but the source is less specific. Check eligibility.'
   };
   function statusLabel(s) { return STATUS_LABEL[s] || cap(s); }
-  // Topic lines (13.17, borrowed from Wayfinding): the eleven categories folded into three, each with a letter so the
-  // colour never carries the meaning alone. A program in several shows the first line that matches, in this order.
+  // Topic lines (13.17, as words since 13.21): the eleven categories folded into three. A card names its line in a
+  // word with a coloured dot, so the colour never carries the meaning alone; "other or not stated" shows nothing.
+  // A program in several shows the first line that matches, in this order.
   var TOPIC_LINES = [
-    { key: 'env', letter: 'E', name: 'Environment: water, energy, parks', cats: ['water', 'energy', 'parks'] },
-    { key: 'inf', letter: 'I', name: 'Infrastructure: transportation, infrastructure, broadband', cats: ['transportation', 'infrastructure', 'broadband'] },
-    { key: 'com', letter: 'C', name: 'Community: housing, health, workforce, public safety', cats: ['housing', 'health', 'workforce', 'public_safety'] }
+    { key: 'env', word: 'Environment', cats: ['water', 'energy', 'parks'] },
+    { key: 'inf', word: 'Infrastructure', cats: ['transportation', 'infrastructure', 'broadband'] },
+    { key: 'com', word: 'Community', cats: ['housing', 'health', 'workforce', 'public_safety'] }
   ];
-  var TOPIC_OTHER = { key: 'oth', letter: 'O', name: 'Other or not stated', cats: [] };
   function topicLine(p) {
     for (var i = 0; i < TOPIC_LINES.length; i++) {
       if ((p.categories || []).some(function (c) { return TOPIC_LINES[i].cats.indexOf(c) >= 0; })) return TOPIC_LINES[i];
     }
-    return TOPIC_OTHER;
+    return null;
   }
-  function topicKey() {
-    return '<span class="tkey-l">Topics:</span>' + TOPIC_LINES.concat([TOPIC_OTHER]).map(function (t) {
-      return '<span class="tkey"><span class="topic t-' + t.key + '" aria-hidden="true"><b>' + t.letter + '</b></span>' + h(t.name.split(':')[0]) + '</span>';
-    }).join('');
+  function topicWord(p) {
+    var L = topicLine(p);
+    return L ? ' · <span class="tw t-' + L.key + '"><i aria-hidden="true"></i>' + L.word + '</span>' : '';
   }
   function statusTag(s) { return '<span class="tag st-' + h(s) + '">' + h(statusLabel(s)) + '</span>'; }
   function levelLabel(p) { return p.level === 'federal' ? 'Federal' : (p.state ? stateName(p.state) : cap(p.level)); }
@@ -569,7 +568,12 @@
     var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
     var brief = [];
     if (nWeekState + nWeekFed) {
-      brief.push(['week', (cov.state ? plural(nWeekState, S.name + ' program', S.name + ' programs') + ' and ' : '') + plural(nWeekFed, 'federal notice', 'federal notices') + ' close in the next 7 days.']);
+      // Only the parts that are not zero, the verb agreeing with the total; a state with sources and none closing says so.
+      var weekParts = [];
+      if (cov.state && nWeekState) weekParts.push(plural(nWeekState, S.name + ' program', S.name + ' programs'));
+      if (nWeekFed) weekParts.push(plural(nWeekFed, 'federal notice', 'federal notices'));
+      brief.push(['week', weekParts.join(' and ') + (nWeekState + nWeekFed === 1 ? ' closes' : ' close') + ' in the next 7 days' +
+        (cov.state && !nWeekState ? '; no ' + S.name + ' program does.' : '.')]);
     } else {
       brief.push([nClosing ? 'closing' : null, 'Nothing on this page closes in the next 7 days' + (nClosing ? '; ' + nClosing + ' close within ' + R.closing_days + '.' : '.')]);
     }
@@ -670,9 +674,15 @@
       var isDefault = !st.q && !st.quick && FACETS.every(function (f) {
         return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
       });
+      // The default (likely fits only) is said once, in words, with the way out (13.20); any other filter is a chip.
+      if (isDefault) {
+        activeEl.innerHTML = '<span><span class="lbl">Likely fits only:</span> <b class="num">' + shown + ' of ' + total + '</b>.</span>' +
+          '<button class="btn quiet" data-clear="all">Show all ' + total + '</button>';
+        return;
+      }
       activeEl.innerHTML = '<span class="count num">Showing ' + shown + ' of ' + total + '</span>' +
         (chips.length ? '<span class="lbl">Filtered to</span>' + chips.join('') : '') +
-        (chips.length ? '<button class="btn quiet" data-clear="all">' + (isDefault ? 'Show all ' + total : 'Clear all') + '</button>' : '');
+        (chips.length ? '<button class="btn quiet" data-clear="all">Clear all</button>' : '');
     }
     activeEl.addEventListener('click', function (e) {
       var b = e.target.closest('button');
@@ -700,6 +710,8 @@
       return '<span class="muted">No deadline stated</span>';
     }
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
+    // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
+    function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
     function card(p) {
       var amount = amountText(p);
       var facts = [
@@ -715,7 +727,7 @@
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
-        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>' + badges(p) + '</p>' +
+        '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
@@ -724,14 +736,13 @@
     // The date column (13.2, direction A): month and day of a stated deadline, or a word when there is none.
     // Decorative for screen readers: the same date is in words on the card's first line.
     function dateCol(p) {
-      var dated = p.closes_at && !p.deadline_placeholder, L = topicLine(p);
-      var badge = '<span class="topic t-' + L.key + '" title="' + h(L.name) + '"><b>' + L.letter + '</b></span><span class="sr-only">Topic: ' + h(L.name) + '. </span>';
+      var dated = p.closes_at && !p.deadline_placeholder;
       if (dated) {
         var past = p.days_to_close != null && p.days_to_close < 0;
         return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
-          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + badge + '</div>';
+          '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + '</div>';
       }
-      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span>' + badge + '</div>';
+      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
     }
     // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
     var BUCKETS = [
@@ -748,12 +759,10 @@
       }).join('');
     }
 
-    el('topic-key').innerHTML = topicKey();
-
     // ---- the four groups ----
     var resultsEl = el('results');
     resultsEl.tabIndex = -1;
-    el('g-state-t').textContent = S.name + ' programs open or announced';
+    el('g-state-t').textContent = 'Open or announced in ' + S.name;
     el('g-unstated-d').textContent = S.name + ' programs for local governments whose agency page states no open or closed status and no date. They are listed so you know they exist; check the agency page before planning around one.';
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
@@ -859,15 +868,7 @@
       if (c) openDetail(byId[c.getAttribute('data-id')], c.querySelector('h3 button'));
     });
 
-    // ---- the two state-page charts (13.14): deadlines ahead, and when this state's deadlines have fallen ----
-    el('ahead-st-l').textContent = S.name;
-    var aheadDone = false;
-    el('ahead').addEventListener('toggle', function () {
-      if (!el('ahead').open || aheadDone) return;
-      aheadDone = true;
-      var r = chartRunway(el('ahead-svg'), P.map(function (p) { return [p.state, p.closes_at, p.deadline_placeholder]; }), 26, true);
-      el('ahead-note').textContent = r.total + ' deadlines in the next 26 weeks on this page, before filters; ' + r.later + ' later. Hover a week for its count.';
-    });
+    // ---- the state-page chart (13.14): when this state's deadlines have fallen (deadlines ahead moved to About in 13.20) ----
     var SEA = DATA.season, seaTot = SEA ? SEA.reduce(function (a, b) { return a + b; }, 0) : 0;
     if (seaTot >= 8) {
       el('season').hidden = false;
@@ -1057,7 +1058,10 @@
       clearTimeout(qTimer);
       qTimer = setTimeout(function () { st.q = qEl.value.trim(); render(); }, 120);
     });
-    el('sort').addEventListener('change', function () { st.sort = el('sort').value; render(); });
+    function setSort(v) { st.sort = v; el('sort').value = v; el('sort-tray').value = v; render(); }
+    el('sort').addEventListener('change', function () { setSort(el('sort').value); });
+    el('sort-tray').addEventListener('change', function () { setSort(el('sort-tray').value); });
+    if (window.matchMedia && matchMedia('(max-width: 480px)').matches) el('q').placeholder = 'Search';
     // On phones the filters are a tray over the results (13.16, NN/g): the result count stays on its button.
     var ft = el('filters-toggle'), backdrop = el('tray-backdrop');
     function setTray(open) {
@@ -1181,7 +1185,7 @@
         b.setAttribute('aria-pressed', String(k === 'opened' ? st.tab === 'changes' && st.feed === 'status' : k === 'unstated' ? false : st.quick === k));
       });
       Array.prototype.forEach.call(document.querySelectorAll('#panel-changes .chip'), function (c) { c.setAttribute('aria-pressed', String(c.getAttribute('data-feed') === st.feed)); });
-      el('sort').value = st.sort;
+      el('sort').value = st.sort; el('sort-tray').value = st.sort;
       if (qEl.value.trim() !== st.q) qEl.value = st.q;
       updateFacets();
       renderGroups();
@@ -1213,11 +1217,16 @@
   function indexPage() {
     var S = DATA.states, F = DATA.federal;
     var withSources = S.filter(function (s) { return s.programs > 0; });
-    el('stats').innerHTML =
-      '<div class="stat"><span class="v num">' + F.open + '</span><span class="k">federal notices open to local governments</span></div>' +
-      '<div class="stat"><span class="v num">' + F.closing_soon + '</span><span class="k">of them close within ' + DATA.rules.closing_days + ' days</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.length + '</span><span class="k">state' + (withSources.length === 1 ? '' : 's') + ' with state agency sources connected</span></div>' +
-      '<div class="stat"><span class="v num">' + withSources.reduce(function (a, s) { return a + s.programs; }, 0) + '</span><span class="k">state programs read, ' + withSources.reduce(function (a, s) { return a + s.open; }, 0) + ' open or announced for local governments, ' + withSources.reduce(function (a, s) { return a + (s.between || 0); }, 0) + ' closed recently</span></div>';
+    function n(x) { return '<b class="num">' + x.toLocaleString('en-US') + '</b>'; }
+    function sum(k) { return withSources.reduce(function (a, s) { return a + (s[k] || 0); }, 0); }
+    el('numbers').innerHTML =
+      '<li>' + n(F.open) + ' federal notice' + (F.open === 1 ? ' is' : 's are') + ' open to local governments.</li>' +
+      '<li>' + n(F.closing_soon) + ' of them close' + (F.closing_soon === 1 ? 's' : '') + ' within ' + DATA.rules.closing_days + ' days.</li>' +
+      '<li>' + n(withSources.length) + ' state' + (withSources.length === 1 ? ' has' : 's have') + ' state agency sources connected.</li>' +
+      '<li>' + n(sum('programs')) + ' state programs are read: ' + n(sum('open')) + ' open or announced for local governments, ' + n(sum('between')) + ' closed recently.</li>';
+    var wk = DATA.changes_week || 0;
+    if (wk) el('feed-sum').textContent += ': ' + wk.toLocaleString('en-US') + ' logged in the last ' + DATA.rules.new_days + ' days';
+    if (wk > DATA.changes.length) el('feed-note').insertBefore(document.createTextNode('The newest ' + DATA.changes.length + ' are listed here. '), el('feed-note').firstChild);
 
     var KIND_TEXT = {
       portal: 'state grants portal read', agencies: 'agency pages read', portal_agencies: 'state portal and agency pages read',
@@ -1261,6 +1270,38 @@
     });
     renderFooter('<p>Each state page carries every federal notice plus that state\'s agency programs where connectors exist. Coverage is stated on the page; a state with no sources yet says so.</p>');
   }
+
+  // ---- the theme switch (13.24): automatic (the system's), dark, light, kept in this browser only. The pre-paint
+  // script in each page's <head> applies a stored choice before anything draws; charts colour with var(--token), so
+  // they follow without a redraw. ----
+  function themeSwitch() {
+    var btn = el('theme-btn');
+    if (!btn) return;
+    var root = document.documentElement, metas = document.querySelectorAll('meta[name="theme-color"]');
+    var orig = Array.prototype.map.call(metas, function (m) { return m.getAttribute('content'); });
+    var NEXT = { auto: 'dark', dark: 'light', light: 'auto' }, NAME = { auto: 'automatic', dark: 'dark', light: 'light' };
+    var ICONS = {
+      auto: '<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>',
+      dark: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+      light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
+    };
+    function current() { var t = root.getAttribute('data-theme'); return t === 'dark' || t === 'light' ? t : 'auto'; }
+    function show() {
+      var t = current();
+      btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS[t] + '</svg>';
+      btn.setAttribute('aria-label', 'Theme: ' + NAME[t] + '. Switch to ' + NAME[NEXT[t]] + '.');
+      btn.title = 'Theme: ' + NAME[t];
+      Array.prototype.forEach.call(metas, function (m, i) { m.setAttribute('content', t === 'auto' ? orig[i] : (t === 'dark' ? '#0f1420' : '#f7f8fa')); });
+    }
+    btn.addEventListener('click', function () {
+      var t = NEXT[current()];
+      if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+      try { if (t === 'auto') localStorage.removeItem('fa-theme'); else localStorage.setItem('fa-theme', t); } catch (e) { /* storage blocked: the choice lasts this visit */ }
+      show();
+    });
+    show();
+  }
+  themeSwitch();
 
   if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
 })();

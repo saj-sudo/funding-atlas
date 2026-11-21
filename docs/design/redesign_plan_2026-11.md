@@ -87,7 +87,8 @@ and links that keep filters in the URL.
 ## Measures of success
 
 - Index: the state map inside the first screen on a 390 by 844 phone (about 759px down today).
-- State page: the first program title above 400px on a phone (652px today).
+- State page: the whole first program card on the first screen of a 390 by 844 phone (changed from "the first title
+  above 400px" by Saj on 2026-11-20: the title was already on screen at 652px; met in 13.20, the card ends at 768px).
 - A link to any page shows a title, a description and an image when pasted into a chat.
 - `uv run ruff check .` and `uv run pytest -q` pass.
 
@@ -101,10 +102,17 @@ declared, so they clamp); the star and close buttons from 40px to 44px.
 | Stage | State | Link | Date |
 |---|---|---|---|
 | Second review of the live site | Done | this file | 2026-11-18 |
-| Mockup of sessions 2 to 5 | Not started. Funding Atlas is eighth in the order | | |
-| Saj picks, and slots the sessions against the connector queue | Waiting on the mockup | | |
-| Session 1, brand surface (needs no mockup) | Not started | | |
-| Sessions 2 to 6 | Not started | | |
+| Mockup of session 2, the index (one screen, today beside proposed, at Saj's word) | Done: map top on a phone 881px to 312px, page 7.0 to 3.3 phone screens; prototype only, `web/` unchanged | https://claude.ai/artifact/RyZbBVmhoV1ep7QFM8Rg64 | 2026-11-19 |
+| Saj picks session 2 | Done: as shown, the change log folded on the index, the desktop side panel | roadmap decisions log | 2026-11-20 |
+| Mockup of sessions 3 to 5 (state page, topics, About) | Done: Maryland's first title on a phone 652px to 544px (whole first card on screen; the 400px target not met, variant B 492px), desktop 807px to 580px; About's clerk charts first, no view names in captions; prototypes only, `web/` unchanged | https://claude.ai/artifact/PEQ57ogx9bL3fDErLFQVUA | 2026-11-20 |
+| Saj picks sessions 3 to 5 | Done: as mocked, not variant B; "Likely fit" off cards; "Other" shows nothing; deadlines ahead and maximum awards are the clerk's charts; the phone measure is the whole first card; all three built now, one commit each | roadmap decisions log | 2026-11-20 |
+| Saj slots sessions 1 and 6 against the connector queue | Closed: Saj asked for both on 2026-11-20 | | 2026-11-20 |
+| Session 1, brand surface (needs no mockup) | Done (13.23): Open Graph and Twitter tags on every page, `web/share.png` 1200 by 630, the mark as the icon in the palette, `theme-color`; About's feed link fixed. The chat preview itself is checked after merge | roadmap Done, 13.23 | 2026-11-20 |
+| Session 2, the index leads with the map | Done (13.19): map top on a phone 881px to 312px, desktop 706px to 253px, index 7.0 to 3.3 phone screens | roadmap Done, 13.19 | 2026-11-20 |
+| Session 3, the state page reaches the first program sooner | Done (13.20): first title on a phone 652px to 527px, whole first card on screen; desktop 807px to 635px | roadmap Done, 13.20 | 2026-11-20 |
+| Session 4, topics as words | Done (13.21): no lettered badge or key row, topic tokens of their own, headings 21.6px against 18.2px card titles on a phone | roadmap Done, 13.21 | 2026-11-20 |
+| Session 5, About for two readers | Done (13.22): clerk charts first, "For researchers", plain captions, one "Data and code" note; "Maximum awards" at 781px (was 2,852px) | roadmap Done, 13.22 | 2026-11-20 |
+| Session 6, a theme switch | Done (13.24): automatic, dark, light from the top bar, kept per browser, applied before paint; checked in both OS modes at both sizes | roadmap Done, 13.24 | 2026-11-20 |
 
 ## Starting a session on this work
 

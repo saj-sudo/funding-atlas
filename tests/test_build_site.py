@@ -237,6 +237,87 @@ def test_build_shapes_changes(conn):
     assert md["changes"][0]["at"] >= md["changes"][-1]["at"]
     assert len(site["index"]["changes"]) <= build_site.INDEX_FEED_N
     assert site["index"]["federal"]["new"] == 1 and site["index"]["federal"]["closing_soon"] == 1
+    week = sum(1 for c in build_site.load_changes(conn) if c["changed_at"][:10] > (NOW - timedelta(days=build_site.NEW_DAYS)).strftime("%Y-%m-%d"))
+    assert site["index"]["changes_week"] == week > 0                     # the T2 run is two days ago, T1 three weeks
+
+
+def test_changes_within_counts_every_change_not_the_index_slice():
+    rows = [{"changed_at": "2026-11-19T06:00:00Z"}] * (build_site.INDEX_FEED_N + 5) + [
+        {"changed_at": "2026-11-14T00:00:01Z"},    # the first day of the 7 days to 2026-11-20 (14th to 20th)
+        {"changed_at": "2026-11-13T23:59:59Z"},    # the day before: outside
+        {"changed_at": None},
+    ]
+    assert build_site.changes_within(rows, "2026-11-20T02:00:00Z", 7) == build_site.INDEX_FEED_N + 6
+
+
+def test_state_page_reaches_the_first_program_sooner(conn, tmp_path):
+    """Redesign session 3 (13.20): the 26-week chart left the state page; sort has a copy in the phone filter tray."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    assert 'id="ahead"' not in page and 'id="sort-tray"' in page
+    assert page.count('<option value="closing">') == 2          # the toolbar's sort and the tray's offer the same orders
+
+
+def test_topics_are_words_with_their_own_colours(conn, tmp_path):
+    """Redesign session 4 (13.21): no lettered badge or key row; topic colours are tokens of their own in both themes."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    assert "topic-key" not in page and 'class="topic ' not in page
+    root, dark = page.split("@media (prefers-color-scheme: dark)", 1)
+    for token in ("--topic-env", "--topic-inf", "--topic-com"):
+        assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
+
+
+def test_about_page_serves_the_clerk_first(conn, tmp_path):
+    """Redesign session 5 (13.22): the two clerk charts lead, the methods charts sit under their own heading, and the
+    captions are plain words: view names are in one Data and code note."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    at = [page.index(s) for s in ('id="c1"', 'id="c5"', "For researchers", 'id="c2"', 'id="c3"', 'id="c4"', "Data and code")]
+    assert at == sorted(at)
+    assert not [s for s in re.findall(r'<p class="src">(.*?)</p>', page, re.S) if "<code>v_" in s]
+    assert "<code>v_navigator_program</code>" in page
+
+
+def test_every_page_has_a_link_preview(conn, tmp_path):
+    """Redesign session 1 (13.23): a link pasted into a chat shows a title, a description and the share image."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    png = (out / "share.png").read_bytes()
+    assert png[:8] == b"\x89PNG\r\n\x1a\n" and int.from_bytes(png[16:20], "big") == 1200 and int.from_bytes(png[20:24], "big") == 630
+    for rel, url in (("index.html", build_site.SITE_URL), ("md/index.html", build_site.SITE_URL + "md/"),
+                     ("about/index.html", build_site.SITE_URL + "about/")):
+        page = (out / rel).read_text(encoding="utf-8")
+        meta = dict(re.findall(r'<meta (?:property|name)="((?:og|twitter):[a-z:_]+)" content="([^"]*)">', page))
+        assert meta["og:url"] == url and meta["og:image"] == build_site.SHARE_IMAGE, rel
+        assert meta["og:title"] and meta["og:description"] and meta["twitter:card"] == "summary_large_image", rel
+        assert f'<link rel="canonical" href="{url}">' in page and page.count('<meta name="theme-color"') == 2, rel
+        assert not any(c in page for c in ("1d5bb8", "7fd09b", "f2c069")), rel    # the old off-palette favicon
+    assert 'href="../feed.xml"' in (out / "about" / "index.html").read_text(encoding="utf-8")
+
+
+def test_theme_switch_matches_the_dark_preference(conn, tmp_path):
+    """Redesign session 6 (13.24): a dark choice gets exactly the dark preference's tokens; every page has the switch
+    and applies a stored choice before it paints."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    for rel in ("index.html", "md/index.html", "about/index.html"):
+        page = (out / rel).read_text(encoding="utf-8")
+        assert 'id="theme-btn"' in page and "localStorage.getItem('fa-theme')" in page, rel
+        assert page.index("localStorage.getItem('fa-theme')") < page.index("<style>"), rel
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    pref = re.search(r':root:not\(\[data-theme="light"\]\) \{(.*?)\}', page, re.S).group(1)
+    chosen = re.search(r':root\[data-theme="dark"\] \{(.*?)\}', page, re.S).group(1)
+    tokens = lambda block: dict(re.findall(r"(--[a-z0-9-]+|color-scheme):\s*([^;]+);", block))  # noqa: E731
+    assert tokens(pref) and tokens(pref) == tokens(chosen)
+    assert ":root, :root[data-theme] { --bg: #fff;" in page                 # print stays light whatever the choice
+
+
+def test_index_leads_with_the_map(conn, tmp_path):
+    """Redesign session 2 (13.19): the map comes before the numbers, the numbers are sentences, the log is folded."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert 'id="stats"' not in index
+    assert index.index('id="map"') < index.index('id="numbers"') < index.index('<details class="changes-fold">') < index.index('id="feed"')
+    assert "Pick your state. Your state's own programs come first." in index
 
 
 def test_index_states_and_tile_grid(conn):

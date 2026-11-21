@@ -207,6 +207,9 @@ PORTAL_APPLICANTS: dict[str, str] = {
     "nonprofits without 501(c)(3) status (excludes institutions of higher education)": "nonprofit",
     "public and state controlled institutions of higher education": "higher_ed",
     "private institutions of higher education": "higher_ed",
+    # New Mexico DFA's Grant Search (12.8b); its other labels (Local Government, Tribes Pueblos Nations, Non-profit,
+    # State Agency, Business / For-profit) are read by the keyword tagger, and Other / Unrestricted name no one
+    "higher education": "higher_ed",
 }
 
 # Topic label -> categories. A label that names two topics carries both (as DHCD's energy-home-repair section
@@ -247,6 +250,14 @@ PORTAL_CATEGORIES: dict[str, tuple[str, ...]] = {
     "rail and freight": ("transportation",), "recreation": ("parks",), "outdoor recreation": ("parks",),
     "recreation and conservation": ("parks",), "recreation and culture": ("parks",),
     "emergency management": ("public_safety",), "emergency mitigation": ("public_safety",), "social services": ("health",),
+    # New Mexico DFA's Grant Search categories (12.8b): 27 labels; Transportation, Housing, Economic Development, Parks
+    # and Recreation and Health are above, these name ours, and the rest (Community, Schools, Tourism, Cultural, Senior
+    # Citizens, Children & Family, Food & Nutrition, Domestic Shelter, Military & Veterans, Spaceport, EXPO, Consumer
+    # Protection, Public & Administrative, Other) fall to `other`
+    "water wastewater solid waste utilities": ("water",), "acequias and dams": ("water",),
+    "roads and bridges": ("transportation",), "behavioral health": ("health",),
+    "law enforcement and public safety": ("public_safety",), "emergency": ("public_safety",),
+    "corrections": ("public_safety",), "judicial": ("public_safety",),
 }
 
 
