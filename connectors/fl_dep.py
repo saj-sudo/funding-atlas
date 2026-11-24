@@ -86,8 +86,7 @@ CLOSED_CYCLE_RE = re.compile(r"\bcycle\s*\(\s*closed\s*\)", re.I)
 # governments (city and county) and special districts are eligible loan sponsors",
 # "All local governments ... may submit FRDAP applications", "A local government entity is a county government, ...",
 # "provides funding to Florida's governmental entities (cities, counties, municipalities, etc.)".
-APPLICANT_RE = re.compile(r"\bloans?\s+to\s+(?:[\w-]+\s+){0,2}(?:local governments?|municipalit\w+|cities|counties)\b"
-                          r"|\bare eligible loan sponsors\b|\blocal governments?\b[^.]*\bmay submit\b"
+APPLICANT_RE = re.compile(r"\bare eligible loan sponsors\b|\blocal governments?\b[^.]*\bmay submit\b"
                           r"|^a local government entity is\b|\bfunding to\b[^.]*\bgovernmental entities\b", re.I)
 # What the money is for is not who applies, and its "not attaining ... standards" would drop the line: cut before tagging.
 TO_DO_RE = re.compile(r"\s+to (?:address|plan)\b.*$", re.I)

@@ -355,13 +355,16 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   r"|\bwho['\u2019]s eligible\b|\bwhat communities are considered\b", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
+    r"|\bloans?\s+(?:are|is)\s+made\s+available\s+to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to (?:apply|submit)\b"
     r"|\b(?:is|are) eligible for funding\b|\bfor local municipalities\b"
     # Connecticut (12.6b): "accepting applications from municipalities", "Applicants must be a municipality",
     # "only available to Connecticut towns and cities", "State funds to urbanized area municipal governments",
     # "grants-in-aid to towns", "enables municipalities ... to apply", "sub-entities able to apply".
     r"|\baccept(?:s|ing) applications from\b|\bapplicants? must be\b|\b(?:is|are) (?:only )?available to\b"
-    r"|\b(?:funds?|funding|grants?(?:-in-aid)?)\s+to\s+(?:[\w-]+\s+){0,3}"
+    # 12.10: loans as well as grants (Mississippi MDA's "provides loans to municipalities", Florida DEP's "loans to local
+    # governments", South Carolina RIA's "loans are made available to"; three 12.9 modules carried a copy)
+    r"|\b(?:funds?|funding|grants?(?:-in-aid)?|loans?)\s+to\s+(?:[\w-]+\s+){0,3}"
     r"(?:municipal\w*|towns?|cities|count(?:y|ies)|local governments?)\b"
     r"|\benables?\b[^.]*\bto apply\b|\bable to apply\b|\bserves? as the sub-?applicant\b"   # FEMA: a town is the sub-applicant
     # North Dakota (12.6c): Commerce's "Eligible Entities – City, County, ..." (a line that starts with it: SLCGP quotes a

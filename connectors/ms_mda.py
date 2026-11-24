@@ -52,7 +52,8 @@ CONTACT_RE = re.compile(r"(?:For more information[^.]*?|To learn more),? contact
 # "CAP provides loans to municipalities and counties ...", "provides municipalities and counties funding ...", "Funding
 # ... can be used by small municipalities ... and counties ...", "provides loans to local units of government ..."
 OWN_APPLICANT_RE = re.compile(
-    r"\bprovides?\s+(?:(?:loans?|grants?|funds|funding)\s+to\s+)?(?:municipalities|counties|local units? of government)\b"
+    # "provides loans to municipalities" is the shared rule's since 12.10; the bare "provides municipalities ..." is not
+    r"\bprovides?\s+(?:municipalities|counties|local units? of government)\b"
     r"|\bcan be used by\s+(?:small\s+)?(?:municipalities|counties)\b", re.I)
 # What the money is for names who a project serves, not who applies ("to assist with the location, expansion or retention
 # of businesses", "to finance public infrastructure projects that promote economic growth"). Cut before tagging only.

@@ -60,7 +60,7 @@ DEADLINES_RE = re.compile(r"^[^.:]*\bdeadlines\b[^.:]*:", re.I)
 # Who may apply, in two sentence forms the shared reader does not know: "Low-interest loans are made available to
 # municipalities, counties and special purpose districts" (SRF) and "Eligible candidates for assistance will be local
 # governments, ..." with "Non-profit water and sewer companies are not eligible for this pilot program." (VIP).
-APPLICANT_RE = re.compile(r"\bloans are made available to\b|^eligible candidates for assistance\b|\bnot eligible for this pilot program\b", re.I)
+APPLICANT_RE = re.compile(r"^eligible candidates for assistance\b|\bnot eligible for this pilot program\b", re.I)
 # "Federal requirements such as ... disadvantaged businesses ... may apply to SRF funded projects": rules that apply, not
 # applicants.
 NOT_APPLICANT_RE = re.compile(r"^federal requirements\b|^eligible applicants$", re.I)
