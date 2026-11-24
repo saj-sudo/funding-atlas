@@ -57,7 +57,6 @@ DROP_RE = re.compile(r"\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b|@ria\.sc\.g
 STOP_RE = re.compile(r"^(?:program strategy|application process|interest rates|program description|featured case study)$", re.I)
 # "The application deadlines for RIA grants in FY27 are:" and, in the next paragraph, the dates.
 DEADLINES_RE = re.compile(r"^[^.:]*\bdeadlines\b[^.:]*:", re.I)
-ROLLING_RE = re.compile(r"\bmay be submitted at any time\b", re.I)
 # Who may apply, in two sentence forms the shared reader does not know: "Low-interest loans are made available to
 # municipalities, counties and special purpose districts" (SRF) and "Eligible candidates for assistance will be local
 # governments, ..." with "Non-profit water and sewer companies are not eligible for this pilot program." (VIP).
@@ -122,7 +121,7 @@ class ScRia(AgencyPageConnector):
         merged = {"title": pages[0].get("title", ""), "blocks": apply + [tuple(b) for b in pages[0].get("blocks", [])]}
         out = []
         for sid, payload in super().records_for(slug, path, [merged], count):
-            rolling = any(ROLLING_RE.search(t) for _, t in payload["page"]["blocks"][:2])
+            rolling = any(hl.ROLLING_OPEN_RE.search(t) for _, t in payload["page"]["blocks"][:2])
             payload["page"]["blocks"] = [
                 (kind, text) for kind, text in payload["page"]["blocks"]
                 if not any(own.search(text) and sid not in sids for own, sids in OWN_LINES)
@@ -137,10 +136,6 @@ class ScRia(AgencyPageConnector):
         lines += [s for s in sents if APPLICANT_RE.search(s) and s not in lines]
         out["eligibility_text"] = "\n".join(lines) or None
         out["applicant_types"] = hl.applicant_tags([hl.clause_cut(line) for line in lines])
-        if out["status"] == "unknown" and out["closes_at"] is None:
-            rolling = next((s for s in sents if ROLLING_RE.search(s)), None)
-            if rolling:
-                out.update(status="open", rolling=True, closes_at_text=rolling)
         return out
 
 

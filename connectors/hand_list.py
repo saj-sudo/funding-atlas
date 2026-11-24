@@ -534,9 +534,18 @@ def opening(sents: list[str]) -> date | None:
     return window[1] if window else None
 
 
+# Applications taken whenever they come (12.10, lifted from four 12.9 modules): South Carolina Commerce's "may be
+# submitted at any time", RIA's "may be submitted at any time for Tier 3 & 4 counties", Wisconsin DOA's "accepted on a
+# continuous basis", Florida DEP's "can be submitted any time during the year". Open and rolling, with no deadline; read
+# only when the page dates nothing and says neither open nor closed.
+ROLLING_OPEN_RE = re.compile(r"\bsubmitted\b[^.]{0,60}?\b(?:at\s+)?any\s?time\b|\baccepted\s+on\s+a\s+continuous\s+basis\b", re.I)
+NOI_RE = re.compile(r"\bNOIs?\b|\bnotices?\s+of\s+intent\b", re.I)
+
+
 def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
-    """status, opens_at, closes_at, closes_at_text: a deadline still ahead (forecasted while the opening is ahead),
-    then closed wording, then a past deadline (unknown: it outranks a stale "now open"), then undated open wording."""
+    """status, opens_at, closes_at, closes_at_text, rolling: a deadline still ahead (forecasted while the opening is
+    ahead), then closed wording, then a past deadline (unknown: it outranks a stale "now open"), then undated open
+    wording. `rolling` is always None here: `rolling_round` reads it last, after the yearless hook."""
     sents = all_sentences(blocks)
     due_s, due = deadline(sents, today)
     opens = opening(sents)
@@ -552,7 +561,18 @@ def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
         status, text = "open", open_s
     else:
         status, text = "unknown", None
-    return {"status": status, "opens_at": opens, "closes_at": due, "closes_at_text": text}
+    return {"status": status, "opens_at": opens, "closes_at": due, "closes_at_text": text, "rolling": None}
+
+
+def rolling_round(blocks: Blocks, out: dict[str, Any]) -> dict[str, Any]:
+    """`out` turned open and rolling when the page dates nothing, says nothing of its timing (no open, closed or
+    yearless-cycle sentence was kept) and says applications are taken at any time. A notice of intent taken at any
+    time is not a round (Missouri SEMA's mitigation page: the application cycle follows a disaster)."""
+    if out["status"] != "unknown" or out["closes_at"] is not None or out["closes_at_text"]:
+        return out
+    s = next((s for s in all_sentences(blocks) if ROLLING_OPEN_RE.search(s) and not NEGATION_RE.search(s)
+              and not NOI_RE.search(s)), None)
+    return {**out, "status": "open", "closes_at_text": s, "rolling": True} if s else out
 
 
 # The labelled lines a page prints under a program's heading (Kentucky's Energy and Environment Cabinet).
@@ -680,7 +700,6 @@ class AgencyPageConnector(HandListConnector):
             funding_type=self.FUNDING_TYPES.get(raw.source_id) or funding_type_for(name) or "grant",
             funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text),
             match_required=match,
-            rolling=None,
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,
             eligibility_structured=None,
@@ -694,4 +713,4 @@ class AgencyPageConnector(HandListConnector):
         if self.YEARLESS_RE is not None and out["status"] == "unknown" and not out["closes_at_text"]:
             out["closes_at_text"] = next((s for s in all_sentences(blocks)
                                           if self.YEARLESS_RE.search(s) and not YEAR_RE.search(s)), None)
-        return out
+        return rolling_round(blocks, out)

@@ -82,7 +82,6 @@ WINDOW_RE = re.compile(rf"({_MONTH}\s+\d{{1,2}})(?:,?\s+(\d{{4}}))?\s*(?:-|\u201
 CLOSED_ON_RE = re.compile(r"\bclosed\s+(?:on\s+)?(?=[a-z]{3,9}\.?\s+\d{1,2},?\s+\d{4})", re.I)
 CLOSED_CYCLE_RE = re.compile(r"\bcycle\s*\(\s*closed\s*\)", re.I)
 # "a Request for Inclusion form, which can be submitted any time during the year"
-ANY_TIME_RE = re.compile(r"\bsubmitted\s+(?:at\s+)?any\s?time\s+(?:during|throughout)\s+the\s+year\b", re.I)
 # Who applies, in this agency's words: "provides low-interest loans to local governments and private utilities", "local
 # governments (city and county) and special districts are eligible loan sponsors",
 # "All local governments ... may submit FRDAP applications", "A local government entity is a county government, ...",
@@ -197,17 +196,12 @@ class FlDep(AgencyPageConnector):
         closed = next((s for s in sents if CLOSED_CYCLE_RE.search(s)), None)
         if closed and out["closes_at"] and out["closes_at"] < today:
             return {**out, "status": "closed", "closes_at_text": f"{closed}: {out['closes_at_text']}"}
-        rolling = next((s for s in sents if ANY_TIME_RE.search(s)), None)
-        if rolling and not out["closes_at"]:
-            return {"status": "open", "opens_at": None, "closes_at": None, "closes_at_text": rolling}
         return out
 
     def fields(self, raw: RawRecord, today: date) -> dict[str, Any]:
         out = super().fields(raw, today)
         blocks = [tuple(b) for b in raw.payload["page"].get("blocks", [])]
         sents = all_sentences(blocks)
-        if out["status"] == "open" and out["closes_at"] is None and ANY_TIME_RE.search(out["closes_at_text"] or ""):
-            out["rolling"] = True
         if out["match_required"] is None and any(MATCH_BASIS_RE.search(s) for s in sents):
             out["match_required"] = True
         if len(out["summary"] or "") < SUMMARY_MIN_CHARS:

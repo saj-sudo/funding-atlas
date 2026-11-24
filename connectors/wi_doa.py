@@ -52,7 +52,6 @@ ZERO_WIDTH_RE = re.compile("[​‌‍﻿]")
 DROP_RE = re.compile(r"\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b|@wisconsin\s*\.gov|\[email\s*protected\]|\bPO Box\b"
                      r"|\bmailing address\b|\((?:PDF|Word|Excel)\)$", re.I)
 STOP_RE = re.compile(r"^(?:contact.*|cdbg program quick links)$", re.I)
-ROLLING_RE = re.compile(r"\baccepted on a continuous basis\b|\bmay be submitted at any time\b", re.I)
 # "Application Available: January 18, 2027" (Affordable Housing Conversion's timeline)
 AVAILABLE_RE = re.compile(r"^application available:", re.I)
 # No dated round: "Typically applications are due in mid-May each year." (PF), "... must submit a notice of intent to apply
@@ -116,10 +115,6 @@ class WiDoa(AgencyPageConnector):
         lines += [line for line in (out["eligibility_text"] or "").split("\n") if line and line not in lines]
         out["eligibility_text"] = "\n".join(lines) or None
         out["applicant_types"] = hl.applicant_tags([PURPOSE_CUT_RE.sub("", hl.clause_cut(line)) for line in lines])
-        if out["status"] == "unknown" and out["closes_at"] is None:
-            rolling = next((s for s in sents if ROLLING_RE.search(s)), None)
-            if rolling:
-                out.update(status="open", rolling=True, closes_at_text=rolling)
         available = next((hl.first_date(s) for s in sents if AVAILABLE_RE.search(s)), None)
         if available and out["opens_at"] is None:
             out["opens_at"] = available

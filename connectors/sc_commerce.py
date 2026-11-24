@@ -64,7 +64,6 @@ STOP_RE = re.compile(r"^(?:national objectives|why is an application request req
                      r"|looking for additional.*|find incentives.*)$", re.I)
 # "Application requests ... may be submitted at any time", "LAR applications may be submitted anytime throughout the year",
 # "Applications can be submitted to the State Program Manager at any time throughout the year".
-ROLLING_RE = re.compile(r"\bsubmitted\b[^.]{0,60}\b(?:at any time|anytime)\b", re.I)
 # "There is no open SCRC funding opportunity at this time."
 NONE_OPEN_RE = re.compile(r"\bno open\b[^.]*\bfunding opportunity\b", re.I)
 # "Application timelines and deadlines vary by funding cycle." (ARC Area Development): no date, kept as the round's text.
@@ -154,13 +153,11 @@ class ScCommerce(AgencyPageConnector):
         lines += [s for s in sents if LIMITED_TO_RE.search(s) and s not in lines]
         out["eligibility_text"] = "\n".join(lines) or None
         out["applicant_types"] = hl.applicant_tags([POPULATION_RE.sub("", hl.clause_cut(line)) for line in lines])
-        if out["status"] == "unknown" and out["closes_at"] is None:
+        # "no open ... funding opportunity" outranks the base's rolling reading, as it did when both were local
+        if (out["status"] == "unknown" or out.get("rolling")) and out["closes_at"] is None:
             none_open = next((s for s in sents if NONE_OPEN_RE.search(s)), None)
-            rolling = next((s for s in sents if ROLLING_RE.search(s)), None)
             if none_open:
-                out.update(status="closed", closes_at_text=none_open)
-            elif rolling:
-                out.update(status="open", rolling=True, closes_at_text=rolling)
+                out.update(status="closed", closes_at_text=none_open, rolling=None)
         return out
 
 
