@@ -136,6 +136,9 @@ CONNECTOR_LABEL = {
     "al_adem": "Alabama Department of Environmental Management",
     "al_dot": "Alabama Department of Transportation",
     "ms_mda": "Mississippi Development Authority",
+    "in_ocra": "Indiana Office of Community and Rural Affairs",
+    "in_indot": "Indiana Department of Transportation",
+    "ga_dca": "Georgia Department of Community Affairs",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
@@ -158,7 +161,6 @@ STATE_NOTE: dict[str, tuple[str, str]] = {
     "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
     "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
     "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
-    "GA": ("none", "No public state list of grants for local governments was found."),
     "HI": ("none", "No public state list of grants for local governments was found."),
     "LA": ("none", "No public state list of grants for local governments was found."),
     "OH": ("none", "Ohio's grants site answered nothing when surveyed."),

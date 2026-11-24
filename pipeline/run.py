@@ -24,8 +24,11 @@ from connectors import (
     de_dema,
     de_dnrec,
     de_dsha,
+    ga_dca,
     grants_gov,
     il_csfa,
+    in_indot,
+    in_ocra,
     ky_dlg,
     ky_dlgfed,
     ky_eec,
@@ -150,6 +153,9 @@ CONNECTORS: dict[str, ModuleType] = {
     "al_adem": al_adem,
     "al_dot": al_dot,
     "ms_mda": ms_mda,
+    "in_ocra": in_ocra,
+    "in_indot": in_indot,
+    "ga_dca": ga_dca,
 }
 
 
