@@ -66,8 +66,6 @@ RECIPIENT_RE = re.compile(r"\bprovides local governments access to\b|\bfinancing
 # is tagged as "units of local government"; what follows "excluding" (entitlement cities and urban counties) is who may not.
 GENERAL_RE = re.compile(r"\bunits of general[- ](?:purpose )?local government\b", re.I)
 EXCLUDING_RE = re.compile(r",?\s*\bexcluding\b.*$", re.I)
-# The annual competition's match depends on the grant's size ("Grants up to $500,000 ... no matching funds required").
-MATCH_VARIES = {"cdbg-annual"}
 
 
 def tag_line(line: str) -> str:
@@ -139,8 +137,6 @@ class GaDca(AgencyPageConnector):
         lines += [s for s in all_sentences(blocks) if RECIPIENT_RE.search(s) and s not in lines]
         out["eligibility_text"] = "\n".join(lines) or None
         out["applicant_types"] = applicant_tags([tag_line(line) for line in lines])
-        if raw.source_id in MATCH_VARIES:
-            out["match_required"] = None
         return out
 
 

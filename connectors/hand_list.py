@@ -441,7 +441,9 @@ PURPOSE_RE = re.compile(r"\b(?:(?:and\s+)?(?:are|is)\s+)?for\s+the\s+(?:developm
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
 MATCH_RE = re.compile(r"\bmatch(?:ing)?\b[^.]*\brequired\b|\brequire[sd]?\b[^.]*\bmatch\b", re.I)
-MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
+# Georgia DCA (12.10, lifted from `ga_dca`): "Grants up to $500,000 ... - no matching funds required." Any such line
+# leaves the field unknown, since a page that says it once usually requires a match above some size.
+MATCH_NOT_RE = re.compile(r"\bno match(?:ing)?\b|\bmatch (?:is )?not required\b", re.I)
 
 
 def clause_cut(line: str) -> str:
