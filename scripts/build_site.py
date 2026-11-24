@@ -81,7 +81,7 @@ CONNECTOR_LABEL = {
     "wv_grants": "West Virginia grants portal (grants.wv.gov)",
     "ca_grants": "California Grants Portal (grants.ca.gov)",
     "il_csfa": "Illinois Catalog of State Financial Assistance (GATA)",
-    "webgrants": "WebGrants storefronts (Iowa, Montana)",
+    "webgrants": "WebGrants storefronts (Iowa, Montana, North Dakota, New Hampshire)",
     "tx_egrants": "Texas Office of the Governor eGrants",
     "nj_dca_sage": "New Jersey DCA SAGE (public RFP list)",
     "ny_sfs": "New York SFS Grant Opportunity Portal",

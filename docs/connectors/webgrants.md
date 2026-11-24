@@ -14,6 +14,42 @@ municipal rows, as expected from a single Department of Agriculture host. Cross-
 against the deadline heading on its own detail page: all 40 agree, and one round (687121) repeats its final date as its
 pre-application date on the list, which the record leaves out.
 
+## New Hampshire CDFA (2026-11-24, roadmap 12.9)
+
+New Hampshire was "stopped" in 12.6 because every `nh.gov` agency answered 403 through the development proxy. Its CDBG
+agency is not on `nh.gov`: the Community Development Finance Authority (`nhcdfa.org`) sends applicants to its own
+WebGrants storefront, `https://www.nhcdfagrants.org` ("APPLY / GRANTS MANAGEMENT" on its home page; `robots.txt`
+answers 404, so nothing is disallowed). It serves `storefrontFOList.do` and `viewStorefrontOpportunity.do` as the other
+three states do, with no pre-application column (read by header name already), so it is one line in `HOSTS` (`nh`).
+
+Read once on 2026-11-24, the list and its eight detail pages, 3 s apart (9 requests):
+
+| Record | Round | Status | Closes |
+|---|---|---|---|
+| `nh-42431` | CDBG Public Facilities: 2026 - Round 2 | open | 2027-01-25 |
+| `nh-42430` | CDBG Housing: 2026 - Round 2 | open | 2027-01-25 |
+| `nh-38168` | CDBG Planning Grants: 2026 | open | 2027-06-30 |
+| `nh-40661` | CDBG Economic Development - 2026 Allocation | open | 2027-06-30 |
+| `nh-28172` | Recovery Housing Program | open, rolling | "Not Applicable" |
+| `nh-35045` | Clean Energy Fund Loan 2026 | open | 2026-12-31 |
+| `nh-42286` | Tax Credit Grant Writing Assistance 2027 | open | 2027-01-22 |
+| `nh-35047` | Small Business Energy Audit Program | open (businesses only) | 2027-03-31 |
+
+The five CDBG and Recovery Housing pages say "Eligible applicants ... include ... New Hampshire incorporated counties,
+cities, and towns", so they tag municipality and county; the Clean Energy Fund loan and the grant-writing round name
+municipalities beside nonprofits.
+
+One change: CDFA labels the officer **"Project Manager"** where the other hosts say "Program Officer". It joins
+`CONTACT_LABELS`, so the name never enters the payload (the list of labels is what keeps contact details out).
+
+Gaps, as read: every round's "Categorical Area" is empty, so no category is set; the CDBG pages name no federal agency
+in the fields the connector reads, so their funding source is `direct`; "Tax Credit Grant Writing Assistance" takes the
+funding type `tax_credit` from its name, though it is a small grant toward writing a tax-credit application.
+**Not verified**: a whole `cli.py run webgrants` from this session (the development network reaches only the New
+Hampshire host; the list and detail pages above were read through the connector's own `parse_list`, `parse_detail`
+and `normalize`). The rest of New Hampshire (`nh.gov`: DOT, DES, the Office of Planning) was not probed from the
+Actions runner and stays a follow-up.
+
 ## North Dakota (2026-11-05, roadmap 12.6c)
 
 The 12.6c probe found the third storefront state: `https://grants.nd.gov` ("WebGrants - North Dakota", the state's

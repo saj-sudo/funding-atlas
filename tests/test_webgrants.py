@@ -1,5 +1,6 @@
 """WebGrants storefront connector tests. Everything runs against the saved pages (never the network): three lists
-(Iowa, Montana Agriculture, Montana Fish, Wildlife and Parks with no rows, North Dakota) and eight detail pages."""
+(Iowa, Montana Agriculture, Montana Fish, Wildlife and Parks with no rows, North Dakota, New Hampshire CDFA) and sixteen
+detail pages."""
 
 from __future__ import annotations
 
@@ -246,8 +247,9 @@ def pages(monkeypatch):
 def test_fetch_reads_every_list_and_every_detail(pages):
     records = wg.fetch()
     assert [r.source_id for r in records] == ["ia-230028", "ia-371353", "ia-666997", "ia-667406", "mtagr-27785", "mtagr-28249",
-                                              "nd-1086108", "nd-1088301"]
-    assert sum(1 for u in pages.calls if wg.LIST_PATH in u) == 4
+                                              "nd-1086108", "nd-1088301", "nh-28172", "nh-35045", "nh-35047", "nh-38168",
+                                              "nh-40661", "nh-42286", "nh-42430", "nh-42431"]
+    assert sum(1 for u in pages.calls if wg.LIST_PATH in u) == 5
     assert records[0].payload["host"] == "ia" and records[0].payload["detail"]["fields"]["Status"] == "Posted"
     assert len(wg.fetch(limit=2)) == 2
 
@@ -334,6 +336,31 @@ def test_north_dakota_storefront():
     assert p.source_url.startswith("https://grants.nd.gov/")
     honor = normalize(HONOR)
     assert (honor.administering_agency, honor.closes_at, honor.rolling) == ("North Dakota Veterans Affairs", None, True)
+
+
+def test_new_hampshire_cdfa_storefront():
+    # the fourth host (12.9): CDFA posts its CDBG rounds here; the list has no pre-application column
+    assert len(list_rows("nh")) == 8
+    today = date(2026, 11, 24)
+
+    def at(source_id: str):
+        return wg.normalize(RawRecord(source_connector=wg.CONNECTOR, source_id=source_id, payload=payload(source_id)), today)
+
+    pf = at("nh-42431")
+    assert (pf.name, pf.jurisdiction, pf.status, pf.closes_at) == (
+        "CDBG Public Facilities: 2026 - Round 2", "NH", "open", date(2027, 1, 25))
+    assert (pf.amount_min, pf.amount_max) == (None, 750000)
+    assert pf.source_url.startswith("https://www.nhcdfagrants.org/")
+    assert {"municipality", "county"} <= {t.value for t in pf.applicant_types}   # "incorporated counties, cities, and towns"
+    rhp = at("nh-28172")
+    assert (rhp.closes_at, rhp.rolling) == (None, True)   # "Not Applicable"
+    assert {t.value for t in at("nh-35047").applicant_types} == {"business"}   # the energy audit round is not a town's
+
+
+def test_new_hampshire_names_its_officer_project_manager_and_the_name_is_not_kept():
+    raw = read("detail_nh-42431.html")
+    assert "Project Manager" in raw
+    assert "Project Manager" not in wg.parse_detail(raw)["fields"]
 
 
 def test_a_page_without_an_eligibility_heading_reads_its_who_applies_sentence():
