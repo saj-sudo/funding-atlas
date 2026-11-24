@@ -54,8 +54,13 @@ run 2 were on 2026-11-17; it is not the load balancer's refusal, and the robots 
 
 The development network is still refused: one request from this session answered `403` (`awselb/2.0`), and nothing
 more was sent. The fixtures were cut from the bodies the runner saved (the `probe-out` artifact), with
-`scripts/probe_tennessee.py --from DIR`. **Not verified**: a live `cli.py run` of either connector; their first live
-read is the daily workflow's.
+`scripts/probe_tennessee.py --from DIR`. Their first live read was the daily workflow's.
+
+**First live read (2026-11-24, daily run 74, 12.9a)**: `tn_ecd` 3 records, `tn_tdot` 1, each hash-identical to its fixture
+read. **CDBG's Regular Round is missing**: its page is the first GET of the run, and the first request of every runner
+session to `www.tn.gov` has been a connection reset (probe run 2: the first two; probe run 10: the first; run 74: the
+first). `fetch` takes the reset as a page it cannot read and, with no stored record, skips the slug. Proposed fix (waits on
+Saj): retry a transport error, never an HTTP status, up to twice, `DELAY_S` apart, in this module only.
 
 ### Implemented (breadth first: ECD, and TDOT's one page that describes a program)
 
