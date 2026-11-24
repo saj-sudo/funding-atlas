@@ -63,6 +63,8 @@ from connectors import (
     or_biz,
     pa_grants,
     sam_assistance_listings,
+    sc_commerce,
+    sc_ria,
     sd_danr,
     sd_dot,
     sd_goed,
@@ -79,6 +81,7 @@ from connectors import (
     vt_vtrans,
     wa_fund_directory,
     webgrants,
+    wi_doa,
     wv_grants,
 )
 from pipeline.upsert import mark_missing, upsert
@@ -156,6 +159,9 @@ CONNECTORS: dict[str, ModuleType] = {
     "in_ocra": in_ocra,
     "in_indot": in_indot,
     "ga_dca": ga_dca,
+    "sc_commerce": sc_commerce,
+    "sc_ria": sc_ria,
+    "wi_doa": wi_doa,
 }
 
 

@@ -139,6 +139,9 @@ CONNECTOR_LABEL = {
     "in_ocra": "Indiana Office of Community and Rural Affairs",
     "in_indot": "Indiana Department of Transportation",
     "ga_dca": "Georgia Department of Community Affairs",
+    "sc_commerce": "South Carolina Department of Commerce",
+    "sc_ria": "South Carolina Rural Infrastructure Authority",
+    "wi_doa": "Wisconsin Department of Administration (Energy, Housing and Community Resources)",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
@@ -164,8 +167,6 @@ STATE_NOTE: dict[str, tuple[str, str]] = {
     "HI": ("none", "No public state list of grants for local governments was found."),
     "LA": ("none", "No public state list of grants for local governments was found."),
     "OH": ("none", "Ohio's grants site answered nothing when surveyed."),
-    "SC": ("none", "No public state list of grants for local governments was found."),
-    "WI": ("none", "No public state list of grants for local governments was found."),
     "DC": ("none", "The District is out of scope for now: it has no towns or counties under it."),
 }
 
