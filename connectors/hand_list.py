@@ -404,7 +404,7 @@ SHORT_ITEM = 160
 YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
-    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
+    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally[- ]funded\b"
     r"|\bfunded with federal aid\b", re.I)   # NDDOT's Urban Grant Program (12.6c)
 FUNDING_SOURCE_RE = re.compile(r"^funding source:", re.I)
 FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational Park Service\b|\bEnvironmental Protection Agency\b|\bEPA\b", re.I)
@@ -607,12 +607,18 @@ def applicant_lines(blocks: Blocks, short_item: int = SHORT_ITEM) -> list[str]:
     return out
 
 
-def funding_source_for(blocks: Blocks, text: str) -> str:
-    """A page's own "Funding source:" line decides; else the page must name the federal source."""
+# A program named for HUD's Community Development Block Grant is a pass-through of HUD's money whether or not its page
+# names HUD (12.10: six 12.9 modules set it by hand; Tennessee's, Louisiana's and Georgia's CDBG pages never say "HUD").
+# The name, not the page text: a page that mentions CDBG only to exclude its entitlement cities is not one.
+CDBG_NAME_RE = re.compile(r"\bCDBG\b|\bCommunity Development Block Grants?\b", re.I)
+
+
+def funding_source_for(blocks: Blocks, text: str, name: str = "") -> str:
+    """A page's own "Funding source:" line decides; else a CDBG program's name, or the page naming the federal source."""
     line = next((t for _, t in blocks if FUNDING_SOURCE_RE.search(t)), None)
     if line is not None:
         return "pass_through" if FEDERAL_LINE_RE.search(line) else "direct"
-    return "pass_through" if FEDERAL_RE.search(text) else "direct"
+    return "pass_through" if CDBG_NAME_RE.search(name) or FEDERAL_RE.search(text) else "direct"
 
 
 Split = tuple[str, str | None, re.Pattern[str] | None]
@@ -698,7 +704,7 @@ class AgencyPageConnector(HandListConnector):
             source_url=self.BASE + path,
             name=name,
             funding_type=self.FUNDING_TYPES.get(raw.source_id) or funding_type_for(name) or "grant",
-            funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text),
+            funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text, name),
             match_required=match,
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,

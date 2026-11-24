@@ -47,10 +47,10 @@ PAGES: dict[str, str] = {
 }
 # Page titles that do not say whose fund or what kind of thing it is, named as the page's own text does.
 NAMES = {"Equity Fund": "OneGeorgia Equity Fund", "Immediate Threat and Danger": "Immediate Threat and Danger Program"}
-# Each set-aside page says it is part of the state CDBG program without naming HUD; DCA's Infrastructure page: "The CDBG
-# Program is a federally-funded grant for states". The Equity Fund is the OneGeorgia Authority's own.
-FUNDING_SOURCES = {"cdbg-annual": "pass_through", "cdbg-eip": "pass_through", "cdbg-redevelopment": "pass_through",
-                   "cdbg-itad": "pass_through", "onegeorgia-equity": "direct"}
+# The CDBG-named records are pass-through by their names (the shared `CDBG_NAME_RE`). Two set-asides carry names without
+# "CDBG" and pages that do not name HUD; DCA's Infrastructure page: "The CDBG Program is a federally-funded grant for
+# states". The Equity Fund is the OneGeorgia Authority's own.
+FUNDING_SOURCES = {"cdbg-eip": "pass_through", "cdbg-redevelopment": "pass_through", "onegeorgia-equity": "direct"}
 INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 DROP_RE = re.compile(r"\[email\s*protected\]|@dca\.ga\.gov|\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b|^review the .* faqs\b", re.I)
 STOP_RE = re.compile(r"(?:frequently asked questions|.*documents & downloads)$", re.I)

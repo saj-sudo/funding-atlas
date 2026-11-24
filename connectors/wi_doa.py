@@ -41,7 +41,9 @@ PAGES: dict[str, str] = {
 }
 # State CDBG is HUD money ("Funding for CDBG programs is provided by the U.S. Department of Housing and Urban Development
 # (HUD)", the Community Resources hub); not every program page repeats it.
-FUNDING_SOURCES = {slug: "pass_through" for slug in PAGES}
+# The five CDBG records are pass-through by their names (the shared `CDBG_NAME_RE`); the conversion program's page does
+# not name its HUD source.
+FUNDING_SOURCES = {"affordable-housing-conversion": "pass_through"}
 # The Planning page never says who may apply; the hub that links it does.
 HAND_QUOTES = {"planning": ("2026-11-24", "DEHCR Community Resources page (/Pages/CommunityResources.aspx)", [
     "Planning Program (CDBG-PLNG) – provides grant funds to local governments to support planning efforts that improve "

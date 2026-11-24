@@ -65,9 +65,6 @@ HAND_QUOTES = {"blueprint-to-build": _HUB, "youth-job-training": _HUB}
 # text keeps it), or the shared tagger drops the whole sentence as a negation.
 EXCLUDING_RE = re.compile(r",\s*excluding\b.*$", re.I)
 FUNDING_TYPES = {"economic-development": "loan"}
-# Every page but these two names HUD ("receive CDBG funds directly from HUD, while smaller communities apply through the
-# state CDBG program"); the ten are one federal program.
-FUNDING_SOURCES = {"blueprint-to-build": "pass_through", "youth-job-training": "pass_through"}
 
 
 def program_name(headline: str) -> str:
@@ -165,7 +162,6 @@ class KsCommerce(AgencyPageConnector):
     PAGES = PAGES
     HAND_QUOTES = HAND_QUOTES
     FUNDING_TYPES = FUNDING_TYPES
-    FUNDING_SOURCES = FUNDING_SOURCES
     DELAY_S = 10.0
 
     def parse_page(self, page_html: str) -> dict[str, Any]:

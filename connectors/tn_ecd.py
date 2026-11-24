@@ -43,8 +43,6 @@ PAGES: dict[str, str] = {
 }
 # The page titles are the programs' names but for CDBG's, which is the round's nickname.
 NAMES = {"cdbg": "Community Development Block Grant (CDBG): Community Development Regular Round"}
-# The regular-round page names no federal agency; the CDBG hub above it says HUD funds the program.
-FUNDING_SOURCES = {"cdbg": "pass_through"}
 
 INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 # Contacts: a named officer's line, an address, a telephone number, an e-mail address.
@@ -116,7 +114,6 @@ class TnEcd(TnAgency):
     CATEGORY_LABEL = CATEGORY_LABEL
     PAGES = PAGES
     NAMES = NAMES
-    FUNDING_SOURCES = FUNDING_SOURCES
 
 
 SITE = TnEcd()

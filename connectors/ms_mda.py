@@ -46,7 +46,6 @@ SPLITS = {"community-incentives": [
     ("other", None, re.compile(r"^(?!(?:" + "|".join(re.escape(t) for t in CARDS.values()) + r")$)")),
 ]}
 # The Public Facilities card names HUD; this one is the same block grant and names only its "national objectives".
-FUNDING_SOURCES = {"community-incentives#cdbg-economic-development": "pass_through"}
 CATEGORY_LABELS = {"community-incentives#freight-rail-loan": "rail and freight"}
 # "For more information on Airport and Port Revolving Loans, contact MDA's Financial Resources Division at 601.359.3552."
 CONTACT_RE = re.compile(r"(?:For more information[^.]*?|To learn more),? contact\b.*?\d{3}[.-]\d{3}[.-]\d{4}\.?", re.I)
@@ -89,7 +88,6 @@ class MsMda(AgencyPageConnector):
     PAGES = PAGES
     DELAY_S = 3.0
     SPLITS = SPLITS
-    FUNDING_SOURCES = FUNDING_SOURCES
     CATEGORY_LABELS = CATEGORY_LABELS
 
     def parse_page(self, page_html: str) -> dict[str, Any]:

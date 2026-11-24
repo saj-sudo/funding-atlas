@@ -53,9 +53,9 @@ SPLITS = {"cdbg": [
     ("cdbg-cv", None, re.compile(r"^CDBG-CV\b")),
 ]}
 SPLIT_KINDS = {"cdbg": ("label", "p")}
-# The CDBG page names no federal agency (LGAP's and CWEF's mention HUD only to define who is a non-entitlement community).
-FUNDING_SOURCES = {"lgap": "direct", "cwef": "direct", "cdbg": "pass_through", "cdbg#clearance": "pass_through",
-                   "cdbg#economic-development": "pass_through", "cdbg#make-a-difference": "pass_through"}
+# LGAP's and CWEF's pages mention HUD only to define a non-entitlement community; the CDBG records are pass-through by
+# their names (the shared `CDBG_NAME_RE`).
+FUNDING_SOURCES = {"lgap": "direct", "cwef": "direct"}
 CATEGORY_LABELS = {"cwef": "drinking water"}
 # "The LGAP application period is open from November 2, 2026, through February 26, 2027.": the shared window rule reads
 # "date through date", not the comma this office puts after the year.
