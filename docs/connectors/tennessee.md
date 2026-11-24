@@ -59,8 +59,9 @@ more was sent. The fixtures were cut from the bodies the runner saved (the `prob
 **First live read (2026-11-24, daily run 74, 12.9a)**: `tn_ecd` 3 records, `tn_tdot` 1, each hash-identical to its fixture
 read. **CDBG's Regular Round is missing**: its page is the first GET of the run, and the first request of every runner
 session to `www.tn.gov` has been a connection reset (probe run 2: the first two; probe run 10: the first; run 74: the
-first). `fetch` takes the reset as a page it cannot read and, with no stored record, skips the slug. Proposed fix (waits on
-Saj): retry a transport error, never an HTTP status, up to twice, `DELAY_S` apart, in this module only.
+first). `fetch` took the reset as a page it cannot read and, with no stored record, skipped the slug. **Fixed in 12.9b (Saj's
+yes)**: `TnAgency.get_page` retries a transport error, never an HTTP status, twice, `DELAY_S` apart, for both connectors.
+Not verified live; the first daily run after merge should fetch 4 from `tn_ecd`.
 
 ### Implemented (breadth first: ECD, and TDOT's one page that describes a program)
 
