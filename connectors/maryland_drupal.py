@@ -227,7 +227,13 @@ def box_heading(main_html: str) -> str | None:
     return clean(h.get_text(" ")) or None if h else None
 
 
-_sentence_re = re.compile(r"(?<=[.!?])\s+(?=[A-Z\"“(])")
+# "a.m." and "p.m." end a sentence only when what follows is not a month or a time zone: "by 5 p.m. Oct. 30, 2026"
+# (South Carolina) and "by 11:59 p.m. ET via ..." (Indiana) are one sentence, "by June 30, 2027, at 5 p.m. If a project
+# is selected ..." (Missouri State Parks) is two (12.10, lifted from `sc_commerce`).
+_MERIDIEM_NEXT = (r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?(?=\s|$)|[ECMP][SD]?T\b"
+                  r"|(?:Eastern|Central|Mountain|Pacific)\b")
+_sentence_re = re.compile(rf"(?<=[.!?])(?<![aApP]\.[mM]\.)\s+(?=[A-Z\"“(])"
+                          rf"|(?<=[aApP]\.[mM]\.)\s+(?=[A-Z\"“(])(?!{_MERIDIEM_NEXT})")
 
 
 def sentences(text: str) -> list[str]:

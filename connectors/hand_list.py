@@ -355,13 +355,16 @@ ELIGIBILITY_LABEL_RE = re.compile(r"\bapplicant eligibility\b|\bwho (?:is|are|ma
                                   r"|\bwho['\u2019]s eligible\b|\bwhat communities are considered\b", re.I)
 APPLICANT_SENTENCE_RE = re.compile(
     r"\beligible applicants?\b|\beligibility\b[^.]*\blimited to\b|\b(?:funds?|funding|grants?)\b[^.]*\bavailable to\b"
+    r"|\bloans?\s+(?:are|is)\s+made\s+available\s+to\b"
     r"|\b(?:grant|grants|grant funding|funding)\s+to\s+municipalit|\bmay apply\b|\beligible to (?:apply|submit)\b"
     r"|\b(?:is|are) eligible for funding\b|\bfor local municipalities\b"
     # Connecticut (12.6b): "accepting applications from municipalities", "Applicants must be a municipality",
     # "only available to Connecticut towns and cities", "State funds to urbanized area municipal governments",
     # "grants-in-aid to towns", "enables municipalities ... to apply", "sub-entities able to apply".
     r"|\baccept(?:s|ing) applications from\b|\bapplicants? must be\b|\b(?:is|are) (?:only )?available to\b"
-    r"|\b(?:funds?|funding|grants?(?:-in-aid)?)\s+to\s+(?:[\w-]+\s+){0,3}"
+    # 12.10: loans as well as grants (Mississippi MDA's "provides loans to municipalities", Florida DEP's "loans to local
+    # governments", South Carolina RIA's "loans are made available to"; three 12.9 modules carried a copy)
+    r"|\b(?:funds?|funding|grants?(?:-in-aid)?|loans?)\s+to\s+(?:[\w-]+\s+){0,3}"
     r"(?:municipal\w*|towns?|cities|count(?:y|ies)|local governments?)\b"
     r"|\benables?\b[^.]*\bto apply\b|\bable to apply\b|\bserves? as the sub-?applicant\b"   # FEMA: a town is the sub-applicant
     # North Dakota (12.6c): Commerce's "Eligible Entities – City, County, ..." (a line that starts with it: SLCGP quotes a
@@ -404,7 +407,7 @@ SHORT_ITEM = 160
 YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 FEDERAL_RE = re.compile(
     r"\bFederal Highway Administration\b|\bFHWA\b|\bFEMA\b|\bFederal Emergency Management Agency\b|\bHUD\b"
-    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally funded\b"
+    r"|\bHousing and Urban Development\b|\bNational Park Service\b|\bfederally[- ]funded\b"
     r"|\bfunded with federal aid\b", re.I)   # NDDOT's Urban Grant Program (12.6c)
 FUNDING_SOURCE_RE = re.compile(r"^funding source:", re.I)
 FEDERAL_LINE_RE = re.compile(r"\bfederal\b|\bFHWA\b|\bFEMA\b|\bHUD\b|\bNational Park Service\b|\bEnvironmental Protection Agency\b|\bEPA\b", re.I)
@@ -438,7 +441,9 @@ PURPOSE_RE = re.compile(r"\b(?:(?:and\s+)?(?:are|is)\s+)?for\s+the\s+(?:developm
 # applicant; the sentence stays in the stored text and is not tagged.
 PARTNER_LINE_RE = re.compile(r"\bmay partner with\b", re.I)
 MATCH_RE = re.compile(r"\bmatch(?:ing)?\b[^.]*\brequired\b|\brequire[sd]?\b[^.]*\bmatch\b", re.I)
-MATCH_NOT_RE = re.compile(r"\bno match\b|\bmatch (?:is )?not required\b", re.I)
+# Georgia DCA (12.10, lifted from `ga_dca`): "Grants up to $500,000 ... - no matching funds required." Any such line
+# leaves the field unknown, since a page that says it once usually requires a match above some size.
+MATCH_NOT_RE = re.compile(r"\bno match(?:ing)?\b|\bmatch (?:is )?not required\b", re.I)
 
 
 def clause_cut(line: str) -> str:
@@ -466,12 +471,19 @@ def first_date(text: str) -> date | None:
 _FULL_DATE = rf"{_MONTHS}\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}}"
 # "Applications Accepted: Dates are April 1, 2026 - September 1, 2026" (Kentucky DLG, every CDBG page): a window with no
 # deadline word, read only when the sentence is about applications and no deadline word was found anywhere.
-RANGE_RE = re.compile(rf"({_FULL_DATE})\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
+# Louisiana OCD (12.10, lifted from `la_ocd`): "open from November 2, 2026, through February 26, 2027", a comma after the
+# first year.
+RANGE_RE = re.compile(rf"({_FULL_DATE}),?\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
 
 
 def application_range(sents: list[str]) -> tuple[str, date, date] | None:
+    """The first application window in the sentences. A range inside parentheses qualifies something else: Missouri
+    State Parks' bus grant is due "by May 14, 2027, for field trips planned for the 2026-2027 school year (July 1,
+    2026, to June 30, 2027)" (12.10, when the window began to allow a comma after the first year)."""
     for s in sents:
         m = RANGE_RE.search(s)
+        if m and s[:m.start()].count("(") > s[:m.start()].count(")"):
+            continue
         if m and APPLICATION_RE.search(s) and not NOT_DEADLINE_RE.search(s):
             start, end = _date(m.group(1)), _date(m.group(2))
             if start and end:
@@ -534,9 +546,18 @@ def opening(sents: list[str]) -> date | None:
     return window[1] if window else None
 
 
+# Applications taken whenever they come (12.10, lifted from four 12.9 modules): South Carolina Commerce's "may be
+# submitted at any time", RIA's "may be submitted at any time for Tier 3 & 4 counties", Wisconsin DOA's "accepted on a
+# continuous basis", Florida DEP's "can be submitted any time during the year". Open and rolling, with no deadline; read
+# only when the page dates nothing and says neither open nor closed.
+ROLLING_OPEN_RE = re.compile(r"\bsubmitted\b[^.]{0,60}?\b(?:at\s+)?any\s?time\b|\baccepted\s+on\s+a\s+continuous\s+basis\b", re.I)
+NOI_RE = re.compile(r"\bNOIs?\b|\bnotices?\s+of\s+intent\b", re.I)
+
+
 def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
-    """status, opens_at, closes_at, closes_at_text: a deadline still ahead (forecasted while the opening is ahead),
-    then closed wording, then a past deadline (unknown: it outranks a stale "now open"), then undated open wording."""
+    """status, opens_at, closes_at, closes_at_text, rolling: a deadline still ahead (forecasted while the opening is
+    ahead), then closed wording, then a past deadline (unknown: it outranks a stale "now open"), then undated open
+    wording. `rolling` is always None here: `rolling_round` reads it last, after the yearless hook."""
     sents = all_sentences(blocks)
     due_s, due = deadline(sents, today)
     opens = opening(sents)
@@ -552,7 +573,18 @@ def round_for(blocks: Blocks, today: date) -> dict[str, Any]:
         status, text = "open", open_s
     else:
         status, text = "unknown", None
-    return {"status": status, "opens_at": opens, "closes_at": due, "closes_at_text": text}
+    return {"status": status, "opens_at": opens, "closes_at": due, "closes_at_text": text, "rolling": None}
+
+
+def rolling_round(blocks: Blocks, out: dict[str, Any]) -> dict[str, Any]:
+    """`out` turned open and rolling when the page dates nothing, says nothing of its timing (no open, closed or
+    yearless-cycle sentence was kept) and says applications are taken at any time. A notice of intent taken at any
+    time is not a round (Missouri SEMA's mitigation page: the application cycle follows a disaster)."""
+    if out["status"] != "unknown" or out["closes_at"] is not None or out["closes_at_text"]:
+        return out
+    s = next((s for s in all_sentences(blocks) if ROLLING_OPEN_RE.search(s) and not NEGATION_RE.search(s)
+              and not NOI_RE.search(s)), None)
+    return {**out, "status": "open", "closes_at_text": s, "rolling": True} if s else out
 
 
 # The labelled lines a page prints under a program's heading (Kentucky's Energy and Environment Cabinet).
@@ -587,12 +619,18 @@ def applicant_lines(blocks: Blocks, short_item: int = SHORT_ITEM) -> list[str]:
     return out
 
 
-def funding_source_for(blocks: Blocks, text: str) -> str:
-    """A page's own "Funding source:" line decides; else the page must name the federal source."""
+# A program named for HUD's Community Development Block Grant is a pass-through of HUD's money whether or not its page
+# names HUD (12.10: six 12.9 modules set it by hand; Tennessee's, Louisiana's and Georgia's CDBG pages never say "HUD").
+# The name, not the page text: a page that mentions CDBG only to exclude its entitlement cities is not one.
+CDBG_NAME_RE = re.compile(r"\bCDBG\b|\bCommunity Development Block Grants?\b", re.I)
+
+
+def funding_source_for(blocks: Blocks, text: str, name: str = "") -> str:
+    """A page's own "Funding source:" line decides; else a CDBG program's name, or the page naming the federal source."""
     line = next((t for _, t in blocks if FUNDING_SOURCE_RE.search(t)), None)
     if line is not None:
         return "pass_through" if FEDERAL_LINE_RE.search(line) else "direct"
-    return "pass_through" if FEDERAL_RE.search(text) else "direct"
+    return "pass_through" if CDBG_NAME_RE.search(name) or FEDERAL_RE.search(text) else "direct"
 
 
 Split = tuple[str, str | None, re.Pattern[str] | None]
@@ -678,9 +716,8 @@ class AgencyPageConnector(HandListConnector):
             source_url=self.BASE + path,
             name=name,
             funding_type=self.FUNDING_TYPES.get(raw.source_id) or funding_type_for(name) or "grant",
-            funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text),
+            funding_source=self.FUNDING_SOURCES.get(raw.source_id) or funding_source_for(blocks, text, name),
             match_required=match,
-            rolling=None,
             summary=summary_for(blocks),
             eligibility_text="\n".join(lines) or None,
             eligibility_structured=None,
@@ -694,4 +731,4 @@ class AgencyPageConnector(HandListConnector):
         if self.YEARLESS_RE is not None and out["status"] == "unknown" and not out["closes_at_text"]:
             out["closes_at_text"] = next((s for s in all_sentences(blocks)
                                           if self.YEARLESS_RE.search(s) and not YEAR_RE.search(s)), None)
-        return out
+        return rolling_round(blocks, out)

@@ -163,3 +163,31 @@ portals, and MN and NM answer it and move to roadmap 12.8.
   and are built; Nevada's state NOFOs live in NEVADA ePro, which had no grant rows on the probe day.
 - Whether the WebGrants storefront exists in states beyond Iowa, Montana and North Dakota (found 2026-11-05 through an agency
   page's "apply on WebGrants" link); it was looked for only where WebGrants turned up.
+
+## 12.9 update (2026-11-24): the states this census left unbuilt
+
+The rows above are the census as taken on 2026-10-18 with later notes. Milestone 12.9 went back to every state still
+without a connector, breadth first (one or two agencies each). Where a row above and this table disagree, this table is
+the later reading.
+
+| State | Verdict now | What is read, or why not | Doc |
+|---|---|---|---|
+| **TN** | built 2026-11-24 | `tn_ecd` (4), `tn_tdot` (1) on `www.tn.gov`; the re-probe from Actions answered 200 on all 20 pages | `connectors/tennessee.md` |
+| **NH** | built 2026-11-24 | CDFA's WebGrants storefront `www.nhcdfagrants.org`, a `webgrants` host (8 rounds); `nh.gov` agencies still unprobed from the runner | `connectors/webgrants.md` |
+| **AL** | built 2026-11-24, without ADECA | `al_adem` (3), `al_dot` (4); ADECA not read (robots disallows `ClaudeBot`); EMA has no program pages | `connectors/alabama.md` |
+| **MS** | built 2026-11-24 | `ms_mda` (8) from MDA's community incentives page | `connectors/mississippi.md` |
+| **LA** | built 2026-11-24 | `la_ocd` (6) on `locd.la.gov`, the office's new host; LGAP and CWEF open to 2027-02-26 | `connectors/louisiana.md` |
+| **IN** | built 2026-11-24 | `in_ocra` (7), `in_indot` (1) on `www.in.gov` | `connectors/indiana.md` |
+| **GA** | built 2026-11-24 | `ga_dca` (5) on `dca.georgia.gov` | `connectors/georgia.md` |
+| **SC** | built 2026-11-24 | `sc_commerce` (9), `sc_ria` (6) | `connectors/south_carolina.md` |
+| **WI** | built 2026-11-24 | `wi_doa` (6) on `energyandhousing.wi.gov` | `connectors/wisconsin.md` |
+| **FL** | built 2026-11-24 | `fl_dos` (9, the Department of State's grants table), `fl_dep` (7); FloridaCommerce still walled | `connectors/florida.md` |
+| **OK** | built 2026-11-24 | `ok_commerce` (8); OGX still login only and unread | `connectors/oklahoma.md` |
+| **KS** | built 2026-11-24 | `ks_commerce` (10 CDBG pages, `Crawl-delay: 10`); the Infrastructure Hub still walled | `connectors/kansas.md` |
+| **HI** | stopped | DBEDT lists no grant or loan a county applies for; attached agencies not surveyed | `connectors/hawaii.md` |
+| **OH** | stopped | `development.ohio.gov` answers 404 (AmazonS3) on every path, from the proxy and the Actions runner | `connectors/ohio.md` |
+| **MN** | stopped | DEED's hub answered once, then Radware's challenge | `connectors/minnesota.md` |
+| **NV** | waiting | unchanged: build the day NEVADA ePro lists a grant row | roadmap |
+| **AK, CO, ID, ME, MI, RI** | blocked for good | unchanged (12.0) | above |
+| **UT, WY** | stopped | unchanged (12.5): script-only lists | above |
+

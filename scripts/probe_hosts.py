@@ -72,10 +72,13 @@ HOSTS: dict[str, tuple[str, str]] = {
     "NM-ALL": ("DFA Grant Search Dashboard's data, every open row",
                "https://platform.dfa.nm.gov/api/CAPS/SearchFundingOpportunities?page=1&pageSize=2000"
                "&sortField=lastUpdatedDate&sortDir=desc&excludeClosed=1"),
+    # 12.9 (2026-11-24): Ohio Development answered 404 from AmazonS3 on every path through the development network
+    "OH": ("Ohio Department of Development (404 from S3 through the proxy)", "https://development.ohio.gov/"),
 }
 
 # state -> further URLs on the same host, probed after the first
 EXTRA: dict[str, list[str]] = {
+    "OH": ["https://development.ohio.gov/community"],
     # 12.8 (2026-11-17): the landing page and the find page's markup; DFA's sitemap (WordPress core or Yoast), to find
     # where it lists grants. Under a dozen requests a host (the Tennessee lesson).
     "MN": ["https://mn.gov/grants/"],

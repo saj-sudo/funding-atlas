@@ -1,9 +1,10 @@
-"""WebGrants storefront connector: the public opportunity lists of Iowa's, Montana's and North Dakota's hosts.
+"""WebGrants storefront connector: the public opportunity lists of Iowa's, Montana's, North Dakota's and New
+Hampshire CDFA's hosts.
 
 WebGrants (Dulles Technology) serves the same storefront on every host: `storefrontFOList.do` is one static table of
 the opportunities posted now, `viewStorefrontOpportunity.do?OIDString=<oid>|Opportunity` one page per opportunity.
 The state is configuration (`HOSTS`); columns are read by header name because one host has no pre-application column.
-About 41 requests a run. A round that ends leaves the list, so nothing can be read back for it: `resolve_missing`
+About 50 requests a run. A round that ends leaves the list, so nothing can be read back for it: `resolve_missing`
 says `unknown`. Applicants come from the page's eligibility sections only. See docs/connectors/webgrants.md.
 """
 
@@ -30,6 +31,7 @@ HOSTS: dict[str, tuple[str, str]] = {
     "mtagr": ("https://mtagr.webgrantscloud.com", "MT"),
     "mtfwp": ("https://mtfwp.webgrantscloud.com", "MT"),
     "nd": ("https://grants.nd.gov", "ND"),          # North Dakota's enterprise storefront (12.6c, 2026-11-05)
+    "nh": ("https://www.nhcdfagrants.org", "NH"),   # New Hampshire CDFA's storefront: CDBG and its other rounds (12.9, 2026-11-24)
 }
 LIST_PATH = "/storefrontFOList.do"
 DETAIL_PATH = "/viewStorefrontOpportunity.do?OIDString={oid}"
@@ -46,7 +48,8 @@ COLUMNS = {
     "pre-application due date": "pre_due", "final-application due date": "final_due",
 }
 # Labels of the contact block. Public on the state's page, and not copied into our payload, which is published.
-CONTACT_LABELS = {"program officer", "phone", "email", "e-mail"}
+# "Project Manager" is New Hampshire CDFA's label for the same officer (12.9).
+CONTACT_LABELS = {"program officer", "project manager", "phone", "email", "e-mail"}
 NOT_APPLICABLE = "not applicable"
 NO_LIMIT = "no limit"
 AMOUNT_RE = re.compile(r"^(No Limit|\$\s*[\d,]+(?:\.\d+)?)\s*-\s*(No Limit|\$\s*[\d,]+(?:\.\d+)?)$", re.I)
