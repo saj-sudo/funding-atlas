@@ -40,3 +40,10 @@ Nothing: no connector, no fixtures, no tests. No internal API was called.
 - If it is refused there as well: ask the Department, as with GOCPP.
 - Ohio's other municipal agencies (ODOT local programs, Ohio EPA's water financing, the Ohio Public Works Commission,
   ODNR's recreation grants) were not surveyed: their hosts are not on this session's allowlist.
+
+## The look from the Actions runner (2026-11-24, `probe-hosts`, `states: OH`, run 11)
+
+The same answer as from the development network: `https://development.ohio.gov/community` returned 404 from `AmazonS3`
+with the static error page (three requests: robots.txt, `/`, `/community`). So the 404 is not this session's network.
+Whether it is this User-Agent or the site itself is not established, and the stop rule forbids trying another. **Ohio
+is stopped**; the route is outreach (ask the Department of Development), not code.
