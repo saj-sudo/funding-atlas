@@ -469,12 +469,19 @@ def first_date(text: str) -> date | None:
 _FULL_DATE = rf"{_MONTHS}\s+\d{{1,2}}(?:st|nd|rd|th)?,?\s+\d{{4}}"
 # "Applications Accepted: Dates are April 1, 2026 - September 1, 2026" (Kentucky DLG, every CDBG page): a window with no
 # deadline word, read only when the sentence is about applications and no deadline word was found anywhere.
-RANGE_RE = re.compile(rf"({_FULL_DATE})\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
+# Louisiana OCD (12.10, lifted from `la_ocd`): "open from November 2, 2026, through February 26, 2027", a comma after the
+# first year.
+RANGE_RE = re.compile(rf"({_FULL_DATE}),?\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
 
 
 def application_range(sents: list[str]) -> tuple[str, date, date] | None:
+    """The first application window in the sentences. A range inside parentheses qualifies something else: Missouri
+    State Parks' bus grant is due "by May 14, 2027, for field trips planned for the 2026-2027 school year (July 1,
+    2026, to June 30, 2027)" (12.10, when the window began to allow a comma after the first year)."""
     for s in sents:
         m = RANGE_RE.search(s)
+        if m and s[:m.start()].count("(") > s[:m.start()].count(")"):
+            continue
         if m and APPLICATION_RE.search(s) and not NOT_DEADLINE_RE.search(s):
             start, end = _date(m.group(1)), _date(m.group(2))
             if start and end:

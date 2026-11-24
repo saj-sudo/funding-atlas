@@ -17,11 +17,7 @@ from datetime import date
 from typing import Any
 
 from connectors.hand_list import (
-    _FULL_DATE,
-    APPLICATION_RE,
     AgencyPageConnector,
-    Blocks,
-    _date,
     all_sentences,
     applicant_tags,
     blocks_from,
@@ -57,9 +53,6 @@ SPLIT_KINDS = {"cdbg": ("label", "p")}
 # their names (the shared `CDBG_NAME_RE`).
 FUNDING_SOURCES = {"lgap": "direct", "cwef": "direct"}
 CATEGORY_LABELS = {"cwef": "drinking water"}
-# "The LGAP application period is open from November 2, 2026, through February 26, 2027.": the shared window rule reads
-# "date through date", not the comma this office puts after the year.
-WINDOW_RE = re.compile(rf"({_FULL_DATE}),?\s*(?:-|\u2013|\u2014|to|through)\s*({_FULL_DATE})", re.I)
 # The CDBG page says who applies once, above the programs ("LOCD partners with local governments to deliver projects"),
 # and in the Make a Difference paragraph ("grants for non-entitlement local governments"); the Economic Development
 # paragraph's "for-profit businesses" are who a project serves.
@@ -101,19 +94,6 @@ class LaOcd(AgencyPageConnector):
 
     def parse_page(self, page_html: str) -> dict[str, Any]:
         return parse_page(page_html)
-
-    def round_with_yearless(self, blocks: Blocks, today: date) -> dict[str, Any]:
-        """The base's round; when it dates nothing, the office's own "open <date>, through <date>" sentence."""
-        out = super().round_with_yearless(blocks, today)
-        if out["closes_at"] is not None:
-            return out
-        for s in all_sentences(blocks):
-            m = WINDOW_RE.search(s)
-            start, end = (_date(m.group(1)), _date(m.group(2))) if m and APPLICATION_RE.search(s) else (None, None)
-            if start and end:
-                status = "unknown" if end < today else ("forecasted" if start > today else "open")
-                return {"status": status, "opens_at": start, "closes_at": end, "closes_at_text": s}
-        return out
 
     def fields(self, raw: RawRecord, today: date) -> dict[str, Any]:
         out = super().fields(raw, today)
