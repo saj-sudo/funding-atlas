@@ -142,6 +142,10 @@ CONNECTOR_LABEL = {
     "sc_commerce": "South Carolina Department of Commerce",
     "sc_ria": "South Carolina Rural Infrastructure Authority",
     "wi_doa": "Wisconsin Department of Administration (Energy, Housing and Community Resources)",
+    "fl_dos": "Florida Department of State",
+    "fl_dep": "Florida Department of Environmental Protection",
+    "ok_commerce": "Oklahoma Department of Commerce",
+    "ks_commerce": "Kansas Department of Commerce",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
@@ -156,11 +160,9 @@ STATE_NOTE: dict[str, tuple[str, str]] = {
     "AK": ("blocked", "Alaska's community grants pages refuse automated readers (a bot wall answers every request)."),
     "CO": ("blocked", "Colorado's local funding guide refuses automated readers."),
     "ID": ("blocked", "Idaho Commerce's grants pages sit behind a bot challenge."),
-    "KS": ("blocked", "The Kansas Infrastructure Hub refuses automated readers."),
     "ME": ("blocked", "Maine's community funding finder refuses automated readers."),
     "MI": ("blocked", "Michigan's grants pages refuse automated readers."),
     "RI": ("blocked", "Rhode Island's funding opportunities page sits behind a bot challenge."),
-    "OK": ("login", "Oklahoma's Grant Exchange is login only and asks crawlers not to read it."),
     "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
     "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
     "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),

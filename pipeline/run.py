@@ -24,11 +24,14 @@ from connectors import (
     de_dema,
     de_dnrec,
     de_dsha,
+    fl_dep,
+    fl_dos,
     ga_dca,
     grants_gov,
     il_csfa,
     in_indot,
     in_ocra,
+    ks_commerce,
     ky_dlg,
     ky_dlgfed,
     ky_eec,
@@ -60,6 +63,7 @@ from connectors import (
     nj_dca_sage,
     nm_dfa,
     ny_sfs,
+    ok_commerce,
     or_biz,
     pa_grants,
     sam_assistance_listings,
@@ -162,6 +166,10 @@ CONNECTORS: dict[str, ModuleType] = {
     "sc_commerce": sc_commerce,
     "sc_ria": sc_ria,
     "wi_doa": wi_doa,
+    "fl_dos": fl_dos,
+    "fl_dep": fl_dep,
+    "ok_commerce": ok_commerce,
+    "ks_commerce": ks_commerce,
 }
 
 
