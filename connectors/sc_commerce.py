@@ -73,9 +73,6 @@ LIMITED_TO_RE = re.compile(r"^applicants are limited to\b", re.I)
 # "... governments in counties with fewer than 20,000 residents" (RDI): a population threshold, not residents who apply. Cut
 # before tagging; the stored text keeps it.
 POPULATION_RE = re.compile(r"\bwith fewer than [\d,]+ residents\b", re.I)
-# "5 p.m. Oct. 30, 2026": the shared sentence splitter breaks after "p.m." before a capital, parting the deadline word from
-# its date. Folded to "5 pm" (the site's own other spelling: "by 5 pm").
-MERIDIEM_RE = re.compile(r"\b([ap])\.m\.(?=\s+[A-Z])", re.I)
 
 
 def parse_page(page_html: str) -> dict[str, Any]:
@@ -96,7 +93,7 @@ def parse_page(page_html: str) -> dict[str, Any]:
     blocks = blocks_from(main, ["h2", "h3", "h4", "p", "li"], stop_re=STOP_RE, drop_re=DROP_RE, bold_max=LABEL_MAX_CHARS)
     # "Eligible applicants include:" over a list is the list's label
     blocks = [("label" if kind == "p" and text.endswith(":") and len(text) <= LABEL_MAX_CHARS
-               and hl.ELIGIBILITY_LABEL_RE.search(text) else kind, MERIDIEM_RE.sub(r"\1m", text)) for kind, text in blocks]
+               and hl.ELIGIBILITY_LABEL_RE.search(text) else kind, text) for kind, text in blocks]
     return {"title": title, "blocks": blocks}
 
 

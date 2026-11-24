@@ -109,7 +109,7 @@ def test_commerce_status_of_the_other_pages():
     # RDI's heading still says "Applications are now open"; its dated deadline has passed and outranks it.
     rdi = progs["rdi"]
     assert (rdi.status, rdi.closes_at) == ("unknown", date(2026, 10, 30))
-    assert rdi.closes_at_text == "Application deadline: 5 pm Oct. 30, 2026"
+    assert rdi.closes_at_text == "Application deadline: 5 p.m. Oct. 30, 2026"   # the page's own words since 12.10
     assert every("sc_commerce", date(2026, 10, 1))["rdi"].status == "open"
 
 
