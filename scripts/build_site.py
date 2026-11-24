@@ -146,6 +146,7 @@ CONNECTOR_LABEL = {
     "fl_dep": "Florida Department of Environmental Protection",
     "ok_commerce": "Oklahoma Department of Commerce",
     "ks_commerce": "Kansas Department of Commerce",
+    "la_ocd": "Louisiana Office of Community Development",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
@@ -163,12 +164,12 @@ STATE_NOTE: dict[str, tuple[str, str]] = {
     "ME": ("blocked", "Maine's community funding finder refuses automated readers."),
     "MI": ("blocked", "Michigan's grants pages refuse automated readers."),
     "RI": ("blocked", "Rhode Island's funding opportunities page sits behind a bot challenge."),
-    "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
     "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
     "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
-    "HI": ("none", "No public state list of grants for local governments was found."),
-    "LA": ("none", "No public state list of grants for local governments was found."),
-    "OH": ("none", "Ohio's grants site answered nothing when surveyed."),
+    "MN": ("blocked", "Minnesota's grants pages list agencies, not grants, and its economic development pages answer automated readers with a bot challenge."),
+    "NV": ("none", "Nevada posts grant notices in its purchasing system, which listed none for local governments when last read."),
+    "HI": ("none", "Hawaii's economic development department lists no grant a county applies for; federal block grants go to its four counties directly."),
+    "OH": ("none", "Ohio's Department of Development site answered \"not found\" on every page when surveyed in November 2026."),
     "DC": ("none", "The District is out of scope for now: it has no towns or counties under it."),
 }
 

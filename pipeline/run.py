@@ -37,6 +37,7 @@ from connectors import (
     ky_eec,
     ky_kia,
     ky_tc,
+    la_ocd,
     ma_onestop,
     md_commerce,
     md_dhcd,
@@ -170,6 +171,7 @@ CONNECTORS: dict[str, ModuleType] = {
     "fl_dep": fl_dep,
     "ok_commerce": ok_commerce,
     "ks_commerce": ks_commerce,
+    "la_ocd": la_ocd,
 }
 
 
