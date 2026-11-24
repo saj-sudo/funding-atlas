@@ -8,6 +8,8 @@ from datetime import UTC, datetime
 from types import ModuleType
 
 from connectors import (
+    al_adem,
+    al_dot,
     ar_adem,
     ar_aedc,
     ar_anrd,
@@ -43,6 +45,7 @@ from connectors import (
     mo_modot,
     mo_parks,
     mo_sema,
+    ms_mda,
     nc_grants,
     nd_commerce,
     nd_des,
@@ -144,6 +147,9 @@ CONNECTORS: dict[str, ModuleType] = {
     "az_parks": az_parks,
     "tn_ecd": tn_ecd,
     "tn_tdot": tn_tdot,
+    "al_adem": al_adem,
+    "al_dot": al_dot,
+    "ms_mda": ms_mda,
 }
 
 
