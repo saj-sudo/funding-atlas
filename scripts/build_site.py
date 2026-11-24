@@ -131,6 +131,8 @@ CONNECTOR_LABEL = {
     "sd_dot": "South Dakota Department of Transportation",
     "sd_danr": "South Dakota Department of Agriculture and Natural Resources (Environmental Funding)",
     "az_parks": "Arizona State Parks and Trails",
+    "tn_ecd": "Tennessee Department of Economic and Community Development",
+    "tn_tdot": "Tennessee Department of Transportation",
 }
 # What each connector reads, for the index map (13.13): a state portal with structured rows, a directory with no
 # status, or agency pages. A connector missing here counts as agency pages.
@@ -151,7 +153,6 @@ STATE_NOTE: dict[str, tuple[str, str]] = {
     "RI": ("blocked", "Rhode Island's funding opportunities page sits behind a bot challenge."),
     "OK": ("login", "Oklahoma's Grant Exchange is login only and asks crawlers not to read it."),
     "AZ": ("login", "Arizona's funding opportunities are in a login-only grants system."),
-    "TN": ("blocked", "Tennessee's state website began refusing this registry's reader in November 2026; it will be checked again."),
     "AL": ("blocked", "Alabama's grants office asks this registry's crawler not to read its pages; the registry respects that."),
     "UT": ("stopped", "Utah's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),
     "WY": ("stopped", "Wyoming's grants list loads only in a browser script; reading it would need a headless browser, which this registry does not use."),

@@ -60,6 +60,8 @@ from connectors import (
     sd_danr,
     sd_dot,
     sd_goed,
+    tn_ecd,
+    tn_tdot,
     tx_egrants,
     va_dcjs,
     va_dcr,
@@ -140,6 +142,8 @@ CONNECTORS: dict[str, ModuleType] = {
     "sd_dot": sd_dot,
     "sd_danr": sd_danr,
     "az_parks": az_parks,
+    "tn_ecd": tn_ecd,
+    "tn_tdot": tn_tdot,
 }
 
 
