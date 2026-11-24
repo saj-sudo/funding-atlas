@@ -19,12 +19,13 @@ connector or one feature per session, no abstractions before the third real case
   table; `docs/connectors/hand_list.md` says how a new agency goes on it in forty lines); `pa_grants` reads a
   search index plus one JSON record per page; a new platform base is extracted only when the second site on that
   platform forces it. The breadth-first states of 12.9 (TN, AL, MS, LA, IN, GA, SC, WI, FL, OK, KS) each carry their own
-  reader on `AgencyPageConnector` and, for now, their own copies of rules the shared base lacks (rolling wording, date
-  windows, applicant sentences): lifting those into `hand_list.py` and `text.py`, measured, is the next session.
+  reader on `AgencyPageConnector`; six of their local rules were lifted into the shared base in 12.10 (rolling wording,
+  CDBG as pass-through, loans as applicant sentences, comma windows, "no matching", a.m./p.m.), and the rest stay local
+  until a third matching case (the roadmap lists them).
 - `connectors/text.py`: the rules every state shares: the applicant tagger, the funding-type keyword, and the tables that
   turn a portal's own applicant and topic labels into ours. A rule that is wrong for one source is wrong for all and is
   fixed there; a portal label is added to the table once, not per connector. A rule change is measured on every stored
-  record with `scripts/measure_tagger.py` (snapshot before and after on the database restored from `gh-pages`, then diff), and on every fixture of every agency-page connector (the stored database does not hold connectors no daily run has read yet).
+  record with `scripts/measure_tagger.py` (snapshot before and after on the database restored from `gh-pages`, then diff), and on every fixture of every agency-page connector with `scripts/measure_fixtures.py` (same interface) (the stored database does not hold connectors no daily run has read yet).
 - `pipeline/`: run a connector, normalize, hash, upsert, log changes, write the diff.
 - `db/`: `schema.sql` plus numbered migrations. Views carry the analytical logic; SQL stays visible.
 - `tests/`: fixtures per connector, never the network. CI runs `ruff check .` and `pytest -q`.
