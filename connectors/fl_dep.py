@@ -50,6 +50,9 @@ PAGES: dict[str, str] = {
     "fct-parks": _GRANTS + "/parks-and-open-space-florida-forever-grant-program",
     "srf": "/wra/srf",
     "water-quality": "/wra/wra/content/wastewater-grant-program",
+    # 12.11: two more pages that name local governments as applicants (docs/connectors/florida.md)
+    "rri": _GRANTS + "/readiness-and-recreation-initiative-grant-program",
+    "nps-319": "/wra/319-tmdl-fund",
 }
 # The two cycle pages are titled "LWCF: Application Process, ..."; the name is the program page's own title.
 NAMES = {"lwcf": "Land and Water Conservation Fund Program", "rtp": "Recreational Trails Program"}
@@ -65,8 +68,11 @@ SHARED_RE = re.compile(r"^(?:eligibility|how to apply)$", re.I)
 FUNDING_TYPES = {"srf": "loan", "srf#drinking-water": "loan"}
 # SRF: "funded through money received from federal grants as well as state contributions"; LWCF: "Grant awards are
 # contingent upon appropriation by the federal government" (NPS is named only by its initials).
-FUNDING_SOURCES = {"srf": "pass_through", "srf#drinking-water": "pass_through", "lwcf": "pass_through"}
-CATEGORY_LABELS = {"srf": "clean water", "srf#drinking-water": "drinking water", "water-quality": "water quality"}
+# The 319 page names EPA's Clean Water Act Section 319(h) grant; the Readiness and Recreation Initiative is LWCF + REPI (12.11)
+FUNDING_SOURCES = {"srf": "pass_through", "srf#drinking-water": "pass_through", "lwcf": "pass_through", "rri": "pass_through",
+                   "nps-319": "pass_through"}
+CATEGORY_LABELS = {"srf": "clean water", "srf#drinking-water": "drinking water", "water-quality": "water quality",
+                   "nps-319": "water quality"}
 INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 DROP_RE = re.compile(r"@floridadep\.gov|\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b|^open dashboard\b|^image$"
                      r"|^learn more about\b|\bforms and documents$|\bother resources$|^contact us\b|\bdashboard\b", re.I)
