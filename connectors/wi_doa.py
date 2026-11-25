@@ -38,7 +38,11 @@ PAGES: dict[str, str] = {
     "economic-development": f"{_P}/CDBG-ED.aspx",
     "emergency-assistance": f"{_P}/CDBG-EAP.aspx",
     "affordable-housing-conversion": f"{_P}/AffordableHousingConversion.aspx",
+    # 12.11: "Towns, villages, cities with populations under 50,000, and most counties ... are eligible to apply"
+    "cdbg-housing": f"{_P}/CDBG.aspx",
 }
+# The housing program is the one record that is not about public works (12.11).
+CATEGORY_LABELS = {"cdbg-housing": "housing"}
 # State CDBG is HUD money ("Funding for CDBG programs is provided by the U.S. Department of Housing and Urban Development
 # (HUD)", the Community Resources hub); not every program page repeats it.
 # The five CDBG records are pass-through by their names (the shared `CDBG_NAME_RE`); the conversion program's page does
@@ -104,6 +108,7 @@ class WiDoa(AgencyPageConnector):
     PAGES = PAGES
     DELAY_S = 3.0
     FUNDING_SOURCES = FUNDING_SOURCES
+    CATEGORY_LABELS = CATEGORY_LABELS
     HAND_QUOTES = HAND_QUOTES
     YEARLESS_RE = YEARLESS_RE
 
