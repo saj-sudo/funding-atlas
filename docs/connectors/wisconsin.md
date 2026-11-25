@@ -137,8 +137,11 @@ module was imported and `SITE.fetch` / `normalize` exercised directly.
   awarded to"); cutting "to assist businesses ..." and "in addressing ... business assistance needs" before tagging.
 - PF's round: when the page dates the 2027 deadline ("due date is to be announced" today) the shared rule reads it with no
   change here.
-- CDBG-HSG (the Housing Regions revolving loan program, `/Pages/AgencyResources/CDBG.aspx`) was not opened: its grants go to
-  a lead local government per housing region; a follow-up.
+- **12.11 (2026-11-25): CDBG-HSG built** as `cdbg-housing` ("CDBG - Housing Regions Program",
+  `/Pages/AgencyResources/CDBG.aspx`): "Towns, villages, cities with populations under 50,000, and most counties in
+  Wisconsin (excluding Dane, Milwaukee, and Waukesha) are eligible to apply"; the money is allocated to seven housing
+  regions and the page states no round, so `unknown`; category housing (`CATEGORY_LABELS`). Run twice on the restored
+  database: added 1, then no changes.
 - `doa.wi.gov` itself: only the home page was read. Its "Local Governments & Grants" menu links Coastal Management (the
   Wisconsin Coastal Management Program's grants, which local governments apply for), Local Projects and the Municipal
   Services Payment program; none was opened. Coastal Management is the next candidate on that host.

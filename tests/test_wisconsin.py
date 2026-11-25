@@ -35,16 +35,17 @@ def texts(slug: str) -> list[str]:
     return [t for _, t in page(slug)["blocks"]]
 
 
-def test_six_records_titled_from_the_page_heading():
+def test_seven_records_titled_from_the_page_heading():
     progs = every()
     assert list(progs) == ["public-facilities", "planning", "public-facilities-economic-development", "economic-development",
-                           "emergency-assistance", "affordable-housing-conversion"]
+                           "emergency-assistance", "affordable-housing-conversion", "cdbg-housing"]
     assert progs["public-facilities"].name == "CDBG - Public Facilities Program (PF)"
     assert progs["affordable-housing-conversion"].name == "Affordable Housing Conversion Program"
     for sid, p in progs.items():
         assert p.jurisdiction == "WI" and p.agency_code == "WI-DOA", sid
         assert p.source_url.startswith("https://energyandhousing.wi.gov/Pages/AgencyResources/"), sid
-        assert p.funding_source == "pass_through" and p.categories[0].value == "infrastructure", sid
+        assert p.funding_source == "pass_through", sid
+        assert p.categories[0].value == ("housing" if sid == "cdbg-housing" else "infrastructure"), sid
 
 
 def test_sharepoint_text_is_folded_and_the_read_stops_at_the_contact_block():
@@ -117,3 +118,10 @@ def test_fetch_and_fallback(monkeypatch):
     monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(m.BASE + m.PAGES["planning"],)))
     assert {r.source_id: r.payload for r in m.fetch(prior=prior)}["planning"] == prior["planning"]
     assert "planning" not in [r.source_id for r in m.fetch()]
+
+
+def test_cdbg_housing_names_its_local_applicants_and_no_round():
+    hsg = every()["cdbg-housing"]
+    assert hsg.name == "CDBG - Housing Regions Program"
+    assert (hsg.status, hsg.opens_at, hsg.closes_at, hsg.rolling) == ("unknown", None, None, None)
+    assert "Towns, villages, cities with populations under 50,000" in hsg.eligibility_text

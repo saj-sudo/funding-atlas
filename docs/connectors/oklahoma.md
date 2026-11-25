@@ -148,8 +148,10 @@ caller's `robots.txt` and home page.
 - **ODMRMF** is in on a scope call (its applicants are councils of government); drop its `PAGES` line if Saj reads the
   navigator as towns only.
 - **Main Street Incentive Program** (dated: "Applications open September 1, 2026 and close September 30, 2026", now past):
-  build when a page says who applies; the Main Street "Application" page (`/community-development/oklahoma-main-street/application/`)
-  was not opened.
+  build when a page says who applies. **12.11 (2026-11-25)**: the "Application" page (`/oklahoma-main-street/application/`)
+  was read once: it is the application to become a Main Street program (a designation: "Interested communities will then
+  submit a Letter of Intent by November 13, 2026, followed by the full application by January 8, 2027"), not the
+  incentive grant, so not built; the incentive program still has no page that names its applicant.
 - **Community Incentives**: the Enterprise Zone Incentive Leverage Act (state match for local units of government) and the
   Quality Events Act (communities reimbursed for hosting events) pay local governments; one paragraph each, no round.
 - **SITES / PREP Fund**: restore if a new round is announced ("Additional details and timelines will be announced").
@@ -157,3 +159,44 @@ caller's `robots.txt` and home page.
   Tourism and Recreation's LWCF and RTP) were not surveyed: their hosts are not on this session's network allowlist.
 - No shared-rule change was needed for Oklahoma beyond the purpose-sentence case above (a rule that reads "funding to help
   local governments" as naming a beneficiary, not an applicant, would remove the module's filter).
+
+## 12.12 (2026-11-25): the round dates from the guidance PDFs, read every run
+
+**Why**: no Oklahoma CDBG page states a round; each program's paragraph on the hub links its year's guidance PDF, and
+the PDFs do (12.11 measured that pages on known hosts mostly carry no round; this is the experiment of reading where the
+dates are). Saj's call: read the PDF live every run, not hand quotes; this lifts the 2026-11-11 hand-quote rule for this
+connector only (decisions log).
+
+**Survey (2026-11-25, one GET each, 3 s apart)**: `robots.txt` allows `/wp-content/uploads/` (it disallows plugins,
+cache, admin). The seven PDFs are 1.4 to 3.0 MB, 18 to 58 pages; `pypdf` reads each in about a second. Six state an
+application deadline, every one 2026 and past; EDIF's states none:
+
+| Record | PDF (`/wp-content/uploads/...`) | The sentence the reader keeps |
+|---|---|---|
+| CIP | `2026-CDBG-CIP-Application-Guidelines.pdf` | "CIP applications must be submitted to ODOC by 5:00 PM, July 10, 2026." (a later "September 4, 2026" round for remaining funds is in the PDF, not read) |
+| Small Cities | `2026-CDBG-Small-Cities-Application-Guidelines.pdf` | "Applications should be submitted by 5:00 p.m., June 19, 2026." (the Letter of Intent's February 16 is not an application deadline) |
+| Community Revitalization | `2026-CDBG-CR-Application-Guidelines.pdf` | "All CDBG Community Revitalization applications must be completed online no later than March 27, 2026, 5:00 p.m." |
+| Water-Wastewater Construction | `2026-CDBG-WW-Construction-Application-Guidelines.pdf` | "... applications must be received by the Oklahoma Department of Commerce/Community Development (ODOC/CD) no later than May 1, 2026, 5:00 p.m." |
+| EDIF | `2026-CDBG-Economic-Development-Infrastructure-Financing-EDIF-Application-Guidelines.pdf` | none |
+| Water + Wastewater Engineering | `2026-WW-Engineering-Application-Guidance.pdf` | "All CDBG Water/Wastewater Engineering applications must be submitted no later than May 1, 2026, at 5:00 p.m." |
+| REAP | `2026-CDBG-REAP-Application-Guidelines.pdf` | "The SSPD must submit the applications to ODOC/CD no later than February 27, 2026, 5:00 p.m." |
+
+**Mapping**: the link is the one in the program's own section of the hub whose file name or link text says Guidelines or
+Guidance (never guessed: no link, no PDF). A deadline sentence names applications and one of "no later than",
+"submitted (to ODOC) by", "accepted until/through", "due date is", "received by"; the first such sentence in the PDF is
+the round. `closes_at` is its date; status is `open` on or before it and `unknown` after (the page's own round, if it
+ever states one, wins). `closes_at_text` is the sentence prefixed with the PDF's name ("2026 CDBG CIP Application
+Guidelines (PDF): ..."); `source_url` stays the hub. The payload keeps the PDF's URL and only its deadline sentences, so
+the hash moves when the PDF's dates move, and next year's file (a new link on the hub) is read with no code change. A PDF
+that cannot be read keeps the stored copy's sentences; a PDF over 8 MB is not read. The shared round reader is not used:
+it reads "submitted by" but not "no later than" or "accepted through", and changing it would move every state.
+
+**Built (2026-11-25)**: `ok_commerce` reads each linked PDF after the pages (3 s apart, about 14 MB a run; `pypdf` 7.1,
+about a second a file). A transport error on a PDF is tried once more (the 3 MB Engineering file failed once mid-run);
+a status is not. Fixtures: the hub's links are in `cdbg.html`; two one-page excerpts of the PDFs (Community
+Revitalization's deadline page, EDIF's first page, cut with `pypdf`) test the extraction, and `guidance/sentences.json`
+holds every PDF's kept sentences as read on 2026-11-25 (the full files are 1.4 to 3 MB and are not committed). Runs on
+the database restored from `gh-pages`: 5 changed, then 1 (the Engineering PDF's transient failure, before the retry),
+then 0. **Result**: 6 of 8 records now carry their round's closing date and sentence; none is open, because every 2026
+deadline has passed (February 27 to July 10). The 2027 files will be new links on the hub, read with no code change: the
+first daily run after the agency posts them should show the rounds `open` with their dates.

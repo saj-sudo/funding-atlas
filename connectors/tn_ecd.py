@@ -3,7 +3,9 @@
 Source: https://www.tn.gov, the state's one Adobe Experience Manager site, one GET per page in `PAGES`, 6 s apart. The
 site's AWS load balancer refused this User-Agent after about sixty requests in fifteen minutes on 2026-11-17, and
 answered every page from the GitHub Actions runner on 2026-11-24 (docs/connectors/tennessee.md); the pace here is
-deliberate, and a refused request falls back to the stored record. The title is `.tn-pagetitle h1`; the program text
+deliberate, and a refused request falls back to the stored record. The runner's first request of a session to
+`www.tn.gov` has been a connection reset every time (12.9a), so a transport error, never an HTTP status, is retried
+twice, `DELAY_S` apart (12.9b). The title is `.tn-pagetitle h1`; the program text
 is the `.tn-rte` and `.textimage-text` blocks under `#main` (a tabbed page has one per tab; the left menu, the link-button tabs and the
 image tiles hold no program text). A paragraph that lists dates one to a line (`<br>`) is read as one block per line,
 so a deadline is not read off its neighbour's date. `parse_page` is shared with `tn_tdot`. Contact lines are dropped.
@@ -15,8 +17,10 @@ page says no further round is funded. Status table and field mapping are the age
 from __future__ import annotations
 
 import re
+import time
 from typing import Any
 
+import httpx
 from bs4 import BeautifulSoup, Tag
 
 from connectors.hand_list import AgencyPageConnector, blocks_from, soup
@@ -96,10 +100,22 @@ class TnAgency(AgencyPageConnector):
     BASE = BASE
     JURISDICTION = "TN"
     DELAY_S = DELAY_S
+    RETRIES = 2
     NAMES: dict[str, str] = {}
 
     def parse_page(self, page_html: str) -> dict[str, Any]:
         return parse_page(page_html)
+
+    def get_page(self, client: httpx.Client, url: str) -> str:
+        """The page, a reset or timeout retried `RETRIES` times; an HTTP status (a 403 wall) is never retried."""
+        for attempt in range(self.RETRIES + 1):
+            try:
+                return super().get_page(client, url)
+            except httpx.TransportError:
+                if attempt == self.RETRIES:
+                    raise
+                time.sleep(self.DELAY_S)
+        raise AssertionError("unreachable")
 
     def records_for(self, slug: str, spec: str, pages: list[dict[str, Any]], count: int) -> list[tuple[str, dict[str, Any]]]:
         out = super().records_for(slug, spec, pages, count)

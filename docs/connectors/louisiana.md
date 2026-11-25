@@ -86,5 +86,8 @@ Scope calls and local rules:
 - Amounts are not stored: the pages give ceilings by population band (villages up to $25,000 ... parishes up to
   $100,000), which is not one program maximum.
 
-Not read (follow-ups): the Recovery Housing Program, the Water Sector Program and the EPA programs pages under Local
-Government Assistance; every disaster recovery program (out of scope); other Louisiana agencies (DOTD, DEQ, GOHSEP).
+**12.11 (2026-11-25), read once each and not built**: the Water Sector Program (appropriations and FY 2026-2027 guidance,
+no applicant named; only "No funds will be awarded to applicants listed on the ... Non-Compliance List"), the Recovery
+Housing Program (no applicant or round on the page) and Environmental Protection Agency Programs (several EPA water
+programs on one page that "assist local governments", with no applicant sentence per program). Still not read: every
+disaster recovery program (out of scope); other Louisiana agencies (DOTD, DEQ, GOHSEP).

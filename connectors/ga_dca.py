@@ -26,6 +26,7 @@ from connectors.hand_list import (
     applicant_tags,
     blocks_from,
     clause_cut,
+    first_date,
     soup,
 )
 from connectors.sam_assistance_listings import clean
@@ -44,6 +45,11 @@ PAGES: dict[str, str] = {
     "cdbg-redevelopment": f"{_CDBG}/redevelopment-fund",
     "cdbg-itad": f"{_CDBG}/immediate-threat-and-danger",
     "onegeorgia-equity": "/financing-tools/infrastructure/onegeorgia-authority/equity-fund",
+    # 12.11: the Equity Fund's two initiatives and the downtown loan fund, each naming a local applicant
+    "onegeorgia-site-development": "/financing-tools/infrastructure/onegeorgia-authority/equity-fund/site-development-initiative",
+    "onegeorgia-workforce-housing": "/financing-tools/infrastructure/onegeorgia-authority/equity-fund/workforce-housing-initiative",
+    "ddrlf": "/financing-tools/small-business/downtown-development-revolving-loan-fund-ddrlf",
+    "chip": "/affordable-housing/housing-development/home-investment-partnerships-program-home/community-home",
 }
 # Page titles that do not say whose fund or what kind of thing it is, named as the page's own text does.
 NAMES = {"Equity Fund": "OneGeorgia Equity Fund", "Immediate Threat and Danger": "Immediate Threat and Danger Program"}
@@ -51,10 +57,17 @@ NAMES = {"Equity Fund": "OneGeorgia Equity Fund", "Immediate Threat and Danger":
 # "CDBG" and pages that do not name HUD; DCA's Infrastructure page: "The CDBG Program is a federally-funded grant for
 # states". The Equity Fund is the OneGeorgia Authority's own.
 FUNDING_SOURCES = {"cdbg-eip": "pass_through", "cdbg-redevelopment": "pass_through", "onegeorgia-equity": "direct"}
+# "The maximum loan is $250,000 per project" (12.11).
+FUNDING_TYPES = {"ddrlf": "loan"}
+CATEGORY_LABELS = {"onegeorgia-workforce-housing": "housing", "chip": "housing"}
 INLINE = ["strong", "b", "em", "i", "a", "span", "u"]
 DROP_RE = re.compile(r"\[email\s*protected\]|@dca\.ga\.gov|\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b|^review the .* faqs\b", re.I)
 STOP_RE = re.compile(r"(?:frequently asked questions|.*documents & downloads)$", re.I)
 APPLY_CARD_RE = re.compile(r"^apply\b", re.I)
+PORTAL_RE = re.compile(r"^application portal$", re.I)
+# "The 2027 CHIP grant cycle is now open through January 31, 2027." (12.11): the shared reader takes "through" as a
+# deadline only beside "accepting"; here an open round's own "open through <date>" is its closing date.
+OPEN_THROUGH_RE = re.compile(r"\bopen through\b", re.I)
 # "Apply for the FY2027 CDBG Annual Competition" (a fiscal year, no date); "Online Applications are accepted quarterly on
 # the 2nd Friday of the following months: January, April, July, October" (no year).
 YEARLESS_RE = re.compile(r"^apply for the FY\d{4}\b|\baccepted quarterly\b", re.I)
@@ -98,7 +111,14 @@ def parse_page(page_html: str) -> dict[str, Any]:
     if main is None:
         return {"title": "", "blocks": []}
     h1 = main.find("h1")
-    title = clean(h1.get_text(" ")) if h1 else ""
+    # the small-business pages print no `h1`; their `<title>` is the program's name before " | Georgia ..." (DDRLF, 12.11)
+    title = clean(h1.get_text(" ")) if h1 else clean(doc.title.get_text(" ")).split(" | ")[0] if doc.title else ""
+    # CHIP (12.11) states its round in an "Application Portal" section printed after "Documents & Downloads", where the
+    # read stops: that one section is read first.
+    for section in main.select("section.layout-section"):
+        head = section.select_one(".layout-section__title")
+        if head is not None and PORTAL_RE.match(clean(head.get_text(" "))):
+            main.insert(0, section.extract())
     for card in main.select("article.embedded-entity"):
         h2 = card.find("h2")
         if h2 is not None and APPLY_CARD_RE.search(clean(h2.get_text(" "))):
@@ -123,10 +143,21 @@ class GaDca(AgencyPageConnector):
     PAGES = PAGES
     DELAY_S = 3.0
     FUNDING_SOURCES = FUNDING_SOURCES
+    FUNDING_TYPES = FUNDING_TYPES
+    CATEGORY_LABELS = CATEGORY_LABELS
     YEARLESS_RE = YEARLESS_RE
 
     def parse_page(self, page_html: str) -> dict[str, Any]:
         return parse_page(page_html)
+
+    def round_with_yearless(self, blocks: Blocks, today: date) -> dict[str, Any]:
+        out = super().round_with_yearless(blocks, today)
+        text = out["closes_at_text"] or ""
+        m = OPEN_THROUGH_RE.search(text)
+        closes = m and first_date(text[m.end():])
+        if out["closes_at"] is None and closes:
+            out = {**out, "closes_at": closes, "status": "open" if today <= closes else "unknown"}
+        return out
 
     def fields(self, raw: Any, today: date) -> dict[str, Any]:
         """The agency-page fields, with this site's recipient sentences added to the eligibility lines and HUD's "units of

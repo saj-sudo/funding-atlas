@@ -170,9 +170,17 @@ request budget for the host:
   `dos.fl.gov` / `dos.myflorida.com` (not on the allowlist, not fetched). A follow-up could read applicants there.
 - DOS Grants prints no round for the next year until the Department edits the row: every record is "Status not confirmed"
   between rounds, with last round's dates.
-- `fl_dep` not built: ORLP, the Readiness and Recreation Initiative, Stan Mayfield Working Waterfronts (three more
-  `PAGES` lines under the same section), 319 / State Water Quality Assistance (`/wra/319-tmdl-fund`), Springs and
-  Watershed Restoration (`/wra/wra`), Water Supply Restoration, and Resilient Florida (under `/rcp`; its page was not
-  located in this session).
+- **12.11 (2026-11-25), `fl_dep` deepened, 9 records**: the **Readiness and Recreation Initiative** (`rri`: "state
+  agencies and local units of government (e.g. ... cities, counties, and special purpose districts)"; last cycle March 15
+  to April 15, 2024, so `unknown` with the dates kept; LWCF + REPI, `pass_through`) and the **Nonpoint Source
+  Management Program** (`nps-319`: "Florida's local governments, including county and municipal governments, special
+  districts ..."; no round on the page, `unknown`; EPA's Section 319(h), `pass_through`, category water quality).
+  **Surveyed and left out** (one GET each, 2026-11-25), because the page names no applicant: ORLP (it names where projects
+  go, "urban areas with a population of 25,000 or more", not who applies; its FY2027-28 window "Sept. 2, 2026 - Sept. 30,
+  2026" is on the page, and `WINDOW_RE` reads only full month names), Stan Mayfield Working Waterfronts Capital Outlay
+  (the FY2026-27 window was August 3 to 17, 2026, first come first served) and its Florida Forever twin, Springs and
+  Watershed Restoration (`/wra/wra`, a description), Water Supply Restoration ("Contact the program to apply"; wells), and
+  the Alternative Water Supply program (eligibility only in its documents). Resilient Florida (under `/rcp`) still not
+  located.
 - The Drinking Water SRF's "private utilities" gets no tag from the shared tagger (the text is stored).
 - The live `fl_dep` run of the finished module (see above) is the first daily run's job.

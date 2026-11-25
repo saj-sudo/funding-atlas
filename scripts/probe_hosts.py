@@ -89,26 +89,22 @@ EXTRA: dict[str, list[str]] = {
     # post (`agencyId`, a `source` other than grants.gov), and the featured list
     "NM-ALL": ["https://platform.dfa.nm.gov/api/CAPS/GetFeaturedOpportunities"],
     "TN": [
-        "https://www.tn.gov/ecd/rural-development/cdbg.html",
-        "https://www.tn.gov/ecd/rural-development/infrastructure-planning-grant.html",
-        "https://www.tn.gov/tdot.html",
-        "https://www.tn.gov/environment.html",
-        "https://www.tn.gov/tema.html",
-        # the program pages a connector would read (all 403 through the development proxy after ~30 requests)
-        "https://www.tn.gov/ecd/community-development-block-grant/cdbg/cdbg-community-development-regular-round.html",
-        "https://www.tn.gov/ecd/rural-development/site-development.html",
-        "https://www.tn.gov/ecd/rural-development/threestar.html",
-        "https://www.tn.gov/ecd/rural-development/tennessee-main-street/downtown-improvement-grant-program.html",
-        "https://www.tn.gov/ecd/rural-development/historic-development-grant-program.html",
-        "https://www.tn.gov/environment/about-tdec/grants/recreation.html",
-        "https://www.tn.gov/environment/about-tdec/grants/water.html",
-        "https://www.tn.gov/environment/about-tdec/grants/materials-management.html",
-        "https://www.tn.gov/environment/about-tdec/grants/remediation.html",
-        "https://www.tn.gov/tdot/local-programs-community-investments/local-programs/tap.html",
-        "https://www.tn.gov/tdot/local-programs-community-investments/local-programs/funding-options.html",
-        "https://www.tn.gov/tdot/local-programs-community-investments/community-investments-office/bicycle-and-pedestrian-program.html",
-        "https://www.tn.gov/tema/assistance/assistance-for-local-governments.html",
-        "https://www.tn.gov/tema/ready-communities/grants/governor-s-response-and-recovery-fund.html",
+        # 12.11: TDEC's and TEMA's program pages, for fixtures of `tn_tdec` and `tn_tema` (links read off the hubs probe run 10
+        # saved on 2026-11-24; the survey list of 12.6j and 12.9 is in git history). Thirteen pages, 3 s apart: the load
+        # balancer walled about sixty requests in fifteen minutes (12.6j).
+        "https://www.tn.gov/environment/about-tdec/grants/recreation/lprf.html",
+        "https://www.tn.gov/environment/about-tdec/grants/recreation/rtp.html",
+        "https://www.tn.gov/environment/about-tdec/grants/recreation/trip.html",
+        "https://www.tn.gov/environment/about-tdec/grants/water/srf.html",
+        "https://www.tn.gov/environment/about-tdec/grants/water/swig.html",
+        "https://www.tn.gov/environment/about-tdec/grants/water/stream-wetland-restoration.html",
+        "https://www.tn.gov/environment/about-tdec/grants/materials-management/convenience-center.html",
+        "https://www.tn.gov/environment/about-tdec/grants/materials-management/recycling-equipment.html",
+        "https://www.tn.gov/environment/about-tdec/grants/materials-management/hhw-collection-facility.html",
+        "https://www.tn.gov/environment/about-tdec/grants/materials-management/organics-management.html",
+        "https://www.tn.gov/tema/ready-communities/grants/empg.html",
+        "https://www.tn.gov/tema/ready-communities/grants/homeland-security-grant-program.html",
+        "https://www.tn.gov/tema/ready-communities/grants/mitigation-grants/hazard-mitigation-grant-program.html",
     ],
 }
 

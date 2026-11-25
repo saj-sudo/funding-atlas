@@ -112,3 +112,61 @@ def test_fetch_paces_itself_and_falls_back(monkeypatch):
     refused = tn_ecd.BASE + tn_ecd.PAGES["cdbg"]
     monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(refused,)))
     assert {r.source_id: r.payload for r in tn_ecd.fetch(prior=prior)}["cdbg"] == prior["cdbg"]
+
+
+def _served(url: str) -> str:
+    slug = next(s for s, p in tn_ecd.PAGES.items() if url == tn_ecd.BASE + p)
+    return (FIX / "tn_ecd" / f"{slug}.html").read_text(encoding="utf-8")
+
+
+def test_the_runners_first_request_reset_is_retried(monkeypatch):
+    # 12.9a: the first request of every runner session to www.tn.gov was a connection reset, and CDBG is the first page.
+    slept: list[float] = []
+    monkeypatch.setattr(hl.time, "sleep", slept.append)
+    resets = [2]
+
+    def site(client, url):
+        if resets[0]:
+            resets[0] -= 1
+            raise httpx.ConnectError("reset", request=httpx.Request("GET", url))
+        return _served(url)
+
+    monkeypatch.setattr(hl, "get", site)
+    assert [r.source_id for r in tn_ecd.fetch()] == list(tn_ecd.PAGES)
+    assert len(slept) == 2 + len(tn_ecd.PAGES) - 1 and all(s >= 6.0 for s in slept)
+
+
+def test_a_status_is_never_retried(monkeypatch):
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    calls: list[str] = []
+    refused = tn_ecd.BASE + tn_ecd.PAGES["cdbg"]
+
+    def site(client, url):
+        calls.append(url)
+        if url == refused:
+            raise httpx.HTTPStatusError("403", request=httpx.Request("GET", url), response=httpx.Response(403))
+        return _served(url)
+
+    monkeypatch.setattr(hl, "get", site)
+    prior = {"cdbg": {"page": {"title": "stored", "blocks": []}}}
+    records = {r.source_id: r.payload for r in tn_ecd.fetch(prior=prior)}
+    assert calls.count(refused) == 1
+    assert records["cdbg"] == prior["cdbg"]
+
+
+def test_three_resets_fall_back_after_two_retries(monkeypatch):
+    monkeypatch.setattr(hl.time, "sleep", lambda s: None)
+    calls: list[str] = []
+    refused = tn_ecd.BASE + tn_ecd.PAGES["cdbg"]
+
+    def site(client, url):
+        calls.append(url)
+        if url == refused:
+            raise httpx.ReadError("reset", request=httpx.Request("GET", url))
+        return _served(url)
+
+    monkeypatch.setattr(hl, "get", site)
+    prior = {"cdbg": {"page": {"title": "stored", "blocks": []}}}
+    assert {r.source_id: r.payload for r in tn_ecd.fetch(prior=prior)}["cdbg"] == prior["cdbg"]
+    assert calls.count(refused) == 3
+    assert "cdbg" not in {r.source_id for r in tn_ecd.fetch()}

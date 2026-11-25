@@ -120,8 +120,23 @@ database has been made. The probe's live read, 2026-11-24:
   the usual ... programs"), so the module tags RDF's and EIP's recipient sentences by their matched phrase; (3) the
   applicant-sentence reader does not know "provides local governments access to" or "financing to local governments";
   (4) the match reader does not know "provides 50% matching funds" or "Local funds must comprise at least 10%".
-- Not surveyed: CHIP (find its program page; the 2027 round was announced 2026-10-02), CDBG Innovative Grant, Section 108,
-  the Equity Fund's Site Development and Workforce Housing initiatives, ARC and SCRC, DDRLF, Certified Local Government
-  Grants, the Georgia Heritage Grant.
+- **12.11 (2026-11-25): four more records, 9 in all.** **CHIP** (`/affordable-housing/housing-development/
+  home-investment-partnerships-program-home/community-home`): "The 2027 CHIP grant cycle is now open through January 31,
+  2027", so `open`, closing 2027-01-31; "Eligible Applicants: Local Governments, Nonprofits ..., Public Government
+  Authorities"; HUD's HOME money, `pass_through`; category housing. Two reading changes, both local to this module and
+  measured (no other fixture record moved): the page prints its round in an "Application Portal" section after
+  "Documents & Downloads", where the read stops, so that one section is read first (`PORTAL_RE`); and an open round's
+  "open through <date>" is its closing date (`OPEN_THROUGH_RE`; the shared reader takes "through" only beside
+  "accepting"; a third case would lift it). **DDRLF** (municipalities and counties of 100,000 or less and development
+  authorities; a loan, "accepted throughout the year and as loan funds are available", `unknown`): the small-business
+  template prints no `h1`, so its name is the page's `<title>` before " | Georgia ...". The Equity Fund's **Site
+  Development Initiative** ("Applicant must be a development authority", tagged `special_district`) and **Workforce
+  Housing Initiative** ("Units of general-purpose local government ... as well as local, regional, and state
+  authorities"; quarterly, `unknown`; category housing). One live run on the restored database: added 4 (the second run
+  was skipped to stay near the host's request budget: 18 requests to `dca.georgia.gov` this session).
+  **Surveyed and left out** (page names no applicant): CDBG Innovative Grant ("allow our local governments flexibility"
+  is not an applicant sentence), ARC ("eligible applicants", unnamed), SCRC (no applicant; its pre-application deadline was
+  May 27, 2025). Not opened: Section 108, the Revolving Loan Fund, Rural Workforce Housing Construction Loan, Certified
+  Local Government Grants, the Georgia Heritage Grant, and the HOME page.
 - Other Georgia agencies (GDOT's LMIG and TA, GEFA's water loans, GEMA's mitigation, DNR's LWCF and trails) are on hosts
   this session could not reach and were not requested.

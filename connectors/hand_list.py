@@ -201,6 +201,10 @@ class HandListConnector:
         """The URLs a slug is read from; the default takes `spec` as a path under `BASE`."""
         return [self.BASE + spec]
 
+    def get_page(self, client: httpx.Client, url: str) -> str:
+        """One page's HTML; the default is the module's `get`, looked up at call time (tests patch `hand_list.get`)."""
+        return get(client, url)
+
     def parse_page(self, page_html: str) -> dict[str, Any]:
         raise NotImplementedError
 
@@ -233,7 +237,7 @@ class HandListConnector:
                         if not first:
                             time.sleep(self.DELAY_S)
                         first = False
-                        pages.append(self.parse_page(get(c, url)))
+                        pages.append(self.parse_page(self.get_page(c, url)))
                 except httpx.HTTPError:
                     records += [RawRecord(source_connector=self.CONNECTOR, source_id=sid, payload=p)
                                 for sid, p in prior.items() if sid == slug or sid.startswith(slug + "#")]

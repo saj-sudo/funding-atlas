@@ -112,9 +112,9 @@ def dep(today: date = TODAY) -> dict:
     return out
 
 
-def test_dep_seven_records_named_from_the_page_or_the_names_table():
+def test_dep_nine_records_named_from_the_page_or_the_names_table():
     progs = dep()
-    assert list(progs) == ["frdap", "lwcf", "rtp", "fct-parks", "srf", "srf#drinking-water", "water-quality"]
+    assert list(progs) == ["frdap", "lwcf", "rtp", "fct-parks", "srf", "srf#drinking-water", "water-quality", "rri", "nps-319"]
     assert progs["frdap"].name == "Florida Recreation Development Assistance Program"
     # the two cycle pages are titled "LWCF: Application Process, ..."
     assert (progs["lwcf"].name, progs["rtp"].name) == ("Land and Water Conservation Fund Program", "Recreational Trails Program")
@@ -168,7 +168,7 @@ def test_dep_funding_type_source_match_and_applicants():
     progs = dep()
     assert {sid: p.funding_source for sid, p in progs.items()} == {
         "frdap": "direct", "lwcf": "pass_through", "rtp": "pass_through", "fct-parks": "direct", "srf": "pass_through",
-        "srf#drinking-water": "pass_through", "water-quality": "direct"}
+        "srf#drinking-water": "pass_through", "water-quality": "direct", "rri": "pass_through", "nps-319": "pass_through"}
     assert {sid for sid, p in progs.items() if p.funding_type == "loan"} == {"srf", "srf#drinking-water"}
     assert {sid for sid, p in progs.items() if p.match_required} == {"lwcf", "rtp", "fct-parks"}
     assert tags(progs["frdap"]) == {"municipality", "county", "special_district"}
@@ -183,7 +183,7 @@ def test_dep_funding_type_source_match_and_applicants():
     assert all(len(p.applicant_types) == len(tags(p)) for p in progs.values())   # one tag per type
     assert {sid: p.categories[0].value for sid, p in progs.items()} == {
         "frdap": "parks", "lwcf": "parks", "rtp": "parks", "fct-parks": "parks", "srf": "water", "srf#drinking-water": "water",
-        "water-quality": "water"}
+        "water-quality": "water", "rri": "parks", "nps-319": "water"}
     assert progs["fct-parks"].summary.startswith("The preservation of green space")   # not "View the Webinar Recording"
 
 
@@ -199,10 +199,23 @@ def test_dep_fetch_and_fallback(monkeypatch):
 
     monkeypatch.setattr(hl, "get", site)
     records = fl_dep.fetch()
-    assert [r.source_id for r in records] == ["frdap", "lwcf", "rtp", "fct-parks", "srf", "srf#drinking-water", "water-quality"]
+    assert [r.source_id for r in records] == ["frdap", "lwcf", "rtp", "fct-parks", "srf", "srf#drinking-water", "water-quality",
+                                              "rri", "nps-319"]
     assert slept == [3.0] * (len(fl_dep.PAGES) - 1)
     prior = {r.source_id: r.payload for r in records}
     monkeypatch.setattr(hl, "get", lambda c, u: site(c, u, broken=(fl_dep.BASE + fl_dep.PAGES["srf"],)))
     again = {r.source_id: r.payload for r in fl_dep.fetch(prior=prior)}
     assert again["srf"] == prior["srf"] and again["srf#drinking-water"] == prior["srf#drinking-water"]
     assert fl_dep.resolve_missing("frdap") == {"status": "unknown"}
+
+
+def test_dep_the_two_pages_of_12_11_name_local_governments():
+    progs = dep()
+    rri, nps = progs["rri"], progs["nps-319"]
+    assert rri.name == "Readiness and Recreation Initiative Grant Program"
+    # the page's last cycle ran March 15 to April 15, 2024: the dates are kept, the status is not guessed
+    assert (rri.status, rri.opens_at, rri.closes_at) == ("unknown", date(2024, 3, 15), date(2024, 4, 15))
+    assert {"municipality", "county", "special_district"} <= tags(rri)
+    assert nps.name == "Nonpoint Source Management Program"
+    assert (nps.status, nps.closes_at) == ("unknown", None)
+    assert {"municipality", "county", "special_district"} <= tags(nps)

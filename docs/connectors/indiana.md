@@ -149,7 +149,15 @@ or the workflow yet (done centrally), so no run against the database has been ma
   2026 is a Sunday); (2) `summary_for` skips a paragraph that contains the word "due" in any sense, so the Stormwater
   record's summary is its second paragraph ("... sewer backups due to inadequate resources ..." is skipped); (3) the
   match reader does not see "applicants must provide a local match of 10%" (Blight Clearance: `match_required` null).
-- Owner Occupied Rehabilitation: read its page, and add it if the local government is the applicant.
-- Not surveyed: Recovery Housing, BSCC, RED, HELP, PreservINg Main Street, OCRA's broadband programs; INDOT's railroad
+- **12.11 (2026-11-25): two more OCRA records, 9 in all.** **Owner Occupied Rehabilitation Program** ("Lead applicants
+  must be a non-entitlement local unit of government (city, county, or incorporated town)"; the 2026 Cycle 3 window
+  "Oct. 1 until Sunday, Nov. 1" prints no year, so `unknown`; category housing; the page names CDBG only for past grants,
+  so the source is left at the module default) and **Building Socially Connected Communities Program** ("Eligible
+  Applicants: Local government, Non-profit organizations, Community groups"; the page reports its 2024 pilot round and
+  states no new one, `unknown`). Run twice on the restored database: added 2, then no changes. **Surveyed and left out**:
+  HELP (an ARPA-era cohort program, its funding the communities' CLFRF), PreservINg Main Street (it names eligible
+  communities, not an applicant, and its "until the program is closed out" reads as `closed`), RED (no applicant or round
+  on the page).
+- Not surveyed: Recovery Housing, OCRA's broadband programs, the Historic Renovation Grant Program; INDOT's railroad
   grants and its Local Trax and safety programs; IFA (State Revolving Fund), DNR (LWCF, trails), IDHS (mitigation), IHCDA.
 - OCRA's round dates also live in its calendar on `events.in.gov` (another host, not on the allowlist, not requested).
