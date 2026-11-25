@@ -148,8 +148,10 @@ caller's `robots.txt` and home page.
 - **ODMRMF** is in on a scope call (its applicants are councils of government); drop its `PAGES` line if Saj reads the
   navigator as towns only.
 - **Main Street Incentive Program** (dated: "Applications open September 1, 2026 and close September 30, 2026", now past):
-  build when a page says who applies; the Main Street "Application" page (`/community-development/oklahoma-main-street/application/`)
-  was not opened.
+  build when a page says who applies. **12.11 (2026-11-25)**: the "Application" page (`/oklahoma-main-street/application/`)
+  was read once: it is the application to become a Main Street program (a designation: "Interested communities will then
+  submit a Letter of Intent by November 13, 2026, followed by the full application by January 8, 2027"), not the
+  incentive grant, so not built; the incentive program still has no page that names its applicant.
 - **Community Incentives**: the Enterprise Zone Incentive Leverage Act (state match for local units of government) and the
   Quality Events Act (communities reimbursed for hosting events) pay local governments; one paragraph each, no round.
 - **SITES / PREP Fund**: restore if a new round is announced ("Additional details and timelines will be announced").

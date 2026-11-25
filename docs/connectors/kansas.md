@@ -154,7 +154,10 @@ detail page in the survey, ten in the probe), ten seconds or more apart, plus th
 - **Commerce's other grants a town can apply for**, each a page of its own, none read: HEAL, SEED, Towns, Rural Champions,
   ROOMS, SIGNS, the Tourism Attraction Development and Tourism Marketing grants. The Grants Calendar (`/grantscalendar/`,
   one table, 33 rows) lists them with maximum, match and months, and would be a cheap index for a second session; it states
-  no applicants and no year.
+  no applicants and no year. **12.11 (2026-11-25)**: the calendar links none of the program pages (one link, a 2026-10 news
+  post, "Towns Grant Funding Available for Rural Quality-of-Place Projects"), and `/officeofruralprosperity/` answers 404;
+  stopped there after two requests rather than guess URLs against `Crawl-delay: 10`. The next try starts from the site's
+  own menu or sitemap.
 - Kansas Main Street, Kansas Community Empowerment and the Office of Broadband Development pages were not opened.
 - Other agencies (KDOT's local programs, KDHE's revolving funds and waste grants, the Water Office, Emergency Management,
   Wildlife and Parks' LWCF and trails) were not surveyed: their hosts are not on this session's network allowlist. The
