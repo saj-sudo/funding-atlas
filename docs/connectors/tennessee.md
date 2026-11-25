@@ -94,3 +94,20 @@ application) and **Active Transportation Office** (no program) pages are not rec
   materials management, remediation), TEMA's local-government assistance, TDOT's State Infrastructure Fund and
   Multimodal Access Grant, the CDBG hub's other rounds. THDA (`thda.org`) is its own host, not surveyed.
 - Keep the request count low when adding pages: the wall of 2026-11-17 came after about sixty requests in fifteen minutes.
+
+## 12.11 (2026-11-25): TDEC and TEMA, walled again
+
+The links were read off the TDEC grant hubs and TEMA's pages that `probe-hosts` run 10 saved on 2026-11-24 (no new
+request): TDEC's LPRF, RTP, TRIP, SRF, SWIG, Stream and Wetland Restoration, and four materials-management grants
+(convenience centers, recycling equipment, household hazardous waste facilities, organics); TEMA's EMPG, Homeland
+Security Grant Program and Hazard Mitigation Grant Program. The Governor's Response and Recovery Fund was left out
+(its page is one disaster's application, the Polk County flooding; the CDBG-DR rule).
+
+`probe-hosts` run 12 (2026-11-25 01:58 UTC, this branch, `states: TN`, 13 pages 3 s apart): **15 of 15 403** from
+`awselb/2.0`, `robots.txt` and `/ecd/grants.html` included. The daily run of 2026-11-24 (20:08 to 20:45 UTC) had read
+`tn_ecd`'s three pages and `tn_tdot`'s one without a 403, five hours earlier. So the wall is back, from a fresh runner,
+on the first request, and it is not the request count. **Nothing built**: `tn_tdec` and `tn_tema` were drafted and
+discarded. By 12.6j's reopen rule ("any 403: Tennessee is blocked for good unless the state allows it"), whether the
+two Tennessee connectors stay is Saj's call (decisions log 2026-11-25). Until then they stay wired: a refused page
+falls back to its stored record, so a wall costs no data, and the daily run's log will show whether it holds.
+
