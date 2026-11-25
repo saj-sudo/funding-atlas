@@ -106,10 +106,11 @@ already read "units of general local government" (`text.py`); only "general purp
 gaps.
 
 **For Saj (12.9 calls, each one line to overrule; decisions log 2026-11-24):**
-- **Tennessee walled again (12.11, decide)**: `probe-hosts` run 12 on 2026-11-25 got 15 of 15 403 (`awselb`), five hours
+- **Tennessee walled again (12.11, watched)**: `probe-hosts` run 12 on 2026-11-25 got 15 of 15 403 (`awselb`), five hours
   after the daily run read Tennessee cleanly. 12.6j's rule says any 403 means blocked for good unless the state allows it.
   Keep `tn_ecd` and `tn_tdot` wired (a wall falls back to stored records, so nothing is lost) and watch the daily runs, or
-  take them out (one line each in `pipeline/run.py` and `site.yml`). My lean: keep them and watch a week.
+  take them out (one line each in `pipeline/run.py` and `site.yml`). **Decided 2026-11-25 (Saj): keep and watch a week**;
+  read the daily runs' `tn_ecd` and `tn_tdot` lines on or after 2026-12-02 and decide then.
 - **Tennessee reads live** (12.9a, run 74): `tn_ecd` 3 and `tn_tdot` 1, not blocked. The CDBG Regular Round was
   missing because the first request of every runner session to `www.tn.gov` is a connection reset (three of three) and
   CDBG is the first page. **12.9b (Saj's yes)**: a reset is retried twice, 6 s apart, never an HTTP status. Verify on the
@@ -592,6 +593,7 @@ decide what gets built next.
 | 2026-11-24 | Scope calls of 12.9 (the workers', each one line to overrule) | left out where the page says no further round: TN Historic Development, IN Historic Renovation, GA Rural Downtown Redevelopment, SC SCIIP, FL DOS's retired rows. In though unusual: OK's disaster mitigation matching fund (planning districts apply), SC's Viability Improvement Program, WI CDBG-ED (the local government applies for a business). Mississippi's second page of loans (POST only) not built. Composed names ("CDBG ..." prefixes) in IN, KS, LA, SC, OK | each state's doc |
 | 2026-11-24 | Tennessee retries a transport error twice, never an HTTP status (Saj) | the runner's first request to `www.tn.gov` was a connection reset in all three sessions, and the CDBG page, first in `PAGES`, was skipped every night (12.9a). A 403 is still a wall and is not retried, so the reopen rule of 12.6j holds | 12.9b |
 | 2026-11-25 | 12.11 scope: a same-host page is built only when it names a local applicant (Saj chose the same-host batch; the keep rule is mine) | fourteen pages left out on it, each named in its state's doc (Florida's ORLP among them: it says where projects go, not who applies). Tennessee: `probe-hosts` run 12 15 of 15 403, nothing built, keep-or-drop left to Saj (Start here) | 12.11 |
+| 2026-11-25 | Tennessee kept and watched for a week after the 12.11 probe's 403s (Saj) | 12.6j's rule (any 403: blocked for good) is not applied yet: the daily run read Tennessee cleanly five hours before the probe was refused, and a refused page falls back to its stored record. Decide from the daily logs on or after 2026-12-02 | Start here |
 
 ## Open questions (do not resolve in code yet)
 
