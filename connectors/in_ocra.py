@@ -42,6 +42,10 @@ PAGES: dict[str, str] = {
     "cdbg-planning": "/ocra/cdbg/planning-grants",
     "cdbg-construction": "/ocra/cdbg/cdbg-construction-grants",
     "stellar": "/ocra/stellar/index",
+    # 12.11: "Lead applicants must be a non-entitlement local unit of government (city, county, or incorporated town)";
+    # BSCC's "Eligible Applicants: Local government, Non-profit organizations, Community groups"
+    "owner-occupied-rehab": "/ocra/cdbg/owner-occupied-rehabilitation-program",
+    "bscc": "/ocra/bscc",
 }
 # The page's titles are "Planning Grants" and "Stellar Pathways Program"; the first is named for the program it is part of.
 NAMES = {"Planning Grants": "CDBG Planning Grants"}
@@ -53,7 +57,8 @@ SPLITS = {"cdbg-construction": [
     ("main-street", "CDBG Main Street Revitalization Program", re.compile(r"^Main Street Revitalization$", re.I)),
     ("water", "CDBG Wastewater/Drinking Water Program", re.compile(r"^Wastewater/Drinking Water$", re.I)),
 ]}
-CATEGORY_LABELS = {"cdbg-construction#stormwater": "stormwater", "cdbg-construction#water": "wastewater"}
+CATEGORY_LABELS = {"cdbg-construction#stormwater": "stormwater", "cdbg-construction#water": "wastewater",
+                   "owner-occupied-rehab": "housing"}
 # Stellar is state money from several agencies; its page names CDBG only to exclude entitlement communities.
 FUNDING_SOURCES = {"stellar": "direct"}
 # The Planning Grants page names no applicant ("communities"); the CDBG hub it sits under does.

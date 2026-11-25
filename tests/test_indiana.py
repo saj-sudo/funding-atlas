@@ -39,9 +39,9 @@ def texts(m, slug: str) -> list[str]:
 
 # ---------- in_ocra ----------
 
-def test_ocra_seven_records_the_construction_page_one_per_tab():
+def test_ocra_nine_records_the_construction_page_one_per_tab():
     progs = every(in_ocra)
-    assert list(progs) == ["cdbg-planning", *CONSTRUCTION, "stellar"]
+    assert list(progs) == ["cdbg-planning", *CONSTRUCTION, "stellar", "owner-occupied-rehab", "bscc"]
     assert progs["cdbg-planning"].name == "CDBG Planning Grants"
     assert [progs[sid].name for sid in CONSTRUCTION] == [
         "CDBG Facilities Program", "CDBG Blight Clearance Program", "CDBG Stormwater Improvements Program",
@@ -90,7 +90,8 @@ def test_ocra_status_a_weekday_and_a_day_is_not_a_date():
 def test_ocra_funding_source_applicants_and_categories():
     progs = every(in_ocra)
     assert {sid: p.funding_source for sid, p in progs.items()} == {
-        "cdbg-planning": "pass_through", **{sid: "pass_through" for sid in CONSTRUCTION}, "stellar": "direct"}
+        "cdbg-planning": "pass_through", **{sid: "pass_through" for sid in CONSTRUCTION}, "stellar": "direct",
+        "owner-occupied-rehab": "direct", "bscc": "direct"}
     for sid in ["cdbg-planning", *CONSTRUCTION]:
         assert tags(progs[sid]) == {"municipality", "county"}
     # the planning page names no applicant: the CDBG hub's sentences, quoted by hand, dated and attributed
@@ -101,8 +102,23 @@ def test_ocra_funding_source_applicants_and_categories():
     assert {sid: p.categories[0].value for sid, p in progs.items()} == {
         "cdbg-planning": "infrastructure", "cdbg-construction": "infrastructure",
         "cdbg-construction#blight-clearance": "infrastructure", "cdbg-construction#stormwater": "water",
-        "cdbg-construction#main-street": "infrastructure", "cdbg-construction#water": "water", "stellar": "infrastructure"}
+        "cdbg-construction#main-street": "infrastructure", "cdbg-construction#water": "water", "stellar": "infrastructure",
+        "owner-occupied-rehab": "housing", "bscc": "infrastructure"}
     assert all(p.funding_type == "grant" for p in progs.values())
+
+
+
+def test_ocra_the_two_pages_of_12_11():
+    progs = every(in_ocra)
+    oor, bscc = progs["owner-occupied-rehab"], progs["bscc"]
+    assert oor.name == "Owner Occupied Rehabilitation Program"
+    # "Applications will be accepted from Oct. 1 until Sunday, Nov. 1": no year, so no date and no status
+    assert (oor.status, oor.opens_at, oor.closes_at) == ("unknown", None, None)
+    assert tags(oor) == {"municipality", "county"}
+    assert oor.eligibility_text.startswith("Lead applicants must be a non-entitlement local unit of government")
+    assert bscc.name == "Building Socially Connected Communities Program"
+    assert (bscc.status, bscc.closes_at) == ("unknown", None)
+    assert tags(bscc) == {"municipality", "county", "nonprofit"}
 
 
 # ---------- in_indot ----------
