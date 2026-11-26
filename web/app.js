@@ -13,7 +13,7 @@
   var FEDERAL_LOADED = !!window.FA_FEDERAL;
   if (PAGE === 'state' && FEDERAL_LOADED) {
     DATA.programs = DATA.programs.concat(window.FA_FEDERAL.programs);
-    DATA.changes = DATA.changes.concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+    DATA.changes = (DATA.changes || []).concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
   }
 
   // ---------- helpers ----------
@@ -552,7 +552,22 @@
   // =====================================================================================
 
   function statePage() {
-    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes || [], R = DATA.rules, S = DATA.state;
+    // The state's own change log is in changes.js and loads when the Changes tab opens (2026-11-26); until then C
+    // holds the federal changes from federal.js, and the page carries the count and the week's status changes.
+    var changesState = DATA.changes_n ? 'idle' : 'loaded';
+    function loadChanges() {
+      if (changesState !== 'idle') return;
+      changesState = 'loading';
+      var sc = document.createElement('script');
+      sc.src = 'changes.js?v=' + TODAY;
+      sc.onload = function () {
+        C = C.concat(window.FA_CHANGES || []).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+        changesState = 'loaded'; render();
+      };
+      sc.onerror = function () { changesState = 'failed'; render(); };
+      document.head.appendChild(sc);
+    }
     var cov = DATA.coverage;
     P.concat(B, U).forEach(function (p) {
       p._text = [p.name, p.agency, agencyName(p), p.agency_code, p.number, p.summary].join(' ').toLowerCase();
@@ -702,7 +717,7 @@
     var nWeekState = PS.filter(inWeek).length, nWeekFed = PF.filter(inWeek).length;
     var nNew = P.filter(function (p) { return p.is_new; }).length;
     var nClosing = P.filter(isSoon).length;
-    var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
+    var flips = C.concat(DATA.week_flips || []).filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
     var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
     var brief = [];
     if (nWeekState + nWeekFed) {
@@ -725,7 +740,7 @@
       var open = el('brief').classList.toggle('all');
       this.setAttribute('aria-expanded', String(open)); this.textContent = open ? 'Fewer' : (brief.length - 1) + ' more this week';
     });
-    el('tab-n-changes').textContent = C.length;
+    el('tab-n-changes').textContent = C.length + (DATA.changes_n || 0);
     el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
 
@@ -1262,7 +1277,10 @@
       renderGroups();
       renderWatch();
       syncFit();
-      renderFeed(feedEl, feedRows(), function (c) {
+      if (st.tab === 'changes') loadChanges();
+      if (changesState === 'loading' || (changesState === 'idle' && st.tab !== 'changes')) feedEl.innerHTML = '<li class="empty">Loading the change log…</li>';
+      else if (changesState === 'failed') feedEl.innerHTML = '<li class="empty">The change log did not load (changes.js). Reload the page, or read it as a <a href="feed.xml" type="application/atom+xml">feed</a>.</li>';
+      else renderFeed(feedEl, feedRows(), function (c) {
         return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
           : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
       });

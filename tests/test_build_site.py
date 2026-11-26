@@ -641,10 +641,19 @@ def quote_slug(conn, name):
     return quote(conn.execute("SELECT slug FROM program WHERE name = ?", (name,)).fetchone()[0])
 
 
-def test_changes_json_equals_the_pages_embedded_changes(conn, tmp_path):
+def test_changes_json_equals_the_pages_change_log(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
-    embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))["changes"]
+    # the state's own log is in changes.js since 2026-11-26 (it loads when the Changes tab opens); the page keeps
+    # the count for the tab and the week's status changes for the briefing line
+    on_page = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    text = (out / "md" / "changes.js").read_text(encoding="utf-8")
+    assert "</script" not in text and "changes.js?v=" in (out / "app.js").read_text(encoding="utf-8")
+    embedded = json.loads(text.removeprefix("window.FA_CHANGES = ").rstrip().rstrip(";"))
+    assert "changes" not in on_page and on_page["changes_n"] == len(embedded) > 0
+    cutoff = (NOW.date() - timedelta(days=build_site.NEW_DAYS)).isoformat()
+    assert on_page["week_flips"] == [c for c in embedded if c["status_flip"] and c["at"][:10] >= cutoff]
+    assert all(c["state"] == "MD" for c in embedded)
     federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
     embedded = sorted(embedded + federal["changes"], key=lambda c: (c["at"], c["id"]), reverse=True)
     data = json.loads((out / "md" / "changes.json").read_text(encoding="utf-8"))

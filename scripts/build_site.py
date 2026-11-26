@@ -810,12 +810,28 @@ def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]
     return page, federal
 
 
+def split_changes(page: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """A state payload without its own change log, and that log (2026-11-26). The log is read only by the Changes tab,
+    so it ships in the state's changes.js and loads when the tab opens. The page keeps what it shows on arrival: the
+    count for the tab, and the week's status changes for the briefing line."""
+    changes = page["changes"]
+    cutoff = date.fromordinal(date.fromisoformat(page["generated_at"][:10]).toordinal() - NEW_DAYS).isoformat()
+    slim = {k: v for k, v in page.items() if k != "changes"}
+    slim["changes_n"] = len(changes)
+    slim["week_flips"] = [c for c in changes if c["status_flip"] and (c["at"] or "")[:10] >= cutoff]
+    return slim, changes
+
+
+def render_changes_js(changes: list[dict[str, Any]]) -> str:
+    return "window.FA_CHANGES = " + embed_json(changes) + ";\n"
+
+
 def render_federal(federal: dict[str, Any]) -> str:
     return "window.FA_FEDERAL = " + embed_json(federal) + ";\n"
 
 
 def render_state(data: dict[str, Any], assets: str, template: str) -> str:
-    data = split_federal(data)[0]
+    data = split_changes(split_federal(data)[0])[0]
     name = data["state"]["name"]
     return fill(
         template,
@@ -1076,6 +1092,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         (d / "summary.json").write_text(summary_json(data), encoding="utf-8")
+        (d / "changes.js").write_text(render_changes_js(split_changes(split_federal(data)[0])[1]), encoding="utf-8")
         counts[code] = len(data["programs"])
     about_tpl = template("about.html")
     (out / "about").mkdir()
