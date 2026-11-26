@@ -128,7 +128,7 @@ From the plan:
 | Phase | State |
 |---|---|
 | A. Proof | Not started. Outreach waits on the domain |
-| B. Trust | Not started |
+| B. Trust | Begun 2026-11-26: migration 0011, unrestricted notices no longer 'likely' by category alone (7 listed federal rows move to "May fit"). Open: the NEA rows (eligible by the source's own words, a relevance call for Saj), grant numbers glued to titles, stale rows, map zeros |
 | C. Concept | Mockup picked 2026-11-26; nothing built in `web/` yet |
 | D to H | Not started |
 
