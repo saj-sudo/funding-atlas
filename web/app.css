@@ -268,23 +268,33 @@ ul, ol { margin: 0; padding: 0; }
 .card .facts span b { font-weight: 600; }
 .card .facts .soon { color: var(--closing); font-weight: 600; }
 .card .facts .k { color: var(--muted); }
-.card.st-closed, .card.st-unknown, .card.st-paused, .card.st-exhausted { border-style: dashed; }
+/* slots (2026-11-26): Amount and Match sit in the same place on every card; hatched is "the source does not say".
+   Dashed now means "cannot be read", so closed and unconfirmed cards keep a solid edge. */
+.card .slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 4px 0 0; max-width: 440px; }
+.card .slot { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 4px 8px 5px; min-width: 0; }
+.card .slot dt { font-size: var(--t-xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); line-height: 1.4; }
+.card .slot dd { margin: 0; font-size: var(--t-sm); font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.card .slot.none, .card .date.none { background: repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px); }
+.card .slot.none { border-color: var(--edge); }
+.card .slot.none dt, .card .slot.none dd, .card .date.none .nd { background: var(--surface); width: fit-content; padding: 0 4px; border-radius: var(--r-sm); }
+.card .slot.none dd { font-weight: 400; color: var(--ink); margin-top: 2px; }
+.card .date.none { align-content: center; border-right: 0; border-radius: var(--r-sm); padding: 4px; }
+.card .date.none .nd { color: var(--ink); padding: 1px 3px; }
 .card.st-closed h3 button, .card.st-exhausted h3 button { color: var(--muted); }
 
 /* status tags: sentence case, one per card, static (no hover), never colour alone: the word carries it */
 .tag { display: inline-flex; align-items: center; padding: 1px 9px; border-radius: var(--r-sm); font-size: var(--t-xs); font-weight: 600; line-height: 1.5; white-space: nowrap; border: 1px solid currentColor; }
 .tag.st-open { color: var(--open); background: var(--likely-soft); }
 .tag.st-forecasted { color: var(--forecast); }
-.tag.st-unknown { color: var(--possible); border-style: dashed; }
+.tag.st-unknown { color: var(--possible); }
 .tag.st-closed, .tag.st-paused, .tag.st-exhausted { color: var(--muted); }
 .tag.new { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 .tag.upd { color: var(--muted); border-color: var(--line); background: var(--soft); }
 
 .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
 .chips li { font-size: var(--t-xs); padding: 1px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); }
-.chips li.more { border-style: dashed; }
 
-.empty { padding: 18px 16px; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--r-lg); }
+.empty { padding: 18px 16px; color: var(--muted); border: 1px solid var(--line); border-radius: var(--r-lg); }
 
 /* ---------- groups: the state's own programs first, then the folded groups, then federal ---------- */
 .results { gap: 28px; }

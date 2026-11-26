@@ -130,7 +130,8 @@ From the plan:
 | A. Proof | Not started. Outreach waits on the domain |
 | B. Trust | Begun 2026-11-26: migration 0011, unrestricted notices no longer 'likely' by category alone (7 listed federal rows move to "May fit"). Open: the NEA rows (eligible by the source's own words, a relevance call for Saj), grant numbers glued to titles, stale rows, map zeros |
 | C. Concept | Mockup picked 2026-11-26; nothing built in `web/` yet |
-| D to H | Not started |
+| D. System | Built 2026-11-26: type, weight and corner scales; control borders at 3:1; the card with Amount and Match slots and a hatched no-date column. Left: a spacing scale, styled selects and checkboxes, long titles (33 over 100 characters), the duplicated dark token block |
+| E to H | Not started |
 
 ## Verification
 - Trust: `scripts/measure_tagger.py` and `scripts/measure_fixtures.py` before and after; zero arts or exchange notices under default "Likely fit" on five sampled states.

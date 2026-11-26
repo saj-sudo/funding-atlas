@@ -332,6 +332,22 @@ def test_map_grammar_and_display_names(conn, tmp_path):
     assert "function programName(p)" in index and "h(programName(p))" in index
 
 
+def test_scales_and_card_slots(conn, tmp_path):
+    """2026-11-26: font sizes, weights and corners come from the token scales; controls take --edge; every card has
+    an Amount and a Match slot, hatched with words when the source does not say; dashed is kept for "cannot be read"."""
+    css = (build_site.WEB / "app.css").read_text(encoding="utf-8")
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    rules = css[css.index("* { box-sizing: border-box; }"):]
+    assert not re.findall(r"font-size: [\d.]+rem", rules) and not re.findall(r"font: (?:\d{3} )?[\d.]+rem", rules)
+    assert set(re.findall(r"font-weight: (\d+)", rules)) <= {"400", "600", "700"}
+    assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
+    assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
+    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [".map a.t.k-blocked ", ".legend i.k-blocked "]
+    assert "slot('Amount', amount) + slot('Match', match)" in page and "'Source does not say'" in page
+    assert "Amount not published" not in page
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]

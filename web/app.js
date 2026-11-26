@@ -720,12 +720,16 @@
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
     function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
+    function slot(label, value) {
+      return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
+    }
     function card(p) {
       var amount = amountText(p);
-      var facts = [
-        '<span>' + (amount ? '<b class="num">' + h(amount) + '</b>' : '<span class="muted">Amount not published</span>') + '</span>'
-      ];
-      if (p.match_required != null) facts.push('<span>' + (p.match_required ? 'Match required' : 'No match required') + '</span>');
+      // Two slots in the same place on every card (2026-11-26): what the source states is plain, what it does not
+      // state is hatched and says so in words.
+      var match = p.match_required == null ? null : p.match_required ? 'Required' + (p.match_pct != null ? ', ' + p.match_pct + '%' : '') : 'None required';
+      var slots = '<dl class="slots">' + slot('Amount', amount) + slot('Match', match) + '</dl>';
+      var facts = [];
       if (p.funding_type && p.funding_type !== 'grant') facts.push('<span>' + h(words(p.funding_type)) + '</span>');
       if (p.last_reopened) facts.push('<span>Reopened last on ' + h(fmtDate(p.last_reopened, true)) + '</span>');
       var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
@@ -736,7 +740,7 @@
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
         '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(programName(p)) + '</button></h3>' +
         '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
-        '<div class="facts">' + facts.join('') + '</div>' +
+        slots + (facts.length ? '<div class="facts">' + facts.join('') + '</div>' : '') +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
         '</div></article>';
@@ -750,7 +754,8 @@
         return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
           '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + '</div>';
       }
-      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
+      var rolling = p.rolling || p.deadline_placeholder;
+      return '<div class="date' + (rolling ? '' : ' none') + '"><span class="nd" aria-hidden="true">' + (rolling ? 'Rolling' : 'No date stated') + '</span></div>';
     }
     // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
     var BUCKETS = [
