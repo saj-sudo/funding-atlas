@@ -320,6 +320,18 @@ def test_index_leads_with_the_map(conn, tmp_path):
     assert "Pick your state. Your state's own programs come first." in index
 
 
+def test_map_grammar_and_display_names(conn, tmp_path):
+    """2026-11-26: solid stated, hatched read and not stated, dashed cannot be read; a hatched tile's number counts
+    programs with no status; a name that opens with its own number is shown without it (display only)."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert "listed, no status stated" in index and "cannot be read: blocked or login only" in index
+    assert "On a hatched state it counts programs the source lists without saying whether they are open." in index
+    assert ".map a.t.k-blocked { color: var(--muted); background: transparent; border: 2px dashed var(--edge); }" in index
+    assert "var num = dir ? s.programs : un ? s.unstated : s.open;" in index
+    assert "function programName(p)" in index and "h(programName(p))" in index
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]

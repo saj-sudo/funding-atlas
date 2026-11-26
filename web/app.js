@@ -1252,8 +1252,12 @@
     var map = el('map');
     map.innerHTML = S.map(function (s) {
       var k = kindClass(s.kind);
-      return '<a class="t k-' + k + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
-        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + s.open + '</span>' : '') +
+      // The number: programs open or announced; where none is and the source lists programs without a status, that
+      // count on a hatched tile (a directory's whole list); 0 only where the source states every round closed.
+      var dir = k === 'directory', un = !dir && s.open === 0 && s.unstated > 0;
+      var num = dir ? s.programs : un ? s.unstated : s.open;
+      return '<a class="t k-' + k + (un ? ' unstated' : '') + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
+        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + num + '</span>' : '') +
         '<span class="sr-only">, ' + h(covText(s)) + '</span></a>';
     }).join('');
     var hover = el('hover');
