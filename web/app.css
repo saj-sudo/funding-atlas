@@ -348,10 +348,12 @@ circle.cdot.m-fed, circle.cdot.m-st { fill-opacity: .85; }
 .ctip { position: fixed; z-index: 60; pointer-events: none; background: var(--ink); color: var(--bg); font-size: var(--t-sm); padding: 6px 9px; border-radius: var(--r-sm); max-width: 300px; box-shadow: var(--shadow); }
 .chart > * { min-width: 0; }
 #c3-table { overflow-x: auto; }   /* the table is wider than a small phone: it scrolls inside itself, not the page */
-.c-table:not([open]) #c3-table { display: none; }   /* a closed details still lays its table out in Chromium */
+.c-table:not([open]) > div { display: none; }   /* a closed details still lays its table out in Chromium */
 .ctable { border-collapse: collapse; font-size: var(--t-sm); width: 100%; margin-top: 8px; }
 .ctable th, .ctable td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 .ctable th:first-child, .ctable td:first-child { text-align: left; }
+.c-table > div { overflow-x: auto; }
+.ctable tbody th { font-weight: 400; white-space: nowrap; }
 .c-table summary { cursor: pointer; color: var(--accent); font-weight: 600; }
 .ahead { margin-top: 4px; }
 .ahead summary { cursor: pointer; color: var(--accent); font: 600 var(--t-sm)/1.4 var(--f-body); }

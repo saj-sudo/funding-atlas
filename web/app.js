@@ -256,11 +256,32 @@
   }
   function wireTips(svgEl) {
     svgEl.addEventListener('mousemove', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); });
-    svgEl.addEventListener('mouseleave', function () { tip(null, null); });
+    // after a tap the browser sends a mouseleave of its own; that one must not put the note away again
+    var touched = 0;
+    svgEl.addEventListener('touchstart', function () { touched = Date.now(); }, { passive: true });
+    svgEl.addEventListener('mouseleave', function () { if (Date.now() - touched > 800) tip(null, null); });
+    // a tap shows the same note (a phone has no hover); a tap anywhere else puts it away
+    svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); e.stopPropagation(); });
+  }
+  document.addEventListener('click', function () { if (tipEl) tipEl.hidden = true; });
+  // Charts are drawn at the width they are shown at (2026-11-26), so their 12px labels stay 12px on a phone; under
+  // 560px each chart has a narrow layout (labels above the marks, fewer ticks). Redrawn when the width changes.
+  function chartW(svgEl, max) { var c = svgEl.parentNode, w = c ? c.clientWidth : 0; return Math.max(280, Math.min(max, w || max)); }
+  function onWidthChange(fn) {
+    var last = window.innerWidth, timer = null;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth === last) return;
+      last = window.innerWidth; clearTimeout(timer); timer = setTimeout(fn, 150);
+    });
+  }
+  function ctable(head, rows) {
+    return '<table class="ctable"><thead><tr>' + head.map(function (x) { return '<th scope="col">' + h(x) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr>' + r.map(function (x, i) { return i ? '<td>' + h(x) + '</td>' : '<th scope="row">' + h(x) + '</th>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function drawSvg(svgEl, w, hh, inner) {
     svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w);
-    svgEl.innerHTML = inner; wireTips(svgEl);
+    svgEl.innerHTML = inner;
+    if (!svgEl._tips) { wireTips(svgEl); svgEl._tips = true; }
   }
   function barPath(x, y, w, hh, roundTop) {      // 4px rounded data end, anchored to the baseline
     if (hh <= 0) return '';
@@ -283,7 +304,7 @@
       if (k >= weeks) { later++; return; }
       if (d[0]) W[k].s++; else W[k].f++;
     });
-    var w = compact ? 760 : 900, hh = compact ? 150 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
+    var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, hh = compact ? 150 : narrow ? 210 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
     W.forEach(function (x) { max = Math.max(max, x.f + x.s); });
     var step = max > 20 ? 10 : 5, top = Math.ceil(max / step) * step, y = function (v) { return T + (hh - T - B) * (1 - v / top); }, g = '';
     for (var v = 0; v <= top; v += step) g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="ctext" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>';
@@ -294,18 +315,18 @@
       if (x.f) g += '<path class="m-fed" d="' + barPath(x0, base - hf, bwi, hf, !x.s) + '"/>';
       if (x.s) g += '<path class="m-st" d="' + barPath(x0, base - hf - hs - (x.f ? 2 : 0), bwi, hs, true) + '"/>';
       g += '</g>';
-      if (j % 4 === 0) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
+      if (j % (narrow ? 8 : 4) === 0 && !(narrow && j > weeks - 3)) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
     });
     g += '<line class="caxis" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
     drawSvg(svgEl, w, hh, g);
-    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s };
+    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s, weeks: W };
   }
 
   // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
   var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
   function chartSeason(svgEl, rows, compact) {
-    var w = compact ? 760 : 900, L = compact ? 10 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
-    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + m + '</text>'; });
+    var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, L = compact ? 10 : narrow ? 92 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
+    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + (narrow && !compact ? m.charAt(0) : m) + '</text>'; });
     rows.forEach(function (r, ri) {
       var tot = r[1].reduce(function (a, b) { return a + b; }, 0), yy = T + ri * (ch + 2);
       if (!compact) g += '<text class="ctext clab" x="' + (L - 10) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="end">' + h(r[0]) + '</text>';
@@ -322,12 +343,14 @@
   }
 
   function chartStated(svgEl, tableEl, rows) {
-    var w = 900, L = 150, R = 30, T = 24, rh = 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 14 : 150, R = narrow ? 18 : 30, T = 24, rh = narrow ? 50 : 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
     [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
     var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
     rows.forEach(function (r, i) {
-      var yy = T + i * rh + rh / 2, name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
-      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
+      var yy = T + i * rh + (narrow ? 34 : rh / 2), name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
+      // narrow: the name sits on its own line above the row's dots
+      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (yy - 16) + '">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>'
+        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
       g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
       ser.forEach(function (sr, j) {
         var v = r.n ? r[sr[0]] / r.n : 0;
@@ -335,9 +358,9 @@
       });
     });
     drawSvg(svgEl, w, hh, g);
-    if (tableEl) tableEl.innerHTML = '<table class="ctable"><thead><tr><th>Source</th><th>Programs</th><th>States a status</th><th>States a deadline</th><th>States an amount</th></tr></thead><tbody>' +
+    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
       rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
-        return '<tr><td>' + h(r.state === 'US' ? 'Federal, open now' : stateName(r.state)) + '</td><td>' + r.n + '</td><td>' + p('status_stated') + '</td><td>' + p('date_stated') + '</td><td>' + p('amount_stated') + '</td></tr>'; }).join('') + '</tbody></table>';
+        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), r.n, p('status_stated'), p('date_stated'), p('amount_stated')]; }));
   }
 
   // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
@@ -351,15 +374,16 @@
       if (f.first_at < p.a) p.a = f.first_at; if (f.last_at > p.b) p.b = f.last_at;
     });
     var rows = order.map(function (k) { return pairs[k]; }).sort(function (a, b) { return (b.src + b.code + b.other) - (a.src + a.code + a.other); });
-    var w = 900, L = 250, R = 60, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 8 : 250, R = narrow ? 34 : 60, rh = narrow ? 46 : 30, off = narrow ? 18 : 0, hh = rows.length * rh + 6, max = 1, g = '';
     rows.forEach(function (r) { max = Math.max(max, r.src + r.code + r.other); });
     var x = function (v) { return L + (w - L - R) * v / max; };
     rows.forEach(function (r, i) {
-      var yy = i * rh + 3, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
+      var top = i * rh + 3, yy = top + off, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
       var reopen = (r.o === 'closed' || r.o === 'exhausted') && (r.n === 'open' || r.n === 'forecasted');
-      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
+      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (top + 13) + '">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>'
+        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
       var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
-      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>';
+      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="26" fill="transparent"/>';
       var x0 = L;
       [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
         var v = r[seg[0]]; if (!v) return;
@@ -372,24 +396,26 @@
     });
     g += '<line class="caxis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + hh + '"/>';
     drawSvg(svgEl, w, hh, g);
-    return rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+    var sums = rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+    sums.rows = rows;
+    return sums;
   }
 
   // awards: [[state|null, amount, name], ...]
   function chartAwards(svgEl, awards) {
-    var w = 900, L = 80, R = 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 58 : 80, R = narrow ? 12 : 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
     var x = function (v) { return L + (w - L - R) * (Math.log10(v) - lo) / (hi - lo); };
-    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/><text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>';
+    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/>' + (narrow && p % 2 === 0 ? '' : '<text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>');
     [['fed', 'Federal', 'm-fed'], ['st', 'State', 'm-st']].forEach(function (grp, gi) {
       var pts = awards.filter(function (a) { return (grp[0] === 'st') === !!a[0] && a[1] >= 1000 && a[1] <= 1e9; }).map(function (a) { return a; });
       var vals = pts.map(function (a) { return a[1]; }).sort(function (a, b) { return a - b; });
       var m = vals.length ? (vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2) : null;
-      med[grp[0]] = { n: vals.length, m: m };
+      med[grp[0]] = { n: vals.length, m: m, lo: vals[0], hi: vals[vals.length - 1] };
       var yy = T + gi * rh + rh / 2, seed = 11;
       g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + grp[1] + '</text>';
       pts.forEach(function (a) { seed = (seed * 9301 + 49297) % 233280; var j = (seed / 233280 - 0.5) * (rh - 26);
         g += '<circle class="' + grp[2] + ' cdot" data-tip="' + h(a[2] + ': up to $' + Number(a[1]).toLocaleString('en-US')) + '" cx="' + x(a[1]) + '" cy="' + (yy + j) + '" r="4.5"/>'; });
-      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '">median ' + shortMoney(m) + '</text>';
+      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) > w - 120 ? x(m) - 6 : x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '"' + (x(m) > w - 120 ? ' text-anchor="end"' : '') + '>median ' + shortMoney(m) + '</text>';
     });
     drawSvg(svgEl, w, hh, g);
     return med;
@@ -527,6 +553,7 @@
 
   function aboutPage() {
     var A = DATA;
+    function draw() {
     var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
     el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
     var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
@@ -544,6 +571,16 @@
       fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
     var med = chartAwards(el('c5'), A.awards);
     el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+    // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
+    el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
+    el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
+    el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
+      return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
+    el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
+      return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
+    }
+    draw();
+    onWidthChange(draw);
     renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
   }
 
@@ -1054,6 +1091,7 @@
       el('season-h').textContent = 'When ' + S.name + '\'s deadlines have fallen:';
       el('season-d').textContent = seaTot + ' stated deadlines of programs open to local governments, two years either side of today, by month. A pattern, not a forecast.';
       chartSeason(el('season-svg'), [[S.name, SEA]], true);
+      onWidthChange(function () { chartSeason(el('season-svg'), [[S.name, SEA]], true); });
     }
 
     // ---- briefing, tabs, feed ----

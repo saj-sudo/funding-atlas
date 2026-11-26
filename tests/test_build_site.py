@@ -445,6 +445,19 @@ def test_closing_week_and_week_changes_count_only_what_is_stated():
     assert wk["status_changes"] == [{"at": "2026-11-25T00:00:00Z", "state": "MD", "name": "N", "slug": "s", "old": "open", "new": "closed", "listed": True}]
 
 
+def test_charts_draw_at_shown_width_with_tables(conn, tmp_path):
+    """2026-11-26: a chart is drawn at the width it is shown at (12px labels stay 12px on a phone), a tap shows a
+    mark's note, and every About chart has its numbers as a table."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js, about = (out / "app.js").read_text(encoding="utf-8"), (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert "function chartW(svgEl, max)" in js and "var w = 900" not in js and "onWidthChange(draw);" in js
+    assert js.count("narrow = w < 560") == 5
+    assert "svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]');" in js
+    for cid in ("c1", "c2", "c3", "c4", "c5"):
+        assert f'<div id="{cid}-table"></div>' in about and (f"el('{cid}-table')" in js), cid
+    assert '<th scope="col">' in js and '<th scope="row">' in js
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]
