@@ -113,6 +113,14 @@
       return out;
     });
   }
+  // Display only: a federal notice whose name opens with its own number ("F26AS00083 Aquatic Invasive ...") shows
+  // the name without it; the number has its own line in the detail panel and stays in search. Stored value unchanged.
+  function programName(p) {
+    var n = p.name || '', num = p.number;
+    if (!num || n.length <= num.length || n.indexOf(num) !== 0) return n;
+    var rest = n.slice(num.length).replace(/^[\s:.\-\u2013\u2014]+/, '');
+    return /^[\s:.\-\u2013\u2014]/.test(n.charAt(num.length)) && rest ? rest : n;
+  }
   function amountText(p) {
     var lo = p.amount_min, hi = p.amount_max;
     if (lo === 0) lo = null;   // "$0 to $500,000" is a form default, not a floor
@@ -726,7 +734,7 @@
       return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(programName(p)) + '</button></h3>' +
         '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
         '<div class="facts">' + facts.join('') + '</div>' +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
@@ -840,8 +848,8 @@
       }
       g += '<line class="tl-today" x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="' + (T - 10) + '" y2="' + hh + '"/><text class="tl-t tl-today-t" x="' + (x(TODAY) + 4) + '" y="' + (T - 12) + '">today</text>';
       inWin.forEach(function (p, i) {
-        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', nm = p.name.length > 48 ? p.name.slice(0, 47) + '…' : p.name;
-        var label = p.name + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
+        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', pn = programName(p), nm = pn.length > 48 ? pn.slice(0, 47) + '…' : pn;
+        var label = pn + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
         g += '<g class="tl-row" data-id="' + p.id + '" tabindex="0" role="button" aria-label="' + h(label) + '"><rect class="tl-hit" x="0" y="' + yy + '" width="' + w + '" height="' + rh + '"/>' +
           '<text class="tl-n" x="' + (L - 10) + '" y="' + (yy + 16) + '" text-anchor="end">' + h(nm) + '</text>';
         if (p.opens_at) { var x0 = x(p.opens_at.slice(0, 10)), x1 = x(c); g += '<rect class="tl-bar ' + cls + '" x="' + x0 + '" y="' + (yy + 7) + '" width="' + Math.max(4, x1 - x0) + '" height="10" rx="4"/>'; }
@@ -1020,7 +1028,7 @@
       current = p;
       syncDetailStar();
       lastFocus = trigger || document.activeElement;
-      el('detail-title').textContent = p.name;
+      el('detail-title').textContent = programName(p);
       el('detail-body').innerHTML = detailHtml(p);
       el('detail-source').href = p.source_url;
       el('detail-copied').hidden = true;
@@ -1089,7 +1097,7 @@
     function toggleStar(p) {
       if (!p) return;
       if (watched[p.slug]) delete watched[p.slug];
-      else watched[p.slug] = { n: p.name, s: p.state || S.code, f: p.state ? p.state : null };
+      else watched[p.slug] = { n: programName(p), s: p.state || S.code, f: p.state ? p.state : null };
       saveWatch(); render();
       if (current && current.slug === p.slug) syncDetailStar();
     }
@@ -1158,7 +1166,7 @@
       function line(p) {
         var when = p.closes_at && !p.deadline_placeholder ? 'Closes ' + fmtDate(p.closes_at, true) + '.' : p.rolling ? 'Rolling deadline.' : p.closes_text ? 'Deadline, in the agency\'s words: "' + (p.closes_text.length > 140 ? p.closes_text.slice(0, 139) + '…' : p.closes_text) + '"' : 'No deadline stated.';
         var amt = amountText(p);
-        return '- ' + p.name + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
+        return '- ' + programName(p) + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
       }
       var head = 'Funding open to ' + S.name + ' local governments, closing in the next ' + dg.win + ' days' + (on.length ? ' (' + on.map(words).join(', ') + ')' : '') +
         '\nFrom Funding Atlas, built ' + fmtDate(DATA.generated_at, true) + '. Status and dates are what each agency\'s page said that day.\n';
