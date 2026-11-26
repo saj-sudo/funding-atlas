@@ -582,7 +582,7 @@
     ];
     var DEFAULT_SEL = { tier: ['likely'] };
 
-    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, view: 'list' };
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, fed: false, view: 'list' };
     function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
     resetSel();
 
@@ -605,6 +605,7 @@
       if (hsh.quick) st.quick = hsh.quick;
       if (hsh.between === '1') st.between = true;
       if (hsh.unstated === '1') st.unstated = true;
+      if (hsh.fed === '1') st.fed = true;
       if (hsh.view === 'timeline') st.view = 'timeline';
       var any = false;
       FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
@@ -620,6 +621,7 @@
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
       if (st.between) parts.push('between=1');
       if (st.unstated) parts.push('unstated=1');
+      if (st.fed) parts.push('fed=1');
       if (st.view !== 'list') parts.push('view=' + st.view);
       var same = true;
       FACETS.forEach(function (f) {
@@ -908,10 +910,30 @@
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
     // Paging (13.16): 30 cards a group until the reader asks for all; filters and search still see every row.
-    var PAGE_N = 30, more = {};
+    // Paging: 30 cards a section with "Show all" on wide screens; on a phone 10 at a time (2026-11-26: California
+    // ran 26 phone screens), so `more` counts the extra pages asked for.
+    var PHONE = !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches);
+    var PAGE_N = PHONE ? 10 : 30, more = {};
     function paged(rows, key) {
-      if (more[key] || rows.length <= PAGE_N + 5) return { rows: rows, button: '' };
-      return { rows: rows.slice(0, PAGE_N), button: '<button class="btn more" type="button" data-more="' + key + '">Show all ' + rows.length + '</button>' };
+      var shown = PHONE ? PAGE_N * (1 + (more[key] || 0)) : (more[key] ? rows.length : PAGE_N);
+      if (rows.length <= shown + (PHONE ? 3 : 5)) return { rows: rows, button: '' };
+      var left = rows.length - shown;
+      return { rows: rows.slice(0, shown), button: '<button class="btn more" type="button" data-more="' + key + '">' +
+        (PHONE ? 'Show ' + Math.min(PAGE_N, left) + ' more of ' + rows.length : 'Show all ' + rows.length) + '</button>' };
+    }
+    // On a phone the federal notices wait behind one line while the page is as it opens (no search, no quick
+    // filter, the default filters) and the state has open programs of its own: they are the reason for the page.
+    function defaultFilters() {
+      return !st.q && !st.quick && FACETS.every(function (f) {
+        return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+      });
+    }
+    function federalFold(rf, rs) {
+      if (!PHONE || st.fed || !FEDERAL_LOADED || !rf.length || !rs.length || !defaultFilters()) return '';
+      var wk = rf.filter(inWeek).length;
+      return '<div class="fed-fold"><p><b>' + rf.length + ' federal ' + (rf.length === 1 ? 'notice' : 'notices') + ' also fit.</b> ' +
+        (wk ? wk + (wk === 1 ? ' closes' : ' close') + ' this week.' : 'None closes this week.') + '</p>' +
+        '<button class="btn" type="button" data-fed="1">Show federal notices</button></div>';
     }
     function groupHtml(rows, empty, key) {
       if (!rows.length) return '<p class="empty">' + empty + '</p>';
@@ -936,7 +958,7 @@
       else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
       el('list-state').innerHTML = groupHtml(rs, stateEmpty, 'state');
       el('g-state-d').hidden = true;
-      el('list-federal').innerHTML = FEDERAL_LOADED ? groupHtml(rf, 'No federal notices match these filters.', 'federal')
+      el('list-federal').innerHTML = FEDERAL_LOADED ? (federalFold(rf, rs) || groupHtml(rf, 'No federal notices match these filters.', 'federal'))
         : '<p class="empty">The federal notices did not load (federal.js). Reload the page, or see them on <a href="https://simpler.grants.gov/search">Grants.gov</a>.</p>';
 
       el('g-unstated').hidden = !ru.length;
@@ -1001,7 +1023,8 @@
     el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
     resultsEl.addEventListener('click', function (e) {
       var mb = e.target.closest('button[data-more]');
-      if (mb) { more[mb.getAttribute('data-more')] = true; render(); return; }
+      if (mb) { var mk = mb.getAttribute('data-more'); more[mk] = (more[mk] || 0) + 1; render(); return; }
+      if (e.target.closest('button[data-fed]')) { st.fed = true; render(); return; }
       var sb = e.target.closest('button[data-star]');
       if (sb) { toggleStar(byId[sb.closest('.card').getAttribute('data-id')]); return; }
       if (e.target.closest('a')) return;

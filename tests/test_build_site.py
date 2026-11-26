@@ -403,6 +403,16 @@ def test_status_sentence_states_only_what_is_stored():
     assert build_site.status_sentence(dict(base, closes_at="2035-12-31", deadline_placeholder=True, days_to_close=3000)) == "Open. No deadline stated."
 
 
+def test_phone_paging_and_federal_fold():
+    """2026-11-26 (Saj, from the mockup): on a phone a section shows 10 cards at a time and the federal notices wait
+    behind one line while the page is as it opens; wide screens keep 30 and "Show all"."""
+    js = (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    assert "window.matchMedia('(max-width: 599px)')" in js and "var PAGE_N = PHONE ? 10 : 30" in js
+    assert "'Show ' + Math.min(PAGE_N, left) + ' more of ' + rows.length : 'Show all ' + rows.length" in js
+    assert "if (!PHONE || st.fed || !FEDERAL_LOADED || !rf.length || !rs.length || !defaultFilters()) return '';" in js
+    assert "Show federal notices" in js and "if (st.fed) parts.push('fed=1');" in js
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]
