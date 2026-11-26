@@ -398,6 +398,107 @@
   // About the data page
   // =====================================================================================
 
+  // =====================================================================================
+  // The program detail: five answers first, then the source's own words. Shared by the state page's dialog and by
+  // each program's own page (p/<slug>/), so the two cannot drift apart.
+  // =====================================================================================
+  var SOURCES = [];   // the page's source list, for "read from <label>" in the trail
+  function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
+  function pagePath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '/'; }
+  function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
+  function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
+  function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
+  var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
+  function detailHtml(p) {
+    var listingName = {};
+    p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
+    var amount = amountText(p);
+    var closes;
+    if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
+    else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
+    else if (p.rolling) closes = 'Rolling deadline';
+    else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
+    else if (p.closes_text) closes = 'In the source\'s words, below';
+    else closes = NOT_PUBLISHED;
+    var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
+    var answers =
+      '<dl class="answers">' +
+      '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+      '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
+      '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
+      '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
+      '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
+      '</dl>';
+    var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
+    var facts =
+      fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
+      fact('Match required', match ? h(match) : null) +
+      fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
+      fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
+      fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
+      fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
+      fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
+      fact('Number', p.number ? h(p.number) : null);
+    var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
+      return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
+    }).join('') + '</ul>' : '';
+    var trail = 'First seen ' + fmtDate(p.first_seen, true) +
+      (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
+      ' · read from ' + (SOURCES.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
+    return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
+      answers +
+      sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
+      sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
+      sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+      sect('History, as the registry saw it', historyHtml(p)) +
+      sect('More details', '<div class="facts">' + facts + '</div>') +
+      sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
+      sect('Assistance Listings this notice cites', alns) +
+      '<p class="trail">' + h(trail) + '</p>';
+  }
+  // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
+  function histWords(e) {
+    var k = e[1];
+    if (k === 'added') return 'First seen by the registry';
+    if (k === 'missing') return 'No longer listed by the source';
+    if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
+    if (k === 'status') {
+      var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
+      return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
+    }
+    var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
+    return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
+  }
+  function histKind(e) {
+    if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
+    if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
+    return e[1];
+  }
+  function historyHtml(p) {
+    var ev = p.history || [];
+    if (!ev.length) return '';
+    var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
+    if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
+    var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
+    var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
+    var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+    g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
+    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+    ev.forEach(function (e) {
+      var k = histKind(e), cx = x(e[0]);
+      if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
+      else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
+    });
+    g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+    var list = ev.slice().reverse().map(function (e) {
+      return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
+        (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
+    }).join('');
+    return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+      '<ol class="hist-list">' + list + '</ol>' +
+      '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+  }
+
   function aboutPage() {
     var A = DATA;
     var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
@@ -547,6 +648,7 @@
       ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
       : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
     var sources = cov.federal.sources.concat(cov.state ? cov.state.sources : []);
+    SOURCES = sources;
     var lastRead = sources.map(function (s) { return s.last_ok || ''; }).sort().pop();
     el('coverage-sum').innerHTML = (cov.state
       ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
@@ -929,100 +1031,6 @@
 
     // ---- detail dialog: five answers first, then the source's own words ----
     var dlg = el('detail'), lastFocus = null, current = null;
-    function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
-    function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
-    function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
-    var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
-    function detailHtml(p) {
-      var listingName = {};
-      p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
-      var amount = amountText(p);
-      var closes;
-      if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
-      else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
-      else if (p.rolling) closes = 'Rolling deadline';
-      else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
-      else if (p.closes_text) closes = 'In the source\'s words, below';
-      else closes = NOT_PUBLISHED;
-      var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
-      var answers =
-        '<dl class="answers">' +
-        '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
-        '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
-        '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
-        '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
-        '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
-        '</dl>';
-      var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
-      var facts =
-        fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
-        fact('Match required', match ? h(match) : null) +
-        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
-        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
-        fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
-        fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
-        fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
-        fact('Number', p.number ? h(p.number) : null);
-      var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
-        return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
-      }).join('') + '</ul>' : '';
-      var trail = 'First seen ' + fmtDate(p.first_seen, true) +
-        (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
-        ' · read from ' + (sources.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
-      return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
-        answers +
-        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
-        sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
-        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
-        sect('History, as the registry saw it', historyHtml(p)) +
-        sect('More details', '<div class="facts">' + facts + '</div>') +
-        sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
-        sect('Assistance Listings this notice cites', alns) +
-        '<p class="trail">' + h(trail) + '</p>';
-    }
-    // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
-    function histWords(e) {
-      var k = e[1];
-      if (k === 'added') return 'First seen by the registry';
-      if (k === 'missing') return 'No longer listed by the source';
-      if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
-      if (k === 'status') {
-        var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
-        return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
-      }
-      var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
-      return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
-    }
-    function histKind(e) {
-      if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
-      if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
-      return e[1];
-    }
-    function historyHtml(p) {
-      var ev = p.history || [];
-      if (!ev.length) return '';
-      var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
-      if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
-      var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
-      var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
-      var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
-      g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
-      if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
-      ev.forEach(function (e) {
-        var k = histKind(e), cx = x(e[0]);
-        if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
-        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
-      });
-      g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
-      var list = ev.slice().reverse().map(function (e) {
-        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
-          (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
-      }).join('');
-      return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
-        '<ol class="hist-list">' + list + '</ol>' +
-        '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
-    }
-
     function syncDetailStar() {
       var b = el('detail-star'), on = !!(current && watched[current.slug]);
       b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '★ Starred' : '☆ Star';
@@ -1097,7 +1105,6 @@
     // ---- stars and the watchlist (13.9): kept in this browser; each program has its own feed at p/<slug>.xml ----
     var WKEY = 'fa-watch', watched = {};
     try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
-    function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
     function saveWatch() { try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: stars last for this visit */ } }
     function toggleStar(p) {
       if (!p) return;

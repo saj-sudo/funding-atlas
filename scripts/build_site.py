@@ -765,6 +765,8 @@ def render_state(data: dict[str, Any], assets: str, template: str) -> str:
         URL=f"{SITE_URL}{data['state']['code'].lower()}/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
+        FEED="feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
         ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
@@ -780,6 +782,8 @@ def render_index(data: dict[str, Any], assets: str, template: str) -> str:
         URL=SITE_URL,
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
+        FEED="feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
         ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
@@ -860,6 +864,8 @@ def render_about(data: dict[str, Any], assets: str, template: str) -> str:
         URL=SITE_URL + "about/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
+        FEED="../feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
         ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
@@ -877,8 +883,14 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     css = (WEB / "app.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assets = asset_version(css, js)
-    state_tpl = (WEB / "state.html").read_text(encoding="utf-8")
-    index_tpl = (WEB / "index.html").read_text(encoding="utf-8")
+    head_tpl = re.sub(r"\A<!--.*?-->\n", "", (WEB / "head.html").read_text(encoding="utf-8"), flags=re.S)
+
+    def template(name: str) -> str:
+        """A page template with the shared head in place; the slots of both are filled together."""
+        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl)
+
+    state_tpl = template("state.html")
+    index_tpl = template("index.html")
 
     out = Path(out)
     if out.exists():
@@ -911,7 +923,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         (d / "summary.json").write_text(summary_json(data), encoding="utf-8")
         counts[code] = len(data["programs"])
-    about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
+    about_tpl = template("about.html")
     (out / "about").mkdir()
     (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl), encoding="utf-8")
     (out / "p").mkdir()
