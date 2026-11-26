@@ -87,8 +87,8 @@ Each line is one session unless noted, in the repo's one-feature-per-session rhy
 | Phase | Sessions | What |
 |---|---|---|
 | A. Proof | calendar time, not sessions | Send outreach; five phone tests; pick the lane and check its dates |
-| B. Trust | 2 to 3 | Tagger false positives, title cleanups, stale rows, map zeros |
-| C. Concept | 2 | Mockups of the absence grammar on map, card, chart, mark; Saj picks |
+| B. Trust | Done 2026-11-26 except two items left by decision. Built: migration 0011 (unrestricted notices not 'likely' by category alone); titles without their own number; the map's bare zeros (see C). Measured and left: old-year open rounds are what the source states; stale unconfirmed rows stay listed (Saj). Left open: the NEA rows (Saj: leave for now; requiring a municipal topic was measured and would move 183 listed rows). Long titles move to the card rebuild in D |
+| C. Concept | Mockup picked 2026-11-26. The index map is built in the grammar (hatched: listed, no status; dashed: cannot be read). The mockup showed Virginia as 20; the built map counts 25 from `v_navigator_unstated`. Cards, charts and mark C not built yet |
 | D. System | 3 | Scales and tokens; controls and borders; card rebuild |
 | E. Structure | 4 | Program pages; index as a front page; state page length; cached assets |
 | F. Charts | 4 | Phone layouts and keyboard access; thesis chart; About as essay; the entry piece |
