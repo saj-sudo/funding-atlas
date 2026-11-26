@@ -74,8 +74,9 @@ surveyed there too, and stopped on its robots.txt.
 `cli.py export` builds `site/` (gitignored) from four views in migrations 0005 and 0006: `v_navigator_program` (every open or
 forecasted program a local government can apply to, any state), `v_navigator_between` (its collapsed appendix: closed or
 past-deadline state programs within 15 months of their last deadline, for the next round), `v_navigator_change` (the
-change log) and `v_navigator_coverage` (what was read per state). Each state page is one self-contained HTML file with its data
-embedded as JSON and no external requests, so `site/md/index.html` also works as an email attachment or offline.
+change log) and `v_navigator_coverage` (what was read per state). Each page embeds its own data as JSON and
+shares `app.css`, `app.js` and, on state pages, `federal.js`, all written beside the pages and loaded from the same origin: no
+external requests. A saved copy of the whole `site/` folder still works offline; a single page on its own no longer does.
 The page markup, stylesheet and script live in `web/`; `scripts/build_site.py` only queries SQL and fills them in.
 
 Hosting is GitHub Pages from the `gh-pages` branch. `.github/workflows/site.yml` runs daily: it restores `atlas.db`

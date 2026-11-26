@@ -22,11 +22,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
 <link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
-<style>
-@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
-@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("{{ROOT}}fonts/source-serif-4-latin.woff2") format("woff2"); }
-{{CSS}}
-</style>
+<link rel="preload" as="font" type="font/woff2" crossorigin href="{{ROOT}}fonts/public-sans-latin.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="{{ROOT}}fonts/source-serif-4-latin.woff2">
+<link rel="stylesheet" href="{{ROOT}}app.css?v={{ASSETS}}">
 </head>
 <body data-page="index">
 <a class="skip" href="#main">Skip to the state picker</a>
@@ -89,8 +87,6 @@
 </footer>
 
 <script type="application/json" id="data">{{DATA}}</script>
-<script>
-{{JS}}
-</script>
+<script src="{{ROOT}}app.js?v={{ASSETS}}" defer></script>
 </body>
 </html>

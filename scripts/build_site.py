@@ -23,6 +23,7 @@ deadlines over the same rows the page lists, nothing new.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import shutil
@@ -732,6 +733,11 @@ def fill(template: str, **slots: str) -> str:
 FEDERAL_JS = "federal.js"
 
 
+def asset_version(css: str, js: str) -> str:
+    """The cache key on app.css and app.js: it changes when either file's text does, not on every daily build."""
+    return hashlib.sha256((css + "\0" + js).encode("utf-8")).hexdigest()[:10]
+
+
 def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     """A state payload without its federal rows, and those rows (13.16). Federal notices and their changes are the
     same on all 51 pages, so they ship once in federal.js on the same origin and every state page loads it from the
@@ -748,7 +754,7 @@ def render_federal(federal: dict[str, Any]) -> str:
     return "window.FA_FEDERAL = " + embed_json(federal) + ";\n"
 
 
-def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
+def render_state(data: dict[str, Any], assets: str, template: str) -> str:
     data = split_federal(data)[0]
     name = data["state"]["name"]
     return fill(
@@ -759,14 +765,13 @@ def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=f"{SITE_URL}{data['state']['code'].lower()}/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
 
 
-def render_index(data: dict[str, Any], css: str, js: str, template: str) -> str:
+def render_index(data: dict[str, Any], assets: str, template: str) -> str:
     return fill(
         template,
         TITLE="Funding Atlas: open public funding for local governments, by state",
@@ -775,8 +780,7 @@ def render_index(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=SITE_URL,
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
@@ -847,7 +851,7 @@ def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], gene
     }
 
 
-def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
+def render_about(data: dict[str, Any], assets: str, template: str) -> str:
     return fill(
         template,
         TITLE="About the data · Funding Atlas",
@@ -856,8 +860,7 @@ def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=SITE_URL + "about/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
@@ -873,6 +876,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     site = build(conn, generated_at=generated_at)
     css = (WEB / "app.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")
+    assets = asset_version(css, js)
     state_tpl = (WEB / "state.html").read_text(encoding="utf-8")
     index_tpl = (WEB / "index.html").read_text(encoding="utf-8")
 
@@ -882,10 +886,14 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     out.mkdir(parents=True)
     (out / ".nojekyll").write_text("")
     # The two web fonts (SIL Open Font License, the licence files go with them): same origin, so the pages still
-    # make no request to anyone else. The @font-face rules are in the templates, where {{ROOT}} is filled.
+    # make no request to anyone else. The @font-face rules open app.css, with paths relative to it.
     shutil.copytree(WEB / "fonts", out / "fonts")
+    # The stylesheet and the script, once, beside the pages (2026-11-26): every page links them from the same origin
+    # and the browser keeps them, where each page used to carry its own 137KB copy.
+    (out / "app.css").write_text(css, encoding="utf-8")
+    (out / "app.js").write_text(js, encoding="utf-8")
     shutil.copy(WEB / "share.png", out / "share.png")     # the link-preview image every page names (13.23)
-    (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
+    (out / "index.html").write_text(render_index(site["index"], assets, index_tpl), encoding="utf-8")
     generated_at = site["index"]["generated_at"]
     (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",
                                               alternate_url=SITE_URL, updated=generated_at), encoding="utf-8")
@@ -896,7 +904,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     for code, data in site["states"].items():
         d = out / code.lower()
         d.mkdir()
-        (d / "index.html").write_text(render_state(data, css, js, state_tpl), encoding="utf-8")
+        (d / "index.html").write_text(render_state(data, assets, state_tpl), encoding="utf-8")
         base = f"{SITE_URL}{code.lower()}/"
         (d / "feed.xml").write_text(render_atom(data["changes"], state=code, self_url=base + "feed.xml",
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
@@ -905,7 +913,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         counts[code] = len(data["programs"])
     about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
     (out / "about").mkdir()
-    (out / "about" / "index.html").write_text(render_about(site["about"], css, js, about_tpl), encoding="utf-8")
+    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl), encoding="utf-8")
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])

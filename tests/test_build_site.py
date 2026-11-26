@@ -262,8 +262,9 @@ def test_topics_are_words_with_their_own_colours(conn, tmp_path):
     """Redesign session 4 (13.21): no lettered badge or key row; topic colours are tokens of their own in both themes."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
-    assert "topic-key" not in page and 'class="topic ' not in page
-    root, dark = page.split("@media (prefers-color-scheme: dark)", 1)
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert "topic-key" not in page + css + js and 'class="topic ' not in page + js
+    root, dark = css.split("@media (prefers-color-scheme: dark)", 1)
     for token in ("--topic-env", "--topic-inf", "--topic-com"):
         assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
 
@@ -302,8 +303,8 @@ def test_theme_switch_matches_the_dark_preference(conn, tmp_path):
     for rel in ("index.html", "md/index.html", "about/index.html"):
         page = (out / rel).read_text(encoding="utf-8")
         assert 'id="theme-btn"' in page and "localStorage.getItem('fa-theme')" in page, rel
-        assert page.index("localStorage.getItem('fa-theme')") < page.index("<style>"), rel
-    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+        assert page.index("localStorage.getItem('fa-theme')") < page.index('<link rel="stylesheet"'), rel
+    page = (out / "app.css").read_text(encoding="utf-8")
     pref = re.search(r':root:not\(\[data-theme="light"\]\) \{(.*?)\}', page, re.S).group(1)
     chosen = re.search(r':root\[data-theme="dark"\] \{(.*?)\}', page, re.S).group(1)
     tokens = lambda block: dict(re.findall(r"(--[a-z0-9-]+|color-scheme):\s*([^;]+);", block))  # noqa: E731
@@ -327,9 +328,10 @@ def test_map_grammar_and_display_names(conn, tmp_path):
     index = (out / "index.html").read_text(encoding="utf-8")
     assert "listed, no status stated" in index and "cannot be read: blocked or login only" in index
     assert "On a hatched state it counts programs the source lists without saying whether they are open." in index
-    assert ".map a.t.k-blocked { color: var(--muted); background: transparent; border: 2px dashed var(--edge); }" in index
-    assert "var num = dir ? s.programs : un ? s.unstated : s.open;" in index
-    assert "function programName(p)" in index and "h(programName(p))" in index
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert ".map a.t.k-blocked { color: var(--muted); background: transparent; border: 2px dashed var(--edge); }" in css
+    assert "var num = dir ? s.programs : un ? s.unstated : s.open;" in js
+    assert "function programName(p)" in js and "h(programName(p))" in js
 
 
 def test_scales_and_card_slots(conn, tmp_path):
@@ -344,8 +346,9 @@ def test_scales_and_card_slots(conn, tmp_path):
     assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
     assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
     assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [".map a.t.k-blocked ", ".legend i.k-blocked "]
-    assert "slot('Amount', amount) + slot('Match', match)" in page and "'Source does not say'" in page
-    assert "Amount not published" not in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "slot('Amount', amount) + slot('Match', match)" in js and "'Source does not say'" in js
+    assert "Amount not published" not in page + js
 
 
 def test_index_states_and_tile_grid(conn):
@@ -385,13 +388,13 @@ def test_stats_views_count_what_the_pages_list(conn):
     assert all(1 <= m <= 12 for _, m, _ in months) and {st for st, _, _ in months} <= {"MD", "VA"}
 
 
-def test_about_page_is_written_and_self_contained(conn, tmp_path):
+def test_about_page_is_written_and_same_origin(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "about" / "index.html").read_text(encoding="utf-8")
-    assert 'data-page="about"' in page and 'url("../fonts/public-sans-latin.woff2")' in page
+    assert 'data-page="about"' in page and 'href="../fonts/public-sans-latin.woff2"' in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
     assert {"deadlines", "awards", "months", "stated", "flips", "open"} <= set(data)
-    assert "<script src" not in page and "cdn" not in page
+    assert set(re.findall(r'<script src="([^"?]+)', page)) == {"../app.js"} and "cdn" not in page
 
 
 def test_embed_json_is_script_safe():
@@ -419,15 +422,29 @@ def test_write_site(conn, tmp_path):
     assert order == sorted(order)
     assert "<may>" in json.dumps(federal)                                # verbatim text survives the round trip
     assert "</script" not in (out / "federal.js").read_text(encoding="utf-8")
-    # self-contained: nothing loaded from anywhere
-    body = page.replace("https://x/", "").replace('<script src="../federal.js?v=' + GEN[:10] + '">', "")
-    assert "<script src" not in body and "<link rel=\"stylesheet\"" not in body and "@import" not in body
-    assert "url(http" not in body and "cdn" not in body
+    # same origin only (2026-11-26): the stylesheet and script are files beside the pages, shared and cached; a page
+    # loads those, federal.js and the two fonts, and nothing from anywhere else
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert css == (build_site.WEB / "app.css").read_text(encoding="utf-8") and js == (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    key = build_site.asset_version(css, js)
+    assert key != build_site.asset_version(css + " ", js) and key != build_site.asset_version(css, js + " ")
+    assert re.findall(r'<script src="([^"]+)"', page) == ["../federal.js?v=" + GEN[:10], "../app.js?v=" + key]
+    assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', page) == ["../app.css?v=" + key]
+    for rel, root in (("index.html", ""), ("about/index.html", "../")):
+        other = (out / rel).read_text(encoding="utf-8")
+        assert re.findall(r'<script src="([^"]+)"', other) == [root + "app.js?v=" + key], rel
+        assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', other) == [root + "app.css?v=" + key], rel
+        assert "<style" not in other and "function programName" not in other, rel
+    assert "<style" not in page and "function programName" not in page and ":root {" not in page
+    body = page.replace("https://x/", "")
+    assert "@import" not in body + css and "url(http" not in body + css and "cdn" not in body + css + js
+    assert not re.search(r'(?:src|href)="https?://(?!x/)', re.sub(r'<(?:meta|link rel="(?:canonical|alternate)")[^>]*>', "", body))
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'data-page="index"' in index and "Funding Atlas" in index
     # web fonts are served from the site itself, with their licences, and referenced relative to each page
     assert (out / "fonts" / "public-sans-latin.woff2").exists() and (out / "fonts" / "OFL-SourceSerif4.txt").exists()
-    assert 'url("../fonts/source-serif-4-latin.woff2")' in page and 'url("fonts/public-sans-latin.woff2")' in index
+    assert 'href="../fonts/source-serif-4-latin.woff2"' in page and 'href="fonts/public-sans-latin.woff2"' in index
+    assert 'url("fonts/source-serif-4-latin.woff2")' in css and 'url("fonts/public-sans-latin.woff2")' in css
     # rebuilding wipes stale files
     (out / "stale.txt").write_text("x")
     build_site.write(conn, out, generated_at=GEN)

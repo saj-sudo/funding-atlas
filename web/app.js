@@ -1,4 +1,4 @@
-/* Funding Atlas page script. Shared by the index and every state page; inlined by scripts/build_site.py.
+/* Funding Atlas page script. Shared by every page; written beside the pages as app.js by scripts/build_site.py.
    Plain browser JavaScript, no build step, no network: everything comes from the JSON block in the page.
    Nothing here invents data. A null stays blank; the only computed things are counts, sort orders and the
    wording of dates relative to the build date. */
