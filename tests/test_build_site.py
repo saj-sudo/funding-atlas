@@ -318,7 +318,7 @@ def test_index_leads_with_the_map(conn, tmp_path):
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'id="stats"' not in index
-    assert index.index('id="map"') < index.index('id="numbers"') < index.index('<details class="changes-fold">') < index.index('id="feed"')
+    assert index.index('id="map"') < index.index('class="today"') < index.index('id="numbers"') < index.index('<details class="changes-fold" id="changes">') < index.index('id="feed"')
     assert "Pick your state. Your state's own programs come first." in index
 
 
@@ -411,6 +411,38 @@ def test_phone_paging_and_federal_fold():
     assert "'Show ' + Math.min(PAGE_N, left) + ' more of ' + rows.length : 'Show all ' + rows.length" in js
     assert "if (!PHONE || st.fed || !FEDERAL_LOADED || !rf.length || !rs.length || !defaultFilters()) return '';" in js
     assert "Show federal notices" in js and "if (st.fed) parts.push('fed=1');" in js
+
+
+def test_index_daily_blocks(conn):
+    """2026-11-26 (Saj's pick A): the index carries what closes this week, the week's changes by kind and what the
+    sources state by how each state is read: counts from the data, nothing inferred."""
+    site = build_site.build(conn, generated_at=GEN)
+    idx = site["index"]
+    cw = idx["closing_week"]
+    assert cw["total"] == cw["state"] + cw["federal"] and len(cw["rows"]) <= 5
+    assert [r["closes_at"] for r in cw["rows"]] == sorted(r["closes_at"] for r in cw["rows"])
+    wk = idx["week"]
+    assert wk["days"] == build_site.NEW_DAYS and sum(wk["kinds"].values()) == idx["changes_week"]
+    assert all({"at", "state", "name", "slug", "old", "new", "listed"} <= set(c) for c in wk["status_changes"])
+    assert idx["stated"] and idx["stated"][0]["kind"] == "federal"
+    assert all(r["status"] <= r["n"] and r["date"] <= r["n"] and r["amount"] <= r["n"] for r in idx["stated"])
+
+
+def test_closing_week_and_week_changes_count_only_what_is_stated():
+    row = lambda **k: {"slug": "s", "name": "N", "number": None, "state": "MD", "agency": "A", "agency_code": None,  # noqa: E731
+                       "closes_at": "2026-12-01", "deadline_placeholder": False, "days_to_close": 3, **k}
+    cw = build_site.closing_week([row(), row(state=None, name="F"), row(days_to_close=8), row(days_to_close=-1),
+                                  row(deadline_placeholder=True), row(closes_at=None, days_to_close=None)])
+    assert (cw["total"], cw["state"], cw["states"], cw["federal"]) == (2, 1, 1, 1) and [r["name"] for r in cw["rows"]] == ["F", "N"]
+    ch = lambda day, kind, fields=None, pid=1: {"changed_at": f"2026-11-{day}T00:00:00Z", "change_type": kind, "program_id": pid,  # noqa: E731
+                                                "changed_fields": json.dumps(fields) if fields else None, "state": "MD", "name": "N", "slug": "s"}
+    wk = build_site.week_changes([
+        ch(25, "changed", {"status": {"old": "open", "new": "closed"}, "closes_at": {"old": None, "new": "2026-12-01"}}),
+        ch(24, "changed", {"closes_at": {"old": None, "new": "2026-12-01"}}), ch(24, "changed", {"summary": {"old": "a", "new": "b"}}),
+        ch(23, "added"), ch(22, "missing", pid=9), ch(10, "changed", {"status": {"old": "open", "new": "closed"}}),
+    ], "2026-11-26T00:00:00Z", 7, {1})
+    assert wk["kinds"] == {"added": 1, "status": 1, "dates": 1, "wording": 1, "missing": 1}
+    assert wk["status_changes"] == [{"at": "2026-11-25T00:00:00Z", "state": "MD", "name": "N", "slug": "s", "old": "open", "new": "closed", "listed": True}]
 
 
 def test_index_states_and_tile_grid(conn):

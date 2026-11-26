@@ -665,6 +665,61 @@ def state_payload(
     }
 
 
+def closing_week(programs: list[dict[str, Any]], n: int = 5) -> dict[str, Any]:
+    """The index's "Closing this week" (2026-11-26): every listed program with a stated deadline in the next 7 days,
+    counted, and the `n` soonest by name. A placeholder date is not a deadline."""
+    rows = sorted((p for p in programs if p["closes_at"] and not p["deadline_placeholder"]
+                   and p["days_to_close"] is not None and 0 <= p["days_to_close"] <= 7),
+                  key=lambda p: (p["closes_at"], p["name"]))
+    own = [p for p in rows if p["state"]]
+    return {
+        "total": len(rows), "state": len(own), "states": len({p["state"] for p in own}), "federal": len(rows) - len(own),
+        "rows": [{"slug": p["slug"], "name": p["name"], "number": p["number"], "state": p["state"], "agency": p["agency"],
+                  "agency_code": p["agency_code"], "closes_at": p["closes_at"]} for p in rows[:n]],
+    }
+
+
+def week_changes(changes: list[dict[str, Any]], generated_at: str, days: int, listed_ids: set[int], n: int = 3) -> dict[str, Any]:
+    """The index's "What changed": the changes of the last `days` days by kind, and the `n` newest status changes by
+    name. A change counts once, by the first kind that fits: first seen, no longer listed, status, dates, else wording."""
+    cutoff = date.fromordinal(date.fromisoformat(generated_at[:10]).toordinal() - days).isoformat()
+    kinds = {"added": 0, "status": 0, "dates": 0, "wording": 0, "missing": 0}
+    flips: list[dict[str, Any]] = []
+    for c in changes:                                          # newest first
+        if (c["changed_at"] or "")[:10] <= cutoff:
+            continue
+        fields = json.loads(c["changed_fields"]) if c.get("changed_fields") else {}
+        if c["change_type"] in ("added", "missing"):
+            kinds[c["change_type"]] += 1
+        elif "status" in fields:
+            kinds["status"] += 1
+            if len(flips) < n:
+                flips.append({"at": c["changed_at"], "state": c["state"], "name": c["name"], "slug": c["slug"],
+                              "old": fields["status"].get("old"), "new": fields["status"].get("new"),
+                              "listed": c["program_id"] in listed_ids})
+        elif "closes_at" in fields or "opens_at" in fields:
+            kinds["dates"] += 1
+        else:
+            kinds["wording"] += 1
+    return {"days": days, "kinds": kinds, "status_changes": flips}
+
+
+def stated_by_kind(stated: list[dict[str, Any]], connectors: dict[str, list[str]]) -> list[dict[str, Any]]:
+    """The index's "What the states publish": v_stats_stated summed by how each state is read, federal notices first.
+    Counts only; the page works out the shares."""
+    out: dict[str, dict[str, Any]] = {}
+    for r in stated:
+        kind = "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]
+        g = out.setdefault(kind, {"kind": kind, "states": 0, "n": 0, "status": 0, "date": 0, "amount": 0})
+        g["states"] += 1
+        g["n"] += r["n"] or 0
+        g["status"] += r["status_stated"] or 0
+        g["date"] += r["date_stated"] or 0
+        g["amount"] += r["amount_stated"] or 0
+    order = ["federal", "portal", "portal_agencies", "agencies", "directory"]
+    return [out[k] for k in order if k in out and out[k]["n"]]
+
+
 def index_payload(
     *,
     programs: list[dict[str, Any]],
@@ -673,6 +728,8 @@ def index_payload(
     connectors: dict[str, list[str]],
     run_info: dict[str, dict[str, str | None]],
     generated_at: str,
+    stats: dict[str, Any] | None = None,
+    listed_ids: set[int] | None = None,
 ) -> dict[str, Any]:
     listed = {p["id"] for p in programs}
     states = []
@@ -706,6 +763,9 @@ def index_payload(
         "states": states,
         "changes": [shape_change(c, listed) for c in changes[:INDEX_FEED_N]],
         "changes_week": changes_within(changes, generated_at, NEW_DAYS),
+        "closing_week": closing_week(programs),
+        "week": week_changes(changes, generated_at, NEW_DAYS, listed_ids if listed_ids is not None else listed),
+        "stated": stated_by_kind((stats or {}).get("stated", []), connectors),
         "questions": list(READER_QUESTIONS),
     }
 
@@ -815,12 +875,12 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         )
         for code, _, _, _ in STATES
     }
+    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     index = index_payload(
         programs=programs, changes=changes, coverage=coverage, connectors=connectors,
-        run_info=run_info, generated_at=generated_at,
+        run_info=run_info, generated_at=generated_at, stats=stats, listed_ids=listed_all,
     )
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
-    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
     # One feed per program (13.9, widened in 13.15): every program a local government could apply to that is listed
     # on a page or has ever had a change logged, so a starred program keeps its feed after it leaves every page and

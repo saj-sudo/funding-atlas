@@ -40,6 +40,30 @@
     </div>
   </section>
 
+  <!-- Three blocks that change every day (2026-11-26, Saj's pick A from the mockup): what closes this week, what
+       changed, and what the sources state. Filled by app.js from the page's data; each is hidden when it has nothing. -->
+  <div class="today">
+    <section class="tblock" id="t-closing" aria-labelledby="t-closing-h" hidden>
+      <h2 id="t-closing-h">Closing this week</h2>
+      <p id="t-closing-sum"></p>
+      <ol class="trows" id="t-closing-rows"></ol>
+    </section>
+    <div class="tcol">
+      <section class="tblock" id="t-changed" aria-labelledby="t-changed-h" hidden>
+        <h2 id="t-changed-h">What changed</h2>
+        <dl class="tkinds" id="t-kinds"></dl>
+        <ul class="tflips" id="t-flips"></ul>
+        <p><a href="#changes" id="t-log">The latest changes, below</a></p>
+      </section>
+      <section class="tblock" id="t-stated" aria-labelledby="t-stated-h" hidden>
+        <h2 id="t-stated-h">What the sources publish</h2>
+        <p class="muted small">Share of programs open to local governments whose source states each item. Hatched is what it leaves out.</p>
+        <div class="tmini" id="t-mini"></div>
+        <p><a href="about/">State by state, in About the data</a></p>
+      </section>
+    </div>
+  </div>
+
   <section class="numbers" aria-labelledby="numbers-h">
     <h2 id="numbers-h">In numbers, today</h2>
     <ul id="numbers"></ul>
@@ -52,7 +76,7 @@
     <p class="muted">The relevance tiers (likely, possible) are rule-based readings of each record, written as SQL you can audit. Argue with the rules, not the records.</p>
   </section>
 
-  <details class="changes-fold">
+  <details class="changes-fold" id="changes">
     <summary id="feed-sum">Latest changes across every source</summary>
     <ol class="feed" id="feed"></ol>
     <p class="muted small" id="feed-note">Each state page's Changes tab has that state's log. The site-wide feed: <a href="feed.xml">Atom</a> · <a href="changes.json">JSON</a>.</p>

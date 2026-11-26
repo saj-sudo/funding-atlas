@@ -1295,6 +1295,44 @@
       '<li>' + n(F.closing_soon) + ' of them close' + (F.closing_soon === 1 ? 's' : '') + ' within ' + DATA.rules.closing_days + ' days.</li>' +
       '<li>' + n(withSources.length) + ' state' + (withSources.length === 1 ? ' has' : 's have') + ' state agency sources connected.</li>' +
       '<li>' + n(sum('programs')) + ' state programs are read: ' + n(sum('open')) + ' open or announced for local governments, ' + n(sum('between')) + ' closed recently.</li>';
+    // ---- the three daily blocks (2026-11-26): counts and names from the build's data, nothing computed beyond shares ----
+    var CW = DATA.closing_week, WK = DATA.week, ST = DATA.stated || [];
+    if (CW && CW.total) {
+      el('t-closing').hidden = false;
+      el('t-closing-sum').innerHTML = n(CW.total) + ' program' + (CW.total === 1 ? ' closes' : 's close') + ' in the next 7 days: ' +
+        n(CW.state) + ' from states' + (CW.states ? ', in ' + CW.states + (CW.states === 1 ? ' state' : ' states') : '') + ', and ' +
+        n(CW.federal) + ' federal notice' + (CW.federal === 1 ? '' : 's') + '.';
+      el('t-closing-rows').innerHTML = CW.rows.map(function (p) {
+        return '<li><span class="td" aria-hidden="true"><small>' + MONTHS[+p.closes_at.slice(5, 7) - 1] + '</small><b>' + (+p.closes_at.slice(8, 10)) + '</b></span>' +
+          '<span><a class="tn" href="' + h(pagePath(p.slug)) + '">' + h(programName(p)) + '</a>' +
+          '<span class="tm">' + h(p.state ? stateName(p.state) : 'Federal') + ' · ' + h(agencyName(p) || 'Agency not stated') +
+          '<span class="sr-only">, closes ' + h(fmtDate(p.closes_at, true)) + '</span></span></span></li>';
+      }).join('');
+    }
+    var KINDS = [['added', 'First seen'], ['wording', 'Wording or details'], ['status', 'Status'], ['dates', 'Dates'], ['missing', 'No longer listed']];
+    if (WK && KINDS.some(function (k) { return WK.kinds[k[0]]; })) {
+      el('t-changed').hidden = false;
+      el('t-changed-h').textContent = 'What changed in the last ' + WK.days + ' days';
+      el('t-kinds').innerHTML = KINDS.map(function (k) { return '<div><dt>' + k[1] + '</dt><dd class="num">' + (WK.kinds[k[0]] || 0).toLocaleString('en-US') + '</dd></div>'; }).join('');
+      el('t-flips').innerHTML = WK.status_changes.map(function (c) {
+        var name = c.listed ? '<a href="' + h(pagePath(c.slug)) + '">' + h(c.name) + '</a>' : h(c.name);
+        return '<li><b>' + h(fmtDate(c.at)) + '</b> · ' + h(c.state ? stateName(c.state) : 'Federal') + ' · ' + name + ': ' +
+          h(statusLabel(c.old || 'unknown')) + ' → ' + h(statusLabel(c.new || 'unknown')) + '</li>';
+      }).join('');
+      el('t-log').addEventListener('click', function () { el('changes').open = true; });
+    }
+    var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
+    if (ST.length) {
+      el('t-stated').hidden = false;
+      el('t-mini').innerHTML = '<span></span><span class="th">Status</span><span class="th">Deadline</span><span class="th">Amount</span>' + ST.map(function (r) {
+        function bar(v, what) {
+          var pct = Math.round(100 * v / r.n);
+          return '<span class="tbar" role="img" aria-label="' + what + ' stated by ' + pct + ' percent"><b style="width:' + pct + '%"></b><i class="num">' + pct + '%</i></span>';
+        }
+        return '<span class="tl">' + h(KIND_ROW[r.kind] || r.kind) + ' <small class="num">' + r.n.toLocaleString('en-US') + '</small></span>' +
+          bar(r.status, 'Status') + bar(r.date, 'Deadline') + bar(r.amount, 'Amount');
+      }).join('');
+    }
     var wk = DATA.changes_week || 0;
     if (wk) el('feed-sum').textContent += ': ' + wk.toLocaleString('en-US') + ' logged in the last ' + DATA.rules.new_days + ' days';
     if (wk > DATA.changes.length) el('feed-note').insertBefore(document.createTextNode('The newest ' + DATA.changes.length + ' are listed here. '), el('feed-note').firstChild);
