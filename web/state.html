@@ -1,32 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{{DESCRIPTION}}">
-<meta name="color-scheme" content="light dark">
-<title>{{TITLE}}</title>
-<link rel="icon" href="{{ICON}}">
-<link rel="canonical" href="{{URL}}">
-<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Funding Atlas">
-<meta property="og:title" content="{{TITLE}}">
-<meta property="og:description" content="{{DESCRIPTION}}">
-<meta property="og:url" content="{{URL}}">
-<meta property="og:image" content="{{SHARE_IMAGE}}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
-<meta name="twitter:card" content="summary_large_image">
-<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
-<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
-<style>
-@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
-@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("{{ROOT}}fonts/source-serif-4-latin.woff2") format("woff2"); }
-{{CSS}}
-</style>
+{{HEAD}}
 </head>
 <body data-page="state">
 <a class="skip" href="#main">Skip to programs</a>
@@ -180,6 +155,7 @@
     <footer>
       <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
       <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <a class="btn" id="detail-page" href="#">Open as a page</a>
       <button class="btn" id="detail-copy">Copy link</button>
       <span class="copied" id="detail-copied" hidden>Copied</span>
     </footer>
@@ -191,9 +167,7 @@
 </footer>
 
 <script type="application/json" id="data">{{DATA}}</script>
-<script src="{{ROOT}}federal.js?v={{GENERATED}}"></script>
-<script>
-{{JS}}
-</script>
+<script src="{{ROOT}}federal.js?v={{GENERATED}}" defer></script>
+<script src="{{ROOT}}app.js?v={{ASSETS}}" defer></script>
 </body>
 </html>

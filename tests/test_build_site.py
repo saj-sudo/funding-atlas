@@ -3,6 +3,7 @@ in-memory database. No network, no browser."""
 
 from __future__ import annotations
 
+import html
 import json
 import re
 from datetime import UTC, date, datetime, timedelta
@@ -262,8 +263,9 @@ def test_topics_are_words_with_their_own_colours(conn, tmp_path):
     """Redesign session 4 (13.21): no lettered badge or key row; topic colours are tokens of their own in both themes."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
-    assert "topic-key" not in page and 'class="topic ' not in page
-    root, dark = page.split("@media (prefers-color-scheme: dark)", 1)
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert "topic-key" not in page + css + js and 'class="topic ' not in page + js
+    root, dark = css.split("@media (prefers-color-scheme: dark)", 1)
     for token in ("--topic-env", "--topic-inf", "--topic-com"):
         assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
 
@@ -302,8 +304,8 @@ def test_theme_switch_matches_the_dark_preference(conn, tmp_path):
     for rel in ("index.html", "md/index.html", "about/index.html"):
         page = (out / rel).read_text(encoding="utf-8")
         assert 'id="theme-btn"' in page and "localStorage.getItem('fa-theme')" in page, rel
-        assert page.index("localStorage.getItem('fa-theme')") < page.index("<style>"), rel
-    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+        assert page.index("localStorage.getItem('fa-theme')") < page.index('<link rel="stylesheet"'), rel
+    page = (out / "app.css").read_text(encoding="utf-8")
     pref = re.search(r':root:not\(\[data-theme="light"\]\) \{(.*?)\}', page, re.S).group(1)
     chosen = re.search(r':root\[data-theme="dark"\] \{(.*?)\}', page, re.S).group(1)
     tokens = lambda block: dict(re.findall(r"(--[a-z0-9-]+|color-scheme):\s*([^;]+);", block))  # noqa: E731
@@ -316,8 +318,144 @@ def test_index_leads_with_the_map(conn, tmp_path):
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'id="stats"' not in index
-    assert index.index('id="map"') < index.index('id="numbers"') < index.index('<details class="changes-fold">') < index.index('id="feed"')
+    assert index.index('id="map"') < index.index('class="today"') < index.index('id="numbers"') < index.index('<details class="changes-fold" id="changes">') < index.index('id="feed"')
     assert "Pick your state. Your state's own programs come first." in index
+
+
+def test_map_grammar_and_display_names(conn, tmp_path):
+    """2026-11-26: solid stated, hatched read and not stated, dashed cannot be read; a hatched tile's number counts
+    programs with no status; a name that opens with its own number is shown without it (display only)."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert "listed, no status stated" in index and "cannot be read: blocked or login only" in index
+    assert "On a hatched state it counts programs the source lists without saying whether they are open." in index
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert ".map a.t.k-blocked { color: var(--muted); background: transparent; border: 2px dashed var(--edge); }" in css
+    assert "var num = dir ? s.programs : un ? s.unstated : s.open;" in js
+    assert "function programName(p)" in js and "h(programName(p))" in js
+
+
+def test_scales_and_card_slots(conn, tmp_path):
+    """2026-11-26: font sizes, weights and corners come from the token scales; controls take --edge; every card has
+    an Amount and a Match slot, hatched with words when the source does not say; dashed is kept for "cannot be read"."""
+    css = (build_site.WEB / "app.css").read_text(encoding="utf-8")
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    page = (out / "md" / "index.html").read_text(encoding="utf-8")
+    rules = css[css.index("* { box-sizing: border-box; }"):]
+    assert not re.findall(r"font-size: [\d.]+rem", rules) and not re.findall(r"font: (?:\d{3} )?[\d.]+rem", rules)
+    assert set(re.findall(r"font-weight: (\d+)", rules)) <= {"400", "600", "700"}
+    assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
+    assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
+    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [".map a.t.k-blocked ", ".legend i.k-blocked "]
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "slot('Amount', amount) + slot('Match', match)" in js and "'Source does not say'" in js
+    assert "Amount not published" not in page + js
+
+
+def test_program_pages(conn, tmp_path):
+    """2026-11-26: every listed program has a page of its own at p/<slug>/, and no other program does; the head is the
+    shared one with the program's own title, description, address and feed; the body says something without script."""
+    site = build_site.build(conn, generated_at=GEN)
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    listed = {p["slug"] for code in site["states"] for k in ("programs", "between", "unstated") for p in site["states"][code][k]}
+    pages = {d.name for d in (out / "p").iterdir() if d.is_dir()}
+    assert listed and pages == {build_site.program_page_path(s).split("/")[1] for s in listed}
+    assert len(site["program_pages"]) == len(listed)
+    key = build_site.asset_version((out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8"))
+    data = next(d for d in site["program_pages"] if d["program"]["state"] == "MD")
+    p = data["program"]
+    page = (out / build_site.program_page_path(p["slug"])).read_text(encoding="utf-8")
+    url = build_site.program_url(p["slug"])
+    assert 'data-page="program"' in page and "{{" not in page
+    assert f"<title>{html.escape(p['name'])} · Maryland · Funding Atlas</title>" in page
+    assert f'<link rel="canonical" href="{url}">' in page and f'<meta property="og:url" content="{url}">' in page
+    assert 'href="../' + build_site.program_feed_path(p["slug"])[2:] + '"' in page       # its own feed, beside the folder
+    assert re.findall(r'<script src="([^"]+)"', page) == ["../../app.js?v=" + key]
+    assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', page) == ["../../app.css?v=" + key]
+    assert page.index("localStorage.getItem('fa-theme')") < page.index('<link rel="stylesheet"')
+    body = page[page.index("<body"):page.index('<script type="application/json"')]
+    assert html.escape(p["name"]) in body and html.escape(p["source_url"], quote=True) in body
+    assert html.escape(build_site.status_sentence(p)) in body and 'href="../../md/"' in body
+    embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert embedded["program"] == p and embedded["state"] == {"code": "MD", "name": "Maryland"}
+    # a federal notice has a page too, and says where it is listed in place of a state
+    fed = next(d for d in site["program_pages"] if d["program"]["state"] is None)
+    fpage = (out / build_site.program_page_path(fed["program"]["slug"])).read_text(encoding="utf-8")
+    assert "· Federal · Funding Atlas</title>" in fpage and "Federal notice, listed on every state page" in fpage
+    # feeds and the sitemap point at the page
+    feed = (out / build_site.program_feed_path(p["slug"])).read_text(encoding="utf-8")
+    assert f'rel="alternate" href="{url}"' in feed or f'href="{url}" rel="alternate"' in feed or url in feed
+    sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+    assert sitemap.count("<url>") == 1 + 51 + 1 + len(listed) and f"<loc>{url}</loc>" in sitemap
+    # the status words are the page script's
+    js = (out / "app.js").read_text(encoding="utf-8")
+    for k, v in build_site.STATUS_LABEL.items():
+        assert f"{k}: '{v}'" in js, k
+
+
+def test_status_sentence_states_only_what_is_stored():
+    base = {"status": "open", "closes_at": None, "deadline_placeholder": False, "days_to_close": None, "rolling": False, "closes_text": None}
+    assert build_site.status_sentence(base) == "Open. No deadline stated."
+    assert build_site.status_sentence(dict(base, rolling=True)) == "Open. Rolling deadline."
+    assert build_site.status_sentence(dict(base, status="unknown", closes_text="Spring")) == "Status not confirmed. Deadline in the source's words."
+    assert build_site.status_sentence(dict(base, closes_at="2026-12-01", days_to_close=5)) == "Open. Closes Dec 1, 2026."
+    assert build_site.status_sentence(dict(base, status="closed", closes_at="2026-02-23", days_to_close=-9)) == "Closed. Last deadline Feb 23, 2026."
+    assert build_site.status_sentence(dict(base, closes_at="2035-12-31", deadline_placeholder=True, days_to_close=3000)) == "Open. No deadline stated."
+
+
+def test_phone_paging_and_federal_fold():
+    """2026-11-26 (Saj, from the mockup): on a phone a section shows 10 cards at a time and the federal notices wait
+    behind one line while the page is as it opens; wide screens keep 30 and "Show all"."""
+    js = (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    assert "window.matchMedia('(max-width: 599px)')" in js and "var PAGE_N = PHONE ? 10 : 30" in js
+    assert "'Show ' + Math.min(PAGE_N, left) + ' more of ' + rows.length : 'Show all ' + rows.length" in js
+    assert "if (!PHONE || st.fed || !FEDERAL_LOADED || !rf.length || !rs.length || !defaultFilters()) return '';" in js
+    assert "Show federal notices" in js and "if (st.fed) parts.push('fed=1');" in js
+
+
+def test_index_daily_blocks(conn):
+    """2026-11-26 (Saj's pick A): the index carries what closes this week, the week's changes by kind and what the
+    sources state by how each state is read: counts from the data, nothing inferred."""
+    site = build_site.build(conn, generated_at=GEN)
+    idx = site["index"]
+    cw = idx["closing_week"]
+    assert cw["total"] == cw["state"] + cw["federal"] and len(cw["rows"]) <= 5
+    assert [r["closes_at"] for r in cw["rows"]] == sorted(r["closes_at"] for r in cw["rows"])
+    wk = idx["week"]
+    assert wk["days"] == build_site.NEW_DAYS and sum(wk["kinds"].values()) == idx["changes_week"]
+    assert all({"at", "state", "name", "slug", "old", "new", "listed"} <= set(c) for c in wk["status_changes"])
+    assert idx["stated"] and idx["stated"][0]["kind"] == "federal"
+    assert all(r["status"] <= r["n"] and r["date"] <= r["n"] and r["amount"] <= r["n"] for r in idx["stated"])
+
+
+def test_closing_week_and_week_changes_count_only_what_is_stated():
+    row = lambda **k: {"slug": "s", "name": "N", "number": None, "state": "MD", "agency": "A", "agency_code": None,  # noqa: E731
+                       "closes_at": "2026-12-01", "deadline_placeholder": False, "days_to_close": 3, **k}
+    cw = build_site.closing_week([row(), row(state=None, name="F"), row(days_to_close=8), row(days_to_close=-1),
+                                  row(deadline_placeholder=True), row(closes_at=None, days_to_close=None)])
+    assert (cw["total"], cw["state"], cw["states"], cw["federal"]) == (2, 1, 1, 1) and [r["name"] for r in cw["rows"]] == ["F", "N"]
+    ch = lambda day, kind, fields=None, pid=1: {"changed_at": f"2026-11-{day}T00:00:00Z", "change_type": kind, "program_id": pid,  # noqa: E731
+                                                "changed_fields": json.dumps(fields) if fields else None, "state": "MD", "name": "N", "slug": "s"}
+    wk = build_site.week_changes([
+        ch(25, "changed", {"status": {"old": "open", "new": "closed"}, "closes_at": {"old": None, "new": "2026-12-01"}}),
+        ch(24, "changed", {"closes_at": {"old": None, "new": "2026-12-01"}}), ch(24, "changed", {"summary": {"old": "a", "new": "b"}}),
+        ch(23, "added"), ch(22, "missing", pid=9), ch(10, "changed", {"status": {"old": "open", "new": "closed"}}),
+    ], "2026-11-26T00:00:00Z", 7, {1})
+    assert wk["kinds"] == {"added": 1, "status": 1, "dates": 1, "wording": 1, "missing": 1}
+    assert wk["status_changes"] == [{"at": "2026-11-25T00:00:00Z", "state": "MD", "name": "N", "slug": "s", "old": "open", "new": "closed", "listed": True}]
+
+
+def test_charts_draw_at_shown_width_with_tables(conn, tmp_path):
+    """2026-11-26: a chart is drawn at the width it is shown at (12px labels stay 12px on a phone), a tap shows a
+    mark's note, and every About chart has its numbers as a table."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js, about = (out / "app.js").read_text(encoding="utf-8"), (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert "function chartW(svgEl, max)" in js and "var w = 900" not in js and "onWidthChange(draw);" in js
+    assert js.count("narrow = w < 560") == 5
+    assert "svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]');" in js
+    for cid in ("c1", "c2", "c3", "c4", "c5"):
+        assert f'<div id="{cid}-table"></div>' in about and (f"el('{cid}-table')" in js), cid
+    assert '<th scope="col">' in js and '<th scope="row">' in js
 
 
 def test_index_states_and_tile_grid(conn):
@@ -357,13 +495,13 @@ def test_stats_views_count_what_the_pages_list(conn):
     assert all(1 <= m <= 12 for _, m, _ in months) and {st for st, _, _ in months} <= {"MD", "VA"}
 
 
-def test_about_page_is_written_and_self_contained(conn, tmp_path):
+def test_about_page_is_written_and_same_origin(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "about" / "index.html").read_text(encoding="utf-8")
-    assert 'data-page="about"' in page and 'url("../fonts/public-sans-latin.woff2")' in page
+    assert 'data-page="about"' in page and 'href="../fonts/public-sans-latin.woff2"' in page
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
     assert {"deadlines", "awards", "months", "stated", "flips", "open"} <= set(data)
-    assert "<script src" not in page and "cdn" not in page
+    assert set(re.findall(r'<script src="([^"?]+)', page)) == {"../app.js"} and "cdn" not in page
 
 
 def test_embed_json_is_script_safe():
@@ -391,15 +529,29 @@ def test_write_site(conn, tmp_path):
     assert order == sorted(order)
     assert "<may>" in json.dumps(federal)                                # verbatim text survives the round trip
     assert "</script" not in (out / "federal.js").read_text(encoding="utf-8")
-    # self-contained: nothing loaded from anywhere
-    body = page.replace("https://x/", "").replace('<script src="../federal.js?v=' + GEN[:10] + '">', "")
-    assert "<script src" not in body and "<link rel=\"stylesheet\"" not in body and "@import" not in body
-    assert "url(http" not in body and "cdn" not in body
+    # same origin only (2026-11-26): the stylesheet and script are files beside the pages, shared and cached; a page
+    # loads those, federal.js and the two fonts, and nothing from anywhere else
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert css == (build_site.WEB / "app.css").read_text(encoding="utf-8") and js == (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    key = build_site.asset_version(css, js)
+    assert key != build_site.asset_version(css + " ", js) and key != build_site.asset_version(css, js + " ")
+    assert re.findall(r'<script src="([^"]+)"', page) == ["../federal.js?v=" + GEN[:10], "../app.js?v=" + key]
+    assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', page) == ["../app.css?v=" + key]
+    for rel, root in (("index.html", ""), ("about/index.html", "../")):
+        other = (out / rel).read_text(encoding="utf-8")
+        assert re.findall(r'<script src="([^"]+)"', other) == [root + "app.js?v=" + key], rel
+        assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', other) == [root + "app.css?v=" + key], rel
+        assert "<style" not in other and "function programName" not in other, rel
+    assert "<style" not in page and "function programName" not in page and ":root {" not in page
+    body = page.replace("https://x/", "")
+    assert "@import" not in body + css and "url(http" not in body + css and "cdn" not in body + css + js
+    assert not re.search(r'(?:src|href)="https?://(?!x/)', re.sub(r'<(?:meta|link rel="(?:canonical|alternate)")[^>]*>', "", body))
     index = (out / "index.html").read_text(encoding="utf-8")
     assert 'data-page="index"' in index and "Funding Atlas" in index
     # web fonts are served from the site itself, with their licences, and referenced relative to each page
     assert (out / "fonts" / "public-sans-latin.woff2").exists() and (out / "fonts" / "OFL-SourceSerif4.txt").exists()
-    assert 'url("../fonts/source-serif-4-latin.woff2")' in page and 'url("fonts/public-sans-latin.woff2")' in index
+    assert 'href="../fonts/source-serif-4-latin.woff2"' in page and 'href="fonts/public-sans-latin.woff2"' in index
+    assert 'url("fonts/source-serif-4-latin.woff2")' in css and 'url("fonts/public-sans-latin.woff2")' in css
     # rebuilding wipes stale files
     (out / "stale.txt").write_text("x")
     build_site.write(conn, out, generated_at=GEN)
@@ -460,7 +612,7 @@ def test_every_listed_program_has_its_own_feed(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     site = build_site.build(conn, generated_at=GEN)
     listed = {p["slug"] for d in site["states"].values() for p in d["programs"] + d["between"] + d["unstated"]}
-    files = {f.name for f in (out / "p").iterdir()}
+    files = {f.name for f in (out / "p").iterdir() if f.is_file()}             # the folders beside them are program pages
     logged = {r["slug"] for r in conn.execute("SELECT DISTINCT slug FROM v_navigator_change")}
     assert files == {build_site.program_feed_path(sl)[2:] for sl in listed | logged}
     # a program that left every page keeps its feed: Long Dead Credit closed two years ago and is listed nowhere
@@ -488,7 +640,7 @@ def test_atom_parses_ids_unique_and_scoped_to_the_state(conn, tmp_path):
     assert all(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", e.find("a:updated", ns).text) for e in entries)
     flip = next(e for e in entries if e.find("a:title", ns).text == "changed: Will Close Later")
     assert flip.find("a:summary", ns).text == "status open → closed · Maryland DHCD · Maryland"
-    assert flip.find("a:link", ns).get("href") == build_site.SITE_URL + "md/#p=" + quote_slug(conn, "Will Close Later")
+    assert flip.find("a:link", ns).get("href") == build_site.SITE_URL + "p/" + quote_slug(conn, "Will Close Later") + "/"
     va = ET.parse(out / "va" / "feed.xml").getroot()
     assert {e.find("a:category", ns).get("term") for e in va.findall("a:entry", ns)} <= {"federal", "VA"}
     root = ET.parse(out / "feed.xml").getroot()
@@ -502,10 +654,19 @@ def quote_slug(conn, name):
     return quote(conn.execute("SELECT slug FROM program WHERE name = ?", (name,)).fetchone()[0])
 
 
-def test_changes_json_equals_the_pages_embedded_changes(conn, tmp_path):
+def test_changes_json_equals_the_pages_change_log(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     page = (out / "md" / "index.html").read_text(encoding="utf-8")
-    embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))["changes"]
+    # the state's own log is in changes.js since 2026-11-26 (it loads when the Changes tab opens); the page keeps
+    # the count for the tab and the week's status changes for the briefing line
+    on_page = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    text = (out / "md" / "changes.js").read_text(encoding="utf-8")
+    assert "</script" not in text and "changes.js?v=" in (out / "app.js").read_text(encoding="utf-8")
+    embedded = json.loads(text.removeprefix("window.FA_CHANGES = ").rstrip().rstrip(";"))
+    assert "changes" not in on_page and on_page["changes_n"] == len(embedded) > 0
+    cutoff = (NOW.date() - timedelta(days=build_site.NEW_DAYS)).isoformat()
+    assert on_page["week_flips"] == [c for c in embedded if c["status_flip"] and c["at"][:10] >= cutoff]
+    assert all(c["state"] == "MD" for c in embedded)
     federal = json.loads((out / "federal.js").read_text(encoding="utf-8").removeprefix("window.FA_FEDERAL = ").rstrip().rstrip(";"))
     embedded = sorted(embedded + federal["changes"], key=lambda c: (c["at"], c["id"]), reverse=True)
     data = json.loads((out / "md" / "changes.json").read_text(encoding="utf-8"))
@@ -535,11 +696,11 @@ def test_field_label_mirrors_app_js():
     assert pairs == build_site.FIELD_LABEL
 
 
-def test_feed_link_uses_the_state_page_when_listed():
+def test_feed_link_uses_the_program_page_when_listed():
     c = {"slug": "a-b", "state": "MD", "listed": True, "source_url": "https://x/1"}
-    assert build_site.feed_link(c, "MD") == build_site.SITE_URL + "md/#p=a-b"
-    assert build_site.feed_link({**c, "state": None}, "VA") == build_site.SITE_URL + "va/#p=a-b"      # a federal notice on Virginia's page
-    assert build_site.feed_link({**c, "state": None}, None) == "https://x/1"                          # the root feed has no page for it
+    assert build_site.feed_link(c, "MD") == build_site.SITE_URL + "p/a-b/"
+    assert build_site.feed_link({**c, "state": None}, "VA") == build_site.SITE_URL + "p/a-b/"         # a federal notice has one page, whichever feed names it
+    assert build_site.feed_link({**c, "state": None}, None) == build_site.SITE_URL + "p/a-b/"
     assert build_site.feed_link({**c, "listed": False}, "MD") == "https://x/1"
 
 

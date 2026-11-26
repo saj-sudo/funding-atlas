@@ -41,6 +41,12 @@ CASES = [
     # 0007: North Dakota's FIND has no category and two applicant codes; its own wording makes it likely.
     ("political subdivisions", prog("13", "July 2026 - June 2027 Infrastructure Request", "X", LOCAL,
                                     summary="the FIND program allows for political subdivisions to submit one application"), "likely"),
+    # 0011: open to anyone is not targeted; a municipal category alone no longer makes an unrestricted notice likely.
+    ("unrestricted with a category", prog("14", "Aquatic Invasive Species Grants to Great Lakes States", "DOI-FWS",
+                                          [ApplicantTag(value="municipality", source_code="99")], ["parks"]), "possible"),
+    ("unrestricted with local wording", prog("15", "Fish Passage Grants", "DOI-FWS",
+                                             [ApplicantTag(value="municipality", source_code="99")], ["water"],
+                                             eligibility_text="Local governments may apply"), "likely"),
     ("stale", prog("12", "Stale But Still Posted", "HUD", LOCAL, ["housing"], eligibility_text="units of general local government"), "likely"),
 ]
 CASES[-1][1].closes_at = __import__("datetime").date(2021, 8, 4)

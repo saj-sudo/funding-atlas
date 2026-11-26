@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{HEAD}}
+</head>
+<body data-page="program">
+<a class="skip" href="#main">Skip to the program</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="{{ROOT}}"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="{{ROOT}}about/">About the data</a>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <article class="detail program">
+    <nav class="crumb" aria-label="Breadcrumb">{{CRUMB}}</nav>
+    <h1 id="detail-title">{{NAME}}</h1>
+    <!-- What the page says before the script runs, and without it: stored fields only. app.js replaces it with the
+         full record, drawn by the same code as the state page's panel. -->
+    <div class="body" id="detail-body">
+      <p class="lede">{{AGENCY}}</p>
+      <p><b>{{STATUS}}</b></p>
+      <noscript><p class="muted">The rest of this record is drawn by a script. The agency's own page is linked below.</p></noscript>
+    </div>
+    <div class="actions">
+      <a class="btn primary src" id="detail-source" href="{{SOURCE_URL}}" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <button class="btn" id="detail-copy" type="button">Copy link</button>
+      <span class="copied" id="detail-copied" role="status" hidden>Copied</span>
+      <a class="btn" href="{{FEED}}" type="application/atom+xml">Feed for this program</a>
+    </div>
+  </article>
+</main>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{{DATA}}</script>
+<script src="{{ROOT}}app.js?v={{ASSETS}}" defer></script>
+</body>
+</html>

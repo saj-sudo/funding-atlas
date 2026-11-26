@@ -1,32 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="{{DESCRIPTION}}">
-<meta name="color-scheme" content="light dark">
-<title>{{TITLE}}</title>
-<link rel="icon" href="{{ICON}}">
-<link rel="canonical" href="{{URL}}">
-<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Funding Atlas">
-<meta property="og:title" content="{{TITLE}}">
-<meta property="og:description" content="{{DESCRIPTION}}">
-<meta property="og:url" content="{{URL}}">
-<meta property="og:image" content="{{SHARE_IMAGE}}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
-<meta name="twitter:card" content="summary_large_image">
-<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
-<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="../feed.xml">
-<style>
-@font-face { font-family: "Public Sans"; font-style: normal; font-weight: 400 700; font-display: swap; src: url("{{ROOT}}fonts/public-sans-latin.woff2") format("woff2"); }
-@font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 600 700; font-display: swap; src: url("{{ROOT}}fonts/source-serif-4-latin.woff2") format("woff2"); }
-{{CSS}}
-</style>
+{{HEAD}}
 </head>
 <body data-page="about">
 <a class="skip" href="#main">Skip to the charts</a>
@@ -51,6 +26,7 @@
     <p class="sub" id="c1-sub"></p>
     <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span></div>
     <div class="chart-scroll"><svg id="c1" role="img" aria-labelledby="c1-sub"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c1-table"></div></details>
     <p class="src">Programs open or announced to local governments with a stated deadline. Weeks start today.</p>
   </figure>
 
@@ -59,6 +35,7 @@
     <p class="sub" id="c5-sub"></p>
     <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span><span>Line: median</span></div>
     <div class="chart-scroll"><svg id="c5" role="img" aria-labelledby="c5-sub"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c5-table"></div></details>
     <p class="src">Open or announced programs with a stated maximum of $1,000 or more. Log scale: each gridline is ten times the last.</p>
   </figure>
   <section class="for-research" aria-labelledby="research-h">
@@ -70,6 +47,7 @@
     <h2>When state deadlines have fallen</h2>
     <p class="sub">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. Darker is a larger share of that row. It describes the past; it predicts nothing.</p>
     <div class="chart-scroll"><svg id="c2" role="img" aria-label="Deadline months by state"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c2-table"></div></details>
     <div class="legend" id="c2-leg"></div>
     <p class="src">States with 8 or more such deadlines have their own row; all states are in the last row.</p>
   </figure>
@@ -88,6 +66,7 @@
     <p class="sub" id="c4-sub"></p>
     <div class="legend"><span><i class="sw fed"></i>The source changed</span><span><i class="sw code"></i>First read after a change to the registry's code</span></div>
     <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
+    <details class="c-table"><summary>Show as a table</summary><div id="c4-table"></div></details>
     <p class="src">Programs a local government could apply to, every source. A change is marked when the registry's own reading code for that source changed between its run and the run before (from git history); it may still be the agency's.</p>
   </figure>
 
@@ -108,8 +87,6 @@
 </footer>
 
 <script type="application/json" id="data">{{DATA}}</script>
-<script>
-{{JS}}
-</script>
+<script src="{{ROOT}}app.js?v={{ASSETS}}" defer></script>
 </body>
 </html>

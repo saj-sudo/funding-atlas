@@ -23,6 +23,8 @@ deadlines over the same rows the page lists, nothing new.
 
 from __future__ import annotations
 
+import hashlib
+import html
 import json
 import re
 import shutil
@@ -501,10 +503,9 @@ def describe_change(c: dict[str, Any]) -> str:
 
 
 def feed_link(c: dict[str, Any], state: str | None) -> str:
-    """The program on the state page it is listed on, else the source's own page."""
-    page = state or c.get("state")
-    if c.get("listed") and page:
-        return f"{SITE_URL}{page.lower()}/#p={quote(c['slug'] or '')}"
+    """The program's own page while it is listed, else the source's page."""
+    if c.get("listed") and c.get("slug"):
+        return program_url(c["slug"])
     return c.get("source_url") or SITE_URL
 
 
@@ -664,6 +665,61 @@ def state_payload(
     }
 
 
+def closing_week(programs: list[dict[str, Any]], n: int = 5) -> dict[str, Any]:
+    """The index's "Closing this week" (2026-11-26): every listed program with a stated deadline in the next 7 days,
+    counted, and the `n` soonest by name. A placeholder date is not a deadline."""
+    rows = sorted((p for p in programs if p["closes_at"] and not p["deadline_placeholder"]
+                   and p["days_to_close"] is not None and 0 <= p["days_to_close"] <= 7),
+                  key=lambda p: (p["closes_at"], p["name"]))
+    own = [p for p in rows if p["state"]]
+    return {
+        "total": len(rows), "state": len(own), "states": len({p["state"] for p in own}), "federal": len(rows) - len(own),
+        "rows": [{"slug": p["slug"], "name": p["name"], "number": p["number"], "state": p["state"], "agency": p["agency"],
+                  "agency_code": p["agency_code"], "closes_at": p["closes_at"]} for p in rows[:n]],
+    }
+
+
+def week_changes(changes: list[dict[str, Any]], generated_at: str, days: int, listed_ids: set[int], n: int = 3) -> dict[str, Any]:
+    """The index's "What changed": the changes of the last `days` days by kind, and the `n` newest status changes by
+    name. A change counts once, by the first kind that fits: first seen, no longer listed, status, dates, else wording."""
+    cutoff = date.fromordinal(date.fromisoformat(generated_at[:10]).toordinal() - days).isoformat()
+    kinds = {"added": 0, "status": 0, "dates": 0, "wording": 0, "missing": 0}
+    flips: list[dict[str, Any]] = []
+    for c in changes:                                          # newest first
+        if (c["changed_at"] or "")[:10] <= cutoff:
+            continue
+        fields = json.loads(c["changed_fields"]) if c.get("changed_fields") else {}
+        if c["change_type"] in ("added", "missing"):
+            kinds[c["change_type"]] += 1
+        elif "status" in fields:
+            kinds["status"] += 1
+            if len(flips) < n:
+                flips.append({"at": c["changed_at"], "state": c["state"], "name": c["name"], "slug": c["slug"],
+                              "old": fields["status"].get("old"), "new": fields["status"].get("new"),
+                              "listed": c["program_id"] in listed_ids})
+        elif "closes_at" in fields or "opens_at" in fields:
+            kinds["dates"] += 1
+        else:
+            kinds["wording"] += 1
+    return {"days": days, "kinds": kinds, "status_changes": flips}
+
+
+def stated_by_kind(stated: list[dict[str, Any]], connectors: dict[str, list[str]]) -> list[dict[str, Any]]:
+    """The index's "What the states publish": v_stats_stated summed by how each state is read, federal notices first.
+    Counts only; the page works out the shares."""
+    out: dict[str, dict[str, Any]] = {}
+    for r in stated:
+        kind = "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]
+        g = out.setdefault(kind, {"kind": kind, "states": 0, "n": 0, "status": 0, "date": 0, "amount": 0})
+        g["states"] += 1
+        g["n"] += r["n"] or 0
+        g["status"] += r["status_stated"] or 0
+        g["date"] += r["date_stated"] or 0
+        g["amount"] += r["amount_stated"] or 0
+    order = ["federal", "portal", "portal_agencies", "agencies", "directory"]
+    return [out[k] for k in order if k in out and out[k]["n"]]
+
+
 def index_payload(
     *,
     programs: list[dict[str, Any]],
@@ -672,6 +728,8 @@ def index_payload(
     connectors: dict[str, list[str]],
     run_info: dict[str, dict[str, str | None]],
     generated_at: str,
+    stats: dict[str, Any] | None = None,
+    listed_ids: set[int] | None = None,
 ) -> dict[str, Any]:
     listed = {p["id"] for p in programs}
     states = []
@@ -705,6 +763,9 @@ def index_payload(
         "states": states,
         "changes": [shape_change(c, listed) for c in changes[:INDEX_FEED_N]],
         "changes_week": changes_within(changes, generated_at, NEW_DAYS),
+        "closing_week": closing_week(programs),
+        "week": week_changes(changes, generated_at, NEW_DAYS, listed_ids if listed_ids is not None else listed),
+        "stated": stated_by_kind((stats or {}).get("stated", []), connectors),
         "questions": list(READER_QUESTIONS),
     }
 
@@ -732,6 +793,11 @@ def fill(template: str, **slots: str) -> str:
 FEDERAL_JS = "federal.js"
 
 
+def asset_version(css: str, js: str) -> str:
+    """The cache key on app.css and app.js: it changes when either file's text does, not on every daily build."""
+    return hashlib.sha256((css + "\0" + js).encode("utf-8")).hexdigest()[:10]
+
+
 def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     """A state payload without its federal rows, and those rows (13.16). Federal notices and their changes are the
     same on all 51 pages, so they ship once in federal.js on the same origin and every state page loads it from the
@@ -744,12 +810,28 @@ def split_federal(data: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]
     return page, federal
 
 
+def split_changes(page: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """A state payload without its own change log, and that log (2026-11-26). The log is read only by the Changes tab,
+    so it ships in the state's changes.js and loads when the tab opens. The page keeps what it shows on arrival: the
+    count for the tab, and the week's status changes for the briefing line."""
+    changes = page["changes"]
+    cutoff = date.fromordinal(date.fromisoformat(page["generated_at"][:10]).toordinal() - NEW_DAYS).isoformat()
+    slim = {k: v for k, v in page.items() if k != "changes"}
+    slim["changes_n"] = len(changes)
+    slim["week_flips"] = [c for c in changes if c["status_flip"] and (c["at"] or "")[:10] >= cutoff]
+    return slim, changes
+
+
+def render_changes_js(changes: list[dict[str, Any]]) -> str:
+    return "window.FA_CHANGES = " + embed_json(changes) + ";\n"
+
+
 def render_federal(federal: dict[str, Any]) -> str:
     return "window.FA_FEDERAL = " + embed_json(federal) + ";\n"
 
 
-def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
-    data = split_federal(data)[0]
+def render_state(data: dict[str, Any], assets: str, template: str) -> str:
+    data = split_changes(split_federal(data)[0])[0]
     name = data["state"]["name"]
     return fill(
         template,
@@ -759,14 +841,15 @@ def render_state(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=f"{SITE_URL}{data['state']['code'].lower()}/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        FEED="feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
 
 
-def render_index(data: dict[str, Any], css: str, js: str, template: str) -> str:
+def render_index(data: dict[str, Any], assets: str, template: str) -> str:
     return fill(
         template,
         TITLE="Funding Atlas: open public funding for local governments, by state",
@@ -775,8 +858,9 @@ def render_index(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=SITE_URL,
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        FEED="feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
@@ -807,12 +891,12 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         )
         for code, _, _, _ in STATES
     }
+    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     index = index_payload(
         programs=programs, changes=changes, coverage=coverage, connectors=connectors,
-        run_info=run_info, generated_at=generated_at,
+        run_info=run_info, generated_at=generated_at, stats=stats, listed_ids=listed_all,
     )
     # The site-wide feed: the newest FEED_N across every source (the index page itself embeds only INDEX_FEED_N).
-    listed_all = {p["id"] for p in programs} | {p["id"] for p in between} | {p["id"] for p in unstated}
     feed = [shape_change(c, listed_all) for c in changes[:FEED_N]]
     # One feed per program (13.9, widened in 13.15): every program a local government could apply to that is listed
     # on a page or has ever had a change logged, so a starred program keeps its feed after it leaves every page and
@@ -826,7 +910,15 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
     program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
     about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
-    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about}
+    # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
+    seen: set[int] = set()
+    program_pages = []
+    for p in programs + between + unstated:
+        if p["id"] not in seen:
+            seen.add(p["id"])
+            program_pages.append(program_payload(p, run_info, generated_at))
+    return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about,
+            "program_pages": program_pages}
 
 
 def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str) -> dict[str, Any]:
@@ -847,7 +939,7 @@ def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], gene
     }
 
 
-def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
+def render_about(data: dict[str, Any], assets: str, template: str) -> str:
     return fill(
         template,
         TITLE="About the data · Funding Atlas",
@@ -856,8 +948,9 @@ def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
         URL=SITE_URL + "about/",
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        CSS=css,
-        JS=js,
+        FEED="../feed.xml",
+        FEED_TITLE="Funding Atlas: changes",
+        ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
@@ -865,7 +958,93 @@ def render_about(data: dict[str, Any], css: str, js: str, template: str) -> str:
 
 def program_feed_path(slug: str) -> str:
     """Where a program's own feed lives, relative to the site root (p/<slug>.xml); app.js builds the same path."""
-    return "p/" + re.sub(r"[^a-z0-9-]+", "-", (slug or "").lower()) + ".xml"
+    return "p/" + _slug_part(slug) + ".xml"
+
+
+def _slug_part(slug: str) -> str:
+    return re.sub(r"[^a-z0-9-]+", "-", (slug or "").lower())
+
+
+def program_page_path(slug: str) -> str:
+    """A listed program's own page, relative to the site root (p/<slug>/); app.js builds the same path."""
+    return "p/" + _slug_part(slug) + "/index.html"
+
+
+def program_url(slug: str) -> str:
+    return SITE_URL + "p/" + _slug_part(slug) + "/"
+
+
+# The same words as STATUS_LABEL in web/app.js (a test compares the two).
+STATUS_LABEL = {"open": "Open", "forecasted": "Announced", "unknown": "Status not confirmed", "closed": "Closed",
+                "paused": "Paused", "exhausted": "Funds used up"}
+
+
+def status_sentence(p: dict[str, Any]) -> str:
+    """One line from stored fields for a program page's static text and link preview: the status label and the stated
+    deadline. Nothing inferred: no date stated is said as such."""
+    label = STATUS_LABEL.get(p["status"], (p["status"] or "").capitalize())
+    if p["closes_at"] and not p["deadline_placeholder"]:
+        d = date.fromisoformat(p["closes_at"][:10])
+        past = p["days_to_close"] is not None and p["days_to_close"] < 0
+        when = f"{'Last deadline' if past else 'Closes'} {d:%b} {d.day}, {d.year}"
+    elif p["rolling"]:
+        when = "Rolling deadline"
+    elif p["closes_text"]:
+        when = "Deadline in the source's words"
+    else:
+        when = "No deadline stated"
+    return f"{label}. {when}."
+
+
+def program_payload(p: dict[str, Any], run_info: dict[str, dict[str, str | None]], generated_at: str) -> dict[str, Any]:
+    """What one program's page embeds: the shaped program (with its history) and the little the shared detail
+    renderer in app.js needs around it."""
+    code = p["state"]
+    return {
+        "generated_at": generated_at,
+        "site_url": SITE_URL,
+        "repo_url": REPO_URL,
+        "rules": {"new_days": NEW_DAYS, "updated_days": UPDATED_DAYS, "closing_days": CLOSING_DAYS},
+        "state": {"code": code, "name": STATE_NAME[code]} if code in STATE_NAME else None,
+        "states": [{"code": code, "name": STATE_NAME[code]}] if code in STATE_NAME else [],
+        "sources": sources_for([p["connector"]], run_info),
+        "questions": list(READER_QUESTIONS),
+        "program": p,
+    }
+
+
+def render_program(data: dict[str, Any], assets: str, template: str) -> str:
+    p, state = data["program"], data["state"]
+    esc = lambda v: html.escape(str(v or ""), quote=True)  # noqa: E731
+    where = state["name"] if state else "Federal"
+    agency = p["agency"] or "Agency not stated"
+    crumb = '<a href="../../">All states</a> <span aria-hidden="true">›</span> ' + (
+        f'<a href="../../{state["code"].lower()}/">{esc(state["name"])}</a>' if state
+        else "<span>Federal notice, listed on every state page</span>")
+    return fill(
+        template,
+        TITLE=esc(f"{p['name']} · {where} · Funding Atlas"),
+        DESCRIPTION=esc(f"{status_sentence(p)} {agency}, {where}. Read daily from the agency's own page; what it does not state is left blank."),
+        ROOT="../../",
+        URL=program_url(p["slug"]),
+        SHARE_IMAGE=SHARE_IMAGE,
+        ICON=ICON,
+        FEED="../" + _slug_part(p["slug"]) + ".xml",
+        FEED_TITLE=esc(f"{FEED_TITLE}: {p['name']}"),
+        ASSETS=assets,
+        CRUMB=crumb,
+        NAME=esc(p["name"]),
+        AGENCY=esc(f"{agency} · {where}"),
+        STATUS=esc(status_sentence(p)),
+        SOURCE_URL=esc(p["source_url"]),
+        GENERATED=data["generated_at"][:10],
+        DATA=embed_json(data),
+    )
+
+
+def render_sitemap(urls: list[str], day: str) -> str:
+    rows = "".join(f"<url><loc>{html.escape(u)}</loc><lastmod>{day}</lastmod></url>\n" for u in urls)
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + rows + "</urlset>\n"
 
 
 def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
@@ -873,8 +1052,15 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     site = build(conn, generated_at=generated_at)
     css = (WEB / "app.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")
-    state_tpl = (WEB / "state.html").read_text(encoding="utf-8")
-    index_tpl = (WEB / "index.html").read_text(encoding="utf-8")
+    assets = asset_version(css, js)
+    head_tpl = re.sub(r"\A<!--.*?-->\n", "", (WEB / "head.html").read_text(encoding="utf-8"), flags=re.S)
+
+    def template(name: str) -> str:
+        """A page template with the shared head in place; the slots of both are filled together."""
+        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl)
+
+    state_tpl = template("state.html")
+    index_tpl = template("index.html")
 
     out = Path(out)
     if out.exists():
@@ -882,10 +1068,14 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     out.mkdir(parents=True)
     (out / ".nojekyll").write_text("")
     # The two web fonts (SIL Open Font License, the licence files go with them): same origin, so the pages still
-    # make no request to anyone else. The @font-face rules are in the templates, where {{ROOT}} is filled.
+    # make no request to anyone else. The @font-face rules open app.css, with paths relative to it.
     shutil.copytree(WEB / "fonts", out / "fonts")
+    # The stylesheet and the script, once, beside the pages (2026-11-26): every page links them from the same origin
+    # and the browser keeps them, where each page used to carry its own 137KB copy.
+    (out / "app.css").write_text(css, encoding="utf-8")
+    (out / "app.js").write_text(js, encoding="utf-8")
     shutil.copy(WEB / "share.png", out / "share.png")     # the link-preview image every page names (13.23)
-    (out / "index.html").write_text(render_index(site["index"], css, js, index_tpl), encoding="utf-8")
+    (out / "index.html").write_text(render_index(site["index"], assets, index_tpl), encoding="utf-8")
     generated_at = site["index"]["generated_at"]
     (out / "feed.xml").write_text(render_atom(site["feed"], state=None, self_url=SITE_URL + "feed.xml",
                                               alternate_url=SITE_URL, updated=generated_at), encoding="utf-8")
@@ -896,23 +1086,31 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
     for code, data in site["states"].items():
         d = out / code.lower()
         d.mkdir()
-        (d / "index.html").write_text(render_state(data, css, js, state_tpl), encoding="utf-8")
+        (d / "index.html").write_text(render_state(data, assets, state_tpl), encoding="utf-8")
         base = f"{SITE_URL}{code.lower()}/"
         (d / "feed.xml").write_text(render_atom(data["changes"], state=code, self_url=base + "feed.xml",
                                                 alternate_url=base, updated=generated_at), encoding="utf-8")
         (d / "changes.json").write_text(changes_json(data["changes"], state=code, generated_at=generated_at, base=base), encoding="utf-8")
         (d / "summary.json").write_text(summary_json(data), encoding="utf-8")
+        (d / "changes.js").write_text(render_changes_js(split_changes(split_federal(data)[0])[1]), encoding="utf-8")
         counts[code] = len(data["programs"])
-    about_tpl = (WEB / "about.html").read_text(encoding="utf-8")
+    about_tpl = template("about.html")
     (out / "about").mkdir()
-    (out / "about" / "index.html").write_text(render_about(site["about"], css, js, about_tpl), encoding="utf-8")
+    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl), encoding="utf-8")
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])
-        alt = (f"{SITE_URL}{pf['state'].lower()}/#p={quote(pf['slug'])}" if pf["state"] and pf["listed"]
-               else (pf["source_url"] or SITE_URL))
+        alt = program_url(pf["slug"]) if pf["listed"] else (pf["source_url"] or SITE_URL)
         (out / path).write_text(render_atom(pf["entries"], state=pf["state"], self_url=SITE_URL + path, alternate_url=alt,
                                             updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
+    program_tpl = template("program.html")
+    urls = [SITE_URL] + [f"{SITE_URL}{code.lower()}/" for code in site["states"]] + [SITE_URL + "about/"]
+    for data in site["program_pages"]:
+        path = out / program_page_path(data["program"]["slug"])
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(render_program(data, assets, program_tpl), encoding="utf-8")
+        urls.append(program_url(data["program"]["slug"]))
+    (out / "sitemap.xml").write_text(render_sitemap(urls, generated_at[:10]), encoding="utf-8")
     return out, counts
 
 

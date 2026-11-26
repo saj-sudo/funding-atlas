@@ -1,4 +1,4 @@
-/* Funding Atlas page script. Shared by the index and every state page; inlined by scripts/build_site.py.
+/* Funding Atlas page script. Shared by every page; written beside the pages as app.js by scripts/build_site.py.
    Plain browser JavaScript, no build step, no network: everything comes from the JSON block in the page.
    Nothing here invents data. A null stays blank; the only computed things are counts, sort orders and the
    wording of dates relative to the build date. */
@@ -7,13 +7,13 @@
 
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var PAGE = document.body.getAttribute('data-page');
-  var ROOT = PAGE === 'state' || PAGE === 'about' ? '../' : '';
+  var ROOT = PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '';
   var TODAY = DATA.generated_at.slice(0, 10);
   // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
   var FEDERAL_LOADED = !!window.FA_FEDERAL;
   if (PAGE === 'state' && FEDERAL_LOADED) {
     DATA.programs = DATA.programs.concat(window.FA_FEDERAL.programs);
-    DATA.changes = DATA.changes.concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+    DATA.changes = (DATA.changes || []).concat(window.FA_FEDERAL.changes).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
   }
 
   // ---------- helpers ----------
@@ -112,6 +112,14 @@
       first = false;
       return out;
     });
+  }
+  // Display only: a federal notice whose name opens with its own number ("F26AS00083 Aquatic Invasive ...") shows
+  // the name without it; the number has its own line in the detail panel and stays in search. Stored value unchanged.
+  function programName(p) {
+    var n = p.name || '', num = p.number;
+    if (!num || n.length <= num.length || n.indexOf(num) !== 0) return n;
+    var rest = n.slice(num.length).replace(/^[\s:.\-\u2013\u2014]+/, '');
+    return /^[\s:.\-\u2013\u2014]/.test(n.charAt(num.length)) && rest ? rest : n;
   }
   function amountText(p) {
     var lo = p.amount_min, hi = p.amount_max;
@@ -224,10 +232,11 @@
       '<div><h2>What I would like to know from you</h2><ol>' + q + '</ol></div>' +
       '<div><h2>Data and code</h2>' +
       '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db.gz">atlas.db.gz</a> (SQLite, gzipped: every record, every raw payload and every logged change).</p>' +
-      (PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
+      (PAGE === 'program' ? '<p>Subscribe to this program\'s changes: <a href="' + h(ROOT + feedPath(DATA.program.slug)) + '" type="application/atom+xml">Atom feed</a> · every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a>' :
+      PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
       '<p>Subscribe to this page\'s change log: <a href="feed.xml" type="application/atom+xml">Atom feed</a> · <a href="changes.json" type="application/json">JSON</a>') +
       (PAGE === 'state' ? ' · <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">every state (Atom)</a>' : '') +
-      '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' +
+      (PAGE === 'state' ? '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' : '. Feed entry ids never change.</p>') +
       '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a> · <a href="' + h(ROOT) + 'about/">About the data</a></p></div>';
   }
 
@@ -247,11 +256,32 @@
   }
   function wireTips(svgEl) {
     svgEl.addEventListener('mousemove', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); });
-    svgEl.addEventListener('mouseleave', function () { tip(null, null); });
+    // after a tap the browser sends a mouseleave of its own; that one must not put the note away again
+    var touched = 0;
+    svgEl.addEventListener('touchstart', function () { touched = Date.now(); }, { passive: true });
+    svgEl.addEventListener('mouseleave', function () { if (Date.now() - touched > 800) tip(null, null); });
+    // a tap shows the same note (a phone has no hover); a tap anywhere else puts it away
+    svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]'); tip(e, t ? t.getAttribute('data-tip') : null); e.stopPropagation(); });
+  }
+  document.addEventListener('click', function () { if (tipEl) tipEl.hidden = true; });
+  // Charts are drawn at the width they are shown at (2026-11-26), so their 12px labels stay 12px on a phone; under
+  // 560px each chart has a narrow layout (labels above the marks, fewer ticks). Redrawn when the width changes.
+  function chartW(svgEl, max) { var c = svgEl.parentNode, w = c ? c.clientWidth : 0; return Math.max(280, Math.min(max, w || max)); }
+  function onWidthChange(fn) {
+    var last = window.innerWidth, timer = null;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth === last) return;
+      last = window.innerWidth; clearTimeout(timer); timer = setTimeout(fn, 150);
+    });
+  }
+  function ctable(head, rows) {
+    return '<table class="ctable"><thead><tr>' + head.map(function (x) { return '<th scope="col">' + h(x) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr>' + r.map(function (x, i) { return i ? '<td>' + h(x) + '</td>' : '<th scope="row">' + h(x) + '</th>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   function drawSvg(svgEl, w, hh, inner) {
     svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + hh); svgEl.setAttribute('width', w);
-    svgEl.innerHTML = inner; wireTips(svgEl);
+    svgEl.innerHTML = inner;
+    if (!svgEl._tips) { wireTips(svgEl); svgEl._tips = true; }
   }
   function barPath(x, y, w, hh, roundTop) {      // 4px rounded data end, anchored to the baseline
     if (hh <= 0) return '';
@@ -274,7 +304,7 @@
       if (k >= weeks) { later++; return; }
       if (d[0]) W[k].s++; else W[k].f++;
     });
-    var w = compact ? 760 : 900, hh = compact ? 150 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
+    var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, hh = compact ? 150 : narrow ? 210 : 250, L = 34, R = 8, T = 10, B = 30, bw = (w - L - R) / weeks, max = 1;
     W.forEach(function (x) { max = Math.max(max, x.f + x.s); });
     var step = max > 20 ? 10 : 5, top = Math.ceil(max / step) * step, y = function (v) { return T + (hh - T - B) * (1 - v / top); }, g = '';
     for (var v = 0; v <= top; v += step) g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text class="ctext" x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + v + '</text>';
@@ -285,18 +315,18 @@
       if (x.f) g += '<path class="m-fed" d="' + barPath(x0, base - hf, bwi, hf, !x.s) + '"/>';
       if (x.s) g += '<path class="m-st" d="' + barPath(x0, base - hf - hs - (x.f ? 2 : 0), bwi, hs, true) + '"/>';
       g += '</g>';
-      if (j % 4 === 0) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
+      if (j % (narrow ? 8 : 4) === 0 && !(narrow && j > weeks - 3)) g += '<text class="ctext" x="' + (L + j * bw + bw / 2) + '" y="' + (hh - B + 18) + '" text-anchor="middle">' + fmtDate(x.start) + '</text>';
     });
     g += '<line class="caxis" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(0) + '" y2="' + y(0) + '"/>';
     drawSvg(svgEl, w, hh, g);
-    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s };
+    return { later: later, total: W.reduce(function (a, x) { return a + x.f + x.s; }, 0), week1: W[0].f + W[0].s, weeks: W };
   }
 
   // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
   var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
   function chartSeason(svgEl, rows, compact) {
-    var w = compact ? 760 : 900, L = compact ? 10 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
-    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + m + '</text>'; });
+    var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, L = compact ? 10 : narrow ? 92 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
+    MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + (narrow && !compact ? m.charAt(0) : m) + '</text>'; });
     rows.forEach(function (r, ri) {
       var tot = r[1].reduce(function (a, b) { return a + b; }, 0), yy = T + ri * (ch + 2);
       if (!compact) g += '<text class="ctext clab" x="' + (L - 10) + '" y="' + (yy + ch / 2 + 4) + '" text-anchor="end">' + h(r[0]) + '</text>';
@@ -313,12 +343,14 @@
   }
 
   function chartStated(svgEl, tableEl, rows) {
-    var w = 900, L = 150, R = 30, T = 24, rh = 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 14 : 150, R = narrow ? 18 : 30, T = 24, rh = narrow ? 50 : 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
     [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
     var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
     rows.forEach(function (r, i) {
-      var yy = T + i * rh + rh / 2, name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
-      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
+      var yy = T + i * rh + (narrow ? 34 : rh / 2), name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
+      // narrow: the name sits on its own line above the row's dots
+      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (yy - 16) + '">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>'
+        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
       g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
       ser.forEach(function (sr, j) {
         var v = r.n ? r[sr[0]] / r.n : 0;
@@ -326,9 +358,9 @@
       });
     });
     drawSvg(svgEl, w, hh, g);
-    if (tableEl) tableEl.innerHTML = '<table class="ctable"><thead><tr><th>Source</th><th>Programs</th><th>States a status</th><th>States a deadline</th><th>States an amount</th></tr></thead><tbody>' +
+    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
       rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
-        return '<tr><td>' + h(r.state === 'US' ? 'Federal, open now' : stateName(r.state)) + '</td><td>' + r.n + '</td><td>' + p('status_stated') + '</td><td>' + p('date_stated') + '</td><td>' + p('amount_stated') + '</td></tr>'; }).join('') + '</tbody></table>';
+        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), r.n, p('status_stated'), p('date_stated'), p('amount_stated')]; }));
   }
 
   // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
@@ -342,15 +374,16 @@
       if (f.first_at < p.a) p.a = f.first_at; if (f.last_at > p.b) p.b = f.last_at;
     });
     var rows = order.map(function (k) { return pairs[k]; }).sort(function (a, b) { return (b.src + b.code + b.other) - (a.src + a.code + a.other); });
-    var w = 900, L = 250, R = 60, rh = 30, hh = rows.length * rh + 6, max = 1, g = '';
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 8 : 250, R = narrow ? 34 : 60, rh = narrow ? 46 : 30, off = narrow ? 18 : 0, hh = rows.length * rh + 6, max = 1, g = '';
     rows.forEach(function (r) { max = Math.max(max, r.src + r.code + r.other); });
     var x = function (v) { return L + (w - L - R) * v / max; };
     rows.forEach(function (r, i) {
-      var yy = i * rh + 3, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
+      var top = i * rh + 3, yy = top + off, lab = statusLabel(r.o) + ' → ' + statusLabel(r.n), tot = r.src + r.code + r.other;
       var reopen = (r.o === 'closed' || r.o === 'exhausted') && (r.n === 'open' || r.n === 'forecasted');
-      g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
+      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (top + 13) + '">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>'
+        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 17) + '" text-anchor="end">' + h(lab) + (reopen ? ' (reopened)' : '') + '</text>';
       var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
-      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="' + (rh - 4) + '" fill="transparent"/>';
+      g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="26" fill="transparent"/>';
       var x0 = L;
       [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
         var v = r[seg[0]]; if (!v) return;
@@ -363,24 +396,26 @@
     });
     g += '<line class="caxis" x1="' + L + '" x2="' + L + '" y1="0" y2="' + hh + '"/>';
     drawSvg(svgEl, w, hh, g);
-    return rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+    var sums = rows.reduce(function (a, r) { a.src += r.src; a.code += r.code; a.other += r.other; return a; }, { src: 0, code: 0, other: 0 });
+    sums.rows = rows;
+    return sums;
   }
 
   // awards: [[state|null, amount, name], ...]
   function chartAwards(svgEl, awards) {
-    var w = 900, L = 80, R = 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
+    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 58 : 80, R = narrow ? 12 : 24, T = 18, rh = 74, hh = T + 2 * rh + 30, lo = 3, hi = 9, g = '', med = {};
     var x = function (v) { return L + (w - L - R) * (Math.log10(v) - lo) / (hi - lo); };
-    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/><text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>';
+    for (var p = lo; p <= hi; p++) g += '<line class="cgrid" x1="' + x(Math.pow(10, p)) + '" x2="' + x(Math.pow(10, p)) + '" y1="' + T + '" y2="' + (T + 2 * rh) + '"/>' + (narrow && p % 2 === 0 ? '' : '<text class="ctext" x="' + x(Math.pow(10, p)) + '" y="' + (T + 2 * rh + 18) + '" text-anchor="' + (p === hi ? 'end' : 'middle') + '">' + shortMoney(Math.pow(10, p)) + '</text>');
     [['fed', 'Federal', 'm-fed'], ['st', 'State', 'm-st']].forEach(function (grp, gi) {
       var pts = awards.filter(function (a) { return (grp[0] === 'st') === !!a[0] && a[1] >= 1000 && a[1] <= 1e9; }).map(function (a) { return a; });
       var vals = pts.map(function (a) { return a[1]; }).sort(function (a, b) { return a - b; });
       var m = vals.length ? (vals.length % 2 ? vals[(vals.length - 1) / 2] : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2) : null;
-      med[grp[0]] = { n: vals.length, m: m };
+      med[grp[0]] = { n: vals.length, m: m, lo: vals[0], hi: vals[vals.length - 1] };
       var yy = T + gi * rh + rh / 2, seed = 11;
       g += '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + grp[1] + '</text>';
       pts.forEach(function (a) { seed = (seed * 9301 + 49297) % 233280; var j = (seed / 233280 - 0.5) * (rh - 26);
         g += '<circle class="' + grp[2] + ' cdot" data-tip="' + h(a[2] + ': up to $' + Number(a[1]).toLocaleString('en-US')) + '" cx="' + x(a[1]) + '" cy="' + (yy + j) + '" r="4.5"/>'; });
-      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '">median ' + shortMoney(m) + '</text>';
+      if (m) g += '<line class="cmed" x1="' + x(m) + '" x2="' + x(m) + '" y1="' + (yy - rh / 2 + 4) + '" y2="' + (yy + rh / 2 - 4) + '"/><text class="ctext clab" x="' + (x(m) > w - 120 ? x(m) - 6 : x(m) + 6) + '" y="' + (yy - rh / 2 + 14) + '"' + (x(m) > w - 120 ? ' text-anchor="end"' : '') + '>median ' + shortMoney(m) + '</text>';
     });
     drawSvg(svgEl, w, hh, g);
     return med;
@@ -390,8 +425,135 @@
   // About the data page
   // =====================================================================================
 
+  // =====================================================================================
+  // The program detail: five answers first, then the source's own words. Shared by the state page's dialog and by
+  // each program's own page (p/<slug>/), so the two cannot drift apart.
+  // =====================================================================================
+  var SOURCES = [];   // the page's source list, for "read from <label>" in the trail
+  function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
+  function pagePath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '/'; }
+  function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
+  function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
+  function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
+  var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
+  function detailHtml(p) {
+    var listingName = {};
+    p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
+    var amount = amountText(p);
+    var closes;
+    if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
+    else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
+    else if (p.rolling) closes = 'Rolling deadline';
+    else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
+    else if (p.closes_text) closes = 'In the source\'s words, below';
+    else closes = NOT_PUBLISHED;
+    var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
+    var answers =
+      '<dl class="answers">' +
+      '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+      '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
+      '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
+      '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
+      '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
+      '</dl>';
+    var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
+    var facts =
+      fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
+      fact('Match required', match ? h(match) : null) +
+      fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
+      fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
+      fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
+      fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
+      fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
+      fact('Number', p.number ? h(p.number) : null);
+    var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
+      return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
+    }).join('') + '</ul>' : '';
+    var trail = 'First seen ' + fmtDate(p.first_seen, true) +
+      (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
+      ' · read from ' + (SOURCES.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
+    return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
+      answers +
+      sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
+      sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
+      sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
+      sect('History, as the registry saw it', historyHtml(p)) +
+      sect('More details', '<div class="facts">' + facts + '</div>') +
+      sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
+      sect('Assistance Listings this notice cites', alns) +
+      '<p class="trail">' + h(trail) + '</p>';
+  }
+  // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
+  function histWords(e) {
+    var k = e[1];
+    if (k === 'added') return 'First seen by the registry';
+    if (k === 'missing') return 'No longer listed by the source';
+    if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
+    if (k === 'status') {
+      var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
+      return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
+    }
+    var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
+    return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
+  }
+  function histKind(e) {
+    if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
+    if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
+    return e[1];
+  }
+  function historyHtml(p) {
+    var ev = p.history || [];
+    if (!ev.length) return '';
+    var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
+    if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
+    var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
+    var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
+    var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+    g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
+    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+    ev.forEach(function (e) {
+      var k = histKind(e), cx = x(e[0]);
+      if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
+      else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
+    });
+    g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+    var list = ev.slice().reverse().map(function (e) {
+      return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
+        (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
+    }).join('');
+    return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+      '<ol class="hist-list">' + list + '</ol>' +
+      '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+  }
+
+  // A listed program's own page (2026-11-26): the same record the state page's panel shows, at an address of its own.
+  function programPage() {
+    var p = DATA.program;
+    SOURCES = DATA.sources || [];
+    el('detail-title').textContent = programName(p);
+    el('detail-body').innerHTML = detailHtml(p);
+    var WKEY = 'fa-watch', watched = {};
+    try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
+    var star = el('detail-star');
+    function syncStar() { var on = !!watched[p.slug]; star.setAttribute('aria-pressed', String(on)); star.textContent = on ? '★ Starred' : '☆ Star'; }
+    star.addEventListener('click', function () {
+      if (watched[p.slug]) delete watched[p.slug];
+      else watched[p.slug] = { n: programName(p), s: p.state || null, f: p.state ? p.state : null };
+      try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: the star lasts for this visit */ }
+      syncStar();
+    });
+    syncStar();
+    el('detail-copy').addEventListener('click', function () {
+      var url = location.href.split('#')[0], done = function () { el('detail-copied').hidden = false; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
+      else window.prompt('Copy this link', url);
+    });
+    renderFooter('');
+  }
+
   function aboutPage() {
     var A = DATA;
+    function draw() {
     var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
     el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
     var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
@@ -409,6 +571,16 @@
       fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
     var med = chartAwards(el('c5'), A.awards);
     el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+    // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
+    el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
+    el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
+    el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
+      return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
+    el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
+      return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
+    }
+    draw();
+    onWidthChange(draw);
     renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
   }
 
@@ -417,7 +589,22 @@
   // =====================================================================================
 
   function statePage() {
-    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes, R = DATA.rules, S = DATA.state;
+    var P = DATA.programs, B = DATA.between || [], U = DATA.unstated || [], C = DATA.changes || [], R = DATA.rules, S = DATA.state;
+    // The state's own change log is in changes.js and loads when the Changes tab opens (2026-11-26); until then C
+    // holds the federal changes from federal.js, and the page carries the count and the week's status changes.
+    var changesState = DATA.changes_n ? 'idle' : 'loaded';
+    function loadChanges() {
+      if (changesState !== 'idle') return;
+      changesState = 'loading';
+      var sc = document.createElement('script');
+      sc.src = 'changes.js?v=' + TODAY;
+      sc.onload = function () {
+        C = C.concat(window.FA_CHANGES || []).sort(function (a, b) { return b.at.localeCompare(a.at) || b.id - a.id; });
+        changesState = 'loaded'; render();
+      };
+      sc.onerror = function () { changesState = 'failed'; render(); };
+      document.head.appendChild(sc);
+    }
     var cov = DATA.coverage;
     P.concat(B, U).forEach(function (p) {
       p._text = [p.name, p.agency, agencyName(p), p.agency_code, p.number, p.summary].join(' ').toLowerCase();
@@ -447,7 +634,7 @@
     ];
     var DEFAULT_SEL = { tier: ['likely'] };
 
-    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, view: 'list' };
+    var st = { q: '', sort: 'closing', sel: {}, quick: null, tab: 'programs', feed: 'all', between: false, unstated: false, fed: false, view: 'list' };
     function resetSel() { st.sel = {}; Object.keys(DEFAULT_SEL).forEach(function (k) { st.sel[k] = DEFAULT_SEL[k].slice(); }); }
     resetSel();
 
@@ -470,6 +657,7 @@
       if (hsh.quick) st.quick = hsh.quick;
       if (hsh.between === '1') st.between = true;
       if (hsh.unstated === '1') st.unstated = true;
+      if (hsh.fed === '1') st.fed = true;
       if (hsh.view === 'timeline') st.view = 'timeline';
       var any = false;
       FACETS.forEach(function (f) { if (hsh[f.key] !== undefined) { any = true; st.sel[f.key] = hsh[f.key] ? hsh[f.key].split(',') : []; } });
@@ -485,6 +673,7 @@
       if (st.feed !== 'all') parts.push('feed=' + st.feed);
       if (st.between) parts.push('between=1');
       if (st.unstated) parts.push('unstated=1');
+      if (st.fed) parts.push('fed=1');
       if (st.view !== 'list') parts.push('view=' + st.view);
       var same = true;
       FACETS.forEach(function (f) {
@@ -539,6 +728,7 @@
       ? 'Grants and loans a town, city or county in ' + S.name + ' can apply for. ' + S.name + '\'s own programs come first, then federal notices.'
       : 'Federal grants a town, city or county in ' + S.name + ' can apply for. No ' + S.name + ' agency sources are connected yet.';
     var sources = cov.federal.sources.concat(cov.state ? cov.state.sources : []);
+    SOURCES = sources;
     var lastRead = sources.map(function (s) { return s.last_ok || ''; }).sort().pop();
     el('coverage-sum').innerHTML = (cov.state
       ? 'Read daily from ' + cov.state.agencies + ' ' + h(S.name) + (cov.state.agencies === 1 ? ' agency' : ' agencies') + ' and Grants.gov'
@@ -564,7 +754,7 @@
     var nWeekState = PS.filter(inWeek).length, nWeekFed = PF.filter(inWeek).length;
     var nNew = P.filter(function (p) { return p.is_new; }).length;
     var nClosing = P.filter(isSoon).length;
-    var flips = C.filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
+    var flips = C.concat(DATA.week_flips || []).filter(function (c) { return c.status_flip && daysBetween(c.at.slice(0, 10), TODAY) <= R.new_days; });
     var opened = flips.filter(function (c) { var f = c.fields.filter(function (x) { return x.field === 'status'; })[0]; return f && (f.new === 'open' || f.new === 'forecasted'); });
     var brief = [];
     if (nWeekState + nWeekFed) {
@@ -587,7 +777,7 @@
       var open = el('brief').classList.toggle('all');
       this.setAttribute('aria-expanded', String(open)); this.textContent = open ? 'Fewer' : (brief.length - 1) + ' more this week';
     });
-    el('tab-n-changes').textContent = C.length;
+    el('tab-n-changes').textContent = C.length + (DATA.changes_n || 0);
     el('tab-n-programs').textContent = P.length + B.length + U.length;
     if (cov.state) el('chip-state').textContent = S.name; else el('chip-state').hidden = true;
 
@@ -712,12 +902,16 @@
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
     function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
+    function slot(label, value) {
+      return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
+    }
     function card(p) {
       var amount = amountText(p);
-      var facts = [
-        '<span>' + (amount ? '<b class="num">' + h(amount) + '</b>' : '<span class="muted">Amount not published</span>') + '</span>'
-      ];
-      if (p.match_required != null) facts.push('<span>' + (p.match_required ? 'Match required' : 'No match required') + '</span>');
+      // Two slots in the same place on every card (2026-11-26): what the source states is plain, what it does not
+      // state is hatched and says so in words.
+      var match = p.match_required == null ? null : p.match_required ? 'Required' + (p.match_pct != null ? ', ' + p.match_pct + '%' : '') : 'None required';
+      var slots = '<dl class="slots">' + slot('Amount', amount) + slot('Match', match) + '</dl>';
+      var facts = [];
       if (p.funding_type && p.funding_type !== 'grant') facts.push('<span>' + h(words(p.funding_type)) + '</span>');
       if (p.last_reopened) facts.push('<span>Reopened last on ' + h(fmtDate(p.last_reopened, true)) + '</span>');
       var cats = p.categories.slice(0, 3).map(function (c) { return '<li>' + h(words(c)) + '</li>'; }).join('') +
@@ -726,9 +920,9 @@
       return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(p.name) + '</button></h3>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(programName(p)) + '</button></h3>' +
         '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
-        '<div class="facts">' + facts.join('') + '</div>' +
+        slots + (facts.length ? '<div class="facts">' + facts.join('') + '</div>' : '') +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
         (cats ? '<ul class="chips" aria-label="Categories">' + cats + '</ul>' : '') +
         '</div></article>';
@@ -742,7 +936,8 @@
         return '<div class="date' + (isSoon(p) ? ' soon' : '') + (past ? ' past' : '') + '"><span class="m" aria-hidden="true">' + MONTHS[+p.closes_at.slice(5, 7) - 1] +
           '</span><span class="dd" aria-hidden="true">' + (+p.closes_at.slice(8, 10)) + '</span>' + (past ? '<span class="nd" aria-hidden="true">closed</span>' : '') + '</div>';
       }
-      return '<div class="date"><span class="nd" aria-hidden="true">' + (p.rolling || p.deadline_placeholder ? 'Rolling' : 'No date') + '</span></div>';
+      var rolling = p.rolling || p.deadline_placeholder;
+      return '<div class="date' + (rolling ? '' : ' none') + '"><span class="nd" aria-hidden="true">' + (rolling ? 'Rolling' : 'No date stated') + '</span></div>';
     }
     // Under "Closing soonest", the open lists get plain time headings (13.2, borrowed from direction C).
     var BUCKETS = [
@@ -767,10 +962,30 @@
     el('g-between-d').textContent = S.name + ' programs for local governments that closed in the last ' + (R.between_months || 15) +
       ' months, with the last deadline and the agency\'s own words about its cycle. Use them to prepare for the next round. Nothing here predicts a date.';
     // Paging (13.16): 30 cards a group until the reader asks for all; filters and search still see every row.
-    var PAGE_N = 30, more = {};
+    // Paging: 30 cards a section with "Show all" on wide screens; on a phone 10 at a time (2026-11-26: California
+    // ran 26 phone screens), so `more` counts the extra pages asked for.
+    var PHONE = !!(window.matchMedia && window.matchMedia('(max-width: 599px)').matches);
+    var PAGE_N = PHONE ? 10 : 30, more = {};
     function paged(rows, key) {
-      if (more[key] || rows.length <= PAGE_N + 5) return { rows: rows, button: '' };
-      return { rows: rows.slice(0, PAGE_N), button: '<button class="btn more" type="button" data-more="' + key + '">Show all ' + rows.length + '</button>' };
+      var shown = PHONE ? PAGE_N * (1 + (more[key] || 0)) : (more[key] ? rows.length : PAGE_N);
+      if (rows.length <= shown + (PHONE ? 3 : 5)) return { rows: rows, button: '' };
+      var left = rows.length - shown;
+      return { rows: rows.slice(0, shown), button: '<button class="btn more" type="button" data-more="' + key + '">' +
+        (PHONE ? 'Show ' + Math.min(PAGE_N, left) + ' more of ' + rows.length : 'Show all ' + rows.length) + '</button>' };
+    }
+    // On a phone the federal notices wait behind one line while the page is as it opens (no search, no quick
+    // filter, the default filters) and the state has open programs of its own: they are the reason for the page.
+    function defaultFilters() {
+      return !st.q && !st.quick && FACETS.every(function (f) {
+        return (st.sel[f.key] || []).slice().sort().join(',') === (DEFAULT_SEL[f.key] || []).slice().sort().join(',');
+      });
+    }
+    function federalFold(rf, rs) {
+      if (!PHONE || st.fed || !FEDERAL_LOADED || !rf.length || !rs.length || !defaultFilters()) return '';
+      var wk = rf.filter(inWeek).length;
+      return '<div class="fed-fold"><p><b>' + rf.length + ' federal ' + (rf.length === 1 ? 'notice' : 'notices') + ' also fit.</b> ' +
+        (wk ? wk + (wk === 1 ? ' closes' : ' close') + ' this week.' : 'None closes this week.') + '</p>' +
+        '<button class="btn" type="button" data-fed="1">Show federal notices</button></div>';
     }
     function groupHtml(rows, empty, key) {
       if (!rows.length) return '<p class="empty">' + empty + '</p>';
@@ -795,7 +1010,7 @@
       else stateEmpty = 'No ' + h(S.name) + ' programs match these filters.';
       el('list-state').innerHTML = groupHtml(rs, stateEmpty, 'state');
       el('g-state-d').hidden = true;
-      el('list-federal').innerHTML = FEDERAL_LOADED ? groupHtml(rf, 'No federal notices match these filters.', 'federal')
+      el('list-federal').innerHTML = FEDERAL_LOADED ? (federalFold(rf, rs) || groupHtml(rf, 'No federal notices match these filters.', 'federal'))
         : '<p class="empty">The federal notices did not load (federal.js). Reload the page, or see them on <a href="https://simpler.grants.gov/search">Grants.gov</a>.</p>';
 
       el('g-unstated').hidden = !ru.length;
@@ -840,8 +1055,8 @@
       }
       g += '<line class="tl-today" x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="' + (T - 10) + '" y2="' + hh + '"/><text class="tl-t tl-today-t" x="' + (x(TODAY) + 4) + '" y="' + (T - 12) + '">today</text>';
       inWin.forEach(function (p, i) {
-        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', nm = p.name.length > 48 ? p.name.slice(0, 47) + '…' : p.name;
-        var label = p.name + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
+        var yy = T + i * rh, c = p.closes_at.slice(0, 10), cls = p.state ? 'st' : 'fed', pn = programName(p), nm = pn.length > 48 ? pn.slice(0, 47) + '…' : pn;
+        var label = pn + ': ' + (p.opens_at ? 'opens ' + fmtDate(p.opens_at, true) + ', ' : 'opening date not stated, ') + 'closes ' + fmtDate(c, true);
         g += '<g class="tl-row" data-id="' + p.id + '" tabindex="0" role="button" aria-label="' + h(label) + '"><rect class="tl-hit" x="0" y="' + yy + '" width="' + w + '" height="' + rh + '"/>' +
           '<text class="tl-n" x="' + (L - 10) + '" y="' + (yy + 16) + '" text-anchor="end">' + h(nm) + '</text>';
         if (p.opens_at) { var x0 = x(p.opens_at.slice(0, 10)), x1 = x(c); g += '<rect class="tl-bar ' + cls + '" x="' + x0 + '" y="' + (yy + 7) + '" width="' + Math.max(4, x1 - x0) + '" height="10" rx="4"/>'; }
@@ -860,7 +1075,8 @@
     el('between-toggle').addEventListener('click', function () { st.between = !st.between; render(); });
     resultsEl.addEventListener('click', function (e) {
       var mb = e.target.closest('button[data-more]');
-      if (mb) { more[mb.getAttribute('data-more')] = true; render(); return; }
+      if (mb) { var mk = mb.getAttribute('data-more'); more[mk] = (more[mk] || 0) + 1; render(); return; }
+      if (e.target.closest('button[data-fed]')) { st.fed = true; render(); return; }
       var sb = e.target.closest('button[data-star]');
       if (sb) { toggleStar(byId[sb.closest('.card').getAttribute('data-id')]); return; }
       if (e.target.closest('a')) return;
@@ -875,6 +1091,7 @@
       el('season-h').textContent = 'When ' + S.name + '\'s deadlines have fallen:';
       el('season-d').textContent = seaTot + ' stated deadlines of programs open to local governments, two years either side of today, by month. A pattern, not a forecast.';
       chartSeason(el('season-svg'), [[S.name, SEA]], true);
+      onWidthChange(function () { chartSeason(el('season-svg'), [[S.name, SEA]], true); });
     }
 
     // ---- briefing, tabs, feed ----
@@ -916,100 +1133,6 @@
 
     // ---- detail dialog: five answers first, then the source's own words ----
     var dlg = el('detail'), lastFocus = null, current = null;
-    function fact(k, v, cls) { return v == null || v === '' ? '' : '<div><span class="k">' + h(k) + '</span><span class="v ' + (cls || '') + '">' + v + '</span></div>'; }
-    function sect(title, body) { return body ? '<div class="sect"><h3>' + h(title) + '</h3>' + body + '</div>' : ''; }
-    function host(url) { var m = /^https?:\/\/([^/]+)/.exec(url || ''); return m ? m[1].replace(/^www\./, '') : 'the agency\'s site'; }
-    var NOT_PUBLISHED = '<span class="muted">Not published: see the agency page</span>';
-    function detailHtml(p) {
-      var listingName = {};
-      p.listings.forEach(function (l) { listingName[l.aln] = l.name; });
-      var amount = amountText(p);
-      var closes;
-      if (p.closes_at && p.deadline_placeholder) closes = p.rolling ? 'Rolling deadline' : 'No deadline stated';
-      else if (p.closes_at) closes = h(fmtDate(p.closes_at, true)) + ' <span class="muted small">(' + h(relDays(p.days_to_close)) + ')</span>';
-      else if (p.rolling) closes = 'Rolling deadline';
-      else if (p.closes_text && p.closes_text.length <= 120) closes = '“' + h(p.closes_text) + '”';
-      else if (p.closes_text) closes = 'In the source\'s words, below';
-      else closes = NOT_PUBLISHED;
-      var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
-      var answers =
-        '<dl class="answers">' +
-        '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
-        '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
-        '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
-        '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
-        '<div><dt>Where do I apply?</dt><dd><a href="' + h(p.source_url) + '" target="_blank" rel="noopener">On ' + h(host(p.source_url)) + '</a></dd></div>' +
-        '</dl>';
-      var match = p.match_required == null ? null : (p.match_required ? 'Yes' : 'No') + (p.match_pct != null ? ' (' + p.match_pct + '%)' : '');
-      var facts =
-        fact('Fit', h(TIER_LONG[p.tier] || p.tier)) +
-        fact('Match required', match ? h(match) : null) +
-        fact('Opens', p.opens_at ? h(fmtDate(p.opens_at, true)) : null) +
-        fact('Reopened last on', p.last_reopened ? h(fmtDate(p.last_reopened, true)) + ' <span class="muted small">(seen by the registry)</span>' : null) +
-        fact('Funding type', p.funding_type ? h(words(p.funding_type)) : null) +
-        fact('Where the money comes from', p.funding_source ? (p.funding_source === 'pass_through' ? 'Federal money passed through the state' : 'Direct from the agency') : null) +
-        fact('Agency', agencyName(p) ? h(agencyName(p)) : null) +
-        fact('Number', p.number ? h(p.number) : null);
-      var alns = p.alns.length ? '<ul class="list">' + p.alns.map(function (a) {
-        return '<li><span class="aln">' + h(a) + '</span>' + (listingName[a] ? '<span>' + h(listingName[a]) + '</span>' : '<span class="muted small">not in the catalog read</span>') + '</li>';
-      }).join('') + '</ul>' : '';
-      var trail = 'First seen ' + fmtDate(p.first_seen, true) +
-        (p.last_changed.slice(0, 10) !== p.first_seen.slice(0, 10) ? ' · last changed ' + fmtDate(p.last_changed, true) : '') +
-        ' · read from ' + (sources.filter(function (s) { return s.connector === p.connector; })[0] || { label: p.connector }).label;
-      return '<div class="when">' + statusTag(p.status) + '<span class="muted">' + h(levelLabel(p)) + '</span>' + badges(p) + '</div>' +
-        answers +
-        sect('Deadline, as written by the source', p.closes_text && p.closes_text.length > 120 ? '<div class="verbatim">' + h(p.closes_text) + '</div>' : '') +
-        sect('Eligibility, as written by the source', p.eligibility ? '<div class="verbatim">' + h(p.eligibility) + '</div>' : '') +
-        sect('Summary', p.summary ? '<p class="prose">' + h(p.summary) + '</p>' : '') +
-        sect('History, as the registry saw it', historyHtml(p)) +
-        sect('More details', '<div class="facts">' + facts + '</div>') +
-        sect('Categories', p.categories.length ? '<ul class="chips">' + p.categories.map(function (t) { return '<li>' + h(words(t)) + '</li>'; }).join('') + '</ul>' : '') +
-        sect('Assistance Listings this notice cites', alns) +
-        '<p class="trail">' + h(trail) + '</p>';
-    }
-    // ---- the history strip (13.7): the program's own change log, drawn on a line from first seen to today ----
-    function histWords(e) {
-      var k = e[1];
-      if (k === 'added') return 'First seen by the registry';
-      if (k === 'missing') return 'No longer listed by the source';
-      if (k === 'edit') return 'Wording or details changed (' + e[2] + (e[2] === 1 ? ' field)' : ' fields)');
-      if (k === 'status') {
-        var reopen = (e[2] === 'closed' || e[2] === 'exhausted') && (e[3] === 'open' || e[3] === 'forecasted');
-        return (reopen ? 'Reopened: ' : 'Status: ') + statusLabel(e[2] || 'unknown') + ' → ' + statusLabel(e[3] || 'unknown');
-      }
-      var lab = k === 'closes_at' ? 'Deadline' : 'Opening date';
-      return lab + ': ' + (e[2] ? fmtDate(e[2], true) : 'not stated') + ' → ' + (e[3] ? fmtDate(e[3], true) : 'not stated');
-    }
-    function histKind(e) {
-      if (e[1] === 'status') return (e[3] === 'open' || e[3] === 'forecasted') ? ((e[2] === 'closed' || e[2] === 'exhausted') ? 'reopen' : 'open') : e[3] === 'closed' ? 'close' : 'other';
-      if (e[1] === 'closes_at' || e[1] === 'opens_at') return 'date';
-      return e[1];
-    }
-    function historyHtml(p) {
-      var ev = p.history || [];
-      if (!ev.length) return '';
-      var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
-      if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
-      var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
-      var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
-      var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
-      g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
-      if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
-      ev.forEach(function (e) {
-        var k = histKind(e), cx = x(e[0]);
-        if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
-        else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
-      });
-      g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
-      var list = ev.slice().reverse().map(function (e) {
-        return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
-          (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
-      }).join('');
-      return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
-        '<ol class="hist-list">' + list + '</ol>' +
-        '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
-    }
-
     function syncDetailStar() {
       var b = el('detail-star'), on = !!(current && watched[current.slug]);
       b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '★ Starred' : '☆ Star';
@@ -1020,9 +1143,10 @@
       current = p;
       syncDetailStar();
       lastFocus = trigger || document.activeElement;
-      el('detail-title').textContent = p.name;
+      el('detail-title').textContent = programName(p);
       el('detail-body').innerHTML = detailHtml(p);
       el('detail-source').href = p.source_url;
+      el('detail-page').href = ROOT + pagePath(p.slug);
       el('detail-copied').hidden = true;
       if (!dlg.open) dlg.showModal();
       el('detail-body').scrollTop = 0;
@@ -1041,7 +1165,8 @@
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
     el('detail-close').addEventListener('click', function () { dlg.close(); });
     el('detail-copy').addEventListener('click', function () {
-      var url = location.href;
+      // the program's own page (2026-11-26), not this page's #p= address, which still opens the panel
+      var url = current ? new URL(ROOT + pagePath(current.slug), location.href).href : location.href;
       var done = function () { el('detail-copied').hidden = false; };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
       else window.prompt('Copy this link', url);
@@ -1084,12 +1209,11 @@
     // ---- stars and the watchlist (13.9): kept in this browser; each program has its own feed at p/<slug>.xml ----
     var WKEY = 'fa-watch', watched = {};
     try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
-    function feedPath(slug) { return 'p/' + String(slug || '').toLowerCase().replace(/[^a-z0-9-]+/g, '-') + '.xml'; }
     function saveWatch() { try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: stars last for this visit */ } }
     function toggleStar(p) {
       if (!p) return;
       if (watched[p.slug]) delete watched[p.slug];
-      else watched[p.slug] = { n: p.name, s: p.state || S.code, f: p.state ? p.state : null };
+      else watched[p.slug] = { n: programName(p), s: p.state || S.code, f: p.state ? p.state : null };
       saveWatch(); render();
       if (current && current.slug === p.slug) syncDetailStar();
     }
@@ -1097,7 +1221,7 @@
       var keys = Object.keys(watched);
       el('watch-n').textContent = keys.length;
       el('watch-list').innerHTML = keys.length ? keys.map(function (k) {
-        var w = watched[k], page = ROOT + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k);
+        var w = watched[k], page = ROOT + pagePath(k);
         return '<li><a href="' + h(page) + '">' + h(w.n) + '</a> <span class="muted small">' + h(w.f ? stateName(w.f) : 'Federal') + '</span>' +
           ' · <a class="small" href="' + h(ROOT + feedPath(k)) + '" type="application/atom+xml">feed</a>' +
           ' <button type="button" class="btn quiet small" data-unstar="' + h(k) + '" aria-label="Remove ' + h(w.n) + '">Remove</button></li>';
@@ -1158,7 +1282,7 @@
       function line(p) {
         var when = p.closes_at && !p.deadline_placeholder ? 'Closes ' + fmtDate(p.closes_at, true) + '.' : p.rolling ? 'Rolling deadline.' : p.closes_text ? 'Deadline, in the agency\'s words: "' + (p.closes_text.length > 140 ? p.closes_text.slice(0, 139) + '…' : p.closes_text) + '"' : 'No deadline stated.';
         var amt = amountText(p);
-        return '- ' + p.name + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
+        return '- ' + programName(p) + '\n  ' + (agencyName(p) || 'Agency not stated') + '. ' + statusLabel(p.status) + '. ' + when + (amt ? ' ' + amt + '.' : '') + (p.match_required ? ' Match required.' : '') + '\n  ' + p.source_url;
       }
       var head = 'Funding open to ' + S.name + ' local governments, closing in the next ' + dg.win + ' days' + (on.length ? ' (' + on.map(words).join(', ') + ')' : '') +
         '\nFrom Funding Atlas, built ' + fmtDate(DATA.generated_at, true) + '. Status and dates are what each agency\'s page said that day.\n';
@@ -1191,7 +1315,10 @@
       renderGroups();
       renderWatch();
       syncFit();
-      renderFeed(feedEl, feedRows(), function (c) {
+      if (st.tab === 'changes') loadChanges();
+      if (changesState === 'loading' || (changesState === 'idle' && st.tab !== 'changes')) feedEl.innerHTML = '<li class="empty">Loading the change log…</li>';
+      else if (changesState === 'failed') feedEl.innerHTML = '<li class="empty">The change log did not load (changes.js). Reload the page, or read it as a <a href="feed.xml" type="application/atom+xml">feed</a>.</li>';
+      else renderFeed(feedEl, feedRows(), function (c) {
         return c.listed ? '<button type="button" data-open="' + c.program_id + '" aria-haspopup="dialog">' + h(c.name) + '</button>'
           : h(c.name) + ' <a class="small" href="' + h(c.source_url) + '">source</a>';
       });
@@ -1224,6 +1351,44 @@
       '<li>' + n(F.closing_soon) + ' of them close' + (F.closing_soon === 1 ? 's' : '') + ' within ' + DATA.rules.closing_days + ' days.</li>' +
       '<li>' + n(withSources.length) + ' state' + (withSources.length === 1 ? ' has' : 's have') + ' state agency sources connected.</li>' +
       '<li>' + n(sum('programs')) + ' state programs are read: ' + n(sum('open')) + ' open or announced for local governments, ' + n(sum('between')) + ' closed recently.</li>';
+    // ---- the three daily blocks (2026-11-26): counts and names from the build's data, nothing computed beyond shares ----
+    var CW = DATA.closing_week, WK = DATA.week, ST = DATA.stated || [];
+    if (CW && CW.total) {
+      el('t-closing').hidden = false;
+      el('t-closing-sum').innerHTML = n(CW.total) + ' program' + (CW.total === 1 ? ' closes' : 's close') + ' in the next 7 days: ' +
+        n(CW.state) + ' from states' + (CW.states ? ', in ' + CW.states + (CW.states === 1 ? ' state' : ' states') : '') + ', and ' +
+        n(CW.federal) + ' federal notice' + (CW.federal === 1 ? '' : 's') + '.';
+      el('t-closing-rows').innerHTML = CW.rows.map(function (p) {
+        return '<li><span class="td" aria-hidden="true"><small>' + MONTHS[+p.closes_at.slice(5, 7) - 1] + '</small><b>' + (+p.closes_at.slice(8, 10)) + '</b></span>' +
+          '<span><a class="tn" href="' + h(pagePath(p.slug)) + '">' + h(programName(p)) + '</a>' +
+          '<span class="tm">' + h(p.state ? stateName(p.state) : 'Federal') + ' · ' + h(agencyName(p) || 'Agency not stated') +
+          '<span class="sr-only">, closes ' + h(fmtDate(p.closes_at, true)) + '</span></span></span></li>';
+      }).join('');
+    }
+    var KINDS = [['added', 'First seen'], ['wording', 'Wording or details'], ['status', 'Status'], ['dates', 'Dates'], ['missing', 'No longer listed']];
+    if (WK && KINDS.some(function (k) { return WK.kinds[k[0]]; })) {
+      el('t-changed').hidden = false;
+      el('t-changed-h').textContent = 'What changed in the last ' + WK.days + ' days';
+      el('t-kinds').innerHTML = KINDS.map(function (k) { return '<div><dt>' + k[1] + '</dt><dd class="num">' + (WK.kinds[k[0]] || 0).toLocaleString('en-US') + '</dd></div>'; }).join('');
+      el('t-flips').innerHTML = WK.status_changes.map(function (c) {
+        var name = c.listed ? '<a href="' + h(pagePath(c.slug)) + '">' + h(c.name) + '</a>' : h(c.name);
+        return '<li><b>' + h(fmtDate(c.at)) + '</b> · ' + h(c.state ? stateName(c.state) : 'Federal') + ' · ' + name + ': ' +
+          h(statusLabel(c.old || 'unknown')) + ' → ' + h(statusLabel(c.new || 'unknown')) + '</li>';
+      }).join('');
+      el('t-log').addEventListener('click', function () { el('changes').open = true; });
+    }
+    var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
+    if (ST.length) {
+      el('t-stated').hidden = false;
+      el('t-mini').innerHTML = '<span></span><span class="th">Status</span><span class="th">Deadline</span><span class="th">Amount</span>' + ST.map(function (r) {
+        function bar(v, what) {
+          var pct = Math.round(100 * v / r.n);
+          return '<span class="tbar" role="img" aria-label="' + what + ' stated by ' + pct + ' percent"><b style="width:' + pct + '%"></b><i class="num">' + pct + '%</i></span>';
+        }
+        return '<span class="tl">' + h(KIND_ROW[r.kind] || r.kind) + ' <small class="num">' + r.n.toLocaleString('en-US') + '</small></span>' +
+          bar(r.status, 'Status') + bar(r.date, 'Deadline') + bar(r.amount, 'Amount');
+      }).join('');
+    }
     var wk = DATA.changes_week || 0;
     if (wk) el('feed-sum').textContent += ': ' + wk.toLocaleString('en-US') + ' logged in the last ' + DATA.rules.new_days + ' days';
     if (wk > DATA.changes.length) el('feed-note').insertBefore(document.createTextNode('The newest ' + DATA.changes.length + ' are listed here. '), el('feed-note').firstChild);
@@ -1244,8 +1409,12 @@
     var map = el('map');
     map.innerHTML = S.map(function (s) {
       var k = kindClass(s.kind);
-      return '<a class="t k-' + k + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
-        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + s.open + '</span>' : '') +
+      // The number: programs open or announced; where none is and the source lists programs without a status, that
+      // count on a hatched tile (a directory's whole list); 0 only where the source states every round closed.
+      var dir = k === 'directory', un = !dir && s.open === 0 && s.unstated > 0;
+      var num = dir ? s.programs : un ? s.unstated : s.open;
+      return '<a class="t k-' + k + (un ? ' unstated' : '') + '" href="' + s.code.toLowerCase() + '/" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-code="' + s.code + '" title="' + h(s.name) + '">' +
+        '<span class="c">' + s.code + '</span>' + (s.programs > 0 ? '<span class="o num" aria-hidden="true">' + num + '</span>' : '') +
         '<span class="sr-only">, ' + h(covText(s)) + '</span></a>';
     }).join('');
     var hover = el('hover');
@@ -1303,5 +1472,5 @@
   }
   themeSwitch();
 
-  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
+  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else if (PAGE === 'program') programPage(); else indexPage();
 })();
