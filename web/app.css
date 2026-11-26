@@ -259,7 +259,7 @@ ul, ol { margin: 0; padding: 0; }
 .list .bucket { margin: 8px 0 0; font-size: var(--t-md); font-weight: 700; color: var(--ink); padding-bottom: 4px; border-bottom: 1px solid var(--line); }
 .list .bucket:first-child { margin-top: 0; }
 .card:focus-within { outline: 3px solid var(--accent); outline-offset: 1px; }
-.card .when, dialog.detail .when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 600; font-size: var(--t-md); }
+.card .when, .detail .when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 600; font-size: var(--t-md); }
 .card .when .soon { color: var(--closing); }
 .card h3 { font: 600 var(--t-lg)/1.3 var(--f-display); letter-spacing: 0; }
 .card h3 button { all: unset; cursor: pointer; color: var(--ink); text-wrap: pretty; }
@@ -417,7 +417,7 @@ main.about { padding-bottom: 12px; }
 .watch-list { list-style: none; display: grid; gap: 4px; }
 .btn.small, .btn .small { font-size: var(--t-sm); padding: 2px 8px; }
 .btn:disabled { opacity: .5; cursor: default; }
-dialog.detail .star-btn[aria-pressed="true"] { color: var(--possible); border-color: var(--possible); }
+.detail .star-btn[aria-pressed="true"] { color: var(--possible); border-color: var(--possible); }
 
 /* ---------- digest (13.8) ---------- */
 #panel-digest { display: grid; gap: 14px; }
@@ -466,27 +466,35 @@ dialog.detail header { display: flex; gap: 12px; align-items: flex-start; paddin
 dialog.detail header h2 { font: 600 var(--t-2xl)/1.25 var(--f-display); flex: 1; text-wrap: pretty; }
 dialog.detail .close { flex: none; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--edge); background: var(--surface); font-size: var(--t-xl); line-height: 1; display: grid; place-items: center; }
 dialog.detail .body { overflow: auto; padding: 16px 20px 24px; display: grid; gap: 18px; align-content: start; }
-dialog.detail .sect h3 { font-size: var(--t-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
-dialog.detail .answers { display: grid; gap: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--r-lg); }
-dialog.detail .answers div { display: grid; grid-template-columns: 11.5em 1fr; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line); }
-dialog.detail .answers div:first-child { border-top: 0; }
-dialog.detail .answers dt { font-weight: 600; }
-dialog.detail .answers dd { margin: 0; overflow-wrap: anywhere; }
-dialog.detail .answers dd.soon { color: var(--closing); font-weight: 600; }
-dialog.detail .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; }
-dialog.detail .facts div { display: grid; gap: 1px; }
-dialog.detail .facts .k { font-size: var(--t-xs); color: var(--muted); }
-dialog.detail .facts .v { font-weight: 600; }
-dialog.detail .facts .v.soon { color: var(--closing); }
-dialog.detail .verbatim { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--soft); padding: 12px 14px; border-radius: var(--r-md); font-size: var(--t-md); line-height: 1.55; max-height: 40vh; overflow: auto; }
-dialog.detail .prose { line-height: 1.6; max-width: 65ch; overflow-wrap: anywhere; }
-dialog.detail .list { list-style: none; display: grid; gap: 4px; }
-dialog.detail .list li { display: flex; gap: 8px; flex-wrap: wrap; }
-dialog.detail .list .aln { font-variant-numeric: tabular-nums; font-weight: 600; }
+.detail .sect h3 { font-size: var(--t-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+.detail .answers { display: grid; gap: 0; margin: 0; border: 1px solid var(--line); border-radius: var(--r-lg); }
+.detail .answers div { display: grid; grid-template-columns: 11.5em 1fr; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--line); }
+.detail .answers div:first-child { border-top: 0; }
+.detail .answers dt { font-weight: 600; }
+.detail .answers dd { margin: 0; overflow-wrap: anywhere; }
+.detail .answers dd.soon { color: var(--closing); font-weight: 600; }
+.detail .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; }
+.detail .facts div { display: grid; gap: 1px; }
+.detail .facts .k { font-size: var(--t-xs); color: var(--muted); }
+.detail .facts .v { font-weight: 600; }
+.detail .facts .v.soon { color: var(--closing); }
+.detail .verbatim { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--soft); padding: 12px 14px; border-radius: var(--r-md); font-size: var(--t-md); line-height: 1.55; max-height: 40vh; overflow: auto; }
+.detail .prose { line-height: 1.6; max-width: 65ch; overflow-wrap: anywhere; }
+.detail .list { list-style: none; display: grid; gap: 4px; }
+.detail .list li { display: flex; gap: 8px; flex-wrap: wrap; }
+.detail .list .aln { font-variant-numeric: tabular-nums; font-weight: 600; }
 dialog.detail footer { padding: 12px 20px; border-top: 1px solid var(--line); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: var(--surface); }
 dialog.detail footer .src { flex: 1; min-width: 0; }
-dialog.detail .copied { color: var(--likely); font-size: var(--t-sm); }
-dialog.detail .trail { font-size: var(--t-sm); color: var(--muted); }
+.detail .copied { color: var(--likely); font-size: var(--t-sm); }
+.detail .trail { font-size: var(--t-sm); color: var(--muted); }
+/* a program's own page (2026-11-26): the panel's record, full width, with the page's own heading and action row */
+.program { max-width: 820px; padding: 22px 0 8px; display: grid; gap: 16px; }
+.program .crumb { font-size: var(--t-sm); color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; }
+.program > * { min-width: 0; }
+.program h1 { text-wrap: pretty; overflow-wrap: anywhere; }
+.program .body { display: grid; gap: 18px; align-content: start; }
+.program .body .lede { color: var(--muted); }
+.program .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 14px; border-top: 1px solid var(--line); }
 /* history strip (13.7) */
 svg.hist { width: 100%; height: auto; display: block; }
 svg.hist .hl { stroke: var(--line); stroke-width: 2; }
@@ -608,7 +616,7 @@ footer.site code { overflow-wrap: anywhere; }   /* file paths wrap on the smalle
   .seg { display: none; }
   .fit { padding: 8px 12px; }
   .tabs { margin: 12px 0 10px; }
-  dialog.detail .answers div { grid-template-columns: 1fr; gap: 2px; }
+  .detail .answers div { grid-template-columns: 1fr; gap: 2px; }
   dialog.detail { width: 100vw; }
   .feed li.ev { grid-template-columns: 1fr; gap: 2px; }
 }

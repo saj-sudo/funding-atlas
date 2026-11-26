@@ -77,6 +77,7 @@ past-deadline state programs within 15 months of their last deadline, for the ne
 change log) and `v_navigator_coverage` (what was read per state). Each page embeds its own data as JSON and
 shares `app.css`, `app.js` and, on state pages, `federal.js`, all written beside the pages and loaded from the same origin: no
 external requests. A saved copy of the whole `site/` folder still works offline; a single page on its own no longer does.
+Every listed program also has a page of its own at `p/<slug>/` (beside its Atom feed, `p/<slug>.xml`), and `sitemap.xml` lists every page.
 The page markup, stylesheet and script live in `web/`; `scripts/build_site.py` only queries SQL and fills them in.
 
 Hosting is GitHub Pages from the `gh-pages` branch. `.github/workflows/site.yml` runs daily: it restores `atlas.db`

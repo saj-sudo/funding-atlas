@@ -3,6 +3,7 @@ in-memory database. No network, no browser."""
 
 from __future__ import annotations
 
+import html
 import json
 import re
 from datetime import UTC, date, datetime, timedelta
@@ -351,6 +352,57 @@ def test_scales_and_card_slots(conn, tmp_path):
     assert "Amount not published" not in page + js
 
 
+def test_program_pages(conn, tmp_path):
+    """2026-11-26: every listed program has a page of its own at p/<slug>/, and no other program does; the head is the
+    shared one with the program's own title, description, address and feed; the body says something without script."""
+    site = build_site.build(conn, generated_at=GEN)
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    listed = {p["slug"] for code in site["states"] for k in ("programs", "between", "unstated") for p in site["states"][code][k]}
+    pages = {d.name for d in (out / "p").iterdir() if d.is_dir()}
+    assert listed and pages == {build_site.program_page_path(s).split("/")[1] for s in listed}
+    assert len(site["program_pages"]) == len(listed)
+    key = build_site.asset_version((out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8"))
+    data = next(d for d in site["program_pages"] if d["program"]["state"] == "MD")
+    p = data["program"]
+    page = (out / build_site.program_page_path(p["slug"])).read_text(encoding="utf-8")
+    url = build_site.program_url(p["slug"])
+    assert 'data-page="program"' in page and "{{" not in page
+    assert f"<title>{html.escape(p['name'])} · Maryland · Funding Atlas</title>" in page
+    assert f'<link rel="canonical" href="{url}">' in page and f'<meta property="og:url" content="{url}">' in page
+    assert 'href="../' + build_site.program_feed_path(p["slug"])[2:] + '"' in page       # its own feed, beside the folder
+    assert re.findall(r'<script src="([^"]+)"', page) == ["../../app.js?v=" + key]
+    assert re.findall(r'<link rel="stylesheet" href="([^"]+)"', page) == ["../../app.css?v=" + key]
+    assert page.index("localStorage.getItem('fa-theme')") < page.index('<link rel="stylesheet"')
+    body = page[page.index("<body"):page.index('<script type="application/json"')]
+    assert html.escape(p["name"]) in body and html.escape(p["source_url"], quote=True) in body
+    assert html.escape(build_site.status_sentence(p)) in body and 'href="../../md/"' in body
+    embedded = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert embedded["program"] == p and embedded["state"] == {"code": "MD", "name": "Maryland"}
+    # a federal notice has a page too, and says where it is listed in place of a state
+    fed = next(d for d in site["program_pages"] if d["program"]["state"] is None)
+    fpage = (out / build_site.program_page_path(fed["program"]["slug"])).read_text(encoding="utf-8")
+    assert "· Federal · Funding Atlas</title>" in fpage and "Federal notice, listed on every state page" in fpage
+    # feeds and the sitemap point at the page
+    feed = (out / build_site.program_feed_path(p["slug"])).read_text(encoding="utf-8")
+    assert f'rel="alternate" href="{url}"' in feed or f'href="{url}" rel="alternate"' in feed or url in feed
+    sitemap = (out / "sitemap.xml").read_text(encoding="utf-8")
+    assert sitemap.count("<url>") == 1 + 51 + 1 + len(listed) and f"<loc>{url}</loc>" in sitemap
+    # the status words are the page script's
+    js = (out / "app.js").read_text(encoding="utf-8")
+    for k, v in build_site.STATUS_LABEL.items():
+        assert f"{k}: '{v}'" in js, k
+
+
+def test_status_sentence_states_only_what_is_stored():
+    base = {"status": "open", "closes_at": None, "deadline_placeholder": False, "days_to_close": None, "rolling": False, "closes_text": None}
+    assert build_site.status_sentence(base) == "Open. No deadline stated."
+    assert build_site.status_sentence(dict(base, rolling=True)) == "Open. Rolling deadline."
+    assert build_site.status_sentence(dict(base, status="unknown", closes_text="Spring")) == "Status not confirmed. Deadline in the source's words."
+    assert build_site.status_sentence(dict(base, closes_at="2026-12-01", days_to_close=5)) == "Open. Closes Dec 1, 2026."
+    assert build_site.status_sentence(dict(base, status="closed", closes_at="2026-02-23", days_to_close=-9)) == "Closed. Last deadline Feb 23, 2026."
+    assert build_site.status_sentence(dict(base, closes_at="2035-12-31", deadline_placeholder=True, days_to_close=3000)) == "Open. No deadline stated."
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]
@@ -505,7 +557,7 @@ def test_every_listed_program_has_its_own_feed(conn, tmp_path):
     out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
     site = build_site.build(conn, generated_at=GEN)
     listed = {p["slug"] for d in site["states"].values() for p in d["programs"] + d["between"] + d["unstated"]}
-    files = {f.name for f in (out / "p").iterdir()}
+    files = {f.name for f in (out / "p").iterdir() if f.is_file()}             # the folders beside them are program pages
     logged = {r["slug"] for r in conn.execute("SELECT DISTINCT slug FROM v_navigator_change")}
     assert files == {build_site.program_feed_path(sl)[2:] for sl in listed | logged}
     # a program that left every page keeps its feed: Long Dead Credit closed two years ago and is listed nowhere
@@ -533,7 +585,7 @@ def test_atom_parses_ids_unique_and_scoped_to_the_state(conn, tmp_path):
     assert all(re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", e.find("a:updated", ns).text) for e in entries)
     flip = next(e for e in entries if e.find("a:title", ns).text == "changed: Will Close Later")
     assert flip.find("a:summary", ns).text == "status open → closed · Maryland DHCD · Maryland"
-    assert flip.find("a:link", ns).get("href") == build_site.SITE_URL + "md/#p=" + quote_slug(conn, "Will Close Later")
+    assert flip.find("a:link", ns).get("href") == build_site.SITE_URL + "p/" + quote_slug(conn, "Will Close Later") + "/"
     va = ET.parse(out / "va" / "feed.xml").getroot()
     assert {e.find("a:category", ns).get("term") for e in va.findall("a:entry", ns)} <= {"federal", "VA"}
     root = ET.parse(out / "feed.xml").getroot()
@@ -580,11 +632,11 @@ def test_field_label_mirrors_app_js():
     assert pairs == build_site.FIELD_LABEL
 
 
-def test_feed_link_uses_the_state_page_when_listed():
+def test_feed_link_uses_the_program_page_when_listed():
     c = {"slug": "a-b", "state": "MD", "listed": True, "source_url": "https://x/1"}
-    assert build_site.feed_link(c, "MD") == build_site.SITE_URL + "md/#p=a-b"
-    assert build_site.feed_link({**c, "state": None}, "VA") == build_site.SITE_URL + "va/#p=a-b"      # a federal notice on Virginia's page
-    assert build_site.feed_link({**c, "state": None}, None) == "https://x/1"                          # the root feed has no page for it
+    assert build_site.feed_link(c, "MD") == build_site.SITE_URL + "p/a-b/"
+    assert build_site.feed_link({**c, "state": None}, "VA") == build_site.SITE_URL + "p/a-b/"         # a federal notice has one page, whichever feed names it
+    assert build_site.feed_link({**c, "state": None}, None) == build_site.SITE_URL + "p/a-b/"
     assert build_site.feed_link({**c, "listed": False}, "MD") == "https://x/1"
 
 

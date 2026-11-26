@@ -7,7 +7,7 @@
 
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var PAGE = document.body.getAttribute('data-page');
-  var ROOT = PAGE === 'state' || PAGE === 'about' ? '../' : '';
+  var ROOT = PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '';
   var TODAY = DATA.generated_at.slice(0, 10);
   // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
   var FEDERAL_LOADED = !!window.FA_FEDERAL;
@@ -232,10 +232,11 @@
       '<div><h2>What I would like to know from you</h2><ol>' + q + '</ol></div>' +
       '<div><h2>Data and code</h2>' +
       '<p>Records are open data under the <a href="https://opendatacommons.org/licenses/odbl/1-0/">Open Database License</a>; the connectors and this page are MIT licensed. Built ' + h(fmtDate(DATA.generated_at)) + ' from <a href="' + h(ROOT) + 'atlas.db.gz">atlas.db.gz</a> (SQLite, gzipped: every record, every raw payload and every logged change).</p>' +
-      (PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
+      (PAGE === 'program' ? '<p>Subscribe to this program\'s changes: <a href="' + h(ROOT + feedPath(DATA.program.slug)) + '" type="application/atom+xml">Atom feed</a> · every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a>' :
+      PAGE === 'about' ? '<p>Subscribe to the change log of every source: <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">Atom feed</a> · <a href="' + h(ROOT) + 'changes.json" type="application/json">JSON</a>' :
       '<p>Subscribe to this page\'s change log: <a href="feed.xml" type="application/atom+xml">Atom feed</a> · <a href="changes.json" type="application/json">JSON</a>') +
       (PAGE === 'state' ? ' · <a href="' + h(ROOT) + 'feed.xml" type="application/atom+xml">every state (Atom)</a>' : '') +
-      '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' +
+      (PAGE === 'state' ? '. The feed carries the same rows as the Changes tab; its entry ids never change.</p>' : '. Feed entry ids never change.</p>') +
       '<p><a href="' + h(DATA.repo_url) + '">Source code and connector docs</a> · <a href="' + h(ROOT) + '">All states</a> · <a href="' + h(ROOT) + 'about/">About the data</a></p></div>';
   }
 
@@ -497,6 +498,31 @@
     return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
       '<ol class="hist-list">' + list + '</ol>' +
       '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
+  }
+
+  // A listed program's own page (2026-11-26): the same record the state page's panel shows, at an address of its own.
+  function programPage() {
+    var p = DATA.program;
+    SOURCES = DATA.sources || [];
+    el('detail-title').textContent = programName(p);
+    el('detail-body').innerHTML = detailHtml(p);
+    var WKEY = 'fa-watch', watched = {};
+    try { watched = JSON.parse(localStorage.getItem(WKEY) || '{}') || {}; } catch (er) { watched = {}; }
+    var star = el('detail-star');
+    function syncStar() { var on = !!watched[p.slug]; star.setAttribute('aria-pressed', String(on)); star.textContent = on ? '★ Starred' : '☆ Star'; }
+    star.addEventListener('click', function () {
+      if (watched[p.slug]) delete watched[p.slug];
+      else watched[p.slug] = { n: programName(p), s: p.state || null, f: p.state ? p.state : null };
+      try { localStorage.setItem(WKEY, JSON.stringify(watched)); } catch (er) { /* private window: the star lasts for this visit */ }
+      syncStar();
+    });
+    syncStar();
+    el('detail-copy').addEventListener('click', function () {
+      var url = location.href.split('#')[0], done = function () { el('detail-copied').hidden = false; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
+      else window.prompt('Copy this link', url);
+    });
+    renderFooter('');
   }
 
   function aboutPage() {
@@ -1044,6 +1070,7 @@
       el('detail-title').textContent = programName(p);
       el('detail-body').innerHTML = detailHtml(p);
       el('detail-source').href = p.source_url;
+      el('detail-page').href = ROOT + pagePath(p.slug);
       el('detail-copied').hidden = true;
       if (!dlg.open) dlg.showModal();
       el('detail-body').scrollTop = 0;
@@ -1062,7 +1089,8 @@
     dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
     el('detail-close').addEventListener('click', function () { dlg.close(); });
     el('detail-copy').addEventListener('click', function () {
-      var url = location.href;
+      // the program's own page (2026-11-26), not this page's #p= address, which still opens the panel
+      var url = current ? new URL(ROOT + pagePath(current.slug), location.href).href : location.href;
       var done = function () { el('detail-copied').hidden = false; };
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { window.prompt('Copy this link', url); });
       else window.prompt('Copy this link', url);
@@ -1117,7 +1145,7 @@
       var keys = Object.keys(watched);
       el('watch-n').textContent = keys.length;
       el('watch-list').innerHTML = keys.length ? keys.map(function (k) {
-        var w = watched[k], page = ROOT + String(w.s).toLowerCase() + '/#p=' + encodeURIComponent(k);
+        var w = watched[k], page = ROOT + pagePath(k);
         return '<li><a href="' + h(page) + '">' + h(w.n) + '</a> <span class="muted small">' + h(w.f ? stateName(w.f) : 'Federal') + '</span>' +
           ' · <a class="small" href="' + h(ROOT + feedPath(k)) + '" type="application/atom+xml">feed</a>' +
           ' <button type="button" class="btn quiet small" data-unstar="' + h(k) + '" aria-label="Remove ' + h(w.n) + '">Remove</button></li>';
@@ -1327,5 +1355,5 @@
   }
   themeSwitch();
 
-  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else indexPage();
+  if (PAGE === 'state') statePage(); else if (PAGE === 'about') aboutPage(); else if (PAGE === 'program') programPage(); else indexPage();
 })();
