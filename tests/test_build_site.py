@@ -582,6 +582,20 @@ def test_about_shows_how_each_state_is_read(conn, tmp_path):
     assert "claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');" in js
 
 
+def test_about_cards_are_stored_records_or_nothing(conn, tmp_path):
+    """2026-11-27: the three records are read from the database by slug, field by field; a slug that is not stored
+    drops its card (the test database stores none of them, so About carries none and hides the section)."""
+    assert len(build_site.CARD_SLUGS) == 3
+    assert build_site.load_cards(conn, set()) == []
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["cards"] == [] and 'id="cards"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "el('h-cards').closest('section').hidden = cards.length < 2;" in js
+    assert js.count("function slot(label, value)") == 1             # one slot for the state page's cards and About's
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

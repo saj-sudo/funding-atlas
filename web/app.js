@@ -343,6 +343,26 @@
     return '<span><i class="sw" style="background:var(--soft)"></i>none</span><span>small share</span>' + RAMP.map(function (c) { return '<i class="sw" style="background:' + c + ';margin:0 1px"></i>'; }).join('') + '<span>26% or more of the row</span>';
   }
 
+  // a card's fixed slot (2026-11-26): the value, or hatched and "Source does not say"; shared by the state page's cards
+  // and About's three records (2026-11-27)
+  function slot(label, value) {
+    return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
+  }
+  // "One federal program, three states" on About: each stored record in four fixed slots, nothing filled in. The
+  // agency's own deadline words are shown when the source gives words but no date the registry could keep.
+  var READ_AS_SHORT = { portal: 'state grants portal', agencies: 'agency page', portal_agencies: 'state portal', directory: 'state directory' };
+  function recordCard(p) {
+    var dl = p.closes_at ? fmtDate(p.closes_at.slice(0, 10), true) : p.rolling ? 'Rolling' : '';
+    var match = p.match_required === 1 || p.match_required === true ? 'Required' : p.match_required === 0 || p.match_required === false ? 'Not required' : '';
+    var name = p.listed ? '<a href="' + h(ROOT + pagePath(p.slug)) + '">' + h(p.name) + '</a>' : h(p.name);
+    return '<article class="card rec"><p class="rec-src">' + h(stateName(p.state)) + ' · ' + h(READ_AS_SHORT[p.read_as] || 'agency page') + '</p>' +
+      '<h3>' + name + '</h3><p class="meta">' + h(p.administering_agency || 'Agency not stated') + '</p>' +
+      '<dl class="slots">' + slot('Status', p.status && p.status !== 'unknown' ? statusLabel(p.status) : '') + slot('Deadline', dl) +
+      slot('Amount', amountText(p)) + slot('Match', match) + '</dl>' +
+      (!dl && p.closes_at_text ? '<p class="cycle"><span class="k">In the agency\'s words:</span> \u201c' + h(p.closes_at_text) + '\u201d</p>' : '') +
+      '<p class="rec-link"><a href="' + h(p.source_url) + '" rel="noopener">The agency\'s page</a></p></article>';
+  }
+
   // how a source is read, in the words the index's "what the states publish" block and About's chart both use
   var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
   function share(v, n) { return n ? Math.round(100 * v / n) : 0; }
@@ -627,6 +647,15 @@
       var ways = [c.portal, c.agencies, c.portal_agencies, c.directory, unread.length].filter(Boolean).length;
       claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');
       el('reasons').innerHTML = unread.map(function (s) { return '<li><b aria-hidden="true">' + s.code + '</b><span>' + h(s.note || s.name + ': no state source read.') + '</span></li>'; }).join('');
+    }
+    if (el('cards')) {
+      var cards = A.cards || [];
+      el('h-cards').closest('section').hidden = cards.length < 2;
+      el('cards').innerHTML = cards.map(recordCard).join('');
+      var sts = cards.map(function (p) { return stateName(p.state); });
+      el('cards-sub').textContent = 'The Community Development Block Grant is federal money that states hand on to their smaller towns. Here is how ' +
+        (sts.length > 2 ? sts.slice(0, -1).join(', ') + ' and ' + sts[sts.length - 1] : sts.join(' and ')) + ' describe the same part of it, public facilities, on the day each was read.';
+      claim('h-cards', cards.length === 3, 'One federal program, three states');
     }
     var K = {}; (A.stated_kinds || []).forEach(function (k) { K[k.kind] = k; });
     var P = K.portal, G = K.agencies;
@@ -1011,9 +1040,6 @@
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
     function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
-    function slot(label, value) {
-      return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
-    }
     function card(p) {
       var amount = amountText(p);
       // Two slots in the same place on every card (2026-11-26): what the source states is plain, what it does not

@@ -626,6 +626,13 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .reasons li { display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 8px; }
 .reasons b { font-weight: 700; color: var(--muted); }
 .atlas-fig .legend .sw { width: 14px; height: 14px; border-radius: 0; }
+/* About's three records (2026-11-27): the site's card, without the date column or the click-to-open */
+.recs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.card.rec { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; cursor: default; }
+.card.rec .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rec-src { font-size: var(--t-xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.rec-link { font-size: var(--t-sm); }
+.src-note { font-size: var(--t-xs); color: var(--muted); max-width: 80ch; }
 @container (max-width: 560px) {
   .atlas-wrap { grid-template-columns: 1fr; gap: 10px; }
   .atlas { gap: 2px; }

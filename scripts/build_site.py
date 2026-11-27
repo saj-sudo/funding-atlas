@@ -193,6 +193,35 @@ def coverage_kind(code: str, connectors: dict[str, list[str]]) -> tuple[str, str
     return "federal", None
 
 
+# "One federal program, three states" on About (2026-11-27, Saj kept the cards from the entry-piece mockup): the same
+# part of the Community Development Block Grant, public facilities, as a state portal, an agency page with words and
+# an agency page that says nothing state it. Read from the stored record each build; a slug no longer stored drops
+# its card, and About hides the section with fewer than two.
+CARD_SLUGS = (
+    "cdbg-public-facilities-2026-round-2-webgrants-nh-42431",
+    "cdbg-public-works-facilities-ne-ded-cdbg#public-works-facilities",
+    "community-development-block-grant-cdbg-public-facilities-program-la-ocd-cdbg",
+)
+
+
+def load_cards(conn: sqlite3.Connection, listed_slugs: set[str]) -> list[dict[str, Any]]:
+    """The stored fields of each CARD_SLUGS record, exactly as stored: nothing is filled in."""
+    out = []
+    for slug in CARD_SLUGS:
+        r = conn.execute(
+            "SELECT name, slug, jurisdiction, source_connector, administering_agency, status, closes_at, closes_at_text,"
+            " rolling, amount_min, amount_max, match_required, source_url FROM program WHERE slug = ?", (slug,),
+        ).fetchone()
+        if r is None:
+            continue
+        d = dict(r)
+        d["state"] = d.pop("jurisdiction")[:2]
+        d["read_as"] = CONNECTOR_KIND.get(d.pop("source_connector"), "agencies")
+        d["listed"] = slug in listed_slugs
+        out.append(d)
+    return out
+
+
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
     "Which rows should not be here, and why?",
@@ -911,6 +940,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
     about = about_payload(
         programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info, coverage=coverage,
+        cards=load_cards(conn, {p["slug"] for p in programs + between + unstated}),
     )
     # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
     seen: set[int] = set()
@@ -926,6 +956,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
 def about_payload(
     *, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str, connectors: dict[str, list[str]] | None = None,
     run_info: dict[str, dict[str, str | None]] | None = None, coverage: dict[str, dict[str, Any]] | None = None,
+    cards: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else.
     "What sources state" (2026-11-27) is drawn by how each state is read: `stated_kinds` is the index's sum by kind,
@@ -958,6 +989,7 @@ def about_payload(
         "rules": {"new_days": NEW_DAYS, "closing_days": CLOSING_DAYS},
         "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
         "atlas": atlas,
+        "cards": cards or [],
         "deadlines": [[p["state"], p["closes_at"], p["deadline_placeholder"]] for p in programs if p["closes_at"]],
         "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
         "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},
