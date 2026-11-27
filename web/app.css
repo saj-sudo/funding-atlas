@@ -582,8 +582,19 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .numbers { margin-top: 32px; }
 .numbers ul { margin: 10px 0 0; padding-left: 1.1em; display: grid; gap: 6px; max-width: 70ch; }
 .numbers .num { font-weight: 700; color: var(--ink); }
-.for-research { margin: 48px 0 8px; display: grid; gap: 6px; }
-.for-research h2 { font: 700 var(--t-3xl)/1.2 var(--f-display); }
+.for-research { margin: 56px 0 0; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 4px; }
+.for-research h2 { font: 700 var(--t-sm)/1.3 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* About as an essay (2026-11-27): a claim, its sentences from the counts, then the chart as evidence */
+.essay-hero .eyebrow { font-size: var(--t-xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.essay-hero h1 { max-width: 22ch; text-wrap: balance; }
+.essay-hero .built { font-size: var(--t-sm); color: var(--muted); margin-top: 8px; max-width: 62ch; }
+.claim { margin-top: 44px; display: grid; gap: 10px; min-width: 0; }
+.claim > * { min-width: 0; }
+.claim > h2 { font: 700 var(--t-3xl)/1.2 var(--f-display); max-width: 32ch; text-wrap: balance; }
+.claim > p { max-width: 66ch; }
+.claim > .chart { margin-top: 6px; }
+.chart > h3 { font: 600 var(--t-xl)/1.25 var(--f-display); }
+.limits ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; max-width: 66ch; }
 .data-code { margin-top: 40px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); display: grid; gap: 8px; max-width: 80ch; font-size: var(--t-sm); }
 .data-code h2 { font-size: var(--t-lg); }
 .data-code ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; }

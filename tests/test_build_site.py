@@ -270,13 +270,20 @@ def test_topics_are_words_with_their_own_colours(conn, tmp_path):
         assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
 
 
-def test_about_page_serves_the_clerk_first(conn, tmp_path):
-    """Redesign session 5 (13.22): the two clerk charts lead, the methods charts sit under their own heading, and the
-    captions are plain words: view names are in one Data and code note."""
+def test_about_page_is_an_essay_argument_first(conn, tmp_path):
+    """2026-11-27 (Saj's pick): About reads as an essay, argument first: what sources state, amounts, what is due, then
+    under "For researchers" when deadlines fall and what changes, then the limits and Data and code. Each section's
+    sentences are built from the payload, so no number is typed into the page. Captions stay plain words: view names
+    are in one Data and code note (13.22)."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     page = (out / "about" / "index.html").read_text(encoding="utf-8")
-    at = [page.index(s) for s in ('id="c1"', 'id="c5"', "For researchers", 'id="c2"', 'id="c3"', 'id="c4"', "Data and code")]
+    at = [page.index(s) for s in ('id="lede"', 'id="c3"', 'id="c5"', 'id="c1"', "For researchers", 'id="c2"', 'id="c4"',
+                                  "What this cannot tell you", "Data and code")]
     assert at == sorted(at)
+    for sid in ("lede", "c3-sub", "c5-sub", "c1-sub", "c2-sub", "c4-sub"):
+        assert f'id="{sid}"></p>' in page, sid                      # filled by the script from the counts
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert isinstance(data["unread"], int) and "log_since" in data
     assert not [s for s in re.findall(r'<p class="src">(.*?)</p>', page, re.S) if "<code>v_" in s]
     assert "<code>v_navigator_program</code>" in page
 
@@ -525,7 +532,7 @@ def test_what_sources_state_is_a_hundred_squares_by_kind(conn, tmp_path):
     for k in kinds:
         mine = [r for r in rows if r["kind"] == k["kind"]]
         assert k["n"] == sum(r["n"] for r in mine) and k["date"] == sum(r["date_stated"] for r in mine) and k["states"] == len(mine)
-    assert '<div id="c3" class="waffle"></div>' in page and '<svg id="c3"' not in page and 'id="c3-head"' in page
+    assert '<div id="c3" class="waffle"></div>' in page and '<svg id="c3"' not in page
     js = (out / "app.js").read_text(encoding="utf-8")
     assert "function chartStated(el, tableEl, kinds, rows)" in js and "for (var i = 0; i < 100; i++)" in js
     assert "m-s1" not in js and "--s3" not in (out / "app.css").read_text(encoding="utf-8")

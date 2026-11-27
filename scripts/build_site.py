@@ -909,7 +909,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     for p in programs + between + unstated:
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
     program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
-    about = about_payload(programs=programs, stats=stats, generated_at=generated_at, connectors=connectors)
+    about = about_payload(programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info)
     # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
     seen: set[int] = set()
     program_pages = []
@@ -923,11 +923,17 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
 
 def about_payload(
     *, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str, connectors: dict[str, list[str]] | None = None,
+    run_info: dict[str, dict[str, str | None]] | None = None,
 ) -> dict[str, Any]:
     """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else.
     "What sources state" (2026-11-27) is drawn by how each state is read: `stated_kinds` is the index's sum by kind,
     and each `stated` row carries its kind. A count the view returns as NULL (no row could say) is 0."""
     connectors = connectors or {}
+    # for the essay's limits (2026-11-27): the states with no state source read (DC is out of scope), and the date
+    # of the registry's first successful read, before which nothing was logged
+    read_kinds = {"portal", "agencies", "portal_agencies", "directory"}
+    unread = sum(1 for c, _, _, _ in STATES if c != "DC" and coverage_kind(c, connectors)[0] not in read_kinds)
+    firsts = [v["first_ok"] for v in (run_info or {}).values() if v.get("first_ok")]
     stated = [
         {**{k: (r[k] or 0) for k in ("n", "status_stated", "date_stated", "amount_stated")}, "state": r["state"],
          "kind": "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]}
@@ -945,6 +951,8 @@ def about_payload(
         "months": stats["months"],
         "stated": stated,
         "stated_kinds": stated_by_kind(stats["stated"], connectors),
+        "unread": unread,
+        "log_since": min(firsts)[:10] if firsts else None,
         "flips": stats["flips"],
         "questions": list(READER_QUESTIONS),
     }

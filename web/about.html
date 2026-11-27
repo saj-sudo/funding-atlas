@@ -4,7 +4,7 @@
 {{HEAD}}
 </head>
 <body data-page="about">
-<a class="skip" href="#main">Skip to the charts</a>
+<a class="skip" href="#main">Skip to the page</a>
 
 <header class="topbar">
   <div class="wrap">
@@ -16,67 +16,96 @@
 </header>
 
 <main id="main" class="wrap about">
-  <section class="index-hero">
-    <h1>About the data</h1>
-    <p class="lede">What the registry reads, what its sources say and leave out, and what the change log has seen. Every chart is a count from the published database; nothing here estimates or forecasts. Built {{GENERATED}}.</p>
+  <!-- About as an essay (2026-11-27, Saj's pick: argument first). Each section is one claim, two or three sentences
+       built from the counts in aboutPage(), then one chart as its evidence with its table. Nothing typed here is a
+       number; a claim heading that the day's counts would not bear falls back to a plain title. -->
+  <section class="index-hero essay-hero">
+    <p class="eyebrow">About the data</p>
+    <h1>What the states say about their own funding, and what they leave out</h1>
+    <p class="lede" id="lede"></p>
+    <p class="built">Built {{GENERATED}} from the published database. Every figure is a count; nothing is estimated or forecast.</p>
   </section>
 
-  <figure class="chart">
-    <h2>Deadlines over the next 26 weeks</h2>
-    <p class="sub" id="c1-sub"></p>
-    <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span></div>
-    <div class="chart-scroll"><svg id="c1" role="img" aria-labelledby="c1-sub"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c1-table"></div></details>
-    <p class="src">Programs open or announced to local governments with a stated deadline. Weeks start today.</p>
-  </figure>
+  <section class="claim" aria-labelledby="h-c3">
+    <h2 id="h-c3">What sources state</h2>
+    <p id="c3-sub"></p>
+    <figure class="chart">
+      <h3>What sources state</h3>
+      <div class="legend"><span><i class="sw fed"></i>Federal, stated</span><span><i class="sw st"></i>State, stated</span><span><i class="sw none"></i>Source does not say</span><span>One square: 1 in 100 programs</span></div>
+      <div id="c3" class="waffle"></div>
+      <details class="c-table"><summary>Show each state as a table</summary><div id="c3-table"></div></details>
+      <p class="src">State programs open to local governments, any status, grouped by how the registry reads the state; federal notices open now for comparison. A deadline counts when the source gives a date or says it is rolling.</p>
+    </figure>
+  </section>
 
-  <figure class="chart">
-    <h2>Maximum awards, where published</h2>
-    <p class="sub" id="c5-sub"></p>
-    <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span><span>Line: median</span></div>
-    <div class="chart-scroll"><svg id="c5" role="img" aria-labelledby="c5-sub"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c5-table"></div></details>
-    <p class="src">Open or announced programs with a stated maximum of $1,000 or more. Log scale: each gridline is ten times the last.</p>
-  </figure>
+  <section class="claim" aria-labelledby="h-c5">
+    <h2 id="h-c5">Maximum awards, where published</h2>
+    <p id="c5-sub"></p>
+    <figure class="chart">
+      <h3>Maximum awards, where published</h3>
+      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span><span>Line: median</span></div>
+      <div class="chart-scroll"><svg id="c5" role="img" aria-labelledby="c5-sub"></svg></div>
+      <details class="c-table"><summary>Show as a table</summary><div id="c5-table"></div></details>
+      <p class="src">Open or announced programs with a stated maximum of $1,000 or more. Log scale: each gridline is ten times the last.</p>
+    </figure>
+  </section>
+
+  <section class="claim" aria-labelledby="h-c1">
+    <h2 id="h-c1">What is due in the next six months</h2>
+    <p id="c1-sub"></p>
+    <figure class="chart">
+      <h3>Deadlines over the next 26 weeks</h3>
+      <div class="legend"><span><i class="sw fed"></i>Federal</span><span><i class="sw st"></i>State</span></div>
+      <div class="chart-scroll"><svg id="c1" role="img" aria-labelledby="c1-sub"></svg></div>
+      <details class="c-table"><summary>Show as a table</summary><div id="c1-table"></div></details>
+      <p class="src">Programs open or announced to local governments with a stated deadline. Weeks start on the day the page was built.</p>
+    </figure>
+  </section>
+
   <section class="for-research" aria-labelledby="research-h">
     <h2 id="research-h">For researchers</h2>
-    <p class="muted">How the sources behave: when deadlines fall, what they state, and what the change log has seen.</p>
+    <p class="muted">How the sources behave over time: when their deadlines fall, and what the change log has seen.</p>
   </section>
 
-  <figure class="chart">
-    <h2>When state deadlines have fallen</h2>
-    <p class="sub">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. The stronger the shade, the larger that month's share of the row. It describes the past; it predicts nothing.</p>
-    <div class="chart-scroll"><svg id="c2" role="img" aria-label="Deadline months by state"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c2-table"></div></details>
-    <div class="legend" id="c2-leg"></div>
-    <p class="src">States with 8 or more such deadlines have their own row; all states are in the last row.</p>
-  </figure>
+  <section class="claim" aria-labelledby="h-c2">
+    <h2 id="h-c2">When state deadlines have fallen</h2>
+    <p id="c2-sub"></p>
+    <figure class="chart">
+      <h3>When state deadlines have fallen</h3>
+      <div class="chart-scroll"><svg id="c2" role="img" aria-labelledby="c2-sub"></svg></div>
+      <details class="c-table"><summary>Show as a table</summary><div id="c2-table"></div></details>
+      <div class="legend" id="c2-leg"></div>
+      <p class="src">Month of every stated deadline of a state program open to local governments, two years either side of today, any status. The stronger the shade, the larger that month's share of the row. States with 8 or more such deadlines have their own row; all states are in the last row.</p>
+    </figure>
+  </section>
 
-  <figure class="chart">
-    <h2>What sources state</h2>
-    <p class="sub" id="c3-head"></p>
-    <div class="legend"><span><i class="sw fed"></i>Federal, stated</span><span><i class="sw st"></i>State, stated</span><span><i class="sw none"></i>Source does not say</span><span>One square: 1 in 100 programs</span></div>
-    <div id="c3" class="waffle"></div>
-    <details class="c-table"><summary>Show each state as a table</summary><div id="c3-table"></div></details>
-    <p class="src">State programs open to local governments, any status, grouped by how the registry reads the state; federal notices open now for comparison. A deadline counts when the source gives a date or says it is rolling.</p>
-  </figure>
+  <section class="claim" aria-labelledby="h-c4">
+    <h2 id="h-c4">What changes, and what may be ours</h2>
+    <p id="c4-sub"></p>
+    <figure class="chart">
+      <h3>Status changes the registry has logged</h3>
+      <div class="legend"><span><i class="sw ink"></i>The source changed</span><span><i class="sw maybe"></i>First read after a change to the registry's code: may be ours</span></div>
+      <div class="chart-scroll"><svg id="c4" role="img" aria-labelledby="c4-sub"></svg></div>
+      <details class="c-table"><summary>Show as a table</summary><div id="c4-table"></div></details>
+      <p class="src">Programs a local government could apply to, every source. A change is marked when the registry's own reading code for that source changed between its run and the run before (from git history); it may still be the agency's.</p>
+    </figure>
+  </section>
 
-  <figure class="chart">
-    <h2>Status changes the registry has logged</h2>
-    <p class="sub" id="c4-sub"></p>
-    <div class="legend"><span><i class="sw ink"></i>The source changed</span><span><i class="sw maybe"></i>First read after a change to the registry's code: may be ours</span></div>
-    <div class="chart-scroll"><svg id="c4" role="img" aria-label="Status changes by type"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c4-table"></div></details>
-    <p class="src">Programs a local government could apply to, every source. A change is marked when the registry's own reading code for that source changed between its run and the run before (from git history); it may still be the agency's.</p>
-  </figure>
+  <section class="claim limits" aria-labelledby="h-limits">
+    <h2 id="h-limits">What this cannot tell you</h2>
+    <ul id="limits">
+      <li>A blank is what the source left out on the day it was read. It is not a zero and not a guess.</li>
+      <li>A count of programs is not a count of dollars: a program with no stated amount may be large.</li>
+    </ul>
+  </section>
 
   <section class="data-code" aria-labelledby="data-code-h">
     <h2 id="data-code-h">Data and code</h2>
     <p class="muted">Each chart is a count from one SQL view on the published database. The views are in <code>db/migrations/0009_navigator_stats.sql</code> and <code>0010</code> (change causes).</p>
     <ul>
-      <li>Deadlines over the next 26 weeks, maximum awards: <code>v_navigator_program</code></li>
-      <li>When state deadlines have fallen: <code>v_stats_deadline_month</code></li>
       <li>What sources state: <code>v_stats_stated</code></li>
+      <li>Maximum awards, deadlines over the next 26 weeks: <code>v_navigator_program</code></li>
+      <li>When state deadlines have fallen: <code>v_stats_deadline_month</code></li>
       <li>Status changes: <code>v_stats_status_flips</code> with <code>v_change_cause</code></li>
     </ul>
   </section>

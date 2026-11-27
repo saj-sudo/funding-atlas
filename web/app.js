@@ -349,11 +349,6 @@
   // "What sources state" (2026-11-27, Saj's pick A2): a hundred squares per kind of source and field, solid for one in
   // a hundred programs whose source states it, hatched for the rest; blue federal, orange state. HTML, not SVG, so its
   // text follows the reader's settings. Each state's own shares are in the table.
-  function statedHeadline(kinds) {
-    var by = {}; kinds.forEach(function (k) { by[k.kind] = k; });
-    var p = by.portal, a = by.agencies;
-    return p && a ? 'State portals give a deadline for ' + share(p.date, p.n) + ' of every 100 programs. Agency pages give one for ' + share(a.date, a.n) + '.' : '';
-  }
   function chartStated(el, tableEl, kinds, rows) {
     var FIELDS = [['status', 'a status'], ['date', 'a deadline'], ['amount', 'an amount']];
     el.innerHTML = kinds.map(function (k) {
@@ -567,36 +562,73 @@
   }
 
   function aboutPage() {
-    var A = DATA;
+    var A = DATA, FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function num(n) { return Number(n).toLocaleString('en-US'); }
+    // About as an essay (2026-11-27): every sentence below is built from the payload's counts. A claim heading is used
+    // only when the day's counts bear it; otherwise the section keeps the chart's plain title.
+    function claim(id, ok, text) { if (ok) el(id).textContent = text; }
+    var K = {}; (A.stated_kinds || []).forEach(function (k) { K[k.kind] = k; });
+    var P = K.portal, G = K.agencies;
+    if (P && G) {
+      var pd = share(P.date, P.n), gd = share(G.date, G.n);
+      el('lede').textContent = 'State portals give a deadline for ' + pd + ' of every 100 programs they list. Agency pages give one for ' + gd +
+        '. Funding Atlas reads both every day, shows what each source states, and marks what it leaves out.';
+      claim('h-c3', pd - gd >= 20 && share(P.status, P.n) > share(G.status, G.n), 'Portals state the basics. Agency pages mostly do not.');
+      el('c3-sub').textContent = 'The registry reads ' + P.states + ' states from a grants portal with structured rows; they state a status for ' + share(P.status, P.n) + '% of the ' +
+        num(P.n) + ' programs open to local governments and a deadline for ' + pd + '%. In the ' + G.states + ' states read from agency pages, ' +
+        share(G.status, G.n) + '% of ' + num(G.n) + ' programs state a status and ' + gd + '% a deadline. An amount is rarer everywhere: ' +
+        share(P.amount, P.n) + '% on portals, ' + num(G.amount) + ' of ' + num(G.n) + ' programs on agency pages.';
+    } else {
+      el('lede').textContent = 'What the registry reads, what its sources say and leave out, and what the change log has seen.';
+      el('c3-sub').textContent = 'Share of programs whose source states a status, a deadline and an amount, by how the registry reads the state.';
+    }
     function draw() {
-    var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
-    el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
-    var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
-      .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
-      .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
-      .map(function (r) { return [stateName(r[0]), r[1]]; });
-    var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
-    chartSeason(el('c2'), rows.concat([['All states', all]]), false);
-    el('c2-leg').innerHTML = seasonLegend();
-    chartStated(el('c3'), el('c3-table'), A.stated_kinds, A.stated);
-    el('c3-head').textContent = statedHeadline(A.stated_kinds);
-    var fc = chartFlips(el('c4'), A.flips);
-    var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
-    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
-      fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
-    var med = chartAwards(el('c5'), A.awards);
-    el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
-    // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
-    el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
-    el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
-    el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
-      return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
-    el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
-      return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
+      var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
+      el('c1-sub').textContent = num(r1.total) + ' programs open or announced to local governments close in the next 26 weeks, ' + num(r1.week1) + ' of them in the next seven days. ' + num(r1.later) + ' more close later.';
+      var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
+        .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
+        .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
+        .map(function (r) { return [stateName(r[0]), r[1]]; });
+      var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
+      chartSeason(el('c2'), rows.concat([['All states', all]]), false);
+      el('c2-leg').innerHTML = seasonLegend();
+      var byMonth = all.map(function (v, i) { return [v, i]; }).sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; }), top = byMonth.slice(0, 3), low = byMonth[11];
+      var allTot = all.reduce(function (a, b) { return a + b; }, 0), topTot = top[0][0] + top[1][0] + top[2][0];
+      if (allTot) {
+        // "bunch" only when the three busiest months hold a third or more of the year's deadlines, and only on enough of
+        // them (120, ten a month) that three months cannot hold most of a handful by chance
+        var ordered = top.slice().sort(function (a, b) { return a[1] - b[1]; }).map(function (m) { return FULL[m[1]]; });
+        claim('h-c2', allTot >= 120 && topTot / allTot >= 0.33, 'State deadlines bunch in ' + ordered[0] + ', ' + ordered[1] + ' and ' + ordered[2]);
+        el('c2-sub').textContent = 'Of ' + num(allTot) + ' stated deadlines two years either side of today, ' + FULL[top[0][1]] + ' holds ' + num(top[0][0]) + ', ' +
+          FULL[top[1][1]] + ' ' + num(top[1][0]) + ' and ' + FULL[top[2][1]] + ' ' + num(top[2][0]) + '; ' + FULL[low[1]] + ' holds the fewest, ' + num(low[0]) +
+          '. This describes the past and predicts nothing.';
+      }
+      chartStated(el('c3'), el('c3-table'), A.stated_kinds, A.stated);
+      var fc = chartFlips(el('c4'), A.flips);
+      var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
+      el('c4-sub').textContent = 'The registry has logged ' + num(tot) + ' status changes on programs a local government could apply to' + (A.log_since ? ' since ' + fmtDate(A.log_since, true) : '') +
+        ', ' + num(re) + ' of them a closed round reopening or announced again. ' + num(fc.src) + ' came from the sources; ' + num(fc.code) +
+        ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + num(fc.other) + ' cannot be labelled.' : '');
+      var med = chartAwards(el('c5'), A.awards);
+      claim('h-c5', med.st.n * 2 < A.open.state, 'Most state programs name no amount');
+      el('c5-sub').textContent = 'Only ' + num(med.st.n) + ' of ' + num(A.open.state) + ' open state programs publish a maximum award, against ' + num(med.fed.n) + ' of ' + num(A.open.federal) +
+        ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+      // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
+      el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
+      el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
+      el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
+        return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
+      el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
+        return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
     }
     draw();
     onWidthChange(draw);
+    // the limits that depend on the day's data go between the two fixed ones
+    var lim = el('limits'), extra = [];
+    if (A.unread) extra.push('A program on a page the registry does not read is not here. ' + A.unread + (A.unread === 1 ? ' state has' : ' states have') + ' no state source read yet; each state page says why.');
+    if (A.log_since) extra.push('The change log begins with the registry\'s first read, ' + fmtDate(A.log_since, true) + '. Anything a source changed before then is not in it.');
+    extra.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; lim.insertBefore(li, lim.lastElementChild); });
     renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
   }
 
