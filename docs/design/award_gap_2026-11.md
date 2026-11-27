@@ -132,7 +132,7 @@ From the plan:
 | C. Concept | Mockup picked 2026-11-26; nothing built in `web/` yet |
 | D. System | Built 2026-11-26: type, weight and corner scales; control borders at 3:1; the card with Amount and Match slots and a hatched no-date column. Left: a spacing scale, styled selects and checkboxes, long titles (33 over 100 characters), the duplicated dark token block |
 | E. Structure | Begun 2026-11-26: cached `app.css` and `app.js` (index 173KB to 32KB, California 491KB to 349KB). Next: a page per listed program, with a shared head partial; then the index as a front page and state page length. California's own rows still put it over 300KB |
-| F. Charts | Begun 2026-11-26: charts drawn at shown width with narrow layouts (labels 12px on a phone, were about 4px), tap notes, a table for every chart. Left: one colour meaning three things across charts; the "what sources state" chart redrawn in the solid and hatched grammar; About as an essay with the charts as evidence; the entry piece |
+| F. Charts | Begun 2026-11-26: charts drawn at shown width with narrow layouts (labels 12px on a phone, were about 4px), tap notes, a table for every chart; 2026-11-27 the history strip on program pages at real size (11px labels, were 7.6px on a phone). Picked 2026-11-27 from https://claude.ai/artifact/YbPatmH6BUDU6dZAwBPvfy (private): the sources chart as a hundred squares per kind of source; hue says who, fill says stated or not, ink for the rest; About as an essay, argument first; headline "97 of every 100 ... 36". Left: one colour meaning three things across charts; the "what sources state" chart redrawn in the solid and hatched grammar; About as an essay with the charts as evidence; the entry piece |
 | G to H | Not started |
 
 ## Verification

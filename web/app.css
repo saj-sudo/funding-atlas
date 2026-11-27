@@ -499,7 +499,7 @@ dialog.detail footer .src { flex: 1; min-width: 0; }
 .program .body .lede { color: var(--muted); }
 .program .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 14px; border-top: 1px solid var(--line); }
 /* history strip (13.7) */
-svg.hist { width: 100%; height: auto; display: block; }
+svg.hist { width: 100%; height: 58px; display: block; overflow: visible; }
 svg.hist .hl { stroke: var(--line); stroke-width: 2; }
 svg.hist .today { stroke: var(--closing); stroke-width: 1.5; }
 svg.hist .dl { stroke: var(--ink); stroke-width: 2; }

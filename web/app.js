@@ -506,22 +506,26 @@
     if (!ev.length) return '';
     var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
     if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
-    var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
-    var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
-    var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+    // positions are percentages of the panel's width and there is no viewBox (2026-11-27), so the line fills the
+    // panel and the 11px labels stay 11px at every width: no measuring, nothing to redraw
+    var span = Math.max(30, daysBetween(start, end)), x = function (d) { return (2 + 96 * Math.min(span, Math.max(0, daysBetween(start, d))) / span).toFixed(2) + '%'; };
+    var g = '<line x1="2%" x2="98%" y1="26" y2="26" class="hl"/>';
+    var anchor = function (pc) { pc = parseFloat(pc); return pc > 70 ? 'end' : pc < 30 ? 'start' : 'middle'; };
     g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
-    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+    // a deadline in the left third would sit on the first-seen date's label, so it goes above the line instead
+    // ("today" is then at the right, since the strip ends at today or at a deadline still to come)
+    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="' + (anchor(x(dl)) === 'start' ? 10 : 52) + '" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
     ev.forEach(function (e) {
       var k = histKind(e), cx = x(e[0]);
       if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
       else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
     });
-    g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+    g += '<text x="2%" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
     var list = ev.slice().reverse().map(function (e) {
       return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
         (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
     }).join('');
-    return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+    return '<svg class="hist" height="58" aria-hidden="true">' + g + '</svg>' +
       '<ol class="hist-list">' + list + '</ol>' +
       '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
   }

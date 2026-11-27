@@ -458,6 +458,15 @@ def test_charts_draw_at_shown_width_with_tables(conn, tmp_path):
     assert '<th scope="col">' in js and '<th scope="row">' in js
 
 
+def test_history_strip_is_not_scaled(conn, tmp_path):
+    """2026-11-27: the program's history strip has no viewBox and places its marks in percentages, so its 11px labels
+    stay 11px on a phone (they were 7.6px at 390 and 17.3px at 1440 when the strip was a 520-unit drawing)."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "'<svg class=\"hist\" height=\"58\" aria-hidden=\"true\">'" in js and "W = 520" not in js
+    assert "svg.hist { width: 100%; height: 58px;" in (out / "app.css").read_text(encoding="utf-8")
+
+
 def test_index_states_and_tile_grid(conn):
     site = build_site.build(conn, generated_at=GEN)
     states = site["index"]["states"]
