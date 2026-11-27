@@ -909,7 +909,9 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     for p in programs + between + unstated:
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
     program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
-    about = about_payload(programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info)
+    about = about_payload(
+        programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info, coverage=coverage,
+    )
     # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
     seen: set[int] = set()
     program_pages = []
@@ -923,7 +925,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
 
 def about_payload(
     *, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str, connectors: dict[str, list[str]] | None = None,
-    run_info: dict[str, dict[str, str | None]] | None = None,
+    run_info: dict[str, dict[str, str | None]] | None = None, coverage: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else.
     "What sources state" (2026-11-27) is drawn by how each state is read: `stated_kinds` is the index's sum by kind,
@@ -939,12 +941,23 @@ def about_payload(
          "kind": "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]}
         for r in stats["stated"]
     ]
+    # the atlas at the top of About (2026-11-27, Saj's pick H1): every state's tile, how it is read, the reason when it
+    # is not, and the deadline counts behind its fill; a directory's own row count, since it states no dates
+    by_state = {r["state"]: r for r in stated}
+    atlas = []
+    for code, name, row, col in STATES:
+        kind, note = coverage_kind(code, connectors)
+        r, cov = by_state.get(code), (coverage or {}).get(code)
+        atlas.append({"code": code, "name": name, "row": row, "col": col, "kind": kind, "note": note,
+                      "listed": cov["n_programs"] if cov else 0,
+                      "n": r["n"] if r else 0, "date": r["date_stated"] if r else 0})
     return {
         "generated_at": generated_at,
         "site_url": SITE_URL,
         "repo_url": REPO_URL,
         "rules": {"new_days": NEW_DAYS, "closing_days": CLOSING_DAYS},
         "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
+        "atlas": atlas,
         "deadlines": [[p["state"], p["closes_at"], p["deadline_placeholder"]] for p in programs if p["closes_at"]],
         "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
         "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},

@@ -594,6 +594,42 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .claim > p { max-width: 66ch; }
 .claim > .chart { margin-top: 6px; }
 .chart > h3 { font: 600 var(--t-xl)/1.25 var(--f-display); }
+/* the atlas (2026-11-27): the tile map of what each state's sources state, in the grammar */
+.atlas-fig { margin: 22px 0 0; display: grid; gap: 10px; container-type: inline-size; min-width: 0; }
+.atlas-fig .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--t-xs); color: var(--muted); }
+.legend .sw.wall { background: transparent; box-shadow: none; border: 1.5px dashed var(--edge); }
+.legend .sw.nolist { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+.legend .sw.oos { background: var(--soft); }
+.atlas-wrap { display: grid; grid-template-columns: minmax(0, 760px) minmax(0, 200px); gap: 20px; align-items: start; }
+.atlas { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px; max-width: 760px; }
+.atlas .tile, .atlas-fed .tile { position: relative; aspect-ratio: 1; min-width: 0; padding: 0; overflow: hidden; border: 1px solid var(--edge); border-radius: 0;
+  background: var(--surface) repeating-linear-gradient(135deg, var(--hatch) 0 1.5px, transparent 1.5px 6px); color: var(--ink); font: 600 var(--t-xs)/1 var(--f-body); cursor: pointer; text-align: left; }
+.tile .lv { position: absolute; inset: auto 0 0 0; background: var(--s-state); }
+.tile.t-fed { border-color: var(--s-fed); } .tile.t-fed .lv { background: var(--s-fed); }
+.tile .cd, .tile .pc { position: absolute; background: var(--surface); padding: 1px 3px; border-radius: var(--r-sm); }
+.tile .cd { top: 3px; left: 3px; } .tile .pc { bottom: 3px; right: 3px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile.t-wall { background: var(--bg); border: 1.5px dashed var(--edge); }
+.tile.t-none { background: var(--bg); border-color: var(--line); }
+.tile.t-oos { background: var(--soft); border-color: transparent; cursor: default; }
+.tile.t-wall .cd, .tile.t-none .cd, .tile.t-oos .cd { background: transparent; color: var(--muted); }
+.tile.on { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 1; }
+.tile:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; z-index: 2; }
+.atlas-fed { display: grid; gap: 8px; font-size: var(--t-xs); color: var(--muted); align-content: start; }
+.atlas-fed .tile { width: 76px; cursor: default; }
+.atlas-note { min-height: 3em; font-size: var(--t-sm); max-width: 66ch; }
+.atlas-fig .src { font-size: var(--t-xs); color: var(--muted); max-width: 80ch; }
+@container (max-width: 560px) {
+  .atlas-wrap { grid-template-columns: 1fr; gap: 10px; }
+  .atlas { gap: 2px; }
+  .atlas .tile .cd { font-size: var(--t-xs); }
+  .atlas .tile .cd { top: 1px; left: 1px; padding: 0 2px; }
+  .atlas .tile .pc { display: none; }
+  .atlas-fed { grid-template-columns: auto 1fr; align-items: center; }
+  .atlas-fed .tile { width: 44px; }
+}
+@container (max-width: 330px) {   /* 24px tiles on a 320 phone: the code takes the whole top edge, still on its own ground */
+  .atlas .tile .cd { top: 0; left: 0; right: 0; padding: 0; text-align: center; border-radius: 0; letter-spacing: -.02em; }
+}
 .limits ul { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; max-width: 66ch; }
 .data-code { margin-top: 40px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); display: grid; gap: 8px; max-width: 80ch; font-size: var(--t-sm); }
 .data-code h2 { font-size: var(--t-lg); }

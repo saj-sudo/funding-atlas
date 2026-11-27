@@ -349,6 +349,45 @@
   // "What sources state" (2026-11-27, Saj's pick A2): a hundred squares per kind of source and field, solid for one in
   // a hundred programs whose source states it, hatched for the rest; blue federal, orange state. HTML, not SVG, so its
   // text follows the reader's settings. Each state's own shares are in the table.
+  // The atlas (2026-11-27, Saj's pick H1 for the entry piece): every state on the tile map. With `kinds` false, a read
+  // state's tile fills from the bottom to the share of its programs whose source states a deadline (solid, the state's
+  // hue) and is hatched above; a directory is all hatched; a state that refuses readers or needs a browser script is
+  // dashed; a state with no list is an empty outline; DC is out of scope. With `kinds` true the fill says how the state
+  // is read instead. Tiles are buttons: a tap or Enter puts the state's sentence in `noteEl`, a live region.
+  var READ_AS = { portal: 'a state grants portal', agencies: 'its agencies\' own pages', portal_agencies: 'a state portal and its agencies\' pages', directory: 'a state directory' };
+  function atlasClass(s, kinds) {
+    if (s.code === 'DC') return 't-oos';
+    if (s.kind === 'blocked' || s.kind === 'login' || s.kind === 'stopped') return 't-wall';
+    if (s.kind === 'directory') return 't-dir';
+    if (READ_AS[s.kind]) return kinds ? 't-k k-' + s.kind : s.n ? 't-read' : 't-none';
+    return 't-none';
+  }
+  function atlasNote(s) {
+    if (s.n) return s.name + ': ' + s.date.toLocaleString('en-US') + ' of ' + s.n.toLocaleString('en-US') + ' programs open to local governments state a deadline (' + share(s.date, s.n) + ' in 100). Read from ' + READ_AS[s.kind] + '.';
+    if (s.kind === 'directory') return s.name + ': a state directory of ' + s.listed.toLocaleString('en-US') + ' programs that states no status or dates.';
+    if (READ_AS[s.kind]) return s.name + ': read from ' + READ_AS[s.kind] + '; none of its programs is open to local governments.';
+    return s.name + ': ' + (s.note || 'no state source read.');
+  }
+  function drawAtlas(el, noteEl, atlas, fed, kinds) {
+    var hh = '<div class="atlas">' + atlas.map(function (s, i) {
+      var cls = atlasClass(s, kinds), p = share(s.date, s.n), fill = !kinds && cls === 't-read';
+      return '<button type="button" class="tile ' + cls + '" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-i="' + i + '" aria-label="' + h(atlasNote(s)) + '">' +
+        (fill ? '<span class="lv" style="height:' + p + '%"></span>' : '') + '<span class="cd">' + s.code + '</span>' + (fill ? '<span class="pc">' + p + '</span>' : '') + '</button>';
+    }).join('') + '</div>';
+    if (!kinds && fed) {
+      var fp = share(fed.date_stated, fed.n);
+      hh = '<div class="atlas-wrap">' + hh + '<div class="atlas-fed"><span class="tile t-read t-fed" aria-hidden="true"><span class="lv" style="height:' + fp + '%"></span><span class="cd">US</span><span class="pc">' + fp + '</span></span>' +
+        '<span>Federal notices open now, for comparison: ' + fp + ' in 100 state a deadline (' + fed.date_stated + ' of ' + fed.n + ').</span></div></div>';
+    }
+    el.innerHTML = hh;
+    el.querySelectorAll('.tile[data-i]').forEach(function (t) {
+      t.addEventListener('click', function () {
+        el.querySelectorAll('.tile.on').forEach(function (x) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+        t.classList.add('on'); t.setAttribute('aria-pressed', 'true');
+        noteEl.textContent = atlasNote(atlas[+t.getAttribute('data-i')]);
+      });
+    });
+  }
   function chartStated(el, tableEl, kinds, rows) {
     var FIELDS = [['status', 'a status'], ['date', 'a deadline'], ['amount', 'an amount']];
     el.innerHTML = kinds.map(function (k) {
@@ -567,6 +606,7 @@
     // About as an essay (2026-11-27): every sentence below is built from the payload's counts. A claim heading is used
     // only when the day's counts bear it; otherwise the section keeps the chart's plain title.
     function claim(id, ok, text) { if (ok) el(id).textContent = text; }
+    if (A.atlas && el('atlas')) drawAtlas(el('atlas'), el('atlas-note'), A.atlas, (A.stated || []).filter(function (r) { return r.state === 'US'; })[0], false);
     var K = {}; (A.stated_kinds || []).forEach(function (k) { K[k.kind] = k; });
     var P = K.portal, G = K.agencies;
     if (P && G) {

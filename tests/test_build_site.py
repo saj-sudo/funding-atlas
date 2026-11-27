@@ -353,7 +353,9 @@ def test_scales_and_card_slots(conn, tmp_path):
     assert set(re.findall(r"font-weight: (\d+)", rules)) <= {"400", "600", "700"}
     assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
     assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
-    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [".map a.t.k-blocked ", ".legend i.k-blocked "]
+    # dashed only ever means "cannot be read": the index map's blocked states, and About's atlas (2026-11-27)
+    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [
+        ".legend .sw.wall ", ".tile.t-wall ", ".map a.t.k-blocked ", ".legend i.k-blocked "]
     js = (out / "app.js").read_text(encoding="utf-8")
     assert "slot('Amount', amount) + slot('Match', match)" in js and "'Source does not say'" in js
     assert "Amount not published" not in page + js
@@ -549,6 +551,23 @@ def test_one_colour_one_meaning_in_the_charts(conn, tmp_path):
     assert "[['src', 'm-ink'], ['other', 'm-ink'], ['code', 'm-maybe']]" in js
     # blue marks only on the two charts that split federal from state: weekly deadlines and maximum awards
     assert js.count("'m-fed'") == 1 and js.count("class=\"m-fed\"") == 1
+
+
+def test_about_opens_with_the_atlas(conn, tmp_path):
+    """2026-11-27 (Saj's pick H1 for the entry piece): About opens with every state on the tile map, filled to the share
+    of its programs whose source states a deadline; each tile carries how the state is read and, if it is not, why."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    atlas = {s["code"]: s for s in data["atlas"]}
+    assert len(atlas) == len(build_site.STATES) and all({"row", "col", "kind", "n", "date", "listed"} <= set(s) for s in atlas.values())
+    md = next(r for r in data["stated"] if r["state"] == "MD")
+    assert atlas["MD"]["n"] == md["n"] and atlas["MD"]["date"] == md["date_stated"]
+    assert atlas["AK"]["kind"] == "blocked" and atlas["AK"]["note"] and atlas["AK"]["n"] == 0
+    assert page.index('id="lede"') < page.index('id="atlas"') < page.index('id="c3"')
+    assert 'id="atlas-note" aria-live="polite"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "function drawAtlas(el, noteEl, atlas, fed, kinds)" in js and "aria-pressed" in js
 
 
 def test_embed_json_is_script_safe():
