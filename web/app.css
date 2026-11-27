@@ -33,8 +33,8 @@
   --topic-com: #8b3a62;
   --caution: #ffcd00;
   --caution-ink: #0b0d10;
-  --q-ink: #ffffff;
-  --q1: #cde2fb; --q2: #9ec5f4; --q3: #6da7ec; --q4: #3987e5; --q5: #256abf; --q6: #184f95; --q7: #0d366b;
+  --o-ink: #ffffff;
+  --o1: #fbd9c4; --o2: #f8bf9c; --o3: #f39e70; --o4: #ea7c45; --o5: #bd501c; --o6: #953c12; --o7: #6b290a;
   --shadow: 0 1px 2px rgba(20, 33, 61, .06), 0 8px 24px rgba(20, 33, 61, .08);
   --f-display: "Source Serif 4", Georgia, "Times New Roman", serif;
   --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -73,8 +73,8 @@
     --topic-com: #e79cc4;
     --caution: #ffd23a;
     --caution-ink: #0b0d10;
-    --q-ink: #0d1733;
-    --q1: #1b2a44; --q2: #1d3a66; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #b7d3f6;
+    --o-ink: #0d1733;
+    --o1: #4a2715; --o2: #68331a; --o3: #86401c; --o4: #9d491d; --o5: #e0743d; --o6: #f29c6f; --o7: #f9c6a8;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
@@ -108,8 +108,8 @@
   --topic-com: #e79cc4;
   --caution: #ffd23a;
   --caution-ink: #0b0d10;
-  --q-ink: #0d1733;
-  --q1: #1b2a44; --q2: #1d3a66; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #b7d3f6;
+  --o-ink: #0d1733;
+  --o1: #4a2715; --o2: #68331a; --o3: #86401c; --o4: #9d491d; --o5: #e0743d; --o6: #f29c6f; --o7: #f9c6a8;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
   color-scheme: dark;
 }
@@ -333,13 +333,14 @@ ul, ol { margin: 0; padding: 0; }
 .clab { fill: var(--ink); font-weight: 600; }
 .cmuted { fill: var(--muted); font-weight: 400; }
 .cval { fill: var(--ink); font-size: 11px; }
-.cval.inv { fill: var(--q-ink); }
+.cval.inv { fill: var(--o-ink); }
 .cgrid { stroke: var(--line); stroke-width: 1; }
 .caxis { stroke: var(--muted); stroke-width: 1; }
 .cmed { stroke: var(--ink); stroke-width: 2; }
 .m-fed { fill: var(--s-fed); }
-.m-code { fill: var(--muted); fill-opacity: .55; }
-.sw.code { background: var(--muted); opacity: .55; } .m-st { fill: var(--s-state); }
+.m-ink { fill: var(--ink); }
+.m-maybe { fill: var(--edge); }
+.sw.ink { background: var(--ink); } .sw.maybe { background: var(--edge); } .m-st { fill: var(--s-state); }
 .cdot { stroke: var(--surface); stroke-width: 2; }
 circle.cdot.m-fed, circle.cdot.m-st { fill-opacity: .85; }
 .ctip { position: fixed; z-index: 60; pointer-events: none; background: var(--ink); color: var(--bg); font-size: var(--t-sm); padding: 6px 9px; border-radius: var(--r-sm); max-width: 300px; box-shadow: var(--shadow); }

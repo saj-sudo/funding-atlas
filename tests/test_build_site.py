@@ -531,6 +531,19 @@ def test_what_sources_state_is_a_hundred_squares_by_kind(conn, tmp_path):
     assert "m-s1" not in js and "--s3" not in (out / "app.css").read_text(encoding="utf-8")
 
 
+def test_one_colour_one_meaning_in_the_charts(conn, tmp_path):
+    """2026-11-27: hue says who (blue federal, orange and its ramp state), fill says whether the source stated it, ink
+    for the rest. Blue had also meant "states a status" and "the source changed", and the heat map of state-only
+    deadlines was a blue ramp."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js, css = (out / "app.js").read_text(encoding="utf-8"), (out / "app.css").read_text(encoding="utf-8")
+    assert "var(--q" not in js and "--q1" not in css and css.count("--o1:") == 3
+    assert "var RAMP = ['var(--o1)'" in js
+    assert "[['src', 'm-ink'], ['other', 'm-ink'], ['code', 'm-maybe']]" in js
+    # blue marks only on the two charts that split federal from state: weekly deadlines and maximum awards
+    assert js.count("'m-fed'") == 1 and js.count("class=\"m-fed\"") == 1
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

@@ -241,8 +241,9 @@
   }
 
   // =====================================================================================
-  // Charts (13.14): plain SVG, one shared tooltip, except "what sources state", which is HTML squares. Colours come
-  // from the theme tokens (--s-fed, --s-state, the --q ramp); every chart has a legend or direct labels and a table.
+  // Charts (13.14): plain SVG, one shared tooltip, except "what sources state", which is HTML squares. One colour rule
+  // (2026-11-27): hue says who (--s-fed federal, --s-state and its --o ramp state), fill says whether the source stated
+  // it (solid stated, hatched not), and everything else is ink. Every chart has a legend or direct labels and a table.
   // =====================================================================================
 
   var tipEl = null;
@@ -323,7 +324,7 @@
   }
 
   // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
-  var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
+  var RAMP = ['var(--o1)', 'var(--o2)', 'var(--o3)', 'var(--o4)', 'var(--o5)', 'var(--o6)', 'var(--o7)'];   // state data, so the state's hue (2026-11-27)
   function chartSeason(svgEl, rows, compact) {
     var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, L = compact ? 10 : narrow ? 92 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
     MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + (narrow && !compact ? m.charAt(0) : m) + '</text>'; });
@@ -395,7 +396,7 @@
       var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
       g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="26" fill="transparent"/>';
       var x0 = L;
-      [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
+      [['src', 'm-ink'], ['other', 'm-ink'], ['code', 'm-maybe']].forEach(function (seg) {
         var v = r[seg[0]]; if (!v) return;
         var x1 = x0 + (x(v) - L), last = x1 >= x(tot) - 0.5;
         g += '<path class="' + seg[1] + '" d="' + (last ? 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 4) + 'Q' + x1 + ',' + (yy + 4) + ' ' + x1 + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x1 + ',' + (yy + 20) + ' ' + (x1 - 4) + ',' + (yy + 20) + 'H' + x0 + 'Z'
