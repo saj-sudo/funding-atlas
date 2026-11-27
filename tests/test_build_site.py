@@ -451,7 +451,7 @@ def test_charts_draw_at_shown_width_with_tables(conn, tmp_path):
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     js, about = (out / "app.js").read_text(encoding="utf-8"), (out / "about" / "index.html").read_text(encoding="utf-8")
     assert "function chartW(svgEl, max)" in js and "var w = 900" not in js and "onWidthChange(draw);" in js
-    assert js.count("narrow = w < 560") == 5
+    assert js.count("narrow = w < 560") == 4                     # "what sources state" is HTML squares since 2026-11-27
     assert "svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]');" in js
     for cid in ("c1", "c2", "c3", "c4", "c5"):
         assert f'<div id="{cid}-table"></div>' in about and (f"el('{cid}-table')" in js), cid
@@ -511,6 +511,24 @@ def test_about_page_is_written_and_same_origin(conn, tmp_path):
     data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
     assert {"deadlines", "awards", "months", "stated", "flips", "open"} <= set(data)
     assert set(re.findall(r'<script src="([^"?]+)', page)) == {"../app.js"} and "cdn" not in page
+
+
+def test_what_sources_state_is_a_hundred_squares_by_kind(conn, tmp_path):
+    """2026-11-27 (Saj's pick A2): "what sources state" sums the stated fields by how each state is read, as the index
+    does; every row carries its kind, no count is null, and the chart is squares, solid for stated, in HTML."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    rows, kinds = data["stated"], data["stated_kinds"]
+    assert rows and all(r["kind"] and all(r[k] is not None for k in ("n", "status_stated", "date_stated", "amount_stated")) for r in rows)
+    assert kinds[0]["kind"] == "federal"
+    for k in kinds:
+        mine = [r for r in rows if r["kind"] == k["kind"]]
+        assert k["n"] == sum(r["n"] for r in mine) and k["date"] == sum(r["date_stated"] for r in mine) and k["states"] == len(mine)
+    assert '<div id="c3" class="waffle"></div>' in page and '<svg id="c3"' not in page and 'id="c3-head"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "function chartStated(el, tableEl, kinds, rows)" in js and "for (var i = 0; i < 100; i++)" in js
+    assert "m-s1" not in js and "--s3" not in (out / "app.css").read_text(encoding="utf-8")
 
 
 def test_embed_json_is_script_safe():

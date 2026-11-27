@@ -241,8 +241,8 @@
   }
 
   // =====================================================================================
-  // Charts (13.14): plain SVG, one shared tooltip. Colours come from the theme tokens (--s-fed, --s-state,
-  // --s3, the --q ramp); every chart has a legend or direct labels, and the stated-fields chart a table.
+  // Charts (13.14): plain SVG, one shared tooltip, except "what sources state", which is HTML squares. Colours come
+  // from the theme tokens (--s-fed, --s-state, the --q ramp); every chart has a legend or direct labels and a table.
   // =====================================================================================
 
   var tipEl = null;
@@ -342,25 +342,35 @@
     return '<span><i class="sw" style="background:var(--soft)"></i>none</span><span>small share</span>' + RAMP.map(function (c) { return '<i class="sw" style="background:' + c + ';margin:0 1px"></i>'; }).join('') + '<span>26% or more of the row</span>';
   }
 
-  function chartStated(svgEl, tableEl, rows) {
-    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 14 : 150, R = narrow ? 18 : 30, T = 24, rh = narrow ? 50 : 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
-    [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
-    var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
-    rows.forEach(function (r, i) {
-      var yy = T + i * rh + (narrow ? 34 : rh / 2), name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
-      // narrow: the name sits on its own line above the row's dots
-      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (yy - 16) + '">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>'
-        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
-      g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
-      ser.forEach(function (sr, j) {
-        var v = r.n ? r[sr[0]] / r.n : 0;
-        g += '<circle class="' + sr[1] + ' cdot" data-tip="' + h(name + ': ' + Math.round(v * 100) + '% state ' + sr[2] + ' (' + r[sr[0]] + ' of ' + r.n + ')') + '" cx="' + x(v) + '" cy="' + (yy + (j - 1) * 8) + '" r="6"/>';
-      });
-    });
-    drawSvg(svgEl, w, hh, g);
-    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
-      rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
-        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), r.n, p('status_stated'), p('date_stated'), p('amount_stated')]; }));
+  // how a source is read, in the words the index's "what the states publish" block and About's chart both use
+  var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
+  function share(v, n) { return n ? Math.round(100 * v / n) : 0; }
+  // "What sources state" (2026-11-27, Saj's pick A2): a hundred squares per kind of source and field, solid for one in
+  // a hundred programs whose source states it, hatched for the rest; blue federal, orange state. HTML, not SVG, so its
+  // text follows the reader's settings. Each state's own shares are in the table.
+  function statedHeadline(kinds) {
+    var by = {}; kinds.forEach(function (k) { by[k.kind] = k; });
+    var p = by.portal, a = by.agencies;
+    return p && a ? 'State portals give a deadline for ' + share(p.date, p.n) + ' of every 100 programs. Agency pages give one for ' + share(a.date, a.n) + '.' : '';
+  }
+  function chartStated(el, tableEl, kinds, rows) {
+    var FIELDS = [['status', 'a status'], ['date', 'a deadline'], ['amount', 'an amount']];
+    el.innerHTML = kinds.map(function (k) {
+      var fed = k.kind === 'federal', name = KIND_ROW[k.kind] || k.kind;
+      return '<div class="wf-group ' + (fed ? 'fed' : 'st') + '"><div class="wf-name"><h3>' + h(name) + '</h3><small class="num">' +
+        k.n.toLocaleString('en-US') + ' programs' + (fed ? ', open now' : ' · ' + k.states + (k.states === 1 ? ' state' : ' states')) + '</small></div>' +
+        FIELDS.map(function (f) {
+          var v = k[f[0]], p = share(v, k.n), cells = '';
+          for (var i = 0; i < 100; i++) cells += '<i' + (i < p ? ' class="on"' : '') + '></i>';
+          return '<div class="wf"><div class="wf-grid" role="img" aria-label="' + h(name + ': ' + p + ' in 100 state ' + f[1] + ', ' + v + ' of ' + k.n) + '">' + cells + '</div>' +
+            '<p><b class="num">' + p + '</b> in 100 state ' + f[1] + '<span class="num">' + v.toLocaleString('en-US') + ' of ' + k.n.toLocaleString('en-US') + '</span></p></div>';
+        }).join('') + '</div>';
+    }).join('');
+    var order = { federal: 0, portal: 1, portal_agencies: 2, agencies: 3, directory: 4 };
+    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Read from', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
+      rows.slice().sort(function (a, b) { return (order[a.kind] - order[b.kind]) || (b.n - a.n); }).map(function (r) {
+        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), KIND_ROW[r.kind] || r.kind, r.n,
+          share(r.status_stated, r.n) + '%', share(r.date_stated, r.n) + '%', share(r.amount_stated, r.n) + '%']; }));
   }
 
   // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
@@ -568,7 +578,8 @@
     Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
     chartSeason(el('c2'), rows.concat([['All states', all]]), false);
     el('c2-leg').innerHTML = seasonLegend();
-    chartStated(el('c3'), el('c3-table'), A.stated.filter(function (r) { return r.n >= 7; }));
+    chartStated(el('c3'), el('c3-table'), A.stated_kinds, A.stated);
+    el('c3-head').textContent = statedHeadline(A.stated_kinds);
     var fc = chartFlips(el('c4'), A.flips);
     var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
     el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
@@ -1381,7 +1392,6 @@
       }).join('');
       el('t-log').addEventListener('click', function () { el('changes').open = true; });
     }
-    var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
     if (ST.length) {
       el('t-stated').hidden = false;
       el('t-mini').innerHTML = '<span></span><span class="th">Status</span><span class="th">Deadline</span><span class="th">Amount</span>' + ST.map(function (r) {

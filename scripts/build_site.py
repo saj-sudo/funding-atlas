@@ -909,7 +909,7 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     for p in programs + between + unstated:
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
     program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
-    about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
+    about = about_payload(programs=programs, stats=stats, generated_at=generated_at, connectors=connectors)
     # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
     seen: set[int] = set()
     program_pages = []
@@ -921,8 +921,18 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
             "program_pages": program_pages}
 
 
-def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str) -> dict[str, Any]:
-    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else."""
+def about_payload(
+    *, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str, connectors: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
+    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else.
+    "What sources state" (2026-11-27) is drawn by how each state is read: `stated_kinds` is the index's sum by kind,
+    and each `stated` row carries its kind. A count the view returns as NULL (no row could say) is 0."""
+    connectors = connectors or {}
+    stated = [
+        {**{k: (r[k] or 0) for k in ("n", "status_stated", "date_stated", "amount_stated")}, "state": r["state"],
+         "kind": "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]}
+        for r in stats["stated"]
+    ]
     return {
         "generated_at": generated_at,
         "site_url": SITE_URL,
@@ -933,7 +943,8 @@ def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], gene
         "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
         "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},
         "months": stats["months"],
-        "stated": stats["stated"],
+        "stated": stated,
+        "stated_kinds": stated_by_kind(stats["stated"], connectors),
         "flips": stats["flips"],
         "questions": list(READER_QUESTIONS),
     }

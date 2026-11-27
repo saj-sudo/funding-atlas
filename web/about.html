@@ -54,11 +54,11 @@
 
   <figure class="chart">
     <h2>What sources state</h2>
-    <p class="sub">Share of state programs open to local governments whose source states a status, a deadline (or rolling), and an amount, by state; federal notices open now for comparison. Structured portals state the basics; agency pages often do not.</p>
-    <div class="legend"><span><i class="sw s1"></i>States a status</span><span><i class="sw s2"></i>States a deadline</span><span><i class="sw s3"></i>States an amount</span></div>
-    <div class="chart-scroll"><svg id="c3" role="img" aria-label="Share of programs stating status, deadline and amount"></svg></div>
-    <details class="c-table"><summary>Show as a table</summary><div id="c3-table"></div></details>
-    <p class="src">States with 7 or more such programs.</p>
+    <p class="sub" id="c3-head"></p>
+    <div class="legend"><span><i class="sw fed"></i>Federal, stated</span><span><i class="sw st"></i>State, stated</span><span><i class="sw none"></i>Source does not say</span><span>One square: 1 in 100 programs</span></div>
+    <div id="c3" class="waffle"></div>
+    <details class="c-table"><summary>Show each state as a table</summary><div id="c3-table"></div></details>
+    <p class="src">State programs open to local governments, any status, grouped by how the registry reads the state; federal notices open now for comparison. A deadline counts when the source gives a date or says it is rolling.</p>
   </figure>
 
   <figure class="chart">
