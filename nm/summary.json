@@ -1,0 +1,82 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "NM",
+  "name": "New Mexico"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/nm/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 46,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "other",
+   "open": 21
+  },
+  {
+   "category": "transportation",
+   "open": 18
+  },
+  {
+   "category": "water",
+   "open": 13
+  },
+  {
+   "category": "parks",
+   "open": 7
+  },
+  {
+   "category": "infrastructure",
+   "open": 6
+  },
+  {
+   "category": "housing",
+   "open": 5
+  },
+  {
+   "category": "health",
+   "open": 2
+  },
+  {
+   "category": "public_safety",
+   "open": 2
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Land & Water Conservation Fund (LWCF)",
+   "agency": "Energy, Minerals, and Natural Resources Department",
+   "closes_at": "2027-01-05",
+   "days_to_close": 39,
+   "link": "https://saj-sudo.github.io/funding-atlas/nm/#p=land-water-conservation-fund-lwcf-nm-dfa-3019"
+  },
+  {
+   "name": "Local Government Road Fund Cooperative Agreement Program (COOP)",
+   "agency": "Department of Transportation",
+   "closes_at": "2027-03-15",
+   "days_to_close": 108,
+   "link": "https://saj-sudo.github.io/funding-atlas/nm/#p=local-government-road-fund-cooperative-agreement-program-coop-nm-dfa-2010"
+  },
+  {
+   "name": "Local Government Road Fund Municipal Arterial Program",
+   "agency": "Department of Transportation",
+   "closes_at": "2027-03-15",
+   "days_to_close": 108,
+   "link": "https://saj-sudo.github.io/funding-atlas/nm/#p=local-government-road-fund-municipal-arterial-program-nm-dfa-2011"
+  },
+  {
+   "name": "Transportation Project Fund (TPF)",
+   "agency": "Department of Transportation",
+   "closes_at": "2027-05-30",
+   "days_to_close": 184,
+   "link": "https://saj-sudo.github.io/funding-atlas/nm/#p=transportation-project-fund-tpf-nm-dfa-2015"
+  }
+ ]
+}

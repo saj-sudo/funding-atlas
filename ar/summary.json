@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "AR",
+  "name": "Arkansas"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ar/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Rural Community Grant Program",
+   "agency": "Arkansas Economic Development Commission",
+   "closes_at": "2027-03-11",
+   "days_to_close": 104,
+   "link": "https://saj-sudo.github.io/funding-atlas/ar/#p=rural-community-grant-program-ar-aedc-rural-community"
+  }
+ ]
+}

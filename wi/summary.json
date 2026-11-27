@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "WI",
+  "name": "Wisconsin"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/wi/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 4,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 4
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Affordable Housing Conversion Program",
+   "agency": "Wisconsin Department of Administration, Division of Energy, Housing and Community Resources",
+   "closes_at": "2027-05-15",
+   "days_to_close": 169,
+   "link": "https://saj-sudo.github.io/funding-atlas/wi/#p=affordable-housing-conversion-program-wi-doa-affordable-housing-conversion"
+  }
+ ]
+}

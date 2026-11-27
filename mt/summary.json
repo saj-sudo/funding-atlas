@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "MT",
+  "name": "Montana"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/mt/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "parks",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "FWP Trail Stewardship Program (TSP) 2027",
+   "agency": "Department of Fish, Wildlife and Parks",
+   "closes_at": "2027-01-15",
+   "days_to_close": 49,
+   "link": "https://saj-sudo.github.io/funding-atlas/mt/#p=fwp-trail-stewardship-program-tsp-2027-webgrants-mtfwp-25123"
+  }
+ ]
+}

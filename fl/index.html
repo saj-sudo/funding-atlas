@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Federal and Florida public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta name="color-scheme" content="light dark">
+<title>Florida: open funding for local governments · Funding Atlas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='12' y='2' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='22' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='2' y='12' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='12' y='12' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='22' y='12' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='2' y='22' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='12' y='22' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='22' y='22' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://saj-sudo.github.io/funding-atlas/fl/">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Funding Atlas">
+<meta property="og:title" content="Florida: open funding for local governments · Funding Atlas">
+<meta property="og:description" content="Federal and Florida public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta property="og:url" content="https://saj-sudo.github.io/funding-atlas/fl/">
+<meta property="og:image" content="https://saj-sudo.github.io/funding-atlas/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
+<meta name="twitter:card" content="summary_large_image">
+<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/public-sans-latin.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/source-serif-4-latin.woff2">
+<link rel="stylesheet" href="../app.css?v=685dfee7ab">
+
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="../"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="../about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built 2026-11-27.</p></noscript>
+  </section>
+
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
+    </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <a class="btn" id="detail-page" href="#">Open as a page</a>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{"generated_at":"2026-11-27T19:28:55Z","site_url":"https://saj-sudo.github.io/funding-atlas/","repo_url":"https://github.com/saj-sudo/funding-atlas","state":{"code":"FL","name":"Florida"},"states":[{"code":"AK","name":"Alaska"},{"code":"ME","name":"Maine"},{"code":"VT","name":"Vermont"},{"code":"NH","name":"New Hampshire"},{"code":"WA","name":"Washington"},{"code":"ID","name":"Idaho"},{"code":"MT","name":"Montana"},{"code":"ND","name":"North Dakota"},{"code":"MN","name":"Minnesota"},{"code":"IL","name":"Illinois"},{"code":"WI","name":"Wisconsin"},{"code":"MI","name":"Michigan"},{"code":"NY","name":"New York"},{"code":"MA","name":"Massachusetts"},{"code":"OR","name":"Oregon"},{"code":"NV","name":"Nevada"},{"code":"WY","name":"Wyoming"},{"code":"SD","name":"South Dakota"},{"code":"IA","name":"Iowa"},{"code":"IN","name":"Indiana"},{"code":"OH","name":"Ohio"},{"code":"PA","name":"Pennsylvania"},{"code":"NJ","name":"New Jersey"},{"code":"CT","name":"Connecticut"},{"code":"RI","name":"Rhode Island"},{"code":"CA","name":"California"},{"code":"UT","name":"Utah"},{"code":"CO","name":"Colorado"},{"code":"NE","name":"Nebraska"},{"code":"MO","name":"Missouri"},{"code":"KY","name":"Kentucky"},{"code":"WV","name":"West Virginia"},{"code":"VA","name":"Virginia"},{"code":"MD","name":"Maryland"},{"code":"DE","name":"Delaware"},{"code":"AZ","name":"Arizona"},{"code":"NM","name":"New Mexico"},{"code":"KS","name":"Kansas"},{"code":"AR","name":"Arkansas"},{"code":"TN","name":"Tennessee"},{"code":"NC","name":"North Carolina"},{"code":"SC","name":"South Carolina"},{"code":"DC","name":"District of Columbia"},{"code":"OK","name":"Oklahoma"},{"code":"LA","name":"Louisiana"},{"code":"MS","name":"Mississippi"},{"code":"AL","name":"Alabama"},{"code":"GA","name":"Georgia"},{"code":"HI","name":"Hawaii"},{"code":"TX","name":"Texas"},{"code":"FL","name":"Florida"}],"rules":{"new_days":7,"updated_days":7,"closing_days":30,"feed_n":200,"between_months":15},"coverage":{"federal":{"open":116,"sources":[{"connector":"grants_gov","label":"Grants.gov","last_ok":"2026-11-27T19:26:53Z"},{"connector":"sam_assistance_listings","label":"SAM.gov Assistance Listings","last_ok":"2026-11-27T19:28:55Z"}]},"state":{"agencies":2,"programs":18,"open":2,"between":4,"unstated":3,"last_ok":"2026-11-27T19:19:44Z","sources":[{"connector":"fl_dep","label":"Florida Department of Environmental Protection","last_ok":"2026-11-27T19:19:44Z"},{"connector":"fl_dos","label":"Florida Department of State","last_ok":"2026-11-27T19:19:19Z"}]}},"excluded_unlikely":612,"questions":["What is open right now that is not on this page?","Which rows should not be here, and why?","Which columns do you actually use when deciding whether to apply? Which are noise?","Where do you look for this today, and what does that source get right that this one does not?"],"programs":[{"id":7955,"slug":"clean-water-state-revolving-fund-fl-dep-srf","name":"Clean Water State Revolving Fund","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"loan","funding_source":"pass_through","status":"open","opens_at":null,"closes_at":null,"closes_text":"The first step in the process for SRF funding, both Clean Water and Drinking Water SRF, is the submission of a Request for Inclusion form, which can be submitted any time during the year.","rolling":true,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Clean Water State Revolving Fund (CWSRF) Program provides low-interest loans to local governments to plan, design, and build or upgrade wastewater, stormwater, and nonpoint source pollution prevention projects. Certain agricultural best management practices may also qualify for funding. Discounted assistance (e.g., very low interest rates, grants, etc.) for small communities is available. Interest rates on loans are below market rates and vary based on the economic wherewithal of the community.","eligibility":"The Clean Water State Revolving Fund (CWSRF) Program provides low-interest loans to local governments to plan, design, and build or upgrade wastewater, stormwater, and nonpoint source pollution prevention projects.\nGenerally, local governments (city and county) and special districts are eligible loan sponsors.","applicant_types":["county","municipality","special_district"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/wra/srf","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]},{"id":7956,"slug":"drinking-water-state-revolving-fund-fl-dep-srf#drinking-water","name":"Drinking Water State Revolving Fund","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"loan","funding_source":"pass_through","status":"open","opens_at":null,"closes_at":null,"closes_text":"The first step in the process for SRF funding, both Clean Water and Drinking Water SRF, is the submission of a Request for Inclusion form, which can be submitted any time during the year.","rolling":true,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Drinking Water State Revolving Fund (DWSRF) Program provides low-interest loans to local governments and private utilities to plan, design, and build or upgrade drinking water systems. Discounted assistance (e.g., very low interest rates, grants, etc.) for disadvantaged communities is available. Interest rates on loans are below market rates and vary based on the economic wherewithal of the community.","eligibility":"The Drinking Water State Revolving Fund (DWSRF) Program provides low-interest loans to local governments and private utilities to plan, design, and build or upgrade drinking water systems.\nGenerally, local governments (city and county) and special districts are eligible loan sponsors.","applicant_types":["county","municipality","special_district"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/wra/srf","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]}],"between":[{"id":7951,"slug":"florida-recreation-development-assistance-program-fl-dep-frdap","name":"Florida Recreation Development Assistance Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"direct","status":"closed","opens_at":null,"closes_at":"2026-10-15","closes_text":"The 2027-2028 FRDAP Application Cycle Closed Oct. 15, 2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Land and Recreation Grants staff administers grants to local governments through the Florida Recreation Development Assistance Program (FRDAP). This competitive, reimbursement grant program provides financial assistance for acquisition or development of land for public outdoor recreation. Eligible participants include all county governments, municipalities in Florida and other legally constituted local governmental entities with the responsibility for providing outdoor recreational sites and facilities for the general public.","eligibility":"The Land and Recreation Grants staff administers grants to local governments through the Florida Recreation Development Assistance Program (FRDAP).\nAll local governments with the legal responsibility for providing outdoor recreation sites and facilities for the use and benefit of the public may submit FRDAP applications during the application submission period.\nA local government entity is a county government, municipality (incorporated city, town, or village), or an independent special district of the State of Florida with legal responsibility for providing outdoor recreation sites and facilities for use and benefit of the general public.","applicant_types":["county","municipality","special_district"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/lands/land-and-recreation-grants/content/florida-recreation-development-assistance-program","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-43,"deadline_placeholder":false,"days_since_deadline":43,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]},{"id":7950,"slug":"public-library-construction-fl-dos-public-library-construction","name":"Public Library Construction","number":null,"level":"state","state":"FL","agency":"Florida Department of State","agency_code":"FL-DOS","connector":"fl_dos","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-06-01","closes_at":"2026-07-10","closes_text":"Application Period: 6/1/2026 - 7/10/2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Eligible applicants are municipal and county governments. Public Library Construction grants are for the construction of public libraries. This includes the construction of new buildings and the acquisition, expansion or remodeling of existing buildings to be used for public library service.","eligibility":"Eligible applicants are municipal and county governments.","applicant_types":["county","municipality"],"categories":["other"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:23Z","last_changed":"2026-11-24T20:36:23Z","source_url":"https://www.dosgrants.com/Program","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-140,"deadline_placeholder":false,"days_since_deadline":140,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]},{"id":7953,"slug":"recreational-trails-program-fl-dep-rtp","name":"Recreational Trails Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"pass_through","status":"closed","opens_at":"2026-04-13","closes_at":"2026-05-28","closes_text":"FY2025-2026 RTP Grant Submission Cycle (Closed): April 13, 2026-May 28, 2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":true,"match_pct":null,"summary":"Eligible applicants include agencies of city, county, state or federal governments, and nonprofit organizations approved by the state, and state or federally recognized Indian tribal governments. Project proposals may address the following recreational trail interests: nonmotorized trail projects, motorized trails projects, mixed-use trails projects (which facilitate both motorized and nonmotorized recreational trail use within a recreational trail corridor), trailside amenities, or trailheads. Scopes of work limited to trail planning activities are not an eligible per Rule 62S-2.072(4)(e), F.A.C .. All grant awards require a match in funding from the project sponsor. The RTP grant is provided on a 50:50, 60:40, or 80:20 (Program:Grantee) matching basis.","eligibility":"Eligible applicants include agencies of city, county, state or federal governments, and nonprofit organizations approved by the state, and state or federally recognized Indian tribal governments.","applicant_types":["county","municipality","nonprofit","tribe"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/lands/land-and-recreation-grants/content/rtp-application-process-submission-cycles-and-funded-0","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-183,"deadline_placeholder":false,"days_since_deadline":183,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]},{"id":7952,"slug":"land-and-water-conservation-fund-program-fl-dep-lwcf","name":"Land and Water Conservation Fund Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":"2025-11-15","closes_at":"2025-12-15","closes_text":"November 15 - December 15, 2025","rolling":null,"amount_min":null,"amount_max":null,"match_required":true,"match_pct":null,"summary":"Since 1965 the LWCF has provided more than $5.2 billion through more than 44,000 grants for a wide variety of projects such as parks, sports and playfields, swimming and boating areas, trails, campgrounds, and similar. Each State is responsible for administering competitions, selecting projects, and then submitting project applications to NPS for review and final decision on award.","eligibility":"Eligible applicants include county governments and incorporated municipalities of the state of Florida and other legally constituted local governmental entities with the legal responsibility for the provision of outdoor recreational sites and facilities for the use and benefit of the general public.","applicant_types":["county","municipality"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/lands/land-and-recreation-grants/content/lwcf-application-process-submission-cycles-and-funded","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-347,"deadline_placeholder":false,"days_since_deadline":347,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]}],"unstated":[{"id":7954,"slug":"parks-and-open-space-florida-forever-grant-program-fl-dep-fct-parks","name":"Parks and Open Space Florida Forever Grant Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":"2026-27 Grant Submission Cycle and Webinar: TBD","rolling":null,"amount_min":null,"amount_max":null,"match_required":true,"match_pct":null,"summary":"The preservation of green space, including parks, open space, beaches and natural areas, is an important factor in creating livable communities. In 1989, the Florida Communities Trust was created to meet this need. The Trust was funded through the Preservation 2000 bond program until the Florida Forever program was approved by the Florida Legislature in 1999.","eligibility":"The Parks and Open Space Florida Forever grant program provides funding to local governments and eligible nonprofit environmental organizations for acquisition of community-based parks, open space and greenways that further outdoor recreation and natural resource protection needs identified in local government comprehensive plans.","applicant_types":["county","municipality","nonprofit"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/lands/land-and-recreation-grants/content/parks-and-open-space-florida-forever-grant-program","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]},{"id":7996,"slug":"nonpoint-source-management-program-fl-dep-nps-319","name":"Nonpoint Source Management Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Funding for control of water pollution from nonpoint sources is managed by the Nonpoint Source Management Program. Nonpoint source pollution, unlike pollution from industrial and sewage treatment plants, comes from many diffuse sources, including stormwater.","eligibility":"Financial assistance is available to Florida's local governments, including county and municipal governments, special districts, water management districts, other state agencies, public universities/colleges and national estuary programs located in Florida.","applicant_types":["county","higher_ed","municipality","special_district","state"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-25T19:40:44Z","last_changed":"2026-11-25T19:40:44Z","source_url":"https://floridadep.gov/wra/319-tmdl-fund","tier":"likely","is_new":true,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-25","added",null,null,"code"]]},{"id":7957,"slug":"water-quality-improvement-grant-program-fl-dep-water-quality","name":"Water Quality Improvement Grant Program","number":null,"level":"state","state":"FL","agency":"Florida Department of Environmental Protection","agency_code":"FL-DEP","connector":"fl_dep","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"DWRA’s Water Quality Improvement Grant Program provides funding to Florida's governmental entities (cities, counties, municipalities, etc.) to address wastewater (including septic to sewer), stormwater and agricultural sources of nutrients in waterbodies that are not attaining nutrient or nutrient-related standards, have an established total maximum daily load or are located within a basin management action plan area, a reasonable assurance plan area, an accepted alternative restoration plan area, or a rural area of opportunity under s. 288.0656.","eligibility":"DWRA’s Water Quality Improvement Grant Program provides funding to Florida's governmental entities (cities, counties, municipalities, etc.) to address wastewater (including septic to sewer), stormwater and agricultural sources of nutrients in waterbodies that are not attaining nutrient or nutrient-related standards, have an established total maximum daily load or are located within a basin management action plan area, a reasonable assurance plan area, an accepted alternative restoration plan area, or a rural area of opportunity under s. 288.0656.","applicant_types":["county","municipality"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-24T20:36:25Z","last_changed":"2026-11-24T20:36:25Z","source_url":"https://floridadep.gov/wra/wra/content/wastewater-grant-program","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-24","added",null,null,"first_read"]]}],"season":[0,0,0,0,1,0,1,0,0,1,0,1],"changes_n":10,"week_flips":[]}</script>
+<script src="../federal.js?v=2026-11-27" defer></script>
+<script src="../app.js?v=685dfee7ab" defer></script>
+</body>
+</html>

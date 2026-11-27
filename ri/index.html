@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Federal and Rhode Island public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta name="color-scheme" content="light dark">
+<title>Rhode Island: open funding for local governments · Funding Atlas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='12' y='2' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='22' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='2' y='12' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='12' y='12' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='22' y='12' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='2' y='22' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='12' y='22' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='22' y='22' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://saj-sudo.github.io/funding-atlas/ri/">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Funding Atlas">
+<meta property="og:title" content="Rhode Island: open funding for local governments · Funding Atlas">
+<meta property="og:description" content="Federal and Rhode Island public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta property="og:url" content="https://saj-sudo.github.io/funding-atlas/ri/">
+<meta property="og:image" content="https://saj-sudo.github.io/funding-atlas/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
+<meta name="twitter:card" content="summary_large_image">
+<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/public-sans-latin.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/source-serif-4-latin.woff2">
+<link rel="stylesheet" href="../app.css?v=685dfee7ab">
+
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="../"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="../about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built 2026-11-27.</p></noscript>
+  </section>
+
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
+    </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <a class="btn" id="detail-page" href="#">Open as a page</a>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{"generated_at":"2026-11-27T19:28:55Z","site_url":"https://saj-sudo.github.io/funding-atlas/","repo_url":"https://github.com/saj-sudo/funding-atlas","state":{"code":"RI","name":"Rhode Island"},"states":[{"code":"AK","name":"Alaska"},{"code":"ME","name":"Maine"},{"code":"VT","name":"Vermont"},{"code":"NH","name":"New Hampshire"},{"code":"WA","name":"Washington"},{"code":"ID","name":"Idaho"},{"code":"MT","name":"Montana"},{"code":"ND","name":"North Dakota"},{"code":"MN","name":"Minnesota"},{"code":"IL","name":"Illinois"},{"code":"WI","name":"Wisconsin"},{"code":"MI","name":"Michigan"},{"code":"NY","name":"New York"},{"code":"MA","name":"Massachusetts"},{"code":"OR","name":"Oregon"},{"code":"NV","name":"Nevada"},{"code":"WY","name":"Wyoming"},{"code":"SD","name":"South Dakota"},{"code":"IA","name":"Iowa"},{"code":"IN","name":"Indiana"},{"code":"OH","name":"Ohio"},{"code":"PA","name":"Pennsylvania"},{"code":"NJ","name":"New Jersey"},{"code":"CT","name":"Connecticut"},{"code":"RI","name":"Rhode Island"},{"code":"CA","name":"California"},{"code":"UT","name":"Utah"},{"code":"CO","name":"Colorado"},{"code":"NE","name":"Nebraska"},{"code":"MO","name":"Missouri"},{"code":"KY","name":"Kentucky"},{"code":"WV","name":"West Virginia"},{"code":"VA","name":"Virginia"},{"code":"MD","name":"Maryland"},{"code":"DE","name":"Delaware"},{"code":"AZ","name":"Arizona"},{"code":"NM","name":"New Mexico"},{"code":"KS","name":"Kansas"},{"code":"AR","name":"Arkansas"},{"code":"TN","name":"Tennessee"},{"code":"NC","name":"North Carolina"},{"code":"SC","name":"South Carolina"},{"code":"DC","name":"District of Columbia"},{"code":"OK","name":"Oklahoma"},{"code":"LA","name":"Louisiana"},{"code":"MS","name":"Mississippi"},{"code":"AL","name":"Alabama"},{"code":"GA","name":"Georgia"},{"code":"HI","name":"Hawaii"},{"code":"TX","name":"Texas"},{"code":"FL","name":"Florida"}],"rules":{"new_days":7,"updated_days":7,"closing_days":30,"feed_n":200,"between_months":15},"coverage":{"federal":{"open":116,"sources":[{"connector":"grants_gov","label":"Grants.gov","last_ok":"2026-11-27T19:26:53Z"},{"connector":"sam_assistance_listings","label":"SAM.gov Assistance Listings","last_ok":"2026-11-27T19:28:55Z"}]},"state":null},"excluded_unlikely":612,"questions":["What is open right now that is not on this page?","Which rows should not be here, and why?","Which columns do you actually use when deciding whether to apply? Which are noise?","Where do you look for this today, and what does that source get right that this one does not?"],"programs":[],"between":[],"unstated":[],"season":null,"changes_n":0,"week_flips":[]}</script>
+<script src="../federal.js?v=2026-11-27" defer></script>
+<script src="../app.js?v=685dfee7ab" defer></script>
+</body>
+</html>

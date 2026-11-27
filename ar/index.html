@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Federal and Arkansas public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta name="color-scheme" content="light dark">
+<title>Arkansas: open funding for local governments · Funding Atlas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='12' y='2' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='22' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='2' y='12' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='12' y='12' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='22' y='12' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='2' y='22' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='12' y='22' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='22' y='22' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://saj-sudo.github.io/funding-atlas/ar/">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Funding Atlas">
+<meta property="og:title" content="Arkansas: open funding for local governments · Funding Atlas">
+<meta property="og:description" content="Federal and Arkansas public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta property="og:url" content="https://saj-sudo.github.io/funding-atlas/ar/">
+<meta property="og:image" content="https://saj-sudo.github.io/funding-atlas/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
+<meta name="twitter:card" content="summary_large_image">
+<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/public-sans-latin.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/source-serif-4-latin.woff2">
+<link rel="stylesheet" href="../app.css?v=685dfee7ab">
+
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="../"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="../about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built 2026-11-27.</p></noscript>
+  </section>
+
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
+    </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <a class="btn" id="detail-page" href="#">Open as a page</a>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{"generated_at":"2026-11-27T19:28:55Z","site_url":"https://saj-sudo.github.io/funding-atlas/","repo_url":"https://github.com/saj-sudo/funding-atlas","state":{"code":"AR","name":"Arkansas"},"states":[{"code":"AK","name":"Alaska"},{"code":"ME","name":"Maine"},{"code":"VT","name":"Vermont"},{"code":"NH","name":"New Hampshire"},{"code":"WA","name":"Washington"},{"code":"ID","name":"Idaho"},{"code":"MT","name":"Montana"},{"code":"ND","name":"North Dakota"},{"code":"MN","name":"Minnesota"},{"code":"IL","name":"Illinois"},{"code":"WI","name":"Wisconsin"},{"code":"MI","name":"Michigan"},{"code":"NY","name":"New York"},{"code":"MA","name":"Massachusetts"},{"code":"OR","name":"Oregon"},{"code":"NV","name":"Nevada"},{"code":"WY","name":"Wyoming"},{"code":"SD","name":"South Dakota"},{"code":"IA","name":"Iowa"},{"code":"IN","name":"Indiana"},{"code":"OH","name":"Ohio"},{"code":"PA","name":"Pennsylvania"},{"code":"NJ","name":"New Jersey"},{"code":"CT","name":"Connecticut"},{"code":"RI","name":"Rhode Island"},{"code":"CA","name":"California"},{"code":"UT","name":"Utah"},{"code":"CO","name":"Colorado"},{"code":"NE","name":"Nebraska"},{"code":"MO","name":"Missouri"},{"code":"KY","name":"Kentucky"},{"code":"WV","name":"West Virginia"},{"code":"VA","name":"Virginia"},{"code":"MD","name":"Maryland"},{"code":"DE","name":"Delaware"},{"code":"AZ","name":"Arizona"},{"code":"NM","name":"New Mexico"},{"code":"KS","name":"Kansas"},{"code":"AR","name":"Arkansas"},{"code":"TN","name":"Tennessee"},{"code":"NC","name":"North Carolina"},{"code":"SC","name":"South Carolina"},{"code":"DC","name":"District of Columbia"},{"code":"OK","name":"Oklahoma"},{"code":"LA","name":"Louisiana"},{"code":"MS","name":"Mississippi"},{"code":"AL","name":"Alabama"},{"code":"GA","name":"Georgia"},{"code":"HI","name":"Hawaii"},{"code":"TX","name":"Texas"},{"code":"FL","name":"Florida"}],"rules":{"new_days":7,"updated_days":7,"closing_days":30,"feed_n":200,"between_months":15},"coverage":{"federal":{"open":116,"sources":[{"connector":"grants_gov","label":"Grants.gov","last_ok":"2026-11-27T19:26:53Z"},{"connector":"sam_assistance_listings","label":"SAM.gov Assistance Listings","last_ok":"2026-11-27T19:28:55Z"}]},"state":{"agencies":4,"programs":15,"open":1,"between":7,"unstated":4,"last_ok":"2026-11-27T19:16:24Z","sources":[{"connector":"ar_adem","label":"Arkansas Division of Emergency Management","last_ok":"2026-11-27T19:16:01Z"},{"connector":"ar_aedc","label":"Arkansas Economic Development Commission","last_ok":"2026-11-27T19:16:24Z"},{"connector":"ar_anrd","label":"Arkansas Department of Agriculture (Natural Resources Division)","last_ok":"2026-11-27T19:15:36Z"},{"connector":"ar_ooo","label":"Arkansas Office of Outdoor Recreation","last_ok":"2026-11-27T19:16:22Z"}]}},"excluded_unlikely":612,"questions":["What is open right now that is not on this page?","Which rows should not be here, and why?","Which columns do you actually use when deciding whether to apply? Which are noise?","Where do you look for this today, and what does that source get right that this one does not?"],"programs":[{"id":7775,"slug":"rural-community-grant-program-ar-aedc-rural-community","name":"Rural Community Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Economic Development Commission","agency_code":"AR-AEDC","connector":"ar_aedc","funding_type":"grant","funding_source":"direct","status":"open","opens_at":null,"closes_at":"2027-03-11","closes_text":"Fiscal Year 2027 Deadlines are: Cycle I - August 13, 2026 Cycle II - March 11, 2027","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Rural Community Grant applications are now available for Fiscal Year 2027 from the Division of Rural Services. You may download the application or you may request one by calling 501-682-3292.","eligibility":"Applicants from incorporated towns of less than 3,000 in population and unincorporated rural areas are eligible for up to $15,000 in matching funds under this program.","applicant_types":["municipality"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:52Z","last_changed":"2026-11-14T16:12:52Z","source_url":"https://www.arkansasedc.com/Rural-Services/division/grants/rural-community-grant","tier":"likely","is_new":false,"is_updated":false,"days_to_close":104,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]}],"between":[{"id":7774,"slug":"arkansas-site-development-program-ar-aedc-site-development","name":"Arkansas Site Development Program","number":null,"level":"state","state":"AR","agency":"Arkansas Economic Development Commission","agency_code":"AR-AEDC","connector":"ar_aedc","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-08-25","closes_at":"2026-11-06","closes_text":"Applications and supporting documentation are due by 5pm Central Time on Friday, November 6, 2026.","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Arkansas Site Development Program is intended to provide matching funding for site development improvement activities that will enhance industrial site readiness and competitiveness for job-creating projects.","eligibility":"Who can apply?\nEligible applicants:\nCities, towns, and counties in Arkansas\nAn economic development organization\nA chamber of commerce\nOwned or optioned by an eligible applicant (optioned land must be owned by the applicant by the time the grant agreement is executed)\nAn eligible applicant must invest a match that is at least a minimum of 5% of the overall project cost estimate.","applicant_types":["county","municipality"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:52Z","last_changed":"2026-11-14T16:12:52Z","source_url":"https://www.arkansasedc.com/community-resources/arkansas-site-development-program","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-21,"deadline_placeholder":false,"days_since_deadline":21,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7776,"slug":"rural-services-block-grant-program-ar-aedc-rural-block-grant","name":"Rural Services Block Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Economic Development Commission","agency_code":"AR-AEDC","connector":"ar_aedc","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":"2026-10-16","closes_text":"The deadline for Fiscal Year 2027 applications is October 16, 2026.","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The RSBGP funds new construction or renovation of community centers, fire stations, or multi-purpose buildings, and the purchase of fire trucks (pumper, tanker, brush or certain service trucks). This grant is made possible through a partnership with the Arkansas Economic Development Commission. Applicants are eligible for up to $100,000. The match for this grant is 10% and may be comprised of in-kind labor, in-kind materials or cash.","eligibility":"Grants are available to incorporated towns and rural communities with a population of less than 3,000.","applicant_types":["municipality"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:52Z","last_changed":"2026-11-14T16:12:52Z","source_url":"https://www.arkansasedc.com/Rural-Services/division/grants/rural-services-block-grant","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-42,"deadline_placeholder":false,"days_since_deadline":42,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7771,"slug":"outdoor-recreation-fun-park-grants-ar-ooo-fun-park","name":"Outdoor Recreation FUN Park Grants","number":null,"level":"state","state":"AR","agency":"Arkansas Office of Outdoor Recreation","agency_code":"AR-OOR","connector":"ar_ooo","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-05-01","closes_at":"2026-08-28","closes_text":"Opens: May 1, 2026 Due: August 28, 2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":null,"eligibility":"Eligible applicants: Municipalities in Arkansas with populations of 7,500 or less and unincorporated communities that are sponsored by a city or county.","applicant_types":["county","municipality"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:29Z","last_changed":"2026-11-14T16:12:29Z","source_url":"https://adpht.arkansas.gov/office-of-outdoor-recreation/arkansas-outdoor-grants/fun-park-grants/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-91,"deadline_placeholder":false,"days_since_deadline":91,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7770,"slug":"outdoor-recreation-matching-grants-ar-ooo-matching","name":"Outdoor Recreation Matching Grants","number":null,"level":"state","state":"AR","agency":"Arkansas Office of Outdoor Recreation","agency_code":"AR-OOR","connector":"ar_ooo","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-05-01","closes_at":"2026-08-28","closes_text":"Opens: May 1, 2026 Due: August 28, 2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":null,"eligibility":"Eligible applicants: All municipalities and counties in Arkansas","applicant_types":["county","municipality"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:29Z","last_changed":"2026-11-14T16:12:29Z","source_url":"https://adpht.arkansas.gov/office-of-outdoor-recreation/arkansas-outdoor-grants/matching-grants/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-91,"deadline_placeholder":false,"days_since_deadline":91,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7772,"slug":"trails-for-life-grants-great-strides-ar-ooo-trails","name":"Trails for Life Grants (Great Strides)","number":null,"level":"state","state":"AR","agency":"Arkansas Office of Outdoor Recreation","agency_code":"AR-OOR","connector":"ar_ooo","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-03-09","closes_at":"2026-06-30","closes_text":"Opens: March 9, 2026 Due: June 30, 2026","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":null,"eligibility":"Eligible applicants: All municipalities and counties in Arkansas*","applicant_types":["county","municipality"],"categories":["parks"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:29Z","last_changed":"2026-11-14T16:12:29Z","source_url":"https://adpht.arkansas.gov/office-of-outdoor-recreation/arkansas-outdoor-grants/trails-grants/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-150,"deadline_placeholder":false,"days_since_deadline":150,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7768,"slug":"state-of-arkansas-hazard-mitigation-grant-program-ar-adem-hazard-mitigation","name":"State of Arkansas Hazard Mitigation Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Division of Emergency Management","agency_code":"AR-ADEM","connector":"ar_adem","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":"2026-05-26","closes_at":"2026-06-15","closes_text":"The Arkansas Hazard Mitigation Grant Program will begin accepting Notices of Intent (NOI’s) May 26, 2026 through June 15, 2026, for the State Fiscal year (FY2027).","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Arkansas Hazard Mitigation Grant Program will begin accepting Notices of Intent (NOI’s) May 26, 2026 through June 15, 2026, for the State Fiscal year (FY2027). The goal of the program is to assist local jurisdictions that have suffered repetitive disaster losses. This program will fund permanent long-term solutions to repetitive problems. Costs incurred before the award date will not be eligible for reimbursement.","eligibility":"All NOI’s must be submitted by local governments or non-profit organizations.","applicant_types":["county","municipality","nonprofit"],"categories":["public_safety"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:08Z","last_changed":"2026-11-14T16:12:08Z","source_url":"https://dps.arkansas.gov/emergency-management/adem/grants-funding/hazard-mitigation-grants/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-165,"deadline_placeholder":false,"days_since_deadline":165,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7763,"slug":"water-and-wastewater-funding-ar-anrd-water-wastewater","name":"Water and Wastewater Funding","number":null,"level":"state","state":"AR","agency":"Arkansas Department of Agriculture (Natural Resources Division)","agency_code":"AR-ANRD","connector":"ar_anrd","funding_type":"loan","funding_source":"direct","status":"closed","opens_at":null,"closes_at":null,"closes_text":"Applications for Arkansas Department of Agriculture funding are currently closed.","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Arkansas Department of Agriculture offers financial assistance through multiple state and federal programs. Each program has its own eligibility requirements, project criteria, and funding terms.","eligibility":"Eligible Applicants:\nCities, towns, and counties\nRural development authorities and improvement districts\nWater and wastewater treatment districts\nPublic facilities boards and water associations\nRegional solid waste authorities and conservation districts","applicant_types":["county","municipality","special_district"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:04Z","last_changed":"2026-11-14T16:12:04Z","source_url":"https://agriculture.arkansas.gov/natural-resources/water-development/water-and-wastewater-funding/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]}],"unstated":[{"id":7773,"slug":"community-development-block-grant-cdbg-ar-aedc-cdbg","name":"Community Development Block Grant (CDBG)","number":null,"level":"state","state":"AR","agency":"Arkansas Economic Development Commission","agency_code":"AR-AEDC","connector":"ar_aedc","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Congress created the Community Development Block Grant (CDBG) program in 1974 to benefit low- and moderate-income persons, prevent and eliminate conditions of slum or blight, and address other urgent community development needs. AEDC has administered the State CDBG program since 1983, when Housing and Urban Development (HUD) moved the administration of the funds to the states. In Arkansas, the CDBG program is also known as the Arkansas Community and Economic Development Program (ACEDP).","eligibility":"Eligible applicants include cities and counties with a population of under 50,000 with a low- to moderate-income (LMI) population of at least 51 percent, or for projects which benefit a targeted eligible clientele.\nOnly cities and counties may apply for CDBG grants.\nHowever, cities and counties may apply for projects that will benefit non-profit groups, for-profit companies, or LMI persons.\nOnly non-entitlement cities and counties are eligible to apply.\nGrants will be for an amount between $75,000 and $500,000 (water/wastewater projects adding new customers may apply for up to $1M).","applicant_types":["county","municipality"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:52Z","last_changed":"2026-11-14T16:12:52Z","source_url":"https://www.arkansasedc.com/community-resources/community-development-block-grant","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7766,"slug":"hazard-mitigation-grant-program-ar-adem-hmgp","name":"Hazard Mitigation Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Division of Emergency Management","agency_code":"AR-ADEM","connector":"ar_adem","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The State of Arkansas, through ADEM, administers the Hazard Mitigation Grant Program (HMGP). (Section 404 of Public Law 93-288, as amended, the Robert T. Stafford Disaster Relief and Emergency Assistance Act).","eligibility":"The Hazard Mitigation Grant Program (HMGP) provides grants to state and local governments to implement long-term hazard mitigation measures after a major disaster declaration.\nThe applicant must be an active participant in a current FEMA-approved Multi-Jurisdictional Hazard Mitigation Plan","applicant_types":["county","municipality"],"categories":["public_safety"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:08Z","last_changed":"2026-11-14T16:12:08Z","source_url":"https://dps.arkansas.gov/emergency-management/adem/grants-funding/hazard-mitigation-grant-program/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7764,"slug":"high-hazard-potential-dam-grant-program-ar-anrd-hhpd","name":"High Hazard Potential Dam Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Department of Agriculture (Natural Resources Division)","agency_code":"AR-ANRD","connector":"ar_anrd","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Rehabilitation of High Hazard Potential Dam (HHPD) Grant Program is a federal initiative administered by FEMA through the National Dam Safety Program (NDSP). This program provides funding to states for subawards to eligible non-federal government agencies and nonprofit organizations to support the rehabilitation, removal, or risk-reduction of High Hazard Potential Dams (HHPDs) that do not meet minimum dam safety standards and pose an unacceptable risk to life and property.","eligibility":"Eligible Applicants\nThis program is exclusive to non-Federal government entities (e.g., State, County, and Municipal governments; special purpose districts) and nonprofit organizations that are registered as 501(c)(3) nonprofits with the Internal Revenue Service.\nPrivate dam owners cannot apply directly, and any applications received from a private dam owner will be rejected; however, an eligible applicant can apply for an HHPD grant on any eligible dam, including dams that are privately owned.\nExample activities are eligible for funding:","applicant_types":["county","municipality","nonprofit","special_district","state"],"categories":["public_safety"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:04Z","last_changed":"2026-11-14T16:12:04Z","source_url":"https://agriculture.arkansas.gov/natural-resources/water-management/dam-safety/high-hazard-potential-dam-grant-program/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]},{"id":7765,"slug":"section-319-nonpoint-source-grant-program-ar-anrd-section-319","name":"Section 319 Nonpoint Source Grant Program","number":null,"level":"state","state":"AR","agency":"Arkansas Department of Agriculture (Natural Resources Division)","agency_code":"AR-ANRD","connector":"ar_anrd","funding_type":"grant","funding_source":"pass_through","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":true,"match_pct":null,"summary":"The Section 319(h) grant program provides federal funding through the Environmental Protection Agency (EPA) to help reduce NPS pollution. Grant-funded projects may include:","eligibility":"Eligible applicants include state or local government agencies, nonprofit organizations, and academic institutions.","applicant_types":["county","municipality","nonprofit"],"categories":["water"],"alns":[],"listings":[],"first_seen":"2026-11-14T16:12:04Z","last_changed":"2026-11-14T16:12:04Z","source_url":"https://agriculture.arkansas.gov/natural-resources/water-management/nonpoint-source-management/","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-14","added",null,null,"first_read"]]}],"season":[0,0,1,0,0,2,0,2,0,1,1,0],"changes_n":12,"week_flips":[]}</script>
+<script src="../federal.js?v=2026-11-27" defer></script>
+<script src="../app.js?v=685dfee7ab" defer></script>
+</body>
+</html>

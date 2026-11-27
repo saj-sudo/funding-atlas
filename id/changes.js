@@ -1,0 +1,1 @@
+window.FA_CHANGES = [];

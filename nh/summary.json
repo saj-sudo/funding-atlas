@@ -1,0 +1,56 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "NH",
+  "name": "New Hampshire"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/nh/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 7,
+  "federal": 116
+ },
+ "by_category": [],
+ "closing_soon": [
+  {
+   "name": "Clean Energy Fund Loan 2026",
+   "agency": "NH CDFA",
+   "closes_at": "2026-12-31",
+   "days_to_close": 34,
+   "link": "https://saj-sudo.github.io/funding-atlas/nh/#p=clean-energy-fund-loan-2026-webgrants-nh-35045"
+  },
+  {
+   "name": "Tax Credit Grant Writing Assistance 2027",
+   "agency": "NH CDFA",
+   "closes_at": "2027-01-22",
+   "days_to_close": 56,
+   "link": "https://saj-sudo.github.io/funding-atlas/nh/#p=tax-credit-grant-writing-assistance-2027-webgrants-nh-42286"
+  },
+  {
+   "name": "CDBG Housing: 2026 - Round 2",
+   "agency": "NH CDFA",
+   "closes_at": "2027-01-25",
+   "days_to_close": 59,
+   "link": "https://saj-sudo.github.io/funding-atlas/nh/#p=cdbg-housing-2026-round-2-webgrants-nh-42430"
+  },
+  {
+   "name": "CDBG Public Facilities: 2026 - Round 2",
+   "agency": "NH CDFA",
+   "closes_at": "2027-01-25",
+   "days_to_close": 59,
+   "link": "https://saj-sudo.github.io/funding-atlas/nh/#p=cdbg-public-facilities-2026-round-2-webgrants-nh-42431"
+  },
+  {
+   "name": "CDBG Economic Development - 2026 Allocation",
+   "agency": "NH CDFA",
+   "closes_at": "2027-06-30",
+   "days_to_close": 215,
+   "link": "https://saj-sudo.github.io/funding-atlas/nh/#p=cdbg-economic-development-2026-allocation-webgrants-nh-40661"
+  }
+ ]
+}

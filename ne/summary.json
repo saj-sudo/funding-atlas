@@ -1,0 +1,47 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "NE",
+  "name": "Nebraska"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/ne/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 3,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "infrastructure",
+   "open": 3
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Civic and Community Center Financing Fund (CCCFF)",
+   "agency": "Nebraska Department of Economic Development",
+   "closes_at": "2027-01-15",
+   "days_to_close": 49,
+   "link": "https://saj-sudo.github.io/funding-atlas/ne/#p=civic-and-community-center-financing-fund-cccff-ne-ded-cccff"
+  },
+  {
+   "name": "CDBG Economic Development",
+   "agency": "Nebraska Department of Economic Development",
+   "closes_at": "2027-06-30",
+   "days_to_close": 215,
+   "link": "https://saj-sudo.github.io/funding-atlas/ne/#p=cdbg-economic-development-ne-ded-cdbg"
+  },
+  {
+   "name": "CDBG Tourism Development",
+   "agency": "Nebraska Department of Economic Development",
+   "closes_at": "2027-06-30",
+   "days_to_close": 215,
+   "link": "https://saj-sudo.github.io/funding-atlas/ne/#p=cdbg-tourism-development-ne-ded-cdbg%23tourism-development"
+  }
+ ]
+}

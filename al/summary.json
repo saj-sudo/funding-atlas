@@ -1,0 +1,33 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "AL",
+  "name": "Alabama"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/al/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 1,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "transportation",
+   "open": 1
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "Industrial Access Program",
+   "agency": "Alabama Department of Transportation",
+   "closes_at": "2027-01-08",
+   "days_to_close": 42,
+   "link": "https://saj-sudo.github.io/funding-atlas/al/#p=industrial-access-program-al-dot-industrial-access"
+  }
+ ]
+}

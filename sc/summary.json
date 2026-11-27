@@ -1,0 +1,51 @@
+{
+ "generated_at": "2026-11-27T19:28:55Z",
+ "state": {
+  "code": "SC",
+  "name": "South Carolina"
+ },
+ "page": "https://saj-sudo.github.io/funding-atlas/sc/",
+ "audience": "local governments",
+ "license": {
+  "records": "ODbL-1.0",
+  "attribution": "Funding Atlas",
+  "source": "https://github.com/saj-sudo/funding-atlas"
+ },
+ "open": {
+  "state": 7,
+  "federal": 116
+ },
+ "by_category": [
+  {
+   "category": "water",
+   "open": 5
+  },
+  {
+   "category": "infrastructure",
+   "open": 2
+  }
+ ],
+ "closing_soon": [
+  {
+   "name": "RIA State Grants: Basic Infrastructure",
+   "agency": "South Carolina Rural Infrastructure Authority",
+   "closes_at": "2027-03-22",
+   "days_to_close": 115,
+   "link": "https://saj-sudo.github.io/funding-atlas/sc/#p=ria-state-grants-basic-infrastructure-sc-ria-grants"
+  },
+  {
+   "name": "RIA State Grants: Economic Infrastructure/Jobs",
+   "agency": "South Carolina Rural Infrastructure Authority",
+   "closes_at": "2027-03-22",
+   "days_to_close": 115,
+   "link": "https://saj-sudo.github.io/funding-atlas/sc/#p=ria-state-grants-economic-infrastructure-jobs-sc-ria-grants%23economic-infrastructure"
+  },
+  {
+   "name": "RIA State Grants: Regional Planning",
+   "agency": "South Carolina Rural Infrastructure Authority",
+   "closes_at": "2027-03-22",
+   "days_to_close": 115,
+   "link": "https://saj-sudo.github.io/funding-atlas/sc/#p=ria-state-grants-regional-planning-sc-ria-grants%23regional-planning"
+  }
+ ]
+}

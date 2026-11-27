@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Federal and Oregon public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta name="color-scheme" content="light dark">
+<title>Oregon: open funding for local governments · Funding Atlas</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='12' y='2' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='22' y='2' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='2' y='12' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='12' y='12' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3Crect x='22' y='12' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='2' y='22' width='8' height='8' rx='2' fill='%2317663a'/%3E%3Crect x='12' y='22' width='8' height='8' rx='2' fill='%238a5a00'/%3E%3Crect x='22' y='22' width='8' height='8' rx='2' fill='%231f3f8f'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://saj-sudo.github.io/funding-atlas/or/">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Funding Atlas">
+<meta property="og:title" content="Oregon: open funding for local governments · Funding Atlas">
+<meta property="og:description" content="Federal and Oregon public funding programs that are open or forecasted and name local governments as eligible, with what changed and what closes soon.">
+<meta property="og:url" content="https://saj-sudo.github.io/funding-atlas/or/">
+<meta property="og:image" content="https://saj-sudo.github.io/funding-atlas/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Funding Atlas: open public funding for local governments, by state.">
+<meta name="twitter:card" content="summary_large_image">
+<script>try { var t = localStorage.getItem('fa-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) {}</script>
+<link rel="alternate" type="application/atom+xml" title="Funding Atlas: changes" href="feed.xml">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/public-sans-latin.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../fonts/source-serif-4-latin.woff2">
+<link rel="stylesheet" href="../app.css?v=685dfee7ab">
+
+</head>
+<body data-page="state">
+<a class="skip" href="#main">Skip to programs</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="../"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</a>
+    <span class="spacer"></span>
+    <a class="navlink" href="../about/">About the data</a>
+    <label class="switch"><span class="lbl">State</span> <select id="state-switch" aria-label="Switch state"></select></label>
+    <button class="theme-btn" id="theme-btn" type="button" aria-label="Theme: automatic. Switch to dark."></button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero">
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <details class="coverage" id="coverage"><summary id="coverage-sum"></summary><div class="coverage-body" id="coverage-body"></div></details>
+    <noscript><p class="noscript">This page filters and sorts in your browser and needs JavaScript. All of the data is embedded in the page source as JSON. Built 2026-11-27.</p></noscript>
+  </section>
+
+  <section class="briefing" aria-labelledby="brief-h">
+    <h2 id="brief-h">This week</h2>
+    <ul id="brief"></ul>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-programs" aria-selected="true" aria-controls="panel-programs">Programs<span class="n num" id="tab-n-programs">0</span></button>
+    <button class="tab" role="tab" id="tab-changes" aria-selected="false" aria-controls="panel-changes" tabindex="-1">Changes<span class="n num" id="tab-n-changes">0</span></button>
+    <button class="tab" role="tab" id="tab-digest" aria-selected="false" aria-controls="panel-digest" tabindex="-1">Digest</button>
+  </div>
+
+  <section id="panel-programs" role="tabpanel" aria-labelledby="tab-programs">
+    <h2 class="sr-only">Programs</h2>
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="q" placeholder="Search programs, agencies, numbers" aria-label="Search programs" autocomplete="off">
+      </div>
+      <label class="sort"><span class="slbl">Sort</span> <select id="sort" aria-label="Sort">
+        <option value="closing">Closing soonest</option>
+        <option value="newest">Newest first</option>
+        <option value="changed">Recently changed</option>
+        <option value="amount">Largest award</option>
+        <option value="name">Name A to Z</option>
+      </select></label>
+      <div class="seg" role="group" aria-label="View"><button type="button" class="segb" data-view="list" aria-pressed="true">List</button><button type="button" class="segb" data-view="timeline" aria-pressed="false">Timeline</button></div>
+      <button class="btn" id="watch-btn" type="button" aria-expanded="false" aria-controls="watch"><span aria-hidden="true">★</span><span class="wlbl"> Starred</span> <span class="n num" id="watch-n">0</span></button>
+      <button class="btn filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="facets">Filter <span class="n num" id="filters-n" hidden>0</span></button>
+    </div>
+    <section class="watch" id="watch" hidden aria-labelledby="watch-h">
+      <h2 id="watch-h">Starred programs</h2>
+      <p class="muted small">Kept in this browser only. Each program has its own feed: add one to a feed reader, Outlook or Slack, or download them all as one bundle (OPML), and you will hear when it opens, closes, reopens or changes its deadline. A program keeps its feed after it leaves every page, so you also hear when it is no longer listed.</p>
+      <ul class="watch-list" id="watch-list"></ul>
+      <div class="dg-actions"><button class="btn" type="button" id="watch-only">Show only starred</button><button class="btn primary" type="button" id="watch-opml">Download feed bundle (OPML)</button></div>
+    </section>
+    <div class="active" id="active" role="status" aria-live="polite"></div>
+    <div class="layout">
+      <aside class="facets" id="facets" aria-label="Filters">
+        <div class="tray-head"><b>Filter</b><button class="btn primary" type="button" id="tray-done">Show results</button></div>
+        <label class="sort tray-sort"><span>Sort</span> <select id="sort-tray">
+          <option value="closing">Closing soonest</option>
+          <option value="newest">Newest first</option>
+          <option value="changed">Recently changed</option>
+          <option value="amount">Largest award</option>
+          <option value="name">Name A to Z</option>
+        </select></label>
+        <a class="skip inside" href="#results">Skip filters, go to results</a>
+        <details class="fit" id="fit">
+          <summary>Check fit in three questions</summary>
+          <div class="fit-q">
+            <label>We are a <select id="fit-who"><option value="">any local government</option></select></label>
+            <label>Looking for <select id="fit-topic"><option value="">any topic</option></select></label>
+            <label>Can we put up a matching share? <select id="fit-match"><option value="">yes, or not sure</option><option value="no">no</option></select></label>
+          </div>
+          <p class="muted small">Each answer is a filter you can see above the results and remove. Answers come from tags read from each source's own text; programs that do not say whether a match is needed stay in.</p>
+        </details>
+        <div id="facet-list"></div>
+      </aside>
+      <div class="tray-backdrop" id="tray-backdrop" hidden></div>
+      <div class="results" id="results">
+        <section class="group timeline" id="g-timeline" hidden aria-labelledby="g-timeline-h">
+          <h2 id="g-timeline-h">Application windows, next 180 days <span class="n num" id="g-timeline-n">0</span></h2>
+          <p class="d" id="g-timeline-d"></p>
+          <div class="tl-legend"><span><i class="sw st"></i><span id="tl-state-l">State</span></span><span><i class="sw fed"></i>Federal</span><span><i class="sw dot"></i>Dot only: opening date not stated</span></div>
+          <div class="tl-scroll"><svg id="tl-svg" role="img" aria-labelledby="g-timeline-h"></svg></div>
+        </section>
+        <section class="group" id="g-state" aria-labelledby="g-state-h">
+          <h2 id="g-state-h"><span id="g-state-t"></span> <span class="n num" id="g-state-n">0</span></h2>
+          <p class="d" id="g-state-d"></p>
+          <div class="list" id="list-state"></div>
+        </section>
+        <section class="group fold" id="g-unstated" aria-labelledby="g-unstated-h">
+          <h2 id="g-unstated-h">Status not confirmed <span class="n num" id="g-unstated-n">0</span></h2>
+          <p class="d" id="g-unstated-d"></p>
+          <button class="btn" id="unstated-toggle" aria-expanded="false" aria-controls="list-unstated">Show</button>
+          <div class="list" id="list-unstated" hidden></div>
+        </section>
+        <section class="group fold" id="g-between" aria-labelledby="g-between-h">
+          <h2 id="g-between-h">Closed recently <span class="n num" id="g-between-n">0</span></h2>
+          <p class="d" id="g-between-d"></p>
+          <div class="season" id="season" hidden>
+            <p class="small"><b id="season-h"></b> <span class="muted" id="season-d"></span></p>
+            <div class="chart-scroll"><svg id="season-svg" role="img" aria-labelledby="season-h"></svg></div>
+          </div>
+          <button class="btn" id="between-toggle" aria-expanded="false" aria-controls="list-between">Show</button>
+          <div class="list" id="list-between" hidden></div>
+        </section>
+        <section class="group" id="g-federal" aria-labelledby="g-federal-h">
+          <h2 id="g-federal-h">Federal notices <span class="n num" id="g-federal-n">0</span></h2>
+          <p class="d" id="g-federal-d">Open or announced by federal agencies, read from Grants.gov. The same notices appear on every state's page.</p>
+          <div class="list" id="list-federal"></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-changes" role="tabpanel" aria-labelledby="tab-changes" hidden>
+    <h2 class="sr-only">Change log</h2>
+    <div class="chipbar" role="group" aria-label="Filter the change log">
+      <button class="chip" data-feed="all" aria-pressed="true">Everything</button>
+      <button class="chip" data-feed="status" aria-pressed="false">Status changes</button>
+      <button class="chip" data-feed="federal" aria-pressed="false">Federal</button>
+      <button class="chip" data-feed="state" aria-pressed="false" id="chip-state">State</button>
+    </div>
+    <ol class="feed" id="feed"></ol>
+  </section>
+  <section id="panel-digest" role="tabpanel" aria-labelledby="tab-digest" hidden>
+    <h2 class="sr-only">Digest</h2>
+    <p class="digest-d" id="dg-d"></p>
+    <div class="digest-controls">
+      <div><span class="dg-lbl" id="dg-cats-l">Topics (none picked means all)</span><div class="chipbar" id="dg-cats" role="group" aria-labelledby="dg-cats-l"></div></div>
+      <div><span class="dg-lbl" id="dg-win-l">Closing within</span><div class="chipbar" id="dg-win" role="group" aria-labelledby="dg-win-l">
+        <button class="chip" type="button" data-w="30" aria-pressed="false">30 days</button><button class="chip" type="button" data-w="60" aria-pressed="true">60 days</button><button class="chip" type="button" data-w="120" aria-pressed="false">120 days</button></div></div>
+      <label class="dg-check"><input type="checkbox" id="dg-fed" checked> Federal notices that likely fit</label>
+      <label class="dg-check"><input type="checkbox" id="dg-nodate"> State programs with no fixed date</label>
+    </div>
+    <textarea id="dg-out" readonly aria-label="Digest text" spellcheck="false"></textarea>
+    <div class="dg-actions"><button class="btn primary" id="dg-copy" type="button">Copy text</button><span class="muted small" id="dg-msg" role="status"></span></div>
+  </section>
+</main>
+
+<dialog class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="inner">
+    <header>
+      <h2 id="detail-title"></h2>
+      <button class="close" id="detail-close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body" id="detail-body"></div>
+    <footer>
+      <a class="btn primary src" id="detail-source" href="#" target="_blank" rel="noopener">Apply or read more on the agency's page</a>
+      <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
+      <a class="btn" id="detail-page" href="#">Open as a page</a>
+      <button class="btn" id="detail-copy">Copy link</button>
+      <span class="copied" id="detail-copied" hidden>Copied</span>
+    </footer>
+  </div>
+</dialog>
+
+<footer class="site">
+  <div class="wrap cols" id="footer"></div>
+</footer>
+
+<script type="application/json" id="data">{"generated_at":"2026-11-27T19:28:55Z","site_url":"https://saj-sudo.github.io/funding-atlas/","repo_url":"https://github.com/saj-sudo/funding-atlas","state":{"code":"OR","name":"Oregon"},"states":[{"code":"AK","name":"Alaska"},{"code":"ME","name":"Maine"},{"code":"VT","name":"Vermont"},{"code":"NH","name":"New Hampshire"},{"code":"WA","name":"Washington"},{"code":"ID","name":"Idaho"},{"code":"MT","name":"Montana"},{"code":"ND","name":"North Dakota"},{"code":"MN","name":"Minnesota"},{"code":"IL","name":"Illinois"},{"code":"WI","name":"Wisconsin"},{"code":"MI","name":"Michigan"},{"code":"NY","name":"New York"},{"code":"MA","name":"Massachusetts"},{"code":"OR","name":"Oregon"},{"code":"NV","name":"Nevada"},{"code":"WY","name":"Wyoming"},{"code":"SD","name":"South Dakota"},{"code":"IA","name":"Iowa"},{"code":"IN","name":"Indiana"},{"code":"OH","name":"Ohio"},{"code":"PA","name":"Pennsylvania"},{"code":"NJ","name":"New Jersey"},{"code":"CT","name":"Connecticut"},{"code":"RI","name":"Rhode Island"},{"code":"CA","name":"California"},{"code":"UT","name":"Utah"},{"code":"CO","name":"Colorado"},{"code":"NE","name":"Nebraska"},{"code":"MO","name":"Missouri"},{"code":"KY","name":"Kentucky"},{"code":"WV","name":"West Virginia"},{"code":"VA","name":"Virginia"},{"code":"MD","name":"Maryland"},{"code":"DE","name":"Delaware"},{"code":"AZ","name":"Arizona"},{"code":"NM","name":"New Mexico"},{"code":"KS","name":"Kansas"},{"code":"AR","name":"Arkansas"},{"code":"TN","name":"Tennessee"},{"code":"NC","name":"North Carolina"},{"code":"SC","name":"South Carolina"},{"code":"DC","name":"District of Columbia"},{"code":"OK","name":"Oklahoma"},{"code":"LA","name":"Louisiana"},{"code":"MS","name":"Mississippi"},{"code":"AL","name":"Alabama"},{"code":"GA","name":"Georgia"},{"code":"HI","name":"Hawaii"},{"code":"TX","name":"Texas"},{"code":"FL","name":"Florida"}],"rules":{"new_days":7,"updated_days":7,"closing_days":30,"feed_n":200,"between_months":15},"coverage":{"federal":{"open":116,"sources":[{"connector":"grants_gov","label":"Grants.gov","last_ok":"2026-11-27T19:26:53Z"},{"connector":"sam_assistance_listings","label":"SAM.gov Assistance Listings","last_ok":"2026-11-27T19:28:55Z"}]},"state":{"agencies":1,"programs":102,"open":1,"between":1,"unstated":7,"last_ok":"2026-11-27T19:13:34Z","sources":[{"connector":"or_biz","label":"Business Oregon","last_ok":"2026-11-27T19:13:34Z"}]}},"excluded_unlikely":612,"questions":["What is open right now that is not on this page?","Which rows should not be here, and why?","Which columns do you actually use when deciding whether to apply? Which are noise?","Where do you look for this today, and what does that source get right that this one does not?"],"programs":[{"id":7317,"slug":"levee-project-grant-fund-program-or-biz-programs/levee","name":"Levee Project Grant Fund Program","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"grant","funding_source":"direct","status":"open","opens_at":null,"closes_at":null,"closes_text":"Applications are accepted year-round based on funding availability.","rolling":true,"amount_min":null,"amount_max":null,"match_required":true,"match_pct":null,"summary":"The Levee Grant Program is funded through the Levee Project Grant Fund under ORS 285B.421. The intent of this program is to provide financial assistance in the form of grants for levee projects across Oregon.","eligibility":"-Municipalities;\n-Corporations or companies for drainage or flood control organized under ORS chapter 554; and\n-For-profit or nonprofit entities and individuals engaged in the ownership, construction, inspection, accreditation, certification or repair of levees.","applicant_types":["business","individual","municipality","nonprofit"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/levee/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]}],"between":[{"id":7293,"slug":"community-development-block-grants-cdbg-or-biz-programs/cdbg","name":"Community Development Block Grants (CDBG)","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"grant","funding_source":"pass_through","status":"closed","opens_at":null,"closes_at":"2026-09-30","closes_text":"July 1–September 30, applications accepted. Award announcements by the end of November.","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Non-metropolitan cities and counties in rural Oregon can apply for and receive grants. Oregon tribes, urban cities (Albany, Ashland, Beaverton, Bend, Corvallis, Eugene, Grants Pass, Gresham, Hillsboro, Medford, Portland, Redmond, Salem, and Springfield), and counties (Clackamas, Multnomah, Washington, Marion) that receive funds directly from the U.S. Department of Housing and Urban Development are not eligible.","eligibility":"Non-metropolitan cities and counties in rural Oregon can apply for and receive grants. Oregon tribes, urban cities (Albany, Ashland, Beaverton, Bend, Corvallis, Eugene, Grants Pass, Gresham, Hillsboro, Medford, Portland, Redmond, Salem, and Springfield), and counties (Clackamas, Multnomah, Washington, Marion) that receive funds directly from the U.S. Department of Housing and Urban Development are not eligible.","applicant_types":["county","municipality","tribe"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-11T17:22:56Z","source_url":"https://www.oregon.gov/biz/programs/CDBG/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":-58,"deadline_placeholder":false,"days_since_deadline":58,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"],["2026-11-11","status","unknown","closed","code"],["2026-11-11","closes_at",null,"2026-09-30","code"]]}],"unstated":[{"id":7272,"slug":"arts-build-communities-abc-grants-or-biz-aboutus/artscommission/grants/for-organizations/arts-build-communities","name":"Arts Build Communities (ABC) Grants","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":"Applications must be submitted in the online grant system no later than 5:00 pm on the deadline date to be considered for review.","rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Girls in traditional attire celebrate during a Centro Cultural del Condado de Washington County community cultural event.","eligibility":"Pre-development, design fees and community planning activities are eligible in this program.\nBe a unit of municipal government (including libraries, schools and Tribal governments); or\nOperate as a nonprofit as evidenced by:\nCurrent IRS 501(c)(3) federal tax-exempt status;\nActive registration with the State of Oregon for corporate, non-profit status;\nCurrent Unique Entity Identifier (UEI) from SAM.gov .","applicant_types":["municipality","nonprofit","school","tribe"],"categories":[],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/aboutus/artscommission/grants/for-organizations/arts-build-communities/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7280,"slug":"broadband-technical-assistance-program-btap-or-biz-programs/btap","name":"Broadband Technical Assistance Program (BTAP)","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":null,"funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Broadband Technical Assistance Program (BTAP) supports and promotes local and regional broadband planning efforts to develop financing and deployment strategies to provide high-speed internet to unserved and underserved locations in Oregon. This program is funded by the Oregon Universal Service Fund.","eligibility":"Municipalities (as defined in ORS 285B.410(9) )\nElectric co-operatives\nNonprofit organizations\nMunicipal affiliates (economic development corporations, regional planning and development councils, councils of government)\nEach of the nine federally recognized Tribes in Oregon (or their respective Tribal Council or their respective business entity)\nInternet Service Providers in partnership with any of the above entities\nPlanning and pre-construction activities\nStrategic planning\nFeasibility studies\nBusiness planning\nPreliminary engineering\nStaffing grants\nGrant application support","applicant_types":["business","municipality","nonprofit","tribe"],"categories":[],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/BTAP/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7361,"slug":"emergency-small-business-grants-or-biz-covid19responseandresources","name":"Emergency Small Business Grants","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"Business Oregon delivered nearly $50 million to the hands of small business owners in our communities suffering in the wake of the pandemic through this grant fund. The initial rounds of funding went to intermediary organizations that in turn provided grants locally in their respective regions. The final round was issued directly by Business Oregon to small businesses.","eligibility":"Round 1 —eligible applicants were cities, counties, and economic development districts that have existing small business COVID-relief programs or will stand up new programs to issue grants to local small businesses.","applicant_types":["business","county","municipality"],"categories":[],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/Covid19ResponseandResources/Pages/Emergency_Small_Business_Assistance.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7362,"slug":"industrial-lands-technical-assistance-grant-or-biz-programs/industrial_lands_ta_grant","name":"Industrial Lands Technical Assistance Grant","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"grant","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"While Oregon has significant quantity of industrially zoned land available throughout the state, technical assistance is required to support the further preparation of these sites for investment and development. The Industrial Lands Technical Assistance grant program was created to boost the state’s inventory of project-ready sites and accelerate private investment.","eligibility":"Council of Governments, Economic Development Organizations, Economic Development Districts and other 501c6 entities may be considered eligible applicants if they can show responsibility for industrially zoned land and have support of local municipal land manager.","applicant_types":["municipality"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/Industrial_Lands_TA_Grant/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7327,"slug":"oregon-investment-advantage-or-biz-programs/oia","name":"Oregon Investment Advantage","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":null,"funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Oregon Investment Advantage is a 10-year taxable income exemption for a certified business in eligible locations. It can often be combined with property tax abatement programs. Companies setting up operations in an eligible county can be certified as many as 10 consecutive times to annually deduct or subtract taxable income related to those operations, potentially eliminating any state business income tax liability for that period.","eligibility":"Inside a county that currently (or in the past two years) qualifies for the program, in terms of annual unemployment and per capita income; and\nOn land zoned for industrial uses or located inside the urban growth boundary (UGB) of a city that has a population of 15,000 or less.","applicant_types":["municipality"],"categories":[],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/OIA/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7348,"slug":"semiconductor-industrial-lands-loan-sill-program-or-biz-programs/sill","name":"Semiconductor Industrial Lands Loan (SILL) Program","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":"loan","funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Legislature adopted Senate Bill 4 in 2023 and committed $10 million dollars to the Industrial Lands Loan Fund to support private and public investments in industrial lands projects associated with new or expanded semiconductor manufacturing industry uses. The Semiconductor Industrial Lands Loan (SILL) Program's purpose is to accelerate investment in planning and improving industrial lands to support investment in semiconductor manufacturing uses and increase the state’s inventory of project-ready industrial sites for semiconductor manufacturing industry investments. The SILL Program is a forgivable loan program designed to reimburse government entities, property owners and businesses, up to $2.5 million for development projects, and planning activities of at least $100,000 for sites of 10 acres or more. Development projects can include a range of eligible activities such as land acquisition, infrastructure and utility improvements, and environmental remediation or mitigation of industrial properties for semiconductor manufacturing uses.","eligibility":"Cities, Counties, Ports (as defined in ORS 777.005 to 777.72 , Airport districts (as defined in ORS 838 ), the Port of Portland, Federally Recognized Tribes and municipal entities that own or operate land, that is investing in the preparation of the land for a development project by a third party or has entered into a development or other agreement with the private owner of industrial land to prepare the land for a development project.\nPrivate Owners including Businesses or Landowners (individuals, trusts, cooperatives, or any other organization type that can show ownership of zoned industrial land) that have an agreement with a local jurisdiction for the development of public infrastructure for the land or Private Owners that are investing in the preparation of the land for a development project by a third party.\nEligible applicant site and project requirements must have site’s of industrial zoned land of ten acres or larger, planning activities of at least $100,000 of funding requests and development projects of no greater than $2.5 million in funding requests.\nProposed projects must consist of at least 10 acres of site area, be zoned for industrial use, have site access to transportation and freight infrastructure and be located within 50 miles from present semiconductor industry clusters in Oregon located in and around Corvallis, Eugene, Gresham, Hillsboro, Medford and Redmond.","applicant_types":["business","county","individual","municipality","tribe"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/SILL/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]},{"id":7352,"slug":"special-public-works-fund-spwf-or-biz-programs/spwf","name":"Special Public Works Fund (SPWF)","number":null,"level":"state","state":"OR","agency":"Business Oregon (Oregon Business Development Department)","agency_code":"OR-BIZ","connector":"or_biz","funding_type":null,"funding_source":"direct","status":"unknown","opens_at":null,"closes_at":null,"closes_text":null,"rolling":null,"amount_min":null,"amount_max":null,"match_required":null,"match_pct":null,"summary":"The Special Public Works Fund provides low-cost financing to eligible municipalities for planning, design, and construction of utilities and facilities essential to industrial growth, commercial enterprise, and job creation.","eligibility":"Cities,\nCounties,\nCounty service districts (organized under ORS Chapter 451 ),\nTribal councils,\nPorts, districts (as defined in ORS 198.010 ), and\nAirport districts (as defined in ORS 838 ).\nEmergency projects as a result of a disaster,\nEnergy systems,\nLevee projects, and\nTelecommunication systems.","applicant_types":["county","municipality","tribe"],"categories":["infrastructure"],"alns":[],"listings":[],"first_seen":"2026-11-04T17:22:15Z","last_changed":"2026-11-04T17:22:15Z","source_url":"https://www.oregon.gov/biz/programs/SPWF/Pages/default.aspx","tier":"likely","is_new":false,"is_updated":false,"days_to_close":null,"deadline_placeholder":false,"days_since_deadline":null,"last_reopened":null,"history":[["2026-11-04","added",null,null,"first_read"]]}],"season":[0,0,0,0,0,0,0,0,1,0,0,0],"changes_n":10,"week_flips":[]}</script>
+<script src="../federal.js?v=2026-11-27" defer></script>
+<script src="../app.js?v=685dfee7ab" defer></script>
+</body>
+</html>
