@@ -3,7 +3,7 @@
 <head>
 {{HEAD}}
 </head>
-<body data-page="about">
+<body data-page="about" data-root="{{ROOT}}">
 <a class="skip" href="#main">Skip to the page</a>
 
 <header class="topbar">
@@ -19,6 +19,7 @@
   <!-- About as an essay (2026-11-27, Saj's pick: argument first). Each section is one claim, two or three sentences
        built from the counts in aboutPage(), then one chart as its evidence with its table. Nothing typed here is a
        number; a claim heading that the day's counts would not bear falls back to a plain title. -->
+  {{EDITION}}
   <section class="index-hero essay-hero">
     <p class="eyebrow">About the data</p>
     <h1>What the states say about their own funding, and what they leave out</h1>
@@ -133,6 +134,7 @@
       <li>When state deadlines have fallen: <code>v_stats_deadline_month</code></li>
       <li>Status changes: <code>v_stats_status_flips</code> with <code>v_change_cause</code></li>
     </ul>
+    {{EDITIONS}}
   </section>
 </main>
 

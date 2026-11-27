@@ -131,14 +131,26 @@ def aln(
 def export(
     out: Annotated[Path, typer.Option(help="directory to write the site into (wiped first)")] = build_site.DEFAULT_OUT,
     db_path: DbOpt = db.DEFAULT_DB,
+    editions: Annotated[Path, typer.Option(help="frozen About editions to draw (editions/<date>.json)")] = build_site.EDITIONS_DIR,
 ) -> None:
     """Build the navigator site (index + one page per state) from the navigator views."""
     conn = db.connect(db_path)
     db.apply_schema(conn)
-    path, counts = build_site.write(conn, out)
+    path, counts = build_site.write(conn, out, editions_dir=editions)
     md_page = conn.execute("SELECT COUNT(*) FROM v_municipal_page").fetchone()[0]
     typer.echo(f"{path}: index + {len(counts)} state pages")
     typer.echo(f"  MD: {counts.get('MD', 0)} rows (v_municipal_page: {md_page})")
+
+
+@app.command()
+def edition(
+    db_path: DbOpt = db.DEFAULT_DB,
+    editions: Annotated[Path, typer.Option(help="where the frozen editions are kept")] = build_site.EDITIONS_DIR,
+) -> None:
+    """Freeze today's About figures as a dated edition (editions/<date>.json); every later export draws it."""
+    conn = db.connect(db_path)
+    db.apply_schema(conn)
+    typer.echo(f"edition written: {build_site.make_edition(conn, editions)}")
 
 
 if __name__ == "__main__":

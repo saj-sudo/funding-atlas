@@ -596,6 +596,32 @@ def test_about_cards_are_stored_records_or_nothing(conn, tmp_path):
     assert js.count("function slot(label, value)") == 1             # one slot for the state page's cards and About's
 
 
+def test_a_dated_edition_keeps_its_figures(conn, tmp_path):
+    """2026-11-27 (Saj: About stays live, dated editions are frozen beside it, their data carried forward on gh-pages):
+    `make_edition` freezes the About payload; a later build draws it at about/edition/<date>/ with the frozen figures,
+    a banner and the site's root three folders up, and About lists it."""
+    eds = tmp_path / "editions"
+    path = build_site.make_edition(conn, eds, generated_at="2026-11-20T09:00:00Z")
+    assert path.name == "2026-11-20.json"
+    frozen = json.loads(path.read_text(encoding="utf-8"))
+    assert frozen["edition"] == "2026-11-20" and frozen["generated_at"].startswith("2026-11-20")
+    (eds / "notes.json").write_text("{}", encoding="utf-8")            # not a date: skipped
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN, editions_dir=eds)
+    page = (out / "about" / "edition" / "2026-11-20" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["generated_at"].startswith("2026-11-20") and data["edition"] == "2026-11-20"
+    assert 'data-root="../../../"' in page and 'src="../../../app.js?v=' in page
+    assert "The edition of Nov 20, 2026. Every figure on this page is frozen" in page and 'href="../../../about/"' in page
+    about = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert 'href="edition/2026-11-20/"' in about and "{{EDITION" not in about and 'data-root="../"' in about
+    assert json.loads((out / "editions" / "2026-11-20.json").read_text(encoding="utf-8"))["edition"] == "2026-11-20"
+    assert "about/edition/2026-11-20/" in (out / "sitemap.xml").read_text(encoding="utf-8")
+    assert not (out / "about" / "edition" / "notes").exists()
+    # no editions folder: About as before, with no listing and no edition pages
+    out2, _ = build_site.write(conn, tmp_path / "site2", generated_at=GEN, editions_dir=tmp_path / "none")
+    assert not (out2 / "about" / "edition").exists() and "Dated editions" not in (out2 / "about" / "index.html").read_text(encoding="utf-8")
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

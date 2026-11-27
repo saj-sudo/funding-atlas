@@ -7,7 +7,8 @@
 
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var PAGE = document.body.getAttribute('data-page');
-  var ROOT = PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '';
+  // a page may say where the site's root is (About's dated editions sit three folders deep, 2026-11-27)
+  var ROOT = document.body.getAttribute('data-root') || (PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '');
   var TODAY = DATA.generated_at.slice(0, 10);
   // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
   var FEDERAL_LOADED = !!window.FA_FEDERAL;

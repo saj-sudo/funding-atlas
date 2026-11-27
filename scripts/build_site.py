@@ -1003,21 +1003,68 @@ def about_payload(
     }
 
 
-def render_about(data: dict[str, Any], assets: str, template: str) -> str:
+EDITIONS_DIR = Path("editions")   # frozen About payloads, carried forward on gh-pages by the daily run (2026-11-27)
+
+
+def edition_label(day: str) -> str:
+    """'2026-11-27' -> 'Nov 27, 2026', as the pages write dates."""
+    d = date.fromisoformat(day)
+    return f"{d.strftime('%b')} {d.day}, {d.year}"
+
+
+def render_about(data: dict[str, Any], assets: str, template: str, *, editions: list[str] | None = None) -> str:
+    """About, live; or, when `data` carries an `edition` date, its frozen copy at about/edition/<date>/ (2026-11-27):
+    the same template and script, three folders deep, with a banner saying the figures are frozen."""
+    day = data.get("edition")
+    root = "../../../" if day else "../"
+    banner = (
+        f'<p class="edition-banner" role="note">The edition of {edition_label(day)}. Every figure on this page is frozen as of '
+        f'that day. <a href="{root}about/">Today\'s numbers are on About.</a></p>' if day else ""
+    )
+    listing = ""
+    if editions and not day:
+        links = ", ".join(f'<a href="edition/{e}/">{edition_label(e)}</a>' for e in sorted(editions, reverse=True))
+        listing = f'<p class="muted">Dated editions, with every figure frozen as of the day: {links}. Their data is in <code>editions/</code>.</p>'
     return fill(
         template,
-        TITLE="About the data · Funding Atlas",
+        TITLE=(f"About the data, edition of {edition_label(day)}" if day else "About the data") + " · Funding Atlas",
         DESCRIPTION="What the Funding Atlas registry reads, what its sources state, and what the change log has seen, in five charts.",
-        ROOT="../",
-        URL=SITE_URL + "about/",
+        ROOT=root,
+        EDITION=banner,
+        EDITIONS=listing,
+        URL=SITE_URL + (f"about/edition/{day}/" if day else "about/"),
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        FEED="../feed.xml",
+        FEED=root + "feed.xml",
         FEED_TITLE="Funding Atlas: changes",
         ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
+
+
+def make_edition(conn: sqlite3.Connection, editions_dir: Path = EDITIONS_DIR, *, generated_at: str | None = None) -> Path:
+    """Freeze today's About payload as editions/<date>.json (`cli.py edition`). The page is drawn from it by every later
+    build, with the code of that build: the figures stay, the design follows the site."""
+    about = build(conn, generated_at=generated_at)["about"]
+    day = about["generated_at"][:10]
+    editions_dir.mkdir(parents=True, exist_ok=True)
+    path = editions_dir / f"{day}.json"
+    path.write_text(json.dumps(dict(about, edition=day), ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return path
+
+
+def load_editions(editions_dir: Path | None) -> dict[str, dict[str, Any]]:
+    """Every editions/<date>.json, by date. A file whose name is not a date is skipped."""
+    out: dict[str, dict[str, Any]] = {}
+    if editions_dir and editions_dir.is_dir():
+        for f in sorted(editions_dir.glob("*.json")):
+            try:
+                date.fromisoformat(f.stem)
+            except ValueError:
+                continue
+            out[f.stem] = dict(json.loads(f.read_text(encoding="utf-8")), edition=f.stem)
+    return out
 
 
 def program_feed_path(slug: str) -> str:
@@ -1111,8 +1158,11 @@ def render_sitemap(urls: list[str], day: str) -> str:
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + rows + "</urlset>\n"
 
 
-def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
-    """Build the site into `out` (wiped first). Returns (out, {state code: program rows})."""
+def write(
+    conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None, editions_dir: Path | None = None,
+) -> tuple[Path, dict[str, int]]:
+    """Build the site into `out` (wiped first). Returns (out, {state code: program rows}). Each frozen edition in
+    `editions_dir` is drawn at about/edition/<date>/ and its JSON published at editions/<date>.json."""
     site = build(conn, generated_at=generated_at)
     css = (WEB / "app.css").read_text(encoding="utf-8")
     js = (WEB / "app.js").read_text(encoding="utf-8")
@@ -1160,7 +1210,14 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         counts[code] = len(data["programs"])
     about_tpl = template("about.html")
     (out / "about").mkdir()
-    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl), encoding="utf-8")
+    editions = load_editions(editions_dir)
+    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl, editions=list(editions)), encoding="utf-8")
+    for day, frozen in editions.items():
+        page = out / "about" / "edition" / day
+        page.mkdir(parents=True)
+        page.joinpath("index.html").write_text(render_about(frozen, assets, about_tpl), encoding="utf-8")
+        (out / "editions").mkdir(exist_ok=True)
+        (out / "editions" / f"{day}.json").write_text(json.dumps(frozen, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])
@@ -1169,6 +1226,7 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                             updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
     program_tpl = template("program.html")
     urls = [SITE_URL] + [f"{SITE_URL}{code.lower()}/" for code in site["states"]] + [SITE_URL + "about/"]
+    urls += [f"{SITE_URL}about/edition/{day}/" for day in editions]
     for data in site["program_pages"]:
         path = out / program_page_path(data["program"]["slug"])
         path.parent.mkdir(parents=True, exist_ok=True)
