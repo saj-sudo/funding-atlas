@@ -618,6 +618,14 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .atlas-fed .tile { width: 76px; cursor: default; }
 .atlas-note { min-height: 3em; font-size: var(--t-sm); max-width: 66ch; }
 .atlas-fig .src { font-size: var(--t-xs); color: var(--muted); max-width: 80ch; }
+/* how each state is read: solid portal, striped agency pages, split both; directory hatched grey as everywhere */
+.tile.t-k.k-portal, .legend .sw.k-portal { background: var(--s-state); }
+.tile.t-k.k-agencies, .legend .sw.k-agencies { background: var(--surface) repeating-linear-gradient(135deg, var(--s-state) 0 2.5px, transparent 2.5px 6px); }
+.tile.t-k.k-portal_agencies, .legend .sw.k-portal_agencies { background: linear-gradient(135deg, var(--s-state) 50%, var(--surface) 50%); }
+.reasons { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; font-size: var(--t-sm); max-width: 72ch; }
+.reasons li { display: grid; grid-template-columns: 2.4em minmax(0, 1fr); gap: 8px; }
+.reasons b { font-weight: 700; color: var(--muted); }
+.atlas-fig .legend .sw { width: 14px; height: 14px; border-radius: 0; }
 @container (max-width: 560px) {
   .atlas-wrap { grid-template-columns: 1fr; gap: 10px; }
   .atlas { gap: 2px; }

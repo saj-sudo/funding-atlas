@@ -607,6 +607,27 @@
     // only when the day's counts bear it; otherwise the section keeps the chart's plain title.
     function claim(id, ok, text) { if (ok) el(id).textContent = text; }
     if (A.atlas && el('atlas')) drawAtlas(el('atlas'), el('atlas-note'), A.atlas, (A.stated || []).filter(function (r) { return r.state === 'US'; })[0], false);
+    // how each state is read (2026-11-27): the same map by kind, the reasons for the unread states, and the counts
+    if (A.atlas && el('kindmap')) {
+      drawAtlas(el('kindmap'), el('kindmap-note'), A.atlas, null, true);
+      var c = { portal: 0, agencies: 0, portal_agencies: 0, directory: 0, refuse: 0, script: 0, nolist: 0 }, unread = [];
+      A.atlas.forEach(function (s) {
+        if (s.code === 'DC') return;
+        if (c[s.kind] !== undefined) c[s.kind]++;
+        else { unread.push(s); if (s.kind === 'stopped') c.script++; else if (s.kind === 'blocked' || s.kind === 'login') c.refuse++; else c.nolist++; }
+      });
+      // a sentence never opens with a numeral: small counts that start one are written as words
+      var WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen'];
+      function st(n) { return n + (n === 1 ? ' state' : ' states'); }
+      function St(n) { return (WORDS[n] || String(n)) + (n === 1 ? ' state' : ' states'); }
+      var parts = [c.refuse ? c.refuse + ' refuse automated readers' : '', c.script ? c.script + ' load their lists only in a browser script' : '', c.nolist ? 'in ' + c.nolist + ' the registry found no list to read' : ''].filter(Boolean);
+      el('read-sub').textContent = 'The registry reads ' + st(c.portal) + ' from a grants portal with a row for each program, ' + st(c.agencies) + ' from their agencies\' own pages, and ' +
+        st(c.portal_agencies) + ' from both. ' + (c.directory ? St(c.directory) + ' keep a directory that lists programs but no dates. ' : '') +
+        (unread.length ? St(unread.length) + ' give it nothing to read: ' + (parts.length > 2 ? parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1] : parts.join(' and ')) + '. Each reason is below, as the state page gives it.' : '');
+      var ways = [c.portal, c.agencies, c.portal_agencies, c.directory, unread.length].filter(Boolean).length;
+      claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');
+      el('reasons').innerHTML = unread.map(function (s) { return '<li><b aria-hidden="true">' + s.code + '</b><span>' + h(s.note || s.name + ': no state source read.') + '</span></li>'; }).join('');
+    }
     var K = {}; (A.stated_kinds || []).forEach(function (k) { K[k.kind] = k; });
     var P = K.portal, G = K.agencies;
     if (P && G) {

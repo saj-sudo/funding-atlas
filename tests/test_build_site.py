@@ -570,6 +570,18 @@ def test_about_opens_with_the_atlas(conn, tmp_path):
     assert "function drawAtlas(el, noteEl, atlas, fed, kinds)" in js and "aria-pressed" in js
 
 
+def test_about_shows_how_each_state_is_read(conn, tmp_path):
+    """2026-11-27: the same map by how each state is read, with the state pages' own reason for every unread state;
+    the paragraph and the "five ways" heading are counted from the atlas, not typed."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert page.index('id="atlas"') < page.index('id="kindmap"') < page.index('id="c3"')
+    assert 'id="read-sub"></p>' in page and 'id="reasons"' in page and 'id="kindmap-note" aria-live="polite"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "drawAtlas(el('kindmap'), el('kindmap-note'), A.atlas, null, true);" in js
+    assert "claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');" in js
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text
