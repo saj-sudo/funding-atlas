@@ -352,7 +352,10 @@ def test_scales_and_card_slots(conn, tmp_path):
     assert not re.findall(r"font-size: [\d.]+rem", rules) and not re.findall(r"font: (?:\d{3} )?[\d.]+rem", rules)
     assert set(re.findall(r"font-weight: (\d+)", rules)) <= {"400", "600", "700"}
     assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
-    assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
+    assert ".btn { display: inline-flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); border: 1px solid var(--edge);" in rules
+    # spacing (2026-11-28): every gap, padding and margin length is a --sp step, apart from 1px hairlines
+    spacing = re.findall(r"(?<![-\w])(?:(?:row-|column-)?gap|padding[-\w]*|margin[-\w]*)\s*:\s*([^;}]+)", re.sub(r"/\*.*?\*/", "", rules, flags=re.S))
+    assert not [v for v in spacing if re.search(r"(?<![\w.(,-])-?(?:[2-9]|\d{2,})px", v)]
     # dashed only ever means "cannot be read": the index map's blocked states, and About's atlas (2026-11-27)
     assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [
         ".legend .sw.wall ", ".tile.t-wall ", ".map a.t.k-blocked ", ".legend i.k-blocked "]
