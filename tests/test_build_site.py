@@ -635,6 +635,15 @@ def test_one_select_and_one_checkbox(conn, tmp_path):
     assert 'select:focus-visible, input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent);' in css
 
 
+def test_long_titles_held_to_three_lines(conn, tmp_path):
+    """2026-11-28: a card's title shows three lines at most (display only); the whole name stays the button's text and,
+    when long, its tooltip; stored names are untouched."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert "-webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;" in css
+    assert "(programName(p).length > 90 ? ' title=\"' + h(programName(p)) + '\"' : '') + '>' + h(programName(p)) + '</button></h3>'" in js
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

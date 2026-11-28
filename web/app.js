@@ -1056,7 +1056,7 @@
       return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(programName(p)) + '</button></h3>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog"' + (programName(p).length > 90 ? ' title="' + h(programName(p)) + '"' : '') + '>' + h(programName(p)) + '</button></h3>' +
         '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
         slots + (facts.length ? '<div class="facts">' + facts.join('') + '</div>' : '') +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
