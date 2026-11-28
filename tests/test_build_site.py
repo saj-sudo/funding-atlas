@@ -270,13 +270,20 @@ def test_topics_are_words_with_their_own_colours(conn, tmp_path):
         assert token + ":" in root and token + ":" in dark.split("}", 2)[0] + dark.split("}", 2)[1]
 
 
-def test_about_page_serves_the_clerk_first(conn, tmp_path):
-    """Redesign session 5 (13.22): the two clerk charts lead, the methods charts sit under their own heading, and the
-    captions are plain words: view names are in one Data and code note."""
+def test_about_page_is_an_essay_argument_first(conn, tmp_path):
+    """2026-11-27 (Saj's pick): About reads as an essay, argument first: what sources state, amounts, what is due, then
+    under "For researchers" when deadlines fall and what changes, then the limits and Data and code. Each section's
+    sentences are built from the payload, so no number is typed into the page. Captions stay plain words: view names
+    are in one Data and code note (13.22)."""
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     page = (out / "about" / "index.html").read_text(encoding="utf-8")
-    at = [page.index(s) for s in ('id="c1"', 'id="c5"', "For researchers", 'id="c2"', 'id="c3"', 'id="c4"', "Data and code")]
+    at = [page.index(s) for s in ('id="lede"', 'id="c3"', 'id="c5"', 'id="c1"', "For researchers", 'id="c2"', 'id="c4"',
+                                  "What this cannot tell you", "Data and code")]
     assert at == sorted(at)
+    for sid in ("lede", "c3-sub", "c5-sub", "c1-sub", "c2-sub", "c4-sub"):
+        assert f'id="{sid}"></p>' in page, sid                      # filled by the script from the counts
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert isinstance(data["unread"], int) and "log_since" in data
     assert not [s for s in re.findall(r'<p class="src">(.*?)</p>', page, re.S) if "<code>v_" in s]
     assert "<code>v_navigator_program</code>" in page
 
@@ -345,8 +352,13 @@ def test_scales_and_card_slots(conn, tmp_path):
     assert not re.findall(r"font-size: [\d.]+rem", rules) and not re.findall(r"font: (?:\d{3} )?[\d.]+rem", rules)
     assert set(re.findall(r"font-weight: (\d+)", rules)) <= {"400", "600", "700"}
     assert set(re.findall(r"border-radius: (\d+px)", rules)) <= {"999px", "0px"}
-    assert ".btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1px solid var(--edge);" in rules
-    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [".map a.t.k-blocked ", ".legend i.k-blocked "]
+    assert ".btn { display: inline-flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); border: 1px solid var(--edge);" in rules
+    # spacing (2026-11-28): every gap, padding and margin length is a --sp step, apart from 1px hairlines
+    spacing = re.findall(r"(?<![-\w])(?:(?:row-|column-)?gap|padding[-\w]*|margin[-\w]*)\s*:\s*([^;}]+)", re.sub(r"/\*.*?\*/", "", rules, flags=re.S))
+    assert not [v for v in spacing if re.search(r"(?<![\w.(,-])-?(?:[2-9]|\d{2,})px", v)]
+    # dashed only ever means "cannot be read": the index map's blocked states, and About's atlas (2026-11-27)
+    assert [m for m in re.findall(r"([^{}\n]+)\{[^}]*dashed", rules)] == [
+        ".legend .sw.wall ", ".tile.t-wall ", ".map a.t.k-blocked ", ".legend i.k-blocked "]
     js = (out / "app.js").read_text(encoding="utf-8")
     assert "slot('Amount', amount) + slot('Match', match)" in js and "'Source does not say'" in js
     assert "Amount not published" not in page + js
@@ -451,11 +463,20 @@ def test_charts_draw_at_shown_width_with_tables(conn, tmp_path):
     out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
     js, about = (out / "app.js").read_text(encoding="utf-8"), (out / "about" / "index.html").read_text(encoding="utf-8")
     assert "function chartW(svgEl, max)" in js and "var w = 900" not in js and "onWidthChange(draw);" in js
-    assert js.count("narrow = w < 560") == 5
+    assert js.count("narrow = w < 560") == 4                     # "what sources state" is HTML squares since 2026-11-27
     assert "svgEl.addEventListener('click', function (e) { var t = e.target.closest('[data-tip]');" in js
     for cid in ("c1", "c2", "c3", "c4", "c5"):
         assert f'<div id="{cid}-table"></div>' in about and (f"el('{cid}-table')" in js), cid
     assert '<th scope="col">' in js and '<th scope="row">' in js
+
+
+def test_history_strip_is_not_scaled(conn, tmp_path):
+    """2026-11-27: the program's history strip has no viewBox and places its marks in percentages, so its 11px labels
+    stay 11px on a phone (they were 7.6px at 390 and 17.3px at 1440 when the strip was a 520-unit drawing)."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "'<svg class=\"hist\" height=\"58\" aria-hidden=\"true\">'" in js and "W = 520" not in js
+    assert "svg.hist { width: 100%; height: 58px;" in (out / "app.css").read_text(encoding="utf-8")
 
 
 def test_index_states_and_tile_grid(conn):
@@ -504,6 +525,174 @@ def test_about_page_is_written_and_same_origin(conn, tmp_path):
     assert set(re.findall(r'<script src="([^"?]+)', page)) == {"../app.js"} and "cdn" not in page
 
 
+def test_what_sources_state_is_a_hundred_squares_by_kind(conn, tmp_path):
+    """2026-11-27 (Saj's pick A2): "what sources state" sums the stated fields by how each state is read, as the index
+    does; every row carries its kind, no count is null, and the chart is squares, solid for stated, in HTML."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    rows, kinds = data["stated"], data["stated_kinds"]
+    assert rows and all(r["kind"] and all(r[k] is not None for k in ("n", "status_stated", "date_stated", "amount_stated")) for r in rows)
+    assert kinds[0]["kind"] == "federal"
+    for k in kinds:
+        mine = [r for r in rows if r["kind"] == k["kind"]]
+        assert k["n"] == sum(r["n"] for r in mine) and k["date"] == sum(r["date_stated"] for r in mine) and k["states"] == len(mine)
+    assert '<div id="c3" class="waffle"></div>' in page and '<svg id="c3"' not in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "function chartStated(el, tableEl, kinds, rows)" in js and "for (var i = 0; i < 100; i++)" in js
+    assert "m-s1" not in js and "--s3" not in (out / "app.css").read_text(encoding="utf-8")
+
+
+def test_one_colour_one_meaning_in_the_charts(conn, tmp_path):
+    """2026-11-27: hue says who (blue federal, orange and its ramp state), fill says whether the source stated it, ink
+    for the rest. Blue had also meant "states a status" and "the source changed", and the heat map of state-only
+    deadlines was a blue ramp."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    js, css = (out / "app.js").read_text(encoding="utf-8"), (out / "app.css").read_text(encoding="utf-8")
+    assert "var(--q" not in js and "--q1" not in css and css.count("--o1:") == 3
+    assert "var RAMP = ['var(--o1)'" in js
+    assert "[['src', 'm-ink'], ['other', 'm-ink'], ['code', 'm-maybe']]" in js
+    # blue marks only on the two charts that split federal from state: weekly deadlines and maximum awards
+    assert js.count("'m-fed'") == 1 and js.count("class=\"m-fed\"") == 1
+
+
+def test_about_opens_with_the_atlas(conn, tmp_path):
+    """2026-11-27 (Saj's pick H1 for the entry piece): About opens with every state on the tile map, filled to the share
+    of its programs whose source states a deadline; each tile carries how the state is read and, if it is not, why."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    atlas = {s["code"]: s for s in data["atlas"]}
+    assert len(atlas) == len(build_site.STATES) and all({"row", "col", "kind", "n", "date", "listed"} <= set(s) for s in atlas.values())
+    md = next(r for r in data["stated"] if r["state"] == "MD")
+    assert atlas["MD"]["n"] == md["n"] and atlas["MD"]["date"] == md["date_stated"]
+    assert atlas["AK"]["kind"] == "blocked" and atlas["AK"]["note"] and atlas["AK"]["n"] == 0
+    assert page.index('id="lede"') < page.index('id="atlas"') < page.index('id="c3"')
+    assert 'id="atlas-note" aria-live="polite"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "function drawAtlas(el, noteEl, atlas, fed, kinds)" in js and "aria-pressed" in js
+
+
+def test_about_shows_how_each_state_is_read(conn, tmp_path):
+    """2026-11-27: the same map by how each state is read, with the state pages' own reason for every unread state;
+    the paragraph and the "five ways" heading are counted from the atlas, not typed."""
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert page.index('id="atlas"') < page.index('id="kindmap"') < page.index('id="c3"')
+    assert 'id="read-sub"></p>' in page and 'id="reasons"' in page and 'id="kindmap-note" aria-live="polite"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "drawAtlas(el('kindmap'), el('kindmap-note'), A.atlas, null, true);" in js
+    assert "claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');" in js
+
+
+def test_about_cards_are_stored_records_or_nothing(conn, tmp_path):
+    """2026-11-27: the three records are read from the database by slug, field by field; a slug that is not stored
+    drops its card (the test database stores none of them, so About carries none and hides the section)."""
+    assert len(build_site.CARD_SLUGS) == 3
+    assert build_site.load_cards(conn, set()) == []
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN)
+    page = (out / "about" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["cards"] == [] and 'id="cards"' in page
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "el('h-cards').closest('section').hidden = cards.length < 2;" in js
+    assert js.count("function slot(label, value)") == 1             # one slot for the state page's cards and About's
+
+
+def test_a_dated_edition_keeps_its_figures(conn, tmp_path):
+    """2026-11-27 (Saj: About stays live, dated editions are frozen beside it, their data carried forward on gh-pages):
+    `make_edition` freezes the About payload; a later build draws it at about/edition/<date>/ with the frozen figures,
+    a banner and the site's root three folders up, and About lists it."""
+    eds = tmp_path / "editions"
+    path = build_site.make_edition(conn, eds, generated_at="2026-11-20T09:00:00Z")
+    assert path.name == "2026-11-20.json"
+    frozen = json.loads(path.read_text(encoding="utf-8"))
+    assert frozen["edition"] == "2026-11-20" and frozen["generated_at"].startswith("2026-11-20")
+    (eds / "notes.json").write_text("{}", encoding="utf-8")            # not a date: skipped
+    out, _ = build_site.write(conn, tmp_path / "site", generated_at=GEN, editions_dir=eds)
+    page = (out / "about" / "edition" / "2026-11-20" / "index.html").read_text(encoding="utf-8")
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["generated_at"].startswith("2026-11-20") and data["edition"] == "2026-11-20"
+    assert 'data-root="../../../"' in page and 'src="../../../app.js?v=' in page
+    assert "The edition of Nov 20, 2026. Every figure on this page is frozen" in page and 'href="../../../about/"' in page
+    about = (out / "about" / "index.html").read_text(encoding="utf-8")
+    assert 'href="edition/2026-11-20/"' in about and "{{EDITION" not in about and 'data-root="../"' in about
+    assert json.loads((out / "editions" / "2026-11-20.json").read_text(encoding="utf-8"))["edition"] == "2026-11-20"
+    assert "about/edition/2026-11-20/" in (out / "sitemap.xml").read_text(encoding="utf-8")
+    assert not (out / "about" / "edition" / "notes").exists()
+    # no editions folder: About as before, with no listing and no edition pages
+    out2, _ = build_site.write(conn, tmp_path / "site2", generated_at=GEN, editions_dir=tmp_path / "none")
+    assert not (out2 / "about" / "edition").exists() and "Dated editions" not in (out2 / "about" / "index.html").read_text(encoding="utf-8")
+
+
+def test_one_select_and_one_checkbox(conn, tmp_path):
+    """2026-11-28: every select and checkbox takes one base rule (the site's edge, a chevron in the muted ink, a focus
+    ring, 40px tall; checkboxes 18px in the accent), so none falls back to the browser's grey."""
+    css = (build_site.write(conn, tmp_path / "site", generated_at=GEN)[0] / "app.css").read_text(encoding="utf-8")
+    assert "appearance: none; -webkit-appearance: none; min-height: 40px;" in css
+    assert 'input[type="checkbox"] { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--accent);' in css
+    assert css.count("\nselect {") == 1                                       # one base rule; the rest only adjust it
+    assert 'select:focus-visible, input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent);' in css
+
+
+def test_long_titles_held_to_three_lines(conn, tmp_path):
+    """2026-11-28: a card's title shows three lines at most (display only); the whole name stays the button's text and,
+    when long, its tooltip; stored names are untouched."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
+    assert "-webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;" in css
+    assert "(programName(p).length > 90 ? ' title=\"' + h(programName(p)) + '\"' : '') + '>' + h(programName(p)) + '</button></h3>'" in js
+
+
+def test_mark_c1_everywhere(conn, tmp_path):
+    """2026-11-28 (Saj's pick C1 of mark C): one tile, solid below and hatched above, drawn once in build_site and filled
+    into every template's top bar; the tab icon is the same drawing, light on a dark tab bar; the wordmark is serif."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    pages = ["index.html", "md/index.html", "about/index.html"] + [str(p.relative_to(out)) for p in list((out / "p").glob("*/index.html"))[:1]]
+    for rel in pages:
+        page = (out / rel).read_text(encoding="utf-8")
+        assert build_site.MARK_SVG in page and "{{MARK}}" not in page and "<i></i><i></i><i></i>" not in page, rel
+    assert "clip-path" in build_site.ICON and "prefers-color-scheme" in build_site.ICON.replace("%3A", ":")
+    css = (out / "app.css").read_text(encoding="utf-8")
+    assert ".brand { display: inline-flex; align-items: center; gap: var(--sp-5); font: 600 var(--t-lg)/1 var(--f-display);" in css
+    assert ".brand .mark i" not in css
+
+
+def test_a_program_that_leaves_every_list_keeps_a_tombstone(tmp_path):
+    """2026-11-28 (Saj: tombstone T1, kept always): a program that had a page and is on no list keeps its page, saying
+    when and how it left, with its status as last listed; noindex, out of the sitemap, its feed linked to it. A listed
+    program is untouched. Departures before 2026-11-26, when pages began, get none: they never had a page."""
+    c = db.connect(":memory:")
+    db.apply_schema(c)
+    c.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('grants_gov', ?, ?, 'ok')", (T1, T1))
+    c.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('md_dhcd', ?, ?, 'ok')", (T1, T1))
+    upsert(c, 1, FIRST_RUN, T1)
+    gone_at = max(NOW - timedelta(days=1), datetime(2026, 11, 27, tzinfo=UTC)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    pid = c.execute("SELECT id FROM program WHERE name = 'Wildlife Crossings Pilot'").fetchone()[0]
+    c.execute("UPDATE program SET status = 'unknown' WHERE id = ?", (pid,))
+    c.execute("INSERT INTO program_change (run_id, program_id, change_type, changed_fields, changed_at) VALUES (1, ?, 'missing', ?, ?)",
+              (pid, json.dumps({"status": {"old": "open", "new": "unknown"}}), gone_at))
+    rows = build_site.load_gone(c)
+    assert [r["name"] for r in rows] == ["Wildlife Crossings Pilot"] and rows[0]["status_before"] == "open"
+    out = build_site.write(c, tmp_path / "site", generated_at=GEN)[0]
+    slug = c.execute("SELECT slug FROM program WHERE id = ?", (pid,)).fetchone()[0]
+    page = (out / build_site.program_page_path(slug)).read_text(encoding="utf-8")
+    assert '<p class="gone" role="note">No longer listed since ' in page and "when its status was open." in page
+    assert '<meta name="robots" content="noindex">' in page and "it may no longer work" in page and "btn primary src" not in page
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["tombstone"]["why"] == "missing" and data["tombstone"]["status_before"] == "open"
+    assert build_site.program_url(slug) not in (out / "sitemap.xml").read_text(encoding="utf-8")
+    feed = (out / build_site.program_feed_path(slug)).read_text(encoding="utf-8")
+    assert build_site.program_url(slug) in feed                               # the feed points at the tombstone page
+    listed = (out / build_site.program_page_path(c.execute("SELECT slug FROM program WHERE name = 'Main Street Facades'").fetchone()[0])).read_text(encoding="utf-8")
+    assert 'class="gone"' not in listed and "noindex" not in listed
+    # the same departure before pages began gets no tombstone
+    c.execute("UPDATE program_change SET changed_at = '2026-11-20T00:00:00Z' WHERE program_id = ? AND change_type = 'missing'", (pid,))
+    assert build_site.load_gone(c) == []
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "if (DATA.tombstone) { p.gone = true;" in js and "Status when last listed" in js
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text
@@ -532,7 +721,9 @@ def test_write_site(conn, tmp_path):
     # same origin only (2026-11-26): the stylesheet and script are files beside the pages, shared and cached; a page
     # loads those, federal.js and the two fonts, and nothing from anywhere else
     css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
-    assert css == (build_site.WEB / "app.css").read_text(encoding="utf-8") and js == (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    # the stylesheet is the source with its dark tokens copied into the dark preference's rule (2026-11-27)
+    assert css == build_site.dark_tokens_once((build_site.WEB / "app.css").read_text(encoding="utf-8"))
+    assert js == (build_site.WEB / "app.js").read_text(encoding="utf-8") and "DARK TOKENS" not in css
     key = build_site.asset_version(css, js)
     assert key != build_site.asset_version(css + " ", js) and key != build_site.asset_version(css, js + " ")
     assert re.findall(r'<script src="([^"]+)"', page) == ["../federal.js?v=" + GEN[:10], "../app.js?v=" + key]

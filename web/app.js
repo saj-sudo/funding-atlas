@@ -7,7 +7,8 @@
 
   var DATA = JSON.parse(document.getElementById('data').textContent);
   var PAGE = document.body.getAttribute('data-page');
-  var ROOT = PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '';
+  // a page may say where the site's root is (About's dated editions sit three folders deep, 2026-11-27)
+  var ROOT = document.body.getAttribute('data-root') || (PAGE === 'program' ? '../../' : PAGE === 'state' || PAGE === 'about' ? '../' : '');
   var TODAY = DATA.generated_at.slice(0, 10);
   // State pages carry only their own rows; federal notices come once from federal.js (same origin, cached).
   var FEDERAL_LOADED = !!window.FA_FEDERAL;
@@ -241,8 +242,9 @@
   }
 
   // =====================================================================================
-  // Charts (13.14): plain SVG, one shared tooltip. Colours come from the theme tokens (--s-fed, --s-state,
-  // --s3, the --q ramp); every chart has a legend or direct labels, and the stated-fields chart a table.
+  // Charts (13.14): plain SVG, one shared tooltip, except "what sources state", which is HTML squares. One colour rule
+  // (2026-11-27): hue says who (--s-fed federal, --s-state and its --o ramp state), fill says whether the source stated
+  // it (solid stated, hatched not), and everything else is ink. Every chart has a legend or direct labels and a table.
   // =====================================================================================
 
   var tipEl = null;
@@ -323,7 +325,7 @@
   }
 
   // rows: [[label, [12 counts]], ...] -> heatmap, each row shaded by its own share
-  var RAMP = ['var(--q1)', 'var(--q2)', 'var(--q3)', 'var(--q4)', 'var(--q5)', 'var(--q6)', 'var(--q7)'];
+  var RAMP = ['var(--o1)', 'var(--o2)', 'var(--o3)', 'var(--o4)', 'var(--o5)', 'var(--o6)', 'var(--o7)'];   // state data, so the state's hue (2026-11-27)
   function chartSeason(svgEl, rows, compact) {
     var w = chartW(svgEl, compact ? 760 : 900), narrow = w < 560, L = compact ? 10 : narrow ? 92 : 100, T = 22, cw = (w - L - 8) / 12, ch = compact ? 26 : 30, hh = T + rows.length * (ch + 2) + 4, g = '';
     MONTHS.forEach(function (m, i) { g += '<text class="ctext" x="' + (L + i * cw + cw / 2) + '" y="15" text-anchor="middle">' + (narrow && !compact ? m.charAt(0) : m) + '</text>'; });
@@ -342,25 +344,89 @@
     return '<span><i class="sw" style="background:var(--soft)"></i>none</span><span>small share</span>' + RAMP.map(function (c) { return '<i class="sw" style="background:' + c + ';margin:0 1px"></i>'; }).join('') + '<span>26% or more of the row</span>';
   }
 
-  function chartStated(svgEl, tableEl, rows) {
-    var w = chartW(svgEl, 900), narrow = w < 560, L = narrow ? 14 : 150, R = narrow ? 18 : 30, T = 24, rh = narrow ? 50 : 36, hh = T + rows.length * rh + 6, x = function (v) { return L + (w - L - R) * v; }, g = '';
-    [0, .25, .5, .75, 1].forEach(function (v) { g += '<line class="cgrid" x1="' + x(v) + '" x2="' + x(v) + '" y1="' + (T - 6) + '" y2="' + (hh - 4) + '"/><text class="ctext" x="' + x(v) + '" y="12" text-anchor="middle">' + (v * 100) + '%</text>'; });
-    var ser = [['status_stated', 'm-s1', 'a status'], ['date_stated', 'm-s2', 'a deadline'], ['amount_stated', 'm-s3', 'an amount']];
-    rows.forEach(function (r, i) {
-      var yy = T + i * rh + (narrow ? 34 : rh / 2), name = r.state === 'US' ? 'Federal, open now' : stateName(r.state);
-      // narrow: the name sits on its own line above the row's dots
-      g += narrow ? '<text class="ctext clab" x="' + L + '" y="' + (yy - 16) + '">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>'
-        : '<text class="ctext clab" x="' + (L - 12) + '" y="' + (yy + 4) + '" text-anchor="end">' + h(name) + ' <tspan class="cmuted">(' + r.n + ')</tspan></text>';
-      g += '<line class="cgrid" x1="' + L + '" x2="' + (w - R) + '" y1="' + yy + '" y2="' + yy + '"/>';
-      ser.forEach(function (sr, j) {
-        var v = r.n ? r[sr[0]] / r.n : 0;
-        g += '<circle class="' + sr[1] + ' cdot" data-tip="' + h(name + ': ' + Math.round(v * 100) + '% state ' + sr[2] + ' (' + r[sr[0]] + ' of ' + r.n + ')') + '" cx="' + x(v) + '" cy="' + (yy + (j - 1) * 8) + '" r="6"/>';
+  // a card's fixed slot (2026-11-26): the value, or hatched and "Source does not say"; shared by the state page's cards
+  // and About's three records (2026-11-27)
+  function slot(label, value) {
+    return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
+  }
+  // "One federal program, three states" on About: each stored record in four fixed slots, nothing filled in. The
+  // agency's own deadline words are shown when the source gives words but no date the registry could keep.
+  var READ_AS_SHORT = { portal: 'state grants portal', agencies: 'agency page', portal_agencies: 'state portal', directory: 'state directory' };
+  function recordCard(p) {
+    var dl = p.closes_at ? fmtDate(p.closes_at.slice(0, 10), true) : p.rolling ? 'Rolling' : '';
+    var match = p.match_required === 1 || p.match_required === true ? 'Required' : p.match_required === 0 || p.match_required === false ? 'Not required' : '';
+    var name = p.listed ? '<a href="' + h(ROOT + pagePath(p.slug)) + '">' + h(p.name) + '</a>' : h(p.name);
+    return '<article class="card rec"><p class="rec-src">' + h(stateName(p.state)) + ' · ' + h(READ_AS_SHORT[p.read_as] || 'agency page') + '</p>' +
+      '<h3>' + name + '</h3><p class="meta">' + h(p.administering_agency || 'Agency not stated') + '</p>' +
+      '<dl class="slots">' + slot('Status', p.status && p.status !== 'unknown' ? statusLabel(p.status) : '') + slot('Deadline', dl) +
+      slot('Amount', amountText(p)) + slot('Match', match) + '</dl>' +
+      (!dl && p.closes_at_text ? '<p class="cycle"><span class="k">In the agency\'s words:</span> \u201c' + h(p.closes_at_text) + '\u201d</p>' : '') +
+      '<p class="rec-link"><a href="' + h(p.source_url) + '" rel="noopener">The agency\'s page</a></p></article>';
+  }
+
+  // how a source is read, in the words the index's "what the states publish" block and About's chart both use
+  var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
+  function share(v, n) { return n ? Math.round(100 * v / n) : 0; }
+  // "What sources state" (2026-11-27, Saj's pick A2): a hundred squares per kind of source and field, solid for one in
+  // a hundred programs whose source states it, hatched for the rest; blue federal, orange state. HTML, not SVG, so its
+  // text follows the reader's settings. Each state's own shares are in the table.
+  // The atlas (2026-11-27, Saj's pick H1 for the entry piece): every state on the tile map. With `kinds` false, a read
+  // state's tile fills from the bottom to the share of its programs whose source states a deadline (solid, the state's
+  // hue) and is hatched above; a directory is all hatched; a state that refuses readers or needs a browser script is
+  // dashed; a state with no list is an empty outline; DC is out of scope. With `kinds` true the fill says how the state
+  // is read instead. Tiles are buttons: a tap or Enter puts the state's sentence in `noteEl`, a live region.
+  var READ_AS = { portal: 'a state grants portal', agencies: 'its agencies\' own pages', portal_agencies: 'a state portal and its agencies\' pages', directory: 'a state directory' };
+  function atlasClass(s, kinds) {
+    if (s.code === 'DC') return 't-oos';
+    if (s.kind === 'blocked' || s.kind === 'login' || s.kind === 'stopped') return 't-wall';
+    if (s.kind === 'directory') return 't-dir';
+    if (READ_AS[s.kind]) return kinds ? 't-k k-' + s.kind : s.n ? 't-read' : 't-none';
+    return 't-none';
+  }
+  function atlasNote(s) {
+    if (s.n) return s.name + ': ' + s.date.toLocaleString('en-US') + ' of ' + s.n.toLocaleString('en-US') + ' programs open to local governments state a deadline (' + share(s.date, s.n) + ' in 100). Read from ' + READ_AS[s.kind] + '.';
+    if (s.kind === 'directory') return s.name + ': a state directory of ' + s.listed.toLocaleString('en-US') + ' programs that states no status or dates.';
+    if (READ_AS[s.kind]) return s.name + ': read from ' + READ_AS[s.kind] + '; none of its programs is open to local governments.';
+    return s.name + ': ' + (s.note || 'no state source read.');
+  }
+  function drawAtlas(el, noteEl, atlas, fed, kinds) {
+    var hh = '<div class="atlas">' + atlas.map(function (s, i) {
+      var cls = atlasClass(s, kinds), p = share(s.date, s.n), fill = !kinds && cls === 't-read';
+      return '<button type="button" class="tile ' + cls + '" style="grid-row:' + (s.row + 1) + ';grid-column:' + (s.col + 1) + '" data-i="' + i + '" aria-label="' + h(atlasNote(s)) + '">' +
+        (fill ? '<span class="lv" style="height:' + p + '%"></span>' : '') + '<span class="cd">' + s.code + '</span>' + (fill ? '<span class="pc">' + p + '</span>' : '') + '</button>';
+    }).join('') + '</div>';
+    if (!kinds && fed) {
+      var fp = share(fed.date_stated, fed.n);
+      hh = '<div class="atlas-wrap">' + hh + '<div class="atlas-fed"><span class="tile t-read t-fed" aria-hidden="true"><span class="lv" style="height:' + fp + '%"></span><span class="cd">US</span><span class="pc">' + fp + '</span></span>' +
+        '<span>Federal notices open now, for comparison: ' + fp + ' in 100 state a deadline (' + fed.date_stated + ' of ' + fed.n + ').</span></div></div>';
+    }
+    el.innerHTML = hh;
+    el.querySelectorAll('.tile[data-i]').forEach(function (t) {
+      t.addEventListener('click', function () {
+        el.querySelectorAll('.tile.on').forEach(function (x) { x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
+        t.classList.add('on'); t.setAttribute('aria-pressed', 'true');
+        noteEl.textContent = atlasNote(atlas[+t.getAttribute('data-i')]);
       });
     });
-    drawSvg(svgEl, w, hh, g);
-    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
-      rows.map(function (r) { var p = function (k) { return r.n ? Math.round(r[k] / r.n * 100) + '%' : ''; };
-        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), r.n, p('status_stated'), p('date_stated'), p('amount_stated')]; }));
+  }
+  function chartStated(el, tableEl, kinds, rows) {
+    var FIELDS = [['status', 'a status'], ['date', 'a deadline'], ['amount', 'an amount']];
+    el.innerHTML = kinds.map(function (k) {
+      var fed = k.kind === 'federal', name = KIND_ROW[k.kind] || k.kind;
+      return '<div class="wf-group ' + (fed ? 'fed' : 'st') + '"><div class="wf-name"><h3>' + h(name) + '</h3><small class="num">' +
+        k.n.toLocaleString('en-US') + ' programs' + (fed ? ', open now' : ' · ' + k.states + (k.states === 1 ? ' state' : ' states')) + '</small></div>' +
+        FIELDS.map(function (f) {
+          var v = k[f[0]], p = share(v, k.n), cells = '';
+          for (var i = 0; i < 100; i++) cells += '<i' + (i < p ? ' class="on"' : '') + '></i>';
+          return '<div class="wf"><div class="wf-grid" role="img" aria-label="' + h(name + ': ' + p + ' in 100 state ' + f[1] + ', ' + v + ' of ' + k.n) + '">' + cells + '</div>' +
+            '<p><b class="num">' + p + '</b> in 100 state ' + f[1] + '<span class="num">' + v.toLocaleString('en-US') + ' of ' + k.n.toLocaleString('en-US') + '</span></p></div>';
+        }).join('') + '</div>';
+    }).join('');
+    var order = { federal: 0, portal: 1, portal_agencies: 2, agencies: 3, directory: 4 };
+    if (tableEl) tableEl.innerHTML = ctable(['Source', 'Read from', 'Programs', 'States a status', 'States a deadline', 'States an amount'],
+      rows.slice().sort(function (a, b) { return (order[a.kind] - order[b.kind]) || (b.n - a.n); }).map(function (r) {
+        return [r.state === 'US' ? 'Federal, open now' : stateName(r.state), KIND_ROW[r.kind] || r.kind, r.n,
+          share(r.status_stated, r.n) + '%', share(r.date_stated, r.n) + '%', share(r.amount_stated, r.n) + '%']; }));
   }
 
   // flips: [{old_status, new_status, cause, n, first_at, last_at}] -> one bar per change, split by cause
@@ -385,7 +451,7 @@
       var t = lab + ': ' + tot + ' (' + r.src + ' from the source' + (r.code ? ', ' + r.code + ' after a code change' : '') + (r.other ? ', ' + r.other + ' unlabelled' : '') + '), ' + fmtDate(r.a, true) + ' to ' + fmtDate(r.b, true);
       g += '<g data-tip="' + h(t) + '"><rect x="' + L + '" y="' + yy + '" width="' + (w - L - R) + '" height="26" fill="transparent"/>';
       var x0 = L;
-      [['src', 'm-fed'], ['other', 'm-fed'], ['code', 'm-code']].forEach(function (seg) {
+      [['src', 'm-ink'], ['other', 'm-ink'], ['code', 'm-maybe']].forEach(function (seg) {
         var v = r[seg[0]]; if (!v) return;
         var x1 = x0 + (x(v) - L), last = x1 >= x(tot) - 0.5;
         g += '<path class="' + seg[1] + '" d="' + (last ? 'M' + x0 + ',' + (yy + 4) + 'H' + (x1 - 4) + 'Q' + x1 + ',' + (yy + 4) + ' ' + x1 + ',' + (yy + 8) + 'V' + (yy + 16) + 'Q' + x1 + ',' + (yy + 20) + ' ' + (x1 - 4) + ',' + (yy + 20) + 'H' + x0 + 'Z'
@@ -450,7 +516,8 @@
     var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
     var answers =
       '<dl class="answers">' +
-      '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+      (p.gone ? '<div><dt>Status when last listed</dt><dd><b>' + h(statusLabel(p.status)) + '.</b></dd></div>'
+        : '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>') +
       '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
       '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
       '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
@@ -506,22 +573,26 @@
     if (!ev.length) return '';
     var start = ev[0][0], end = TODAY, dl = p.closes_at && !p.deadline_placeholder ? p.closes_at.slice(0, 10) : null;
     if (dl && dl > end && daysBetween(end, dl) <= 120) end = dl;
-    var span = Math.max(30, daysBetween(start, end)), W = 520, L = 10, R = 10, x = function (d) { return L + (W - L - R) * Math.min(span, Math.max(0, daysBetween(start, d))) / span; };
-    var g = '<line x1="' + L + '" x2="' + (W - R) + '" y1="26" y2="26" class="hl"/>';
-    var anchor = function (px) { return px > W - 60 ? 'end' : px < 60 ? 'start' : 'middle'; };
+    // positions are percentages of the panel's width and there is no viewBox (2026-11-27), so the line fills the
+    // panel and the 11px labels stay 11px at every width: no measuring, nothing to redraw
+    var span = Math.max(30, daysBetween(start, end)), x = function (d) { return (2 + 96 * Math.min(span, Math.max(0, daysBetween(start, d))) / span).toFixed(2) + '%'; };
+    var g = '<line x1="2%" x2="98%" y1="26" y2="26" class="hl"/>';
+    var anchor = function (pc) { pc = parseFloat(pc); return pc > 70 ? 'end' : pc < 30 ? 'start' : 'middle'; };
     g += '<line x1="' + x(TODAY) + '" x2="' + x(TODAY) + '" y1="12" y2="40" class="today"/><text x="' + x(TODAY) + '" y="10" text-anchor="' + anchor(x(TODAY)) + '" class="ht">today</text>';
-    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="52" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
+    // a deadline in the left third would sit on the first-seen date's label, so it goes above the line instead
+    // ("today" is then at the right, since the strip ends at today or at a deadline still to come)
+    if (dl && dl >= start && dl <= end) g += '<line x1="' + x(dl) + '" x2="' + x(dl) + '" y1="18" y2="34" class="dl"/><text x="' + x(dl) + '" y="' + (anchor(x(dl)) === 'start' ? 10 : 52) + '" text-anchor="' + anchor(x(dl)) + '" class="ht">deadline ' + h(fmtDate(dl)) + '</text>';
     ev.forEach(function (e) {
       var k = histKind(e), cx = x(e[0]);
       if (k === 'date') g += '<line x1="' + cx + '" x2="' + cx + '" y1="20" y2="32" class="ev-date"/>';
       else g += '<circle cx="' + cx + '" cy="26" r="' + (k === 'reopen' ? 7 : 5.5) + '" class="ev-' + k + (e[4] === 'code' ? ' ev-code' : '') + '"/>';
     });
-    g += '<text x="' + L + '" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
+    g += '<text x="2%" y="52" class="ht">' + h(fmtDate(start, true)) + '</text>';
     var list = ev.slice().reverse().map(function (e) {
       return '<li><span class="hd">' + h(fmtDate(e[0], true)) + '</span><span class="hk ev-' + histKind(e) + '" aria-hidden="true"></span><span>' + h(histWords(e)) +
         (e[4] === 'code' ? ' <span class="muted small">(the first read after a change to how the registry reads this source)</span>' : '') + '</span></li>';
     }).join('');
-    return '<svg class="hist" viewBox="0 0 ' + W + ' 58" aria-hidden="true">' + g + '</svg>' +
+    return '<svg class="hist" height="58" aria-hidden="true">' + g + '</svg>' +
       '<ol class="hist-list">' + list + '</ol>' +
       '<p class="muted small">The registry has read this source since ' + h(fmtDate(start, true)) + '. Earlier rounds are not in the log; nothing here predicts the next one.</p>';
   }
@@ -529,6 +600,8 @@
   // A listed program's own page (2026-11-26): the same record the state page's panel shows, at an address of its own.
   function programPage() {
     var p = DATA.program;
+    // a tombstone (2026-11-28): the record as last stored, its status the one it had when it was last listed
+    if (DATA.tombstone) { p.gone = true; if (DATA.tombstone.status_before) p.status = DATA.tombstone.status_before; }
     SOURCES = DATA.sources || [];
     el('detail-title').textContent = programName(p);
     el('detail-body').innerHTML = detailHtml(p);
@@ -552,35 +625,104 @@
   }
 
   function aboutPage() {
-    var A = DATA;
+    var A = DATA, FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    function num(n) { return Number(n).toLocaleString('en-US'); }
+    // About as an essay (2026-11-27): every sentence below is built from the payload's counts. A claim heading is used
+    // only when the day's counts bear it; otherwise the section keeps the chart's plain title.
+    function claim(id, ok, text) { if (ok) el(id).textContent = text; }
+    if (A.atlas && el('atlas')) drawAtlas(el('atlas'), el('atlas-note'), A.atlas, (A.stated || []).filter(function (r) { return r.state === 'US'; })[0], false);
+    // how each state is read (2026-11-27): the same map by kind, the reasons for the unread states, and the counts
+    if (A.atlas && el('kindmap')) {
+      drawAtlas(el('kindmap'), el('kindmap-note'), A.atlas, null, true);
+      var c = { portal: 0, agencies: 0, portal_agencies: 0, directory: 0, refuse: 0, script: 0, nolist: 0 }, unread = [];
+      A.atlas.forEach(function (s) {
+        if (s.code === 'DC') return;
+        if (c[s.kind] !== undefined) c[s.kind]++;
+        else { unread.push(s); if (s.kind === 'stopped') c.script++; else if (s.kind === 'blocked' || s.kind === 'login') c.refuse++; else c.nolist++; }
+      });
+      // a sentence never opens with a numeral: small counts that start one are written as words
+      var WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen'];
+      function st(n) { return n + (n === 1 ? ' state' : ' states'); }
+      function St(n) { return (WORDS[n] || String(n)) + (n === 1 ? ' state' : ' states'); }
+      var parts = [c.refuse ? c.refuse + ' refuse automated readers' : '', c.script ? c.script + ' load their lists only in a browser script' : '', c.nolist ? 'in ' + c.nolist + ' the registry found no list to read' : ''].filter(Boolean);
+      el('read-sub').textContent = 'The registry reads ' + st(c.portal) + ' from a grants portal with a row for each program, ' + st(c.agencies) + ' from their agencies\' own pages, and ' +
+        st(c.portal_agencies) + ' from both. ' + (c.directory ? St(c.directory) + ' keep a directory that lists programs but no dates. ' : '') +
+        (unread.length ? St(unread.length) + ' give it nothing to read: ' + (parts.length > 2 ? parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1] : parts.join(' and ')) + '. Each reason is below, as the state page gives it.' : '');
+      var ways = [c.portal, c.agencies, c.portal_agencies, c.directory, unread.length].filter(Boolean).length;
+      claim('h-read', ways === 5 && A.atlas.length === 51, 'Fifty states, read five ways');
+      el('reasons').innerHTML = unread.map(function (s) { return '<li><b aria-hidden="true">' + s.code + '</b><span>' + h(s.note || s.name + ': no state source read.') + '</span></li>'; }).join('');
+    }
+    if (el('cards')) {
+      var cards = A.cards || [];
+      el('h-cards').closest('section').hidden = cards.length < 2;
+      el('cards').innerHTML = cards.map(recordCard).join('');
+      var sts = cards.map(function (p) { return stateName(p.state); });
+      el('cards-sub').textContent = 'The Community Development Block Grant is federal money that states hand on to their smaller towns. Here is how ' +
+        (sts.length > 2 ? sts.slice(0, -1).join(', ') + ' and ' + sts[sts.length - 1] : sts.join(' and ')) + ' describe the same part of it, public facilities, on the day each was read.';
+      claim('h-cards', cards.length === 3, 'One federal program, three states');
+    }
+    var K = {}; (A.stated_kinds || []).forEach(function (k) { K[k.kind] = k; });
+    var P = K.portal, G = K.agencies;
+    if (P && G) {
+      var pd = share(P.date, P.n), gd = share(G.date, G.n);
+      el('lede').textContent = 'State portals give a deadline for ' + pd + ' of every 100 programs they list. Agency pages give one for ' + gd +
+        '. Funding Atlas reads both every day, shows what each source states, and marks what it leaves out.';
+      claim('h-c3', pd - gd >= 20 && share(P.status, P.n) > share(G.status, G.n), 'Portals state the basics. Agency pages mostly do not.');
+      el('c3-sub').textContent = 'The registry reads ' + P.states + ' states from a grants portal with structured rows; they state a status for ' + share(P.status, P.n) + '% of the ' +
+        num(P.n) + ' programs open to local governments and a deadline for ' + pd + '%. In the ' + G.states + ' states read from agency pages, ' +
+        share(G.status, G.n) + '% of ' + num(G.n) + ' programs state a status and ' + gd + '% a deadline. An amount is rarer everywhere: ' +
+        share(P.amount, P.n) + '% on portals, ' + num(G.amount) + ' of ' + num(G.n) + ' programs on agency pages.';
+    } else {
+      el('lede').textContent = 'What the registry reads, what its sources say and leave out, and what the change log has seen.';
+      el('c3-sub').textContent = 'Share of programs whose source states a status, a deadline and an amount, by how the registry reads the state.';
+    }
     function draw() {
-    var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
-    el('c1-sub').textContent = r1.total + ' programs open or announced to local governments close in the next 26 weeks; ' + r1.week1 + ' of them in the next seven days. ' + r1.later + ' more close later.';
-    var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
-      .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
-      .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
-      .map(function (r) { return [stateName(r[0]), r[1]]; });
-    var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
-    chartSeason(el('c2'), rows.concat([['All states', all]]), false);
-    el('c2-leg').innerHTML = seasonLegend();
-    chartStated(el('c3'), el('c3-table'), A.stated.filter(function (r) { return r.n >= 7; }));
-    var fc = chartFlips(el('c4'), A.flips);
-    var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
-    el('c4-sub').textContent = tot + ' status changes on programs a local government could apply to since the registry started reading, ' + re + ' of them a closed round reopening or being announced again. ' +
-      fc.src + ' came from the sources; ' + fc.code + ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + fc.other + ' cannot be labelled.' : '');
-    var med = chartAwards(el('c5'), A.awards);
-    el('c5-sub').textContent = 'Only ' + med.st.n + ' of ' + A.open.state + ' open state programs publish a maximum award, against ' + med.fed.n + ' of ' + A.open.federal + ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
-    // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
-    el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
-    el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
-    el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
-      return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
-    el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
-      return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
+      var r1 = chartRunway(el('c1'), A.deadlines, 26, false);
+      el('c1-sub').textContent = num(r1.total) + ' programs open or announced to local governments close in the next 26 weeks, ' + num(r1.week1) + ' of them in the next seven days. ' + num(r1.later) + ' more close later.';
+      var rows = Object.keys(A.months).map(function (k) { return [k, A.months[k]]; })
+        .filter(function (r) { return r[1].reduce(function (a, b) { return a + b; }, 0) >= 8; })
+        .sort(function (a, b) { return b[1].reduce(function (x, y) { return x + y; }, 0) - a[1].reduce(function (x, y) { return x + y; }, 0); })
+        .map(function (r) { return [stateName(r[0]), r[1]]; });
+      var all = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      Object.keys(A.months).forEach(function (k) { A.months[k].forEach(function (v, i) { all[i] += v; }); });
+      chartSeason(el('c2'), rows.concat([['All states', all]]), false);
+      el('c2-leg').innerHTML = seasonLegend();
+      var byMonth = all.map(function (v, i) { return [v, i]; }).sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; }), top = byMonth.slice(0, 3), low = byMonth[11];
+      var allTot = all.reduce(function (a, b) { return a + b; }, 0), topTot = top[0][0] + top[1][0] + top[2][0];
+      if (allTot) {
+        // "bunch" only when the three busiest months hold a third or more of the year's deadlines, and only on enough of
+        // them (120, ten a month) that three months cannot hold most of a handful by chance
+        var ordered = top.slice().sort(function (a, b) { return a[1] - b[1]; }).map(function (m) { return FULL[m[1]]; });
+        claim('h-c2', allTot >= 120 && topTot / allTot >= 0.33, 'State deadlines bunch in ' + ordered[0] + ', ' + ordered[1] + ' and ' + ordered[2]);
+        el('c2-sub').textContent = 'Of ' + num(allTot) + ' stated deadlines two years either side of today, ' + FULL[top[0][1]] + ' holds ' + num(top[0][0]) + ', ' +
+          FULL[top[1][1]] + ' ' + num(top[1][0]) + ' and ' + FULL[top[2][1]] + ' ' + num(top[2][0]) + '; ' + FULL[low[1]] + ' holds the fewest, ' + num(low[0]) +
+          '. This describes the past and predicts nothing.';
+      }
+      chartStated(el('c3'), el('c3-table'), A.stated_kinds, A.stated);
+      var fc = chartFlips(el('c4'), A.flips);
+      var tot = fc.src + fc.code + fc.other, re = A.flips.filter(function (r) { return (r.old_status === 'closed' || r.old_status === 'exhausted') && (r.new_status === 'open' || r.new_status === 'forecasted'); }).reduce(function (a, r) { return a + r.n; }, 0);
+      el('c4-sub').textContent = 'The registry has logged ' + num(tot) + ' status changes on programs a local government could apply to' + (A.log_since ? ' since ' + fmtDate(A.log_since, true) : '') +
+        ', ' + num(re) + ' of them a closed round reopening or announced again. ' + num(fc.src) + ' came from the sources; ' + num(fc.code) +
+        ' were the first read after a change to how the registry reads that source, so they may be ours, not the agency\'s.' + (fc.other ? ' ' + num(fc.other) + ' cannot be labelled.' : '');
+      var med = chartAwards(el('c5'), A.awards);
+      claim('h-c5', med.st.n * 2 < A.open.state, 'Most state programs name no amount');
+      el('c5-sub').textContent = 'Only ' + num(med.st.n) + ' of ' + num(A.open.state) + ' open state programs publish a maximum award, against ' + num(med.fed.n) + ' of ' + num(A.open.federal) +
+        ' federal notices. Where they do, the state median is ' + shortMoney(med.st.m || 0) + ' and the federal ' + shortMoney(med.fed.m || 0) + '.';
+      // every chart has its numbers as a table too: the marks' notes need a pointer, the tables do not
+      el('c1-table').innerHTML = ctable(['Week of', 'Federal', 'State', 'All'], r1.weeks.map(function (x) { return [fmtDate(x.start, true), x.f, x.s, x.f + x.s]; }));
+      el('c2-table').innerHTML = ctable(['State'].concat(MONTHS), rows.concat([['All states', all]]).map(function (r) { return [r[0]].concat(r[1]); }));
+      el('c4-table').innerHTML = ctable(['Change', 'From the source', 'After a code change', 'Not labelled', 'All'], fc.rows.map(function (r) {
+        return [statusLabel(r.o) + ' → ' + statusLabel(r.n), r.src, r.code, r.other, r.src + r.code + r.other]; }));
+      el('c5-table').innerHTML = ctable(['', 'Programs with a stated maximum', 'Smallest', 'Median', 'Largest'], [['Federal', med.fed], ['State', med.st]].map(function (x) {
+        return [x[0], x[1].n, x[1].n ? shortMoney(x[1].lo) : '', x[1].n ? shortMoney(x[1].m) : '', x[1].n ? shortMoney(x[1].hi) : '']; }));
     }
     draw();
     onWidthChange(draw);
+    // the limits that depend on the day's data go between the two fixed ones
+    var lim = el('limits'), extra = [];
+    if (A.unread) extra.push('A program on a page the registry does not read is not here. ' + A.unread + (A.unread === 1 ? ' state has' : ' states have') + ' no state source read yet; each state page says why.');
+    if (A.log_since) extra.push('The change log begins with the registry\'s first read, ' + fmtDate(A.log_since, true) + '. Anything a source changed before then is not in it.');
+    extra.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; lim.insertBefore(li, lim.lastElementChild); });
     renderFooter('<p>These charts are drawn from the same database as every state page, the day it was built. The SQL behind each is in <code>db/migrations/0009_navigator_stats.sql</code>.</p>');
   }
 
@@ -902,9 +1044,6 @@
     function agoDays(d) { return d === 1 ? '1 day ago' : d + ' days ago'; }
     // While the list holds only likely fits, the filter line says so once and the cards do not repeat it (13.20).
     function onlyLikely() { return (st.sel.tier || []).join(',') === 'likely'; }
-    function slot(label, value) {
-      return '<div class="slot' + (value ? '' : ' none') + '"><dt>' + label + '</dt><dd' + (value ? ' class="num"' : '') + '>' + (value ? h(value) : 'Source does not say') + '</dd></div>';
-    }
     function card(p) {
       var amount = amountText(p);
       // Two slots in the same place on every card (2026-11-26): what the source states is plain, what it does not
@@ -920,7 +1059,7 @@
       return '<article class="card st-' + h(p.status) + '" data-id="' + p.id + '">' + dateCol(p) + '<div class="cbody">' +
         '<button type="button" class="star" data-star="' + h(p.slug) + '" aria-pressed="' + (watched[p.slug] ? 'true' : 'false') + '" aria-label="Star ' + h(p.name) + '">' + (watched[p.slug] ? '★' : '☆') + '</button>' +
         '<div class="when">' + statusTag(p.status) + deadlineHtml(p) + '</div>' +
-        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog">' + h(programName(p)) + '</button></h3>' +
+        '<h3><button type="button" data-open="' + p.id + '" data-url="' + h(p.source_url) + '" aria-haspopup="dialog"' + (programName(p).length > 90 ? ' title="' + h(programName(p)) + '"' : '') + '>' + h(programName(p)) + '</button></h3>' +
         '<p class="meta">' + h(agencyName(p) || 'Agency not stated') + (p.level === 'federal' ? ' · Federal' : '') + (onlyLikely() && p.tier === 'likely' ? '' : ' · <span class="tier-' + h(p.tier) + '">' + h(TIER_LABEL[p.tier] || p.tier) + '</span>') + topicWord(p) + badges(p) + '</p>' +
         slots + (facts.length ? '<div class="facts">' + facts.join('') + '</div>' : '') +
         (quoteText ? '<p class="cycle"><span class="k">The source says:</span> ' + h(quoteText.length > 220 ? quoteText.slice(0, 219) + '…' : quoteText) + '</p>' : '') +
@@ -1377,7 +1516,6 @@
       }).join('');
       el('t-log').addEventListener('click', function () { el('changes').open = true; });
     }
-    var KIND_ROW = { federal: 'Federal notices', portal: 'State portals', portal_agencies: 'Portal and agency pages', agencies: 'Agency pages', directory: 'Directories' };
     if (ST.length) {
       el('t-stated').hidden = false;
       el('t-mini').innerHTML = '<span></span><span class="th">Status</span><span class="th">Deadline</span><span class="th">Amount</span>' + ST.map(function (r) {

@@ -47,14 +47,22 @@ DEFAULT_OUT = Path("site")
 SITE_URL = "https://saj-sudo.github.io/funding-atlas/"
 REPO_URL = "https://github.com/saj-sudo/funding-atlas"
 SHARE_IMAGE = SITE_URL + "share.png"   # web/share.png, 1200 by 630, from docs/design/share_image.html (13.23)
-# The browser-tab icon is the brand's nine-square mark in the palette (accent, likely, possible), as .brand .mark draws
-# it; URL-encoded SVG, never base64, so the pages stay self-contained and readable.
-_MARK = ["#1f3f8f", "#17663a", "#1f3f8f", "#8a5a00", "#1f3f8f", "#17663a", "#17663a", "#8a5a00", "#1f3f8f"]
+# The mark (2026-11-28, Saj's pick C1 of mark C): one tile filled from the bottom, solid below and hatched above, the
+# atlas tile itself: solid is what a source states, hatched what it leaves blank. Drawn once here: the top bar of every
+# template gets it through {{MARK}} in currentColor, and the browser-tab icon is the same drawing in ink, light on a dark
+# tab bar. URL-encoded SVG, never base64, so the pages stay readable.
+_MARK_BODY = (
+    "<clipPath id='fa-mark-top'><rect x='2' y='2' width='28' height='12'/></clipPath>"
+    "<g clip-path='url(#fa-mark-top)' stroke='currentColor' stroke-width='2.6'>"
+    + "".join(f"<line x1='{2 + k}' y1='14' x2='{14 + k}' y2='2'/>" for k in range(-12, 28, 9))
+    + "</g><rect x='2' y='14' width='28' height='16' fill='currentColor'/>"
+    "<rect x='2' y='2' width='28' height='28' fill='none' stroke='currentColor' stroke-width='2'/>"
+)
+MARK_SVG = f'<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">{_MARK_BODY}</svg>'.replace("'", '"')
 ICON = "data:image/svg+xml," + quote(
     "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
-    + "".join(f"<rect x='{2 + 10 * (i % 3)}' y='{2 + 10 * (i // 3)}' width='8' height='8' rx='2' fill='{c}'/>"
-              for i, c in enumerate(_MARK))
-    + "</svg>", safe=" /:=.'")
+    "<style>svg{color:#14213d}@media (prefers-color-scheme:dark){svg{color:#e6eaf4}}</style>"
+    + _MARK_BODY + "</svg>", safe=" /:=.'")
 
 NEW_DAYS = 7           # first seen (after the source's first full read) within this many days -> "new"
 UPDATED_DAYS = 7       # source changed within this many days -> "updated"
@@ -193,6 +201,35 @@ def coverage_kind(code: str, connectors: dict[str, list[str]]) -> tuple[str, str
     return "federal", None
 
 
+# "One federal program, three states" on About (2026-11-27, Saj kept the cards from the entry-piece mockup): the same
+# part of the Community Development Block Grant, public facilities, as a state portal, an agency page with words and
+# an agency page that says nothing state it. Read from the stored record each build; a slug no longer stored drops
+# its card, and About hides the section with fewer than two.
+CARD_SLUGS = (
+    "cdbg-public-facilities-2026-round-2-webgrants-nh-42431",
+    "cdbg-public-works-facilities-ne-ded-cdbg#public-works-facilities",
+    "community-development-block-grant-cdbg-public-facilities-program-la-ocd-cdbg",
+)
+
+
+def load_cards(conn: sqlite3.Connection, listed_slugs: set[str]) -> list[dict[str, Any]]:
+    """The stored fields of each CARD_SLUGS record, exactly as stored: nothing is filled in."""
+    out = []
+    for slug in CARD_SLUGS:
+        r = conn.execute(
+            "SELECT name, slug, jurisdiction, source_connector, administering_agency, status, closes_at, closes_at_text,"
+            " rolling, amount_min, amount_max, match_required, source_url FROM program WHERE slug = ?", (slug,),
+        ).fetchone()
+        if r is None:
+            continue
+        d = dict(r)
+        d["state"] = d.pop("jurisdiction")[:2]
+        d["read_as"] = CONNECTOR_KIND.get(d.pop("source_connector"), "agencies")
+        d["listed"] = slug in listed_slugs
+        out.append(d)
+    return out
+
+
 READER_QUESTIONS = (
     "What is open right now that is not on this page?",
     "Which rows should not be here, and why?",
@@ -251,6 +288,36 @@ def load_between(conn: sqlite3.Connection) -> list[dict[str, Any]]:
 def load_unstated(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     """State programs a town could apply to whose source states no status and no date (migration 0008)."""
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
+
+
+def load_gone(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    """Programs that had a page and are on no list now (migration 0012): each keeps a tombstone page."""
+    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_gone")]
+
+
+STATUS_WORD = {"open": "open", "forecasted": "announced", "closed": "closed", "exhausted": "out of funds", "unknown": "not confirmed"}
+
+
+def tombstone_for(row: dict[str, Any], today: date) -> dict[str, Any]:
+    """Why a program is on no list, in one sentence from stored data only (2026-11-28, Saj: T1, kept always)."""
+    day = lambda iso: edition_label(iso[:10])  # noqa: E731
+    if row["last_change"] == "missing":
+        why = "missing"
+        text = (f"No longer listed since {day(row['left_at'])}. The agency's list stopped showing this program that day"
+                + (f", when its status was {STATUS_WORD.get(row['status_before'], row['status_before'])}." if row["status_before"] else "."))
+    elif row["last_change"] == "changed" and row["last_status_old"] in ("open", "forecasted") and row["last_status_new"]:
+        why = "status"
+        text = (f"No longer listed since {day(row['last_change_at'])}, when the agency's page changed its status from "
+                f"{STATUS_WORD.get(row['last_status_old'])} to {STATUS_WORD.get(row['last_status_new'], row['last_status_new'])}.")
+    elif row["status"] in ("open", "forecasted") and row["closes_at"] and row["closes_at"][:10] < today.isoformat():
+        why = "deadline"
+        text = f"No longer listed: its stated deadline, {day(row['closes_at'])}, has passed."
+    else:
+        why = "aged"
+        text = (f"This round closed on {day(row['closes_at'])} and is no longer on the site's lists, which keep a closed round "
+                "for 15 months after its deadline." if row["closes_at"] else "No longer on the site's lists.")
+    return {"why": why, "text": text + " Below is the record as the registry last stored it. If it is listed again, this "
+            "page returns to normal.", "status_before": row["status_before"] if why == "missing" else row["last_status_old"] if why == "status" else None}
 
 
 HISTORY_FIELDS = ("status", "closes_at", "opens_at")
@@ -793,6 +860,18 @@ def fill(template: str, **slots: str) -> str:
 FEDERAL_JS = "federal.js"
 
 
+DARK_SLOT = '    /* DARK TOKENS: scripts/build_site.py copies the :root[data-theme="dark"] block below in here when it writes app.css */\n'
+
+
+def dark_tokens_once(css: str) -> str:
+    """The dark tokens are written once in web/app.css, under :root[data-theme="dark"] (2026-11-27); the dark
+    preference's rule gets the same declarations here, so the switch and the preference cannot drift."""
+    m = re.search(r'^:root\[data-theme="dark"\] \{\n(.*?)^\}', css, re.S | re.M)
+    if not m or DARK_SLOT not in css:
+        raise ValueError("app.css: the dark token block or its slot is missing")
+    return css.replace(DARK_SLOT, "".join("  " + line + "\n" for line in m.group(1).splitlines()), 1)
+
+
 def asset_version(css: str, js: str) -> str:
     """The cache key on app.css and app.js: it changes when either file's text does, not on every daily build."""
     return hashlib.sha256((css + "\0" + js).encode("utf-8")).hexdigest()[:10]
@@ -874,12 +953,14 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     programs = [shape_program(r, run_info, today) for r in load_programs(conn)]
     between = [shape_program(r, run_info, today) for r in load_between(conn)]
     unstated = [shape_program(r, run_info, today) for r in load_unstated(conn)]
+    gone_rows = load_gone(conn)
+    gone = [shape_program(r, run_info, today) for r in gone_rows]
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
-    history = load_history(conn, {p["id"] for p in programs + between + unstated})
+    history = load_history(conn, {p["id"] for p in programs + between + unstated + gone})
     stats = load_stats(conn)
-    for p in programs + between + unstated:
+    for p in programs + between + unstated + gone:
         p["history"] = history.get(p["id"], [])
     unknown = sorted({p["state"] for p in programs if p["state"] and p["state"] not in STATE_NAME})
     if unknown:
@@ -908,8 +989,13 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         meta.setdefault(c["program_id"], {"slug": c["slug"], "name": c["name"], "state": c["state"], "source_url": c["source_url"]})
     for p in programs + between + unstated:
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
-    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
-    about = about_payload(programs=programs, stats=stats, generated_at=generated_at)
+    # a program on no list but with a tombstone page (2026-11-28) links its feed to that page, like a listed one
+    tomb_ids = {p["id"] for p in gone}
+    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all or pid in tomb_ids) for pid, m in meta.items()]
+    about = about_payload(
+        programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info, coverage=coverage,
+        cards=load_cards(conn, {p["slug"] for p in programs + between + unstated}),
+    )
     # One page per listed program (2026-11-26): open or announced, closed recently, status not confirmed.
     seen: set[int] = set()
     program_pages = []
@@ -917,43 +1003,127 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         if p["id"] not in seen:
             seen.add(p["id"])
             program_pages.append(program_payload(p, run_info, generated_at))
+    # Tombstones: a page for each program that had one and is on no list now (2026-11-28, Saj: T1, kept always)
+    for p, row in zip(gone, gone_rows, strict=True):
+        if p["id"] not in seen:
+            seen.add(p["id"])
+            program_pages.append(dict(program_payload(p, run_info, generated_at), tombstone=tombstone_for(row, today)))
     return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about,
             "program_pages": program_pages}
 
 
-def about_payload(*, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str) -> dict[str, Any]:
-    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else."""
+def about_payload(
+    *, programs: list[dict[str, Any]], stats: dict[str, Any], generated_at: str, connectors: dict[str, list[str]] | None = None,
+    run_info: dict[str, dict[str, str | None]] | None = None, coverage: dict[str, dict[str, Any]] | None = None,
+    cards: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """The About the data page (13.14): the chart views plus the open rows' deadlines and awards, nothing else.
+    "What sources state" (2026-11-27) is drawn by how each state is read: `stated_kinds` is the index's sum by kind,
+    and each `stated` row carries its kind. A count the view returns as NULL (no row could say) is 0."""
+    connectors = connectors or {}
+    # for the essay's limits (2026-11-27): the states with no state source read (DC is out of scope), and the date
+    # of the registry's first successful read, before which nothing was logged
+    read_kinds = {"portal", "agencies", "portal_agencies", "directory"}
+    unread = sum(1 for c, _, _, _ in STATES if c != "DC" and coverage_kind(c, connectors)[0] not in read_kinds)
+    firsts = [v["first_ok"] for v in (run_info or {}).values() if v.get("first_ok")]
+    stated = [
+        {**{k: (r[k] or 0) for k in ("n", "status_stated", "date_stated", "amount_stated")}, "state": r["state"],
+         "kind": "federal" if r["state"] == "US" else coverage_kind(r["state"], connectors)[0]}
+        for r in stats["stated"]
+    ]
+    # the atlas at the top of About (2026-11-27, Saj's pick H1): every state's tile, how it is read, the reason when it
+    # is not, and the deadline counts behind its fill; a directory's own row count, since it states no dates
+    by_state = {r["state"]: r for r in stated}
+    atlas = []
+    for code, name, row, col in STATES:
+        kind, note = coverage_kind(code, connectors)
+        r, cov = by_state.get(code), (coverage or {}).get(code)
+        atlas.append({"code": code, "name": name, "row": row, "col": col, "kind": kind, "note": note,
+                      "listed": cov["n_programs"] if cov else 0,
+                      "n": r["n"] if r else 0, "date": r["date_stated"] if r else 0})
     return {
         "generated_at": generated_at,
         "site_url": SITE_URL,
         "repo_url": REPO_URL,
         "rules": {"new_days": NEW_DAYS, "closing_days": CLOSING_DAYS},
         "states": [{"code": c, "name": n} for c, n, _, _ in STATES],
+        "atlas": atlas,
+        "cards": cards or [],
         "deadlines": [[p["state"], p["closes_at"], p["deadline_placeholder"]] for p in programs if p["closes_at"]],
         "awards": [[p["state"], p["amount_max"], p["name"]] for p in programs if p["amount_max"]],
         "open": {"state": sum(1 for p in programs if p["state"]), "federal": sum(1 for p in programs if not p["state"])},
         "months": stats["months"],
-        "stated": stats["stated"],
+        "stated": stated,
+        "stated_kinds": stated_by_kind(stats["stated"], connectors),
+        "unread": unread,
+        "log_since": min(firsts)[:10] if firsts else None,
         "flips": stats["flips"],
         "questions": list(READER_QUESTIONS),
     }
 
 
-def render_about(data: dict[str, Any], assets: str, template: str) -> str:
+EDITIONS_DIR = Path("editions")   # frozen About payloads, carried forward on gh-pages by the daily run (2026-11-27)
+
+
+def edition_label(day: str) -> str:
+    """'2026-11-27' -> 'Nov 27, 2026', as the pages write dates."""
+    d = date.fromisoformat(day)
+    return f"{d.strftime('%b')} {d.day}, {d.year}"
+
+
+def render_about(data: dict[str, Any], assets: str, template: str, *, editions: list[str] | None = None) -> str:
+    """About, live; or, when `data` carries an `edition` date, its frozen copy at about/edition/<date>/ (2026-11-27):
+    the same template and script, three folders deep, with a banner saying the figures are frozen."""
+    day = data.get("edition")
+    root = "../../../" if day else "../"
+    banner = (
+        f'<p class="edition-banner" role="note">The edition of {edition_label(day)}. Every figure on this page is frozen as of '
+        f'that day. <a href="{root}about/">Today\'s numbers are on About.</a></p>' if day else ""
+    )
+    listing = ""
+    if editions and not day:
+        links = ", ".join(f'<a href="edition/{e}/">{edition_label(e)}</a>' for e in sorted(editions, reverse=True))
+        listing = f'<p class="muted">Dated editions, with every figure frozen as of the day: {links}. Their data is in <code>editions/</code>.</p>'
     return fill(
         template,
-        TITLE="About the data · Funding Atlas",
+        TITLE=(f"About the data, edition of {edition_label(day)}" if day else "About the data") + " · Funding Atlas",
         DESCRIPTION="What the Funding Atlas registry reads, what its sources state, and what the change log has seen, in five charts.",
-        ROOT="../",
-        URL=SITE_URL + "about/",
+        ROOT=root,
+        EDITION=banner,
+        EDITIONS=listing,
+        URL=SITE_URL + (f"about/edition/{day}/" if day else "about/"),
         SHARE_IMAGE=SHARE_IMAGE,
         ICON=ICON,
-        FEED="../feed.xml",
+        FEED=root + "feed.xml",
         FEED_TITLE="Funding Atlas: changes",
         ASSETS=assets,
         DATA=embed_json(data),
         GENERATED=data["generated_at"][:10],
     )
+
+
+def make_edition(conn: sqlite3.Connection, editions_dir: Path = EDITIONS_DIR, *, generated_at: str | None = None) -> Path:
+    """Freeze today's About payload as editions/<date>.json (`cli.py edition`). The page is drawn from it by every later
+    build, with the code of that build: the figures stay, the design follows the site."""
+    about = build(conn, generated_at=generated_at)["about"]
+    day = about["generated_at"][:10]
+    editions_dir.mkdir(parents=True, exist_ok=True)
+    path = editions_dir / f"{day}.json"
+    path.write_text(json.dumps(dict(about, edition=day), ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return path
+
+
+def load_editions(editions_dir: Path | None) -> dict[str, dict[str, Any]]:
+    """Every editions/<date>.json, by date. A file whose name is not a date is skipped."""
+    out: dict[str, dict[str, Any]] = {}
+    if editions_dir and editions_dir.is_dir():
+        for f in sorted(editions_dir.glob("*.json")):
+            try:
+                date.fromisoformat(f.stem)
+            except ValueError:
+                continue
+            out[f.stem] = dict(json.loads(f.read_text(encoding="utf-8")), edition=f.stem)
+    return out
 
 
 def program_feed_path(slug: str) -> str:
@@ -1014,16 +1184,19 @@ def program_payload(p: dict[str, Any], run_info: dict[str, dict[str, str | None]
 
 
 def render_program(data: dict[str, Any], assets: str, template: str) -> str:
-    p, state = data["program"], data["state"]
+    p, state, tomb = data["program"], data["state"], data.get("tombstone")
     esc = lambda v: html.escape(str(v or ""), quote=True)  # noqa: E731
     where = state["name"] if state else "Federal"
     agency = p["agency"] or "Agency not stated"
     crumb = '<a href="../../">All states</a> <span aria-hidden="true">›</span> ' + (
         f'<a href="../../{state["code"].lower()}/">{esc(state["name"])}</a>' if state
         else "<span>Federal notice, listed on every state page</span>")
-    return fill(
+    page = fill(
         template,
-        TITLE=esc(f"{p['name']} · {where} · Funding Atlas"),
+        TOMBSTONE=f'<p class="gone" role="note">{esc(tomb["text"])}</p>' if tomb else "",
+        SOURCE_CLASS="btn src" if tomb else "btn primary src",
+        SOURCE_LABEL="The agency's page (it may no longer work)" if tomb else "Apply or read more on the agency's page",
+        TITLE=esc(f"{p['name']} · {where} · " + ("No longer listed · " if tomb else "") + "Funding Atlas"),
         DESCRIPTION=esc(f"{status_sentence(p)} {agency}, {where}. Read daily from the agency's own page; what it does not state is left blank."),
         ROOT="../../",
         URL=program_url(p["slug"]),
@@ -1040,6 +1213,8 @@ def render_program(data: dict[str, Any], assets: str, template: str) -> str:
         GENERATED=data["generated_at"][:10],
         DATA=embed_json(data),
     )
+    # a tombstone stays for the links that point at it, not for search: it asks not to be indexed
+    return page.replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"', 1) if tomb else page
 
 
 def render_sitemap(urls: list[str], day: str) -> str:
@@ -1047,17 +1222,20 @@ def render_sitemap(urls: list[str], day: str) -> str:
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + rows + "</urlset>\n"
 
 
-def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None) -> tuple[Path, dict[str, int]]:
-    """Build the site into `out` (wiped first). Returns (out, {state code: program rows})."""
+def write(
+    conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: str | None = None, editions_dir: Path | None = None,
+) -> tuple[Path, dict[str, int]]:
+    """Build the site into `out` (wiped first). Returns (out, {state code: program rows}). Each frozen edition in
+    `editions_dir` is drawn at about/edition/<date>/ and its JSON published at editions/<date>.json."""
     site = build(conn, generated_at=generated_at)
-    css = (WEB / "app.css").read_text(encoding="utf-8")
+    css = dark_tokens_once((WEB / "app.css").read_text(encoding="utf-8"))
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assets = asset_version(css, js)
     head_tpl = re.sub(r"\A<!--.*?-->\n", "", (WEB / "head.html").read_text(encoding="utf-8"), flags=re.S)
 
     def template(name: str) -> str:
         """A page template with the shared head in place; the slots of both are filled together."""
-        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl)
+        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl).replace("{{MARK}}", MARK_SVG)
 
     state_tpl = template("state.html")
     index_tpl = template("index.html")
@@ -1096,7 +1274,14 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
         counts[code] = len(data["programs"])
     about_tpl = template("about.html")
     (out / "about").mkdir()
-    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl), encoding="utf-8")
+    editions = load_editions(editions_dir)
+    (out / "about" / "index.html").write_text(render_about(site["about"], assets, about_tpl, editions=list(editions)), encoding="utf-8")
+    for day, frozen in editions.items():
+        page = out / "about" / "edition" / day
+        page.mkdir(parents=True)
+        page.joinpath("index.html").write_text(render_about(frozen, assets, about_tpl), encoding="utf-8")
+        (out / "editions").mkdir(exist_ok=True)
+        (out / "editions" / f"{day}.json").write_text(json.dumps(frozen, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (out / "p").mkdir()
     for pf in site["program_feeds"]:
         path = program_feed_path(pf["slug"])
@@ -1105,11 +1290,13 @@ def write(conn: sqlite3.Connection, out: Path = DEFAULT_OUT, *, generated_at: st
                                             updated=generated_at, title=f"{FEED_TITLE}: {pf['name']}"), encoding="utf-8")
     program_tpl = template("program.html")
     urls = [SITE_URL] + [f"{SITE_URL}{code.lower()}/" for code in site["states"]] + [SITE_URL + "about/"]
+    urls += [f"{SITE_URL}about/edition/{day}/" for day in editions]
     for data in site["program_pages"]:
         path = out / program_page_path(data["program"]["slug"])
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(render_program(data, assets, program_tpl), encoding="utf-8")
-        urls.append(program_url(data["program"]["slug"]))
+        if not data.get("tombstone"):                  # a tombstone stays for its links, not for search
+            urls.append(program_url(data["program"]["slug"]))
     (out / "sitemap.xml").write_text(render_sitemap(urls, generated_at[:10]), encoding="utf-8")
     return out, counts
 

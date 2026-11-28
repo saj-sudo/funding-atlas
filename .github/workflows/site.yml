@@ -7,7 +7,7 @@
 # Nothing generated is ever committed to main.
 #
 #   schedule          daily: run every connector, then build and publish
-#   workflow_dispatch same, with a switch to skip the connectors
+#   workflow_dispatch same, with a switch to skip the connectors and one to freeze a dated edition of About
 #   push to main      build and publish only, from the stored database (a UI change goes live on merge
 #                     without re-reading the sources)
 
@@ -22,6 +22,10 @@ on:
         description: "Run the connectors before building"
         type: boolean
         default: true
+      make_edition:
+        description: "Freeze today's About figures as a dated edition (about/edition/<date>/)"
+        type: boolean
+        default: false
   push:
     branches: [main]
 
@@ -56,6 +60,16 @@ jobs:
           uv run python cli.py init-db
           uv run python cli.py code-releases      # refilled from git each run (migration 0010)
 
+      # Dated editions of About (2026-11-27): frozen JSON that has to outlive the force-pushed gh-pages, so, like the
+      # database, it is carried forward from the last build. Nothing generated is committed to main.
+      - name: Restore the editions from gh-pages
+        run: |
+          mkdir -p editions
+          if git rev-parse -q --verify origin/gh-pages >/dev/null; then
+            git archive origin/gh-pages editions 2>/dev/null | tar -x -C . 2>/dev/null || echo "no editions on gh-pages yet"
+          fi
+          echo "editions: $(ls editions | tr '\n' ' ')"
+
       - name: Run the connectors
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.run_connectors)
         run: |
@@ -69,6 +83,10 @@ jobs:
             echo "::endgroup::"
           done
           echo "failed connectors:${failed:- none}"
+
+      - name: Freeze a dated edition
+        if: github.event_name == 'workflow_dispatch' && inputs.make_edition
+        run: uv run python cli.py edition
 
       - name: Build the site
         run: |
