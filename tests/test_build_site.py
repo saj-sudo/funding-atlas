@@ -644,6 +644,20 @@ def test_long_titles_held_to_three_lines(conn, tmp_path):
     assert "(programName(p).length > 90 ? ' title=\"' + h(programName(p)) + '\"' : '') + '>' + h(programName(p)) + '</button></h3>'" in js
 
 
+def test_mark_c1_everywhere(conn, tmp_path):
+    """2026-11-28 (Saj's pick C1 of mark C): one tile, solid below and hatched above, drawn once in build_site and filled
+    into every template's top bar; the tab icon is the same drawing, light on a dark tab bar; the wordmark is serif."""
+    out = build_site.write(conn, tmp_path / "site", generated_at=GEN)[0]
+    pages = ["index.html", "md/index.html", "about/index.html"] + [str(p.relative_to(out)) for p in list((out / "p").glob("*/index.html"))[:1]]
+    for rel in pages:
+        page = (out / rel).read_text(encoding="utf-8")
+        assert build_site.MARK_SVG in page and "{{MARK}}" not in page and "<i></i><i></i><i></i>" not in page, rel
+    assert "clip-path" in build_site.ICON and "prefers-color-scheme" in build_site.ICON.replace("%3A", ":")
+    css = (out / "app.css").read_text(encoding="utf-8")
+    assert ".brand { display: inline-flex; align-items: center; gap: var(--sp-5); font: 600 var(--t-lg)/1 var(--f-display);" in css
+    assert ".brand .mark i" not in css
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

@@ -15,11 +15,8 @@
 html, body { width: 1200px; height: 630px; overflow: hidden; }
 body { background: var(--bg); color: var(--ink); font-family: "Public Sans", sans-serif; display: grid; grid-template-columns: 600px 1fr; gap: 40px; padding: 64px 64px 56px 72px; border-top: 14px solid var(--accent); }
 .left { display: grid; align-content: space-between; }
-.brand { display: flex; align-items: center; gap: 18px; font-weight: 700; font-size: 34px; letter-spacing: -.01em; }
-.mark { width: 52px; height: 52px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-.mark i { background: var(--accent); border-radius: 4px; }
-.mark i:nth-child(2), .mark i:nth-child(6), .mark i:nth-child(7) { background: var(--likely); }
-.mark i:nth-child(4), .mark i:nth-child(8) { background: var(--possible); }
+.brand { display: flex; align-items: center; gap: 18px; font: 600 38px/1 "Source Serif 4", serif; }
+.mark { width: 52px; height: 52px; color: var(--ink); }   /* mark C1 (2026-11-28), the drawing in scripts/build_site.py */
 h1 { font: 700 60px/1.08 "Source Serif 4", serif; letter-spacing: -.01em; text-wrap: balance; }
 p { font-size: 26px; line-height: 1.4; color: var(--muted); }
 .url { font-size: 22px; font-weight: 600; color: var(--accent); }
@@ -29,7 +26,7 @@ p { font-size: 26px; line-height: 1.4; color: var(--muted); }
 </head>
 <body>
 <div class="left">
-  <div class="brand"><span class="mark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>Funding Atlas</div>
+  <div class="brand"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><clipPath id="fa-mark-top"><rect x="2" y="2" width="28" height="12"/></clipPath><g clip-path="url(#fa-mark-top)" stroke="currentColor" stroke-width="2.6"><line x1="-10" y1="14" x2="2" y2="2"/><line x1="-1" y1="14" x2="11" y2="2"/><line x1="8" y1="14" x2="20" y2="2"/><line x1="17" y1="14" x2="29" y2="2"/><line x1="26" y1="14" x2="38" y2="2"/></g><rect x="2" y="14" width="28" height="16" fill="currentColor"/><rect x="2" y="2" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"/></svg>Funding Atlas</div>
   <div style="display:grid;gap:22px">
     <h1>Open public funding for local governments, by state.</h1>
     <p>Federal and state programs open to towns, cities and counties, read daily from the agencies that run them.</p>

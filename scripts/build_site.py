@@ -47,14 +47,22 @@ DEFAULT_OUT = Path("site")
 SITE_URL = "https://saj-sudo.github.io/funding-atlas/"
 REPO_URL = "https://github.com/saj-sudo/funding-atlas"
 SHARE_IMAGE = SITE_URL + "share.png"   # web/share.png, 1200 by 630, from docs/design/share_image.html (13.23)
-# The browser-tab icon is the brand's nine-square mark in the palette (accent, likely, possible), as .brand .mark draws
-# it; URL-encoded SVG, never base64, so the pages stay self-contained and readable.
-_MARK = ["#1f3f8f", "#17663a", "#1f3f8f", "#8a5a00", "#1f3f8f", "#17663a", "#17663a", "#8a5a00", "#1f3f8f"]
+# The mark (2026-11-28, Saj's pick C1 of mark C): one tile filled from the bottom, solid below and hatched above, the
+# atlas tile itself: solid is what a source states, hatched what it leaves blank. Drawn once here: the top bar of every
+# template gets it through {{MARK}} in currentColor, and the browser-tab icon is the same drawing in ink, light on a dark
+# tab bar. URL-encoded SVG, never base64, so the pages stay readable.
+_MARK_BODY = (
+    "<clipPath id='fa-mark-top'><rect x='2' y='2' width='28' height='12'/></clipPath>"
+    "<g clip-path='url(#fa-mark-top)' stroke='currentColor' stroke-width='2.6'>"
+    + "".join(f"<line x1='{2 + k}' y1='14' x2='{14 + k}' y2='2'/>" for k in range(-12, 28, 9))
+    + "</g><rect x='2' y='14' width='28' height='16' fill='currentColor'/>"
+    "<rect x='2' y='2' width='28' height='28' fill='none' stroke='currentColor' stroke-width='2'/>"
+)
+MARK_SVG = f'<svg class="mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">{_MARK_BODY}</svg>'.replace("'", '"')
 ICON = "data:image/svg+xml," + quote(
     "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
-    + "".join(f"<rect x='{2 + 10 * (i % 3)}' y='{2 + 10 * (i // 3)}' width='8' height='8' rx='2' fill='{c}'/>"
-              for i, c in enumerate(_MARK))
-    + "</svg>", safe=" /:=.'")
+    "<style>svg{color:#14213d}@media (prefers-color-scheme:dark){svg{color:#e6eaf4}}</style>"
+    + _MARK_BODY + "</svg>", safe=" /:=.'")
 
 NEW_DAYS = 7           # first seen (after the source's first full read) within this many days -> "new"
 UPDATED_DAYS = 7       # source changed within this many days -> "updated"
@@ -1183,7 +1191,7 @@ def write(
 
     def template(name: str) -> str:
         """A page template with the shared head in place; the slots of both are filled together."""
-        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl)
+        return (WEB / name).read_text(encoding="utf-8").replace("{{HEAD}}", head_tpl).replace("{{MARK}}", MARK_SVG)
 
     state_tpl = template("state.html")
     index_tpl = template("index.html")
