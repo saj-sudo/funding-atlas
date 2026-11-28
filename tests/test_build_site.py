@@ -625,6 +625,16 @@ def test_a_dated_edition_keeps_its_figures(conn, tmp_path):
     assert not (out2 / "about" / "edition").exists() and "Dated editions" not in (out2 / "about" / "index.html").read_text(encoding="utf-8")
 
 
+def test_one_select_and_one_checkbox(conn, tmp_path):
+    """2026-11-28: every select and checkbox takes one base rule (the site's edge, a chevron in the muted ink, a focus
+    ring, 40px tall; checkboxes 18px in the accent), so none falls back to the browser's grey."""
+    css = (build_site.write(conn, tmp_path / "site", generated_at=GEN)[0] / "app.css").read_text(encoding="utf-8")
+    assert "appearance: none; -webkit-appearance: none; min-height: 40px;" in css
+    assert 'input[type="checkbox"] { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--accent);' in css
+    assert css.count("\nselect {") == 1                                       # one base rule; the rest only adjust it
+    assert 'select:focus-visible, input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent);' in css
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

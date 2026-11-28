@@ -98,6 +98,18 @@ body {
 a { color: var(--accent); }
 a:hover { text-decoration-thickness: 2px; }
 button, input, select { font: inherit; color: inherit; }
+/* controls in the site's style (2026-11-28): one select and one checkbox everywhere; native underneath, so the phone's
+   own picker and the keyboard still work. The chevron is drawn in the muted ink, so it follows the theme. */
+select {
+  appearance: none; -webkit-appearance: none; min-height: 40px; max-width: 100%; cursor: pointer; line-height: 1.3;
+  padding: var(--sp-4) var(--sp-10) var(--sp-4) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-md);
+  background: var(--surface) no-repeat; color: var(--ink);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px, 5px 5px;
+}
+select:hover { border-color: var(--ink); }
+select:focus-visible, input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+input[type="checkbox"] { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--accent); cursor: pointer; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 h1, h2, h3 { line-height: 1.2; margin: 0; letter-spacing: -.01em; }
@@ -131,7 +143,7 @@ ul, ol { margin: 0; padding: 0; }
 .brand .mark i:nth-child(4), .brand .mark i:nth-child(8) { background: var(--possible); opacity: .9; }
 .topbar .spacer { flex: 1; }
 .topbar label { display: inline-flex; align-items: center; gap: var(--sp-4); font-size: var(--t-sm); color: var(--muted); }
-.topbar select { padding: var(--sp-3) var(--sp-10) var(--sp-3) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-md); background: var(--surface); color: var(--ink); max-width: 220px; }
+.topbar select { min-height: 36px; padding-top: var(--sp-3); padding-bottom: var(--sp-3); max-width: 220px; }
 .topbar .gen { font-size: var(--t-sm); color: var(--muted); white-space: nowrap; }
 .topbar label.switch select { max-width: 200px; }
 
@@ -177,7 +189,7 @@ ul, ol { margin: 0; padding: 0; }
 .search input:focus { outline: none; }
 .search:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
 .toolbar label.sort { display: inline-flex; align-items: center; gap: var(--sp-4); font-size: var(--t-sm); color: var(--muted); }
-.toolbar select { padding: var(--sp-4) var(--sp-10) var(--sp-4) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-lg); background: var(--surface); }
+.toolbar select { border-radius: var(--r-lg); }
 .btn { display: inline-flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); border: 1px solid var(--edge); border-radius: var(--r-lg); background: var(--surface); font-weight: 600; text-decoration: none; color: var(--ink); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn.quiet { border-color: transparent; background: none; color: var(--accent); padding-left: var(--sp-3); padding-right: var(--sp-3); }
@@ -197,7 +209,6 @@ ul, ol { margin: 0; padding: 0; }
 .facet ul { list-style: none; display: grid; gap: var(--sp-1); margin-top: var(--sp-2); }
 .facet li label { display: flex; align-items: center; gap: var(--sp-4); padding: var(--sp-2) var(--sp-2); border-radius: var(--r-sm); cursor: pointer; }
 .facet li label:hover { background: var(--soft); }
-.facet input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); margin: 0; flex: none; }
 .facet .lbl { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .facet .cnt { font-size: var(--t-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
 .facet li.zero label { color: var(--muted); opacity: .6; }
@@ -399,7 +410,6 @@ main.about { padding-bottom: var(--sp-6); }
 .fit summary { cursor: pointer; font-weight: 600; color: var(--accent); }
 .fit-q { display: flex; flex-wrap: wrap; gap: var(--sp-5) var(--sp-7); margin: var(--sp-5) 0 var(--sp-3); }
 .fit-q label { display: grid; gap: var(--sp-2); font-size: var(--t-sm); color: var(--muted); }
-.fit-q select { padding: var(--sp-4) var(--sp-10) var(--sp-4) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-md); background: var(--surface); color: var(--ink); max-width: 100%; }
 
 /* ---------- stars and the watchlist (13.9) ---------- */
 .card .star { position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border: 0; background: none; font-size: var(--t-2xl); line-height: 1; color: var(--muted); border-radius: 999px; }
@@ -654,7 +664,7 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .hover { margin-top: var(--sp-6); min-height: 2.6em; padding: var(--sp-5) var(--sp-6); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
 .hover b { font-weight: 700; }
 .goto { display: flex; gap: var(--sp-4); align-items: center; flex-wrap: wrap; margin-top: var(--sp-7); }
-.goto select { padding: var(--sp-4) var(--sp-10) var(--sp-4) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-lg); background: var(--surface); min-width: 220px; }
+.goto select { border-radius: var(--r-lg); min-width: 220px; }
 .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-10); align-items: start; }
 
 /* ---------- footer ---------- */
@@ -694,7 +704,7 @@ footer.site code { overflow-wrap: anywhere; }   /* file paths wrap on the smalle
   .toolbar label.sort { display: none; }
   .toolbar .btn { flex: none; }
   .tray-sort { display: flex; align-items: center; gap: var(--sp-4); margin: 0 0 var(--sp-6); font-weight: 600; }
-  .tray-sort select { flex: 1; padding: var(--sp-4) var(--sp-10) var(--sp-4) var(--sp-5); border: 1px solid var(--edge); border-radius: var(--r-lg); background: var(--surface); }
+  .tray-sort select { flex: 1; border-radius: var(--r-lg); }
   .tab { padding: var(--sp-5) var(--sp-5); white-space: nowrap; }
   .tab .n { margin-left: var(--sp-2); }
   .seg { display: none; }
