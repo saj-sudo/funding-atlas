@@ -618,6 +618,9 @@ svg.hist circle.ev-code { stroke: var(--possible) !important; stroke-dasharray: 
 .rec-src { font-size: var(--t-xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .rec-link { font-size: var(--t-sm); }
 .src-note { font-size: var(--t-xs); color: var(--muted); max-width: 80ch; }
+/* a program on no list (2026-11-28, tombstone T1): the notice above the record as last stored */
+.program .gone { margin: var(--sp-4) 0 var(--sp-6); padding: var(--sp-5) var(--sp-6); border: 1.5px solid var(--edge); background: var(--soft); border-radius: var(--r-md); font-size: var(--t-sm); max-width: 72ch; }
+.program .gone + h1 { color: var(--muted); }
 .edition-banner { margin: var(--sp-7) 0 0; padding: var(--sp-5) var(--sp-6); background: var(--soft); border: 1px solid var(--edge); border-radius: var(--r-md); font-size: var(--t-sm); max-width: 80ch; }
 @container (max-width: 560px) {
   .atlas-wrap { grid-template-columns: 1fr; gap: var(--sp-5); }

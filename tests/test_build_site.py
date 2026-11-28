@@ -658,6 +658,41 @@ def test_mark_c1_everywhere(conn, tmp_path):
     assert ".brand .mark i" not in css
 
 
+def test_a_program_that_leaves_every_list_keeps_a_tombstone(tmp_path):
+    """2026-11-28 (Saj: tombstone T1, kept always): a program that had a page and is on no list keeps its page, saying
+    when and how it left, with its status as last listed; noindex, out of the sitemap, its feed linked to it. A listed
+    program is untouched. Departures before 2026-11-26, when pages began, get none: they never had a page."""
+    c = db.connect(":memory:")
+    db.apply_schema(c)
+    c.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('grants_gov', ?, ?, 'ok')", (T1, T1))
+    c.execute("INSERT INTO run (connector, started_at, finished_at, status) VALUES ('md_dhcd', ?, ?, 'ok')", (T1, T1))
+    upsert(c, 1, FIRST_RUN, T1)
+    gone_at = max(NOW - timedelta(days=1), datetime(2026, 11, 27, tzinfo=UTC)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    pid = c.execute("SELECT id FROM program WHERE name = 'Wildlife Crossings Pilot'").fetchone()[0]
+    c.execute("UPDATE program SET status = 'unknown' WHERE id = ?", (pid,))
+    c.execute("INSERT INTO program_change (run_id, program_id, change_type, changed_fields, changed_at) VALUES (1, ?, 'missing', ?, ?)",
+              (pid, json.dumps({"status": {"old": "open", "new": "unknown"}}), gone_at))
+    rows = build_site.load_gone(c)
+    assert [r["name"] for r in rows] == ["Wildlife Crossings Pilot"] and rows[0]["status_before"] == "open"
+    out = build_site.write(c, tmp_path / "site", generated_at=GEN)[0]
+    slug = c.execute("SELECT slug FROM program WHERE id = ?", (pid,)).fetchone()[0]
+    page = (out / build_site.program_page_path(slug)).read_text(encoding="utf-8")
+    assert '<p class="gone" role="note">No longer listed since ' in page and "when its status was open." in page
+    assert '<meta name="robots" content="noindex">' in page and "it may no longer work" in page and "btn primary src" not in page
+    data = json.loads(re.search(r'<script type="application/json" id="data">(.*?)</script>', page, re.S).group(1))
+    assert data["tombstone"]["why"] == "missing" and data["tombstone"]["status_before"] == "open"
+    assert build_site.program_url(slug) not in (out / "sitemap.xml").read_text(encoding="utf-8")
+    feed = (out / build_site.program_feed_path(slug)).read_text(encoding="utf-8")
+    assert build_site.program_url(slug) in feed                               # the feed points at the tombstone page
+    listed = (out / build_site.program_page_path(c.execute("SELECT slug FROM program WHERE name = 'Main Street Facades'").fetchone()[0])).read_text(encoding="utf-8")
+    assert 'class="gone"' not in listed and "noindex" not in listed
+    # the same departure before pages began gets no tombstone
+    c.execute("UPDATE program_change SET changed_at = '2026-11-20T00:00:00Z' WHERE program_id = ? AND change_type = 'missing'", (pid,))
+    assert build_site.load_gone(c) == []
+    js = (out / "app.js").read_text(encoding="utf-8")
+    assert "if (DATA.tombstone) { p.gone = true;" in js and "Status when last listed" in js
+
+
 def test_embed_json_is_script_safe():
     text = build_site.embed_json({"a": "</script><b> "})
     assert "</" not in text and "\\u2028" in text

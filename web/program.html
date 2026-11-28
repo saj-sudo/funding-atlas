@@ -18,6 +18,7 @@
 <main id="main" class="wrap">
   <article class="detail program">
     <nav class="crumb" aria-label="Breadcrumb">{{CRUMB}}</nav>
+    {{TOMBSTONE}}
     <h1 id="detail-title">{{NAME}}</h1>
     <!-- What the page says before the script runs, and without it: stored fields only. app.js replaces it with the
          full record, drawn by the same code as the state page's panel. -->
@@ -27,7 +28,7 @@
       <noscript><p class="muted">The rest of this record is drawn by a script. The agency's own page is linked below.</p></noscript>
     </div>
     <div class="actions">
-      <a class="btn primary src" id="detail-source" href="{{SOURCE_URL}}" rel="noopener">Apply or read more on the agency's page</a>
+      <a class="{{SOURCE_CLASS}}" id="detail-source" href="{{SOURCE_URL}}" rel="noopener">{{SOURCE_LABEL}}</a>
       <button class="btn star-btn" id="detail-star" type="button" aria-pressed="false">Star</button>
       <button class="btn" id="detail-copy" type="button">Copy link</button>
       <span class="copied" id="detail-copied" role="status" hidden>Copied</span>

@@ -290,6 +290,36 @@ def load_unstated(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_unstated")]
 
 
+def load_gone(conn: sqlite3.Connection) -> list[dict[str, Any]]:
+    """Programs that had a page and are on no list now (migration 0012): each keeps a tombstone page."""
+    return [dict(r) for r in conn.execute("SELECT * FROM v_navigator_gone")]
+
+
+STATUS_WORD = {"open": "open", "forecasted": "announced", "closed": "closed", "exhausted": "out of funds", "unknown": "not confirmed"}
+
+
+def tombstone_for(row: dict[str, Any], today: date) -> dict[str, Any]:
+    """Why a program is on no list, in one sentence from stored data only (2026-11-28, Saj: T1, kept always)."""
+    day = lambda iso: edition_label(iso[:10])  # noqa: E731
+    if row["last_change"] == "missing":
+        why = "missing"
+        text = (f"No longer listed since {day(row['left_at'])}. The agency's list stopped showing this program that day"
+                + (f", when its status was {STATUS_WORD.get(row['status_before'], row['status_before'])}." if row["status_before"] else "."))
+    elif row["last_change"] == "changed" and row["last_status_old"] in ("open", "forecasted") and row["last_status_new"]:
+        why = "status"
+        text = (f"No longer listed since {day(row['last_change_at'])}, when the agency's page changed its status from "
+                f"{STATUS_WORD.get(row['last_status_old'])} to {STATUS_WORD.get(row['last_status_new'], row['last_status_new'])}.")
+    elif row["status"] in ("open", "forecasted") and row["closes_at"] and row["closes_at"][:10] < today.isoformat():
+        why = "deadline"
+        text = f"No longer listed: its stated deadline, {day(row['closes_at'])}, has passed."
+    else:
+        why = "aged"
+        text = (f"This round closed on {day(row['closes_at'])} and is no longer on the site's lists, which keep a closed round "
+                "for 15 months after its deadline." if row["closes_at"] else "No longer on the site's lists.")
+    return {"why": why, "text": text + " Below is the record as the registry last stored it. If it is listed again, this "
+            "page returns to normal.", "status_before": row["status_before"] if why == "missing" else row["last_status_old"] if why == "status" else None}
+
+
 HISTORY_FIELDS = ("status", "closes_at", "opens_at")
 
 
@@ -923,12 +953,14 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
     programs = [shape_program(r, run_info, today) for r in load_programs(conn)]
     between = [shape_program(r, run_info, today) for r in load_between(conn)]
     unstated = [shape_program(r, run_info, today) for r in load_unstated(conn)]
+    gone_rows = load_gone(conn)
+    gone = [shape_program(r, run_info, today) for r in gone_rows]
     changes = load_changes(conn)
     coverage = load_coverage(conn)
     connectors = state_connectors(conn)
-    history = load_history(conn, {p["id"] for p in programs + between + unstated})
+    history = load_history(conn, {p["id"] for p in programs + between + unstated + gone})
     stats = load_stats(conn)
-    for p in programs + between + unstated:
+    for p in programs + between + unstated + gone:
         p["history"] = history.get(p["id"], [])
     unknown = sorted({p["state"] for p in programs if p["state"] and p["state"] not in STATE_NAME})
     if unknown:
@@ -957,7 +989,9 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         meta.setdefault(c["program_id"], {"slug": c["slug"], "name": c["name"], "state": c["state"], "source_url": c["source_url"]})
     for p in programs + between + unstated:
         meta[p["id"]] = {"slug": p["slug"], "name": p["name"], "state": p["state"], "source_url": p["source_url"]}
-    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all) for pid, m in meta.items()]
+    # a program on no list but with a tombstone page (2026-11-28) links its feed to that page, like a listed one
+    tomb_ids = {p["id"] for p in gone}
+    program_feeds = [dict(m, entries=own.get(pid, []), listed=pid in listed_all or pid in tomb_ids) for pid, m in meta.items()]
     about = about_payload(
         programs=programs, stats=stats, generated_at=generated_at, connectors=connectors, run_info=run_info, coverage=coverage,
         cards=load_cards(conn, {p["slug"] for p in programs + between + unstated}),
@@ -969,6 +1003,11 @@ def build(conn: sqlite3.Connection, *, generated_at: str | None = None) -> dict[
         if p["id"] not in seen:
             seen.add(p["id"])
             program_pages.append(program_payload(p, run_info, generated_at))
+    # Tombstones: a page for each program that had one and is on no list now (2026-11-28, Saj: T1, kept always)
+    for p, row in zip(gone, gone_rows, strict=True):
+        if p["id"] not in seen:
+            seen.add(p["id"])
+            program_pages.append(dict(program_payload(p, run_info, generated_at), tombstone=tombstone_for(row, today)))
     return {"index": index, "states": states, "feed": feed, "program_feeds": program_feeds, "about": about,
             "program_pages": program_pages}
 
@@ -1145,16 +1184,19 @@ def program_payload(p: dict[str, Any], run_info: dict[str, dict[str, str | None]
 
 
 def render_program(data: dict[str, Any], assets: str, template: str) -> str:
-    p, state = data["program"], data["state"]
+    p, state, tomb = data["program"], data["state"], data.get("tombstone")
     esc = lambda v: html.escape(str(v or ""), quote=True)  # noqa: E731
     where = state["name"] if state else "Federal"
     agency = p["agency"] or "Agency not stated"
     crumb = '<a href="../../">All states</a> <span aria-hidden="true">›</span> ' + (
         f'<a href="../../{state["code"].lower()}/">{esc(state["name"])}</a>' if state
         else "<span>Federal notice, listed on every state page</span>")
-    return fill(
+    page = fill(
         template,
-        TITLE=esc(f"{p['name']} · {where} · Funding Atlas"),
+        TOMBSTONE=f'<p class="gone" role="note">{esc(tomb["text"])}</p>' if tomb else "",
+        SOURCE_CLASS="btn src" if tomb else "btn primary src",
+        SOURCE_LABEL="The agency's page (it may no longer work)" if tomb else "Apply or read more on the agency's page",
+        TITLE=esc(f"{p['name']} · {where} · " + ("No longer listed · " if tomb else "") + "Funding Atlas"),
         DESCRIPTION=esc(f"{status_sentence(p)} {agency}, {where}. Read daily from the agency's own page; what it does not state is left blank."),
         ROOT="../../",
         URL=program_url(p["slug"]),
@@ -1171,6 +1213,8 @@ def render_program(data: dict[str, Any], assets: str, template: str) -> str:
         GENERATED=data["generated_at"][:10],
         DATA=embed_json(data),
     )
+    # a tombstone stays for the links that point at it, not for search: it asks not to be indexed
+    return page.replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"', 1) if tomb else page
 
 
 def render_sitemap(urls: list[str], day: str) -> str:
@@ -1251,7 +1295,8 @@ def write(
         path = out / program_page_path(data["program"]["slug"])
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(render_program(data, assets, program_tpl), encoding="utf-8")
-        urls.append(program_url(data["program"]["slug"]))
+        if not data.get("tombstone"):                  # a tombstone stays for its links, not for search
+            urls.append(program_url(data["program"]["slug"]))
     (out / "sitemap.xml").write_text(render_sitemap(urls, generated_at[:10]), encoding="utf-8")
     return out, counts
 

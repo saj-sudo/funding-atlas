@@ -516,7 +516,8 @@
     var who = p.applicant_types.length ? h(p.applicant_types.map(words).join(', ')) + ' <span class="muted small">(read from the source\'s text)</span>' : NOT_PUBLISHED;
     var answers =
       '<dl class="answers">' +
-      '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>' +
+      (p.gone ? '<div><dt>Status when last listed</dt><dd><b>' + h(statusLabel(p.status)) + '.</b></dd></div>'
+        : '<div><dt>Is it open?</dt><dd><b>' + h(statusLabel(p.status)) + '.</b> ' + h(STATUS_GLOSS[p.status] || '') + '</dd></div>') +
       '<div><dt>When does it close?</dt><dd class="' + (isSoon(p) ? 'soon' : '') + '">' + closes + '</dd></div>' +
       '<div><dt>How much?</dt><dd>' + (amount ? h(amount) : NOT_PUBLISHED) + '</dd></div>' +
       '<div><dt>Who can apply?</dt><dd>' + who + '</dd></div>' +
@@ -599,6 +600,8 @@
   // A listed program's own page (2026-11-26): the same record the state page's panel shows, at an address of its own.
   function programPage() {
     var p = DATA.program;
+    // a tombstone (2026-11-28): the record as last stored, its status the one it had when it was last listed
+    if (DATA.tombstone) { p.gone = true; if (DATA.tombstone.status_before) p.status = DATA.tombstone.status_before; }
     SOURCES = DATA.sources || [];
     el('detail-title').textContent = programName(p);
     el('detail-body').innerHTML = detailHtml(p);
