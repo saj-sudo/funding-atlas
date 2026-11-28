@@ -822,6 +822,18 @@ def fill(template: str, **slots: str) -> str:
 FEDERAL_JS = "federal.js"
 
 
+DARK_SLOT = '    /* DARK TOKENS: scripts/build_site.py copies the :root[data-theme="dark"] block below in here when it writes app.css */\n'
+
+
+def dark_tokens_once(css: str) -> str:
+    """The dark tokens are written once in web/app.css, under :root[data-theme="dark"] (2026-11-27); the dark
+    preference's rule gets the same declarations here, so the switch and the preference cannot drift."""
+    m = re.search(r'^:root\[data-theme="dark"\] \{\n(.*?)^\}', css, re.S | re.M)
+    if not m or DARK_SLOT not in css:
+        raise ValueError("app.css: the dark token block or its slot is missing")
+    return css.replace(DARK_SLOT, "".join("  " + line + "\n" for line in m.group(1).splitlines()), 1)
+
+
 def asset_version(css: str, js: str) -> str:
     """The cache key on app.css and app.js: it changes when either file's text does, not on every daily build."""
     return hashlib.sha256((css + "\0" + js).encode("utf-8")).hexdigest()[:10]
@@ -1164,7 +1176,7 @@ def write(
     """Build the site into `out` (wiped first). Returns (out, {state code: program rows}). Each frozen edition in
     `editions_dir` is drawn at about/edition/<date>/ and its JSON published at editions/<date>.json."""
     site = build(conn, generated_at=generated_at)
-    css = (WEB / "app.css").read_text(encoding="utf-8")
+    css = dark_tokens_once((WEB / "app.css").read_text(encoding="utf-8"))
     js = (WEB / "app.js").read_text(encoding="utf-8")
     assets = asset_version(css, js)
     head_tpl = re.sub(r"\A<!--.*?-->\n", "", (WEB / "head.html").read_text(encoding="utf-8"), flags=re.S)

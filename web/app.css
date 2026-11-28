@@ -47,40 +47,11 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1420;
-    --surface: #161d2c;
-    --ink: #e6eaf4;
-    --muted: #a3adc4;
-    --line: #2a3347;
-    --soft: #1c2436;
-    --hatch: #55617c;
-    --edge: #6f7a94;
-    --accent: #9db5ff;
-    --accent-ink: #0d1733;
-    --accent-soft: #1d2945;
-    --likely: #7fd3a0;
-    --likely-soft: #173324;
-    --possible: #f0c06a;
-    --possible-soft: #33291a;
-    --closing: #ff8f85;
-    --closing-soft: #3a1f1d;
-    --open: #7fd3a0;
-    --forecast: #c2adff;
-    --s-fed: #3987e5;
-    --s-state: #d95926;
-    --topic-env: #8fd18a;
-    --topic-inf: #f0b46a;
-    --topic-com: #e79cc4;
-    --caution: #ffd23a;
-    --caution-ink: #0b0d10;
-    --o-ink: #0d1733;
-    --o1: #4a2715; --o2: #68331a; --o3: #86401c; --o4: #9d491d; --o5: #e0743d; --o6: #f29c6f; --o7: #f9c6a8;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
-    color-scheme: dark;
+    /* DARK TOKENS: scripts/build_site.py copies the :root[data-theme="dark"] block below in here when it writes app.css */
   }
 }
-/* The theme switch (13.24) sets data-theme on <html>; a dark choice gets the same tokens as the dark preference above.
-   Keep the two blocks identical: tests/test_build_site.py compares them. */
+/* The dark tokens, written once (2026-11-27). The theme switch (13.24) sets data-theme on <html>; the dark preference
+   above gets this same block, copied in by the build, so the two cannot drift (tests/test_build_site.py compares them). */
 :root[data-theme="dark"] {
   --bg: #0f1420;
   --surface: #161d2c;

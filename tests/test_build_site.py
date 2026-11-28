@@ -650,7 +650,9 @@ def test_write_site(conn, tmp_path):
     # same origin only (2026-11-26): the stylesheet and script are files beside the pages, shared and cached; a page
     # loads those, federal.js and the two fonts, and nothing from anywhere else
     css, js = (out / "app.css").read_text(encoding="utf-8"), (out / "app.js").read_text(encoding="utf-8")
-    assert css == (build_site.WEB / "app.css").read_text(encoding="utf-8") and js == (build_site.WEB / "app.js").read_text(encoding="utf-8")
+    # the stylesheet is the source with its dark tokens copied into the dark preference's rule (2026-11-27)
+    assert css == build_site.dark_tokens_once((build_site.WEB / "app.css").read_text(encoding="utf-8"))
+    assert js == (build_site.WEB / "app.js").read_text(encoding="utf-8") and "DARK TOKENS" not in css
     key = build_site.asset_version(css, js)
     assert key != build_site.asset_version(css + " ", js) and key != build_site.asset_version(css, js + " ")
     assert re.findall(r'<script src="([^"]+)"', page) == ["../federal.js?v=" + GEN[:10], "../app.js?v=" + key]
